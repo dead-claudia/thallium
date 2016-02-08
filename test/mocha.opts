@@ -1,0 +1,4 @@
+--ui tdd
+--reporter dot
+--require ./test-util/env.js
+--recursive

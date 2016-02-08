@@ -1,0 +1,26 @@
+Usage: testiphile [options...] [--] [file globs...]
+
+Options:
+
+-h, --help
+    Show this help prompt.
+
+-hh, --help-detailed
+    Show a more detailed help prompt, suitable for a console pager like `less`.
+
+-c [file], --config [file]
+    Use a custom config file.
+
+-r [extension], --register [extension]
+    Register a particular extension, optionally with a module.
+
+-m [module], --module [module]
+    Use this module to represent Testiphile
+
+--
+    Stop parsing options.
+
+All unknown options are passed directly to Node. For more details on each
+option, run the following command:
+
+    testiphile --help-detailed

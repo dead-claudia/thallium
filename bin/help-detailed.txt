@@ -1,0 +1,56 @@
+Usage: testiphile [options...] [--] [file globs...]
+
+Options:
+
+-h, --help
+    Show a simpler help prompt.
+
+-hh, --help-detailed
+    Show this help prompt, suitable for a console pager like `less`.
+
+-c [file], --config [file]
+    Use a custom config file. By default, this is inferred from the first file
+    glob, for example `test/.config.js` from a glob of `test/**`. If the
+    extension does not match anything, this will first try to infer it from the
+    glob before giving up.
+
+    Any extension understood by node-interpret will be automagically recognized
+    and registered, including Babel, CoffeeScript, and many others. Do note that
+    if multiple config files can match this option, this will only try to load
+    the first one it can find without loading, and it's unspecified which it
+    will load other than that it prefers a `.js` file if this option is not
+    passed.
+
+    If this option is passed multiple times, the last one takes precedence.
+
+-r [extension], --register [extension]
+    Register a particular extension, optionally with a module. This may be
+    repeated as many times as desired. This accepts the following syntax:
+
+    ext, .ext
+        Register `ext`, inferring the module from node-interpret.
+
+    ext:module, .ext:module
+        Register `ext`, requiring from `module`.
+
+    Note that if the same extension is passed multiple times, the last takes
+    precedence.
+
+-m [module], --module [module]
+    Use this module to represent Testiphile instead of the one installed in the
+    closest node_modules to the config. This is resolved to the current working
+    directory, and it must be a full path to the module.
+
+    If this option is passed multiple times, the last one takes precedence.
+
+--
+    Stop parsing options past this point. Treat any further argument as a file.
+
+All options are optional, and all unknown options are passed directly to Node.
+If no file globs are given, `test/**/*.{extname of config found}` is used as the
+default glob, with `test/.config.{extname}` being the default config, where the
+`extname` is inferred.
+
+This tries to be sane by attempting to infer the general intent as much as
+possible over some magical, over-specified algorithm, so it's much easier to set
+up and run.
