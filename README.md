@@ -25,9 +25,10 @@ To be completed. See the source, tests, and TypeScript definition file for now.
 
 1. Introduce timeouts to the async tests.
 2. Finish + test the CLI. It's still a work in progress, mostly in testing.
-3. Remove Promise dependency, but still keep the stack down. This is mainly for compatibility reasons.
-4. Self-host this module's tests like what Mocha does.
-5. Write the documentation for this project, including the many core assertions.
+3. Remove Promise dependency, but still keep the stack down between tests.
+4. Add support for coroutines (Promise optional) with a duck test.
+5. Self-host this module's tests like what Mocha does.
+6. Write the documentation for this project, including the many core assertions.
 
 ## License
 
