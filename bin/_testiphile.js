@@ -324,6 +324,9 @@ function parseResult(args, set, testiphile, result) {
     return {result: result != null ? result : {}, files: files, t: t}
 }
 
+// TODO: optionally run tests in parallel. This will require an added internal
+// reporter to do the messaging.
+
 function loadTests(result, bail, next) {
     var callback = makeNext(bail, next)
     gs.createStream(result.files, {allowEmpty: true})

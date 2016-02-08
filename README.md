@@ -1,6 +1,6 @@
 # Testiphile
 
-- tes ti phil'
+- **tes ti phil'**
 
   1. One who loves tests and/or testing.
 
@@ -15,18 +15,19 @@ npm install --save-dev isiahmeadows/testiphile
 
 ## Usage
 
-To be written. This will probably change with the CLI.
+To be completed. This will probably change with the CLI.
 
 ## API
 
-To be completed. See the tests and TypeScript definition file for now.
+To be completed. See the source, tests, and TypeScript definition file for now.
 
 ## Remaining work
 
-1. Finish + test the CLI. It's still a work in progress, mostly in testing.
-2. Remove Promise dependency, but still keep the stack down. This is mainly for compatibility reasons.
-3. Self-host this module's tests like what Mocha does.
-4. Write the documentation for this project, including the many core assertions.
+1. Introduce timeouts to the async tests.
+2. Finish + test the CLI. It's still a work in progress, mostly in testing.
+3. Remove Promise dependency, but still keep the stack down. This is mainly for compatibility reasons.
+4. Self-host this module's tests like what Mocha does.
+5. Write the documentation for this project, including the many core assertions.
 
 ## License
 
