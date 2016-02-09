@@ -8,6 +8,13 @@
     "lint": "eslint .",
     "test": "npm run lint && mocha"
   },
+  "files": [
+    "./assertions.js",
+    "./core.js",
+    "./index.js",
+    "./lib",
+    "./bin"
+  ],
   "keywords": [
     "test",
     "testing",
