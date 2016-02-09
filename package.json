@@ -6,8 +6,7 @@
   "main": "index.js",
   "scripts": {
     "lint": "eslint .",
-    "test": "npm run lint && mocha",
-    "ci:test": "nvm exec stable eslint . && mocha"
+    "test": "npm run lint && mocha"
   },
   "keywords": [
     "test",
@@ -15,10 +14,6 @@
     "tdd",
     "testiphile"
   ],
-  "bin": {
-    "testiphile": "./bin/testiphile.js",
-    "_testiphile": "./bin/_testiphile.js"
-  },
   "author": "Isiah Meadows",
   "license": "ISC",
   "devDependencies": {
@@ -28,7 +23,6 @@
     "mocha": "^2.3.4"
   },
   "dependencies": {
-    "any-promise": "^1.1.0",
     "glob-parent": "^2.0.0",
     "glob-stream": "^5.3.1",
     "interpret": "^1.0.0",
