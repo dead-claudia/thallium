@@ -2,7 +2,7 @@
 /* eslint-env node */
 "use strict"
 
-process.title = "testiphile"
+process.title = "techtonic"
 
 var cp = require("child_process")
 var path = require("path")
@@ -51,7 +51,7 @@ while (i < process.argv.length) rest.push(process.argv[i++])
 
 var res = cp.spawnSync("node", [].concat.apply([
     node,
-    [path.resolve(__dirname, "_testiphile.js")],
+    [path.resolve(__dirname, "_techtonic.js")],
     args.config == null ? [] : ["--config", args.config],
     args.module == null ? [] : ["--module", args.module],
     args.cwd == null ? [] : ["--cwd", args.cwd],

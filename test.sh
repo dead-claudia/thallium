@@ -10,9 +10,9 @@
 # nodist/nvm-windows/nvmw/etc., or if you want to add support for FreeBSD, which
 # won't likely gain support anytime soon.
 
-nvm exec node ./node_modules/.bin/eslint $(dirname $0) || exit $?
+eslint $(dirname $0) || exit $?
 
-for i in 0.8 0.10 0.12 1 2 3 4 5; do
+for i in 0.10 0.12 1 2 3 4 5; do
     nvm which $i > /dev/null 2>&1 || nvm install $i || exit $?
     nvm exec $i mocha $@ || exit $?
 done

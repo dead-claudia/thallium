@@ -1,4 +1,4 @@
-Usage: testiphile [options...] [--] [file globs...]
+Usage: techtonic [options...] [--] [file globs...]
 
 Options:
 

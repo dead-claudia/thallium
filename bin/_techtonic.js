@@ -6,7 +6,7 @@ if (require.main !== module) {
     throw new Error("This is not a module!")
 }
 
-process.title = "testiphile"
+process.title = "techtonic"
 
 var fs = require("fs")
 var path = require("path")
@@ -28,11 +28,11 @@ function main() {
     var data = readConfig(opts.args, opts.set)
     fixExtension(data, opts.args, opts.set)
 
-    var testiphile = loadRequires(data)
+    var techtonic = loadRequires(data)
     var bail = finish.bind(null, oldCwd)
 
     return requireConfig(data, bail, function (result) {
-        result = parseResult(opts.args, opts.set, testiphile, result)
+        result = parseResult(opts.args, opts.set, techtonic, result)
 
         // Impure fixed-point combinator to clean up a *lot* of repetition.
         ;(function xs(fs) {
@@ -270,7 +270,7 @@ function fixExtension(args, set, data) {
 
 function loadRequires(data) {
     var opts = {basedir: path.dirname(data.config)}
-    var testiphile = resolve.sync("testiphile", opts)
+    var techtonic = resolve.sync("techtonic", opts)
 
     for (var i = 0; i < data.requires.length; i++) {
         var req = data.requires[i]
@@ -281,7 +281,7 @@ function loadRequires(data) {
         /* eslint-enable global-require */
     }
 
-    return testiphile
+    return techtonic
 }
 
 function resolveCallback(func, inst, default_, bail, next) {
@@ -308,17 +308,17 @@ function requireConfig(data, bail, next) {
 }
 
 // The null checks ensure that the correct default is used.
-function parseResult(args, set, testiphile, result) {
+function parseResult(args, set, techtonic, result) {
     var files = result != null && !set.files && result.files != null
         ? result.files
         : args.files
 
     var mod = result != null && !set.module && result.module != null
         ? result.module
-        : testiphile
+        : techtonic
 
-    var t = result != null && result.testiphile != null
-        ? result.testiphile
+    var t = result != null && result.techtonic != null
+        ? result.techtonic
         : require(mod) // eslint-disable-line global-require
 
     return {result: result != null ? result : {}, files: files, t: t}

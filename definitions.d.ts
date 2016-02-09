@@ -1,6 +1,6 @@
 /* tslint:disable */
 
-declare module "testiphile/core" {
+declare module "techtonic/core" {
     interface NestedReporterArray extends Array<NestedReporter> {}
     type NestedReporter = Reporter | NestedReporterArray;
 
@@ -138,8 +138,8 @@ declare module "testiphile/core" {
     }
 }
 
-declare module "testiphile/assertions" {
-    import {Test} from "testiphile/core";
+declare module "techtonic/assertions" {
+    import {Test} from "techtonic/core";
 
     type TypeofValue =
         "boolean" |
@@ -309,8 +309,8 @@ declare module "testiphile/assertions" {
     export default function plugin(t: Test): void;
 }
 
-declare module "testiphile" {
-    import {Test as CoreTest} from "testiphile/core";
+declare module "techtonic" {
+    import {Test as CoreTest} from "techtonic/core";
 
     export {
         AssertionError,
@@ -325,9 +325,9 @@ declare module "testiphile" {
         AsyncDone,
         Plugin,
         AssertionErrorJsonResult,
-    } from "testiphile/core";
+    } from "techtonic/core";
 
-    import {Assertions} from "testiphile/assertions";
+    import {Assertions} from "techtonic/assertions";
 
     export interface Test extends CoreTest, Assertions {}
 
@@ -335,7 +335,7 @@ declare module "testiphile" {
     export default base;
 }
 
-declare module "testiphile/index" {
-    export * from "testiphile";
-    export {default as default} from "testiphile";
+declare module "techtonic/index" {
+    export * from "techtonic";
+    export {default as default} from "techtonic";
 }

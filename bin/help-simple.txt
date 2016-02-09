@@ -1,4 +1,4 @@
-Usage: testiphile [options...] [--] [file globs...]
+Usage: techtonic [options...] [--] [file globs...]
 
 Options:
 
@@ -23,4 +23,4 @@ Options:
 All unknown options are passed directly to Node. For more details on each
 option, run the following command:
 
-    testiphile --help-detailed
+    techtonic --help-detailed

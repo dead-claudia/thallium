@@ -1,23 +1,20 @@
-# Testiphile
+# Techtonic
 
-[![Build Status](https://travis-ci.org/isiahmeadows/testiphile.svg?branch=master)](https://travis-ci.org/isiahmeadows/testiphile) [![Join the chat at https://gitter.im/isiahmeadows/testiphile](https://badges.gitter.im/isiahmeadows/testiphile.svg)](https://gitter.im/isiahmeadows/testiphile?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+[![Build Status](https://travis-ci.org/isiahmeadows/techtonic.svg?branch=master)](https://travis-ci.org/isiahmeadows/techtonic) [![Join the chat at https://gitter.im/isiahmeadows/techtonic](https://badges.gitter.im/isiahmeadows/techtonic.svg)](https://gitter.im/isiahmeadows/techtonic?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
-- **tes ti phil'**
+A simple, unopinionated, modular test framework meant to simplify your tests. It supports Node 0.10 and later, and browser support is also planned.
 
-  1. One who loves tests and/or testing.
-
-*Yep. I came up with that myself. I doubt you'll find that in a dictionary
-anywhere.*
+*Note that this is a huge work in progress.*
 
 ## Installation
 
-```js
-npm install --save-dev isiahmeadows/testiphile
+```
+npm install --save-dev isiahmeadows/techtonic
 ```
 
 ## Usage
 
-To be completed. This will probably change with the CLI, but for now, you can look at the tests.
+To be completed. This is waiting on the completion of the CLI, but for now, you can look at the tests.
 
 ## API
 
