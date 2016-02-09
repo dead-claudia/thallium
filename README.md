@@ -9,7 +9,7 @@ A simple, unopinionated, modular test framework meant to simplify your tests. It
 ## Installation
 
 ```
-npm install --save-dev isiahmeadows/techtonic
+npm install --save-dev techtonic
 ```
 
 ## Usage

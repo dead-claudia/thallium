@@ -11,6 +11,7 @@
     "./assertions.js",
     "./core.js",
     "./index.js",
+    "./definitions.d.ts",
     "./lib",
     "./bin"
   ],
@@ -23,7 +24,7 @@
   "browser": {
     "./lib/timers.js": "./lib/browser-timers.js"
   },
-  "author": "Isiah Meadows",
+  "author": "Isiah Meadows <me@isiahmeadows.com>",
   "license": "ISC",
   "devDependencies": {
     "bluebird": "^3.2.2",
