@@ -1,6 +1,6 @@
 # Testiphile
 
-[![Join the chat at https://gitter.im/isiahmeadows/testiphile](https://badges.gitter.im/isiahmeadows/testiphile.svg)](https://gitter.im/isiahmeadows/testiphile?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+[![Build Status](https://travis-ci.org/isiahmeadows/testiphile.svg?branch=master)](https://travis-ci.org/isiahmeadows/testiphile) [![Join the chat at https://gitter.im/isiahmeadows/testiphile](https://badges.gitter.im/isiahmeadows/testiphile.svg)](https://gitter.im/isiahmeadows/testiphile?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 - **tes ti phil'**
 
