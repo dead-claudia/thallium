@@ -3,8 +3,8 @@
 process.env.NODE_ENV = "development"
 
 // Polyfill the promise
-if (typeof Promise === "undefined") {
+if (typeof Promise !== "function") {
     /* eslint-disable global-require */
-    global.Promise = require("es6-promise")
+    global.Promise = require("bluebird")
     /* eslint-enable global-require */
 }

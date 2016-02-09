@@ -22,7 +22,7 @@
   "author": "Isiah Meadows",
   "license": "ISC",
   "devDependencies": {
-    "es6-promise": "^3.0.2",
+    "bluebird": "^3.2.2",
     "eslint": "^1.10.3",
     "eslint-config-isiahmeadows": "0.0.2",
     "mocha": "^2.3.4"

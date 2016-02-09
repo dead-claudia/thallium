@@ -32,6 +32,13 @@ define("assert", function (test, message) {
     }
 })
 
+define("fail", function (message) {
+    return {
+        test: false,
+        message: (message ? message + "" : "").replace(/(\{\w+\})/g, "\\$1"),
+    }
+})
+
 /**
  * These makes many of the common operators much easier to do.
  */
@@ -147,12 +154,12 @@ binary("looseEqual", util.looseIs, [
     "Expected {actual} to not loosely equal {expected}",
 ])
 
-binary("deepEqual", util.deepEqualStrict, [
+binary("deepEqual", util.deepEqual, [
     "Expected {actual} to deeply equal {expected}",
     "Expected {actual} to not deeply equal {expected}",
 ])
 
-binary("looseDeepEqual", util.deepEqual, [
+binary("looseDeepEqual", util.looseDeepEqual, [
     "Expected {actual} to loosely equal {expected}",
     "Expected {actual} to not loosely equal {expected}",
 ])
@@ -321,21 +328,6 @@ define("notLooseHasKey", function (object, key, value) {
     }
 })
 
-function tryMatch(matcher, e) {
-    if (typeof matcher === "string") return e.message === matcher
-
-    if (toString.call(matcher) === "[object RegExp]") {
-        return matcher.test(e.message)
-    }
-
-    // Don't accept objects yet.
-    if (typeof matcher !== "function") {
-        throw new TypeError("Unexpected matcher type: " + typeof matcher)
-    }
-
-    return !!matcher(e)
-}
-
 function getName(func) {
     if (func.name != null) return func.name || "<anonymous>"
     if (func.displayName != null) return func.displayName || "<anonymous>"
@@ -359,7 +351,7 @@ define("throws", function (func, Type) {
     }
 })
 
-define("doesNotThrow", function (func, Type) {
+define("notThrows", function (func, Type) {
     var test = true
     try {
         func()
@@ -376,6 +368,21 @@ define("doesNotThrow", function (func, Type) {
     }
 })
 
+function tryMatch(matcher, e) {
+    if (typeof matcher === "string") return e.message === matcher
+
+    if (toString.call(matcher) === "[object RegExp]") {
+        return matcher.test(e.message)
+    }
+
+    // Don't accept objects yet.
+    if (typeof matcher !== "function") {
+        throw new TypeError("Unexpected matcher type: " + typeof matcher)
+    }
+
+    return !!matcher(e)
+}
+
 define("throwsMatch", function (func, matcher) {
     var test = false
     try {
@@ -387,11 +394,11 @@ define("throwsMatch", function (func, matcher) {
         test: test,
         expected: matcher,
         func: func,
-        message: "Expected {func} to match {matcher}",
+        message: "Expected {func} to match {expected}",
     }
 })
 
-define("doesNotThrowMatch", function (func, matcher) {
+define("notThrowsMatch", function (func, matcher) {
     var test = true
     try {
         func()
@@ -402,7 +409,7 @@ define("doesNotThrowMatch", function (func, matcher) {
         test: test,
         expected: matcher,
         func: func,
-        message: "Expected {func} to not match {matcher}",
+        message: "Expected {func} to not match {expected}",
     }
 })
 
@@ -544,13 +551,13 @@ var includesAny = makeIncludes(false, util.strictIs)
 defineIncludes("includes", includesAll, false,
     "Expected {actual} to have all keys in {keys}")
 
-defineIncludes("doesNotIncludeAll", includesAll, true,
+defineIncludes("notIncludesAll", includesAll, true,
     "Expected {actual} to not have all keys in {keys}")
 
 defineIncludes("includesAny", includesAny, false,
     "Expected {actual} to have any key in {keys}")
 
-defineIncludes("doesNotInclude", includesAny, true,
+defineIncludes("notIncludes", includesAny, true,
     "Expected {actual} to not have any key in {keys}")
 
 var includesLooseAll = makeIncludes(true, util.looseIs)
@@ -559,43 +566,43 @@ var includesLooseAny = makeIncludes(false, util.looseIs)
 defineIncludes("includesLoose", includesLooseAll, false,
     "Expected {actual} to loosely have all keys in {keys}")
 
-defineIncludes("doesNotIncludeLooseAll", includesLooseAll, true,
+defineIncludes("notIncludesLooseAll", includesLooseAll, true,
     "Expected {actual} to loosely not have all keys in {keys}")
 
 defineIncludes("includesLooseAny", includesLooseAny, false,
     "Expected {actual} to loosely have any key in {keys}")
 
-defineIncludes("doesNotIncludeLoose", includesLooseAny, true,
+defineIncludes("notIncludesLoose", includesLooseAny, true,
     "Expected {actual} to loosely not have any key in {keys}")
 
-var includesDeepAll = makeIncludes(true, util.deepEqualStrict)
-var includesDeepAny = makeIncludes(false, util.deepEqualStrict)
+var includesDeepAll = makeIncludes(true, util.deepEqual)
+var includesDeepAny = makeIncludes(false, util.deepEqual)
 
 defineIncludes("includesDeep", includesDeepAll, false,
     "Expected {actual} to match all keys in {keys}")
 
-defineIncludes("doesNotIncludeDeepAll", includesDeepAll, true,
+defineIncludes("notIncludesDeepAll", includesDeepAll, true,
     "Expected {actual} to not match all keys in {keys}")
 
 defineIncludes("includesDeepAny", includesDeepAny, false,
     "Expected {actual} to match any key in {keys}")
 
-defineIncludes("doesNotIncludeDeep", includesDeepAny, true,
+defineIncludes("notIncludesDeep", includesDeepAny, true,
     "Expected {actual} to not match any key in {keys}")
 
-var includesLooseDeepAll = makeIncludes(true, util.deepEqual)
-var includesLooseDeepAny = makeIncludes(false, util.deepEqual)
+var includesLooseDeepAll = makeIncludes(true, util.looseDeepEqual)
+var includesLooseDeepAny = makeIncludes(false, util.looseDeepEqual)
 
 defineIncludes("includesLooseDeep", includesLooseDeepAll, false,
     "Expected {actual} to loosely match all keys in {keys}")
 
-defineIncludes("doesNotIncludeLooseDeepAll", includesLooseDeepAll, true,
+defineIncludes("notIncludesLooseDeepAll", includesLooseDeepAll, true,
     "Expected {actual} to loosely not match all keys in {keys}")
 
 defineIncludes("includesLooseDeepAny", includesLooseDeepAny, false,
     "Expected {actual} to loosely match any key in {keys}")
 
-defineIncludes("doesNotIncludeLooseDeep", includesLooseDeepAny, true,
+defineIncludes("notIncludesLooseDeep", includesLooseDeepAny, true,
     "Expected {actual} to loosely not match any key in {keys}")
 
 function isEmpty(object) {
@@ -652,13 +659,13 @@ var hasAnyKeys = hasKeysType(false, util.strictIs)
 makeHasKeys("hasKeys", hasAllKeys, false,
     "Expected {actual} to have all keys in {keys}")
 
-makeHasKeys("doesNotHaveAllKeys", hasAllKeys, true,
+makeHasKeys("notHasAllKeys", hasAllKeys, true,
     "Expected {actual} to not have all keys in {keys}")
 
 makeHasKeys("hasAnyKeys", hasAnyKeys, false,
     "Expected {actual} to have any key in {keys}")
 
-makeHasKeys("doesNotHaveKeys", hasAnyKeys, true,
+makeHasKeys("notHasKeys", hasAnyKeys, true,
     "Expected {actual} to not have any key in {keys}")
 
 var hasLooseAllKeys = hasKeysType(true, util.looseIs)
@@ -667,41 +674,41 @@ var hasLooseAnyKeys = hasKeysType(false, util.looseIs)
 makeHasKeys("hasLooseKeys", hasLooseAllKeys, false,
     "Expected {actual} to loosely have all keys in {keys}")
 
-makeHasKeys("doesNotHaveLooseAllKeys", hasLooseAllKeys, true,
+makeHasKeys("notHasLooseAllKeys", hasLooseAllKeys, true,
     "Expected {actual} to loosely not have all keys in {keys}")
 
 makeHasKeys("hasLooseAnyKeys", hasLooseAnyKeys, false,
     "Expected {actual} to loosely have any key in {keys}")
 
-makeHasKeys("doesNotHaveLooseKeys", hasLooseAnyKeys, true,
+makeHasKeys("notHasLooseKeys", hasLooseAnyKeys, true,
     "Expected {actual} to loosely not have any key in {keys}")
 
-var hasDeepAllKeys = hasKeysType(true, util.deepEqualStrict)
-var hasDeepAnyKeys = hasKeysType(false, util.deepEqualStrict)
+var hasDeepAllKeys = hasKeysType(true, util.deepEqual)
+var hasDeepAnyKeys = hasKeysType(false, util.deepEqual)
 
 makeHasKeys("hasDeepKeys", hasDeepAllKeys, false,
     "Expected {actual} to match all keys in {keys}")
 
-makeHasKeys("doesNotHaveDeepAllKeys", hasDeepAllKeys, true,
+makeHasKeys("notHasDeepAllKeys", hasDeepAllKeys, true,
     "Expected {actual} to not match all keys in {keys}")
 
 makeHasKeys("hasDeepAnyKeys", hasDeepAnyKeys, false,
     "Expected {actual} to match any key in {keys}")
 
-makeHasKeys("doesNotHaveDeepKeys", hasDeepAnyKeys, true,
+makeHasKeys("notHasDeepKeys", hasDeepAnyKeys, true,
     "Expected {actual} to not match any key in {keys}")
 
-var hasLooseDeepAllKeys = hasKeysType(true, util.deepEqual)
-var hasLooseDeepAnyKeys = hasKeysType(false, util.deepEqual)
+var hasLooseDeepAllKeys = hasKeysType(true, util.looseDeepEqual)
+var hasLooseDeepAnyKeys = hasKeysType(false, util.looseDeepEqual)
 
 makeHasKeys("hasLooseDeepKeys", hasLooseDeepAllKeys, false,
     "Expected {actual} to loosely match all keys in {keys}")
 
-makeHasKeys("doesNotHaveLooseDeepAllKeys", hasLooseDeepAllKeys, true,
+makeHasKeys("notHasLooseDeepAllKeys", hasLooseDeepAllKeys, true,
     "Expected {actual} to loosely not match all keys in {keys}")
 
 makeHasKeys("hasLooseDeepAnyKeys", hasLooseDeepAnyKeys, false,
     "Expected {actual} to loosely match any key in {keys}")
 
-makeHasKeys("doesNotHaveLooseDeepKeys", hasLooseDeepAnyKeys, true,
+makeHasKeys("notHasLooseDeepKeys", hasLooseDeepAnyKeys, true,
     "Expected {actual} to loosely not match any key in {keys}")

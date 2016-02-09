@@ -4,7 +4,6 @@
 
 var t = require("../index.js")
 
-// Safe, because this isn't being run with the `exports` interface.
 exports.fail = function (name) {
     var args = []
     for (var i = 1; i < arguments.length; i++) {

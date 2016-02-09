@@ -94,6 +94,24 @@ declare module "testiphile/core" {
     var base: Test;
     export default base;
 
+    type IteratorResult = {
+        done: boolean;
+        value: any;
+    }
+
+    type Iterator = {
+        next(value?: any): IteratorResult;
+        return?(value?: any): IteratorResult;
+        throw?(e?: any): IteratorResult;
+    }
+
+    type Thenable = {
+        then(
+            onresolve: (value: any) => void,
+            onreject: (value: any) => void
+        ): any;
+    }
+
     export interface Test {
         AssertionError: AssertionErrorConstructor;
 
@@ -106,9 +124,11 @@ declare module "testiphile/core" {
         // Define many assertion methods on this instance
         define(methods: {[name: string]: (...args: any[]) => TestResult}): this;
 
-        // Define an async test. This may return a promise or call `done` with
-        // a possible error.
+        // Define an async test. This may return a promise, a generator, or call
+        // `done` with a possible error.
         async(name: string, run: (test: this, done: AsyncDone) => any): this;
+        async(name: string, run: (test: this) => Thenable): this;
+        async(name: string, run: (test: this) => Iterator): this;
 
         // New sync test, assertion shorthand
         test(name: string): this;
@@ -134,7 +154,10 @@ declare module "testiphile/assertions" {
 
     export interface Assertions {
         // basic assertion
-        assert(cond: boolean, message: string): this;
+        assert(cond: boolean, message?: string): this;
+
+        // unconditionally fail with an optional message
+        fail(message?: string): this;
 
         ok(cond: any): this;
         notOk(cond: any): this;
@@ -227,10 +250,10 @@ declare module "testiphile/assertions" {
         // notLooseHasKey(object: {[key: symbol]: any}, key: symbol, value?: any): this;
 
         throws(func: () => any, Type?: new (...args: any[]) => any): this;
-        doesNotThrow(func: () => any, Type?: new (...args: any[]) => any): this;
+        notThrows(func: () => any, Type?: new (...args: any[]) => any): this;
 
         throwsMatch(func: () => any, matcher?: Matcher): this;
-        doesNotThrowMatch(func: () => any, matcher?: Matcher): this;
+        notThrowsMatch(func: () => any, matcher?: Matcher): this;
 
         length(object: {length: number}, length: number): this;
         notLength(object: {length: number}, length: number): this;
@@ -240,44 +263,44 @@ declare module "testiphile/assertions" {
         notCloseTo(actual: number, expected: number, delta: number): this;
 
         includes<T>(array: T[], keys: T | T[]): this;
-        doesNotIncludeAll<T>(array: T[], keys: T | T[]): this;
+        notIncludesAll<T>(array: T[], keys: T | T[]): this;
         includesAny<T>(array: T[], keys: T | T[]): this;
-        doesNotInclude<T>(array: T[], keys: T | T[]): this;
+        notIncludes<T>(array: T[], keys: T | T[]): this;
 
         includesLoose<T>(array: T[], keys: T | T[]): this;
-        doesNotIncludeLooseAll<T>(array: T[], keys: T | T[]): this;
+        notIncludesLooseAll<T>(array: T[], keys: T | T[]): this;
         includesLooseAny<T>(array: T[], keys: T | T[]): this;
-        doesNotIncludeLoose<T>(array: T[], keys: T | T[]): this;
+        notIncludesLoose<T>(array: T[], keys: T | T[]): this;
 
-        includesDeep(array: any[], keys: any): this;
-        doesNotIncludeDeepAll(array: any[], keys: any): this;
-        includesDeepAny(array: any[], keys: any): this;
-        doesNotIncludeDeep(array: any[], keys: any): this;
+        includesDeep<T>(array: T[], keys: T): this;
+        notIncludesDeepAll<T>(array: T[], keys: T): this;
+        includesDeepAny<T>(array: T[], keys: T): this;
+        notIncludesDeep<T>(array: T[], keys: T): this;
 
-        includesLooseDeep(array: any[], keys: any): this;
-        doesNotIncludeLooseDeepAll(array: any[], keys: any): this;
-        includesLooseDeepAny(array: any[], keys: any): this;
-        doesNotIncludeLooseDeep(array: any[], keys: any): this;
+        includesLooseDeep<T>(array: T[], keys: T): this;
+        notIncludesLooseDeepAll<T>(array: T[], keys: T): this;
+        includesLooseDeepAny<T>(array: T[], keys: T): this;
+        notIncludesLooseDeep<T>(array: T[], keys: T): this;
 
         hasKeys(object: any, keys: any): this;
-        doesNotHaveAllKeys(object: any, keys: any): this;
+        notHasAllKeys(object: any, keys: any): this;
         hasAnyKeys(object: any, keys: any): this;
-        doesNotHaveKeys(object: any, keys: any): this;
+        notHasKeys(object: any, keys: any): this;
 
         hasLooseKeys(object: any, keys: any): this;
-        doesNotHaveLooseAllKeys(object: any, keys: any): this;
+        notHasLooseAllKeys(object: any, keys: any): this;
         hasLooseAnyKeys(object: any, keys: any): this;
-        doesNotHaveLooseKeys(object: any, keys: any): this;
+        notHasLooseKeys(object: any, keys: any): this;
 
         hasDeepKeys(object: any, keys: any): this;
-        doesNotHaveDeepAllKeys(object: any, keys: any): this;
+        notHasDeepAllKeys(object: any, keys: any): this;
         hasDeepAnyKeys(object: any, keys: any): this;
-        doesNotHaveDeepKeys(object: any, keys: any): this;
+        notHasDeepKeys(object: any, keys: any): this;
 
         hasLooseDeepKeys(object: any, keys: any): this;
-        doesNotHaveLooseDeepAllKeys(object: any, keys: any): this;
+        notHasLooseDeepAllKeys(object: any, keys: any): this;
         hasLooseDeepAnyKeys(object: any, keys: any): this;
-        doesNotHaveLooseDeepKeys(object: any, keys: any): this;
+        notHasLooseDeepKeys(object: any, keys: any): this;
     }
 
     /**

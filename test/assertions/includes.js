@@ -45,14 +45,14 @@ suite("assertions (includes)", function () {
         })
     })
 
-    suite("t.doesNotIncludeAll()", function () {
+    suite("t.notIncludesAll()", function () {
         test("checks numbers", function () {
-            fail("doesNotIncludeAll", [1, 2, 3, 4, 5], 1)
-            fail("doesNotIncludeAll", [1, 2, 3, 4, 5], [1])
+            fail("notIncludesAll", [1, 2, 3, 4, 5], 1)
+            fail("notIncludesAll", [1, 2, 3, 4, 5], [1])
         })
 
         test("is strict", function () {
-            t.doesNotIncludeAll(["1", 2, 3, 4, 5], [1])
+            t.notIncludesAll(["1", 2, 3, 4, 5], [1])
         })
 
         test("checks objects", function () {
@@ -60,19 +60,19 @@ suite("assertions (includes)", function () {
             var obj2 = {}
             var obj3 = {}
 
-            fail("doesNotIncludeAll", [obj1, 3, obj3, "foo"], [obj1, obj3])
-            fail("doesNotIncludeAll", [obj1, obj2, obj3], [obj1, obj2, obj3])
+            fail("notIncludesAll", [obj1, 3, obj3, "foo"], [obj1, obj3])
+            fail("notIncludesAll", [obj1, obj2, obj3], [obj1, obj2, obj3])
 
-            t.doesNotIncludeAll([obj1, 3, obj3, "foo"], [obj1, obj2, obj3])
+            t.notIncludesAll([obj1, 3, obj3, "foo"], [obj1, obj2, obj3])
         })
 
         test("checks nothing", function () {
-            t.doesNotIncludeAll([{}, {}], [])
+            t.notIncludesAll([{}, {}], [])
         })
 
         test("checks missing numbers", function () {
-            t.doesNotIncludeAll([1, 2, 3, 4, 5], 10)
-            t.doesNotIncludeAll([1, 2, 3, 4, 5], [10])
+            t.notIncludesAll([1, 2, 3, 4, 5], 10)
+            t.notIncludesAll([1, 2, 3, 4, 5], [10])
         })
 
         test("checks missing objects", function () {
@@ -80,9 +80,9 @@ suite("assertions (includes)", function () {
             var obj2 = {}
             var obj3 = {}
 
-            t.doesNotIncludeAll([obj1, obj2, 3, "foo", {}], [{}])
-            t.doesNotIncludeAll([obj1, obj2, obj3], [{}])
-            t.doesNotIncludeAll([obj1, obj2, obj3], [[]])
+            t.notIncludesAll([obj1, obj2, 3, "foo", {}], [{}])
+            t.notIncludesAll([obj1, obj2, obj3], [{}])
+            t.notIncludesAll([obj1, obj2, obj3], [[]])
         })
     })
 
@@ -126,14 +126,14 @@ suite("assertions (includes)", function () {
         })
     })
 
-    suite("t.doesNotInclude()", function () {
+    suite("t.notIncludes()", function () {
         test("checks numbers", function () {
-            fail("doesNotInclude", [1, 2, 3, 4, 5], 1)
-            fail("doesNotInclude", [1, 2, 3, 4, 5], [1])
+            fail("notIncludes", [1, 2, 3, 4, 5], 1)
+            fail("notIncludes", [1, 2, 3, 4, 5], [1])
         })
 
         test("is strict", function () {
-            t.doesNotInclude(["1", 2, 3, 4, 5], [1])
+            t.notIncludes(["1", 2, 3, 4, 5], [1])
         })
 
         test("checks objects", function () {
@@ -141,18 +141,18 @@ suite("assertions (includes)", function () {
             var obj2 = {}
             var obj3 = {}
 
-            fail("doesNotInclude", [obj1, 3, obj3, "foo"], [obj1, obj3])
-            fail("doesNotInclude", [obj1, obj2, obj3], [obj1, obj2, obj3])
-            fail("doesNotInclude", [obj1, 3, obj3, "foo"], [obj1, obj2, obj3])
+            fail("notIncludes", [obj1, 3, obj3, "foo"], [obj1, obj3])
+            fail("notIncludes", [obj1, obj2, obj3], [obj1, obj2, obj3])
+            fail("notIncludes", [obj1, 3, obj3, "foo"], [obj1, obj2, obj3])
         })
 
         test("checks nothing", function () {
-            t.doesNotInclude([{}, {}], [])
+            t.notIncludes([{}, {}], [])
         })
 
         test("checks missing numbers", function () {
-            t.doesNotInclude([1, 2, 3, 4, 5], 10)
-            t.doesNotInclude([1, 2, 3, 4, 5], [10])
+            t.notIncludes([1, 2, 3, 4, 5], 10)
+            t.notIncludes([1, 2, 3, 4, 5], [10])
         })
 
         test("checks missing objects", function () {
@@ -160,9 +160,9 @@ suite("assertions (includes)", function () {
             var obj2 = {}
             var obj3 = {}
 
-            t.doesNotInclude([obj1, obj2, 3, "foo", {}], [{}])
-            t.doesNotInclude([obj1, obj2, obj3], [{}])
-            t.doesNotInclude([obj1, obj2, obj3], [[]])
+            t.notIncludes([obj1, obj2, 3, "foo", {}], [{}])
+            t.notIncludes([obj1, obj2, obj3], [{}])
+            t.notIncludes([obj1, obj2, obj3], [[]])
         })
     })
 
@@ -209,14 +209,14 @@ suite("assertions (includes)", function () {
         })
     })
 
-    suite("t.doesNotIncludeLooseAll()", function () {
+    suite("t.notIncludesLooseAll()", function () {
         test("checks numbers", function () {
-            fail("doesNotIncludeLooseAll", [1, 2, 3, 4, 5], 1)
-            fail("doesNotIncludeLooseAll", [1, 2, 3, 4, 5], [1])
+            fail("notIncludesLooseAll", [1, 2, 3, 4, 5], 1)
+            fail("notIncludesLooseAll", [1, 2, 3, 4, 5], [1])
         })
 
         test("is loose", function () {
-            fail("doesNotIncludeLooseAll", ["1", 2, 3, 4, 5], [1])
+            fail("notIncludesLooseAll", ["1", 2, 3, 4, 5], [1])
         })
 
         test("checks objects", function () {
@@ -224,20 +224,20 @@ suite("assertions (includes)", function () {
             var obj2 = {}
             var obj3 = {}
 
-            fail("doesNotIncludeLooseAll", [obj1, 3, obj3, "foo"], [obj1, obj3])
-            fail("doesNotIncludeLooseAll",
+            fail("notIncludesLooseAll", [obj1, 3, obj3, "foo"], [obj1, obj3])
+            fail("notIncludesLooseAll",
                 [obj1, obj2, obj3], [obj1, obj2, obj3])
 
-            t.doesNotIncludeLooseAll([obj1, 3, obj3, "foo"], [obj1, obj2, obj3])
+            t.notIncludesLooseAll([obj1, 3, obj3, "foo"], [obj1, obj2, obj3])
         })
 
         test("checks nothing", function () {
-            t.doesNotIncludeLooseAll([{}, {}], [])
+            t.notIncludesLooseAll([{}, {}], [])
         })
 
         test("checks missing numbers", function () {
-            t.doesNotIncludeLooseAll([1, 2, 3, 4, 5], 10)
-            t.doesNotIncludeLooseAll([1, 2, 3, 4, 5], [10])
+            t.notIncludesLooseAll([1, 2, 3, 4, 5], 10)
+            t.notIncludesLooseAll([1, 2, 3, 4, 5], [10])
         })
 
         test("checks missing objects", function () {
@@ -245,9 +245,9 @@ suite("assertions (includes)", function () {
             var obj2 = {}
             var obj3 = {}
 
-            t.doesNotIncludeAll([obj1, obj2, 3, "foo", {}], [{}])
-            t.doesNotIncludeAll([obj1, obj2, obj3], [{}])
-            t.doesNotIncludeAll([obj1, obj2, obj3], [[]])
+            t.notIncludesAll([obj1, obj2, 3, "foo", {}], [{}])
+            t.notIncludesAll([obj1, obj2, obj3], [{}])
+            t.notIncludesAll([obj1, obj2, obj3], [[]])
         })
     })
 
@@ -291,14 +291,14 @@ suite("assertions (includes)", function () {
         })
     })
 
-    suite("t.doesNotIncludeLoose()", function () {
+    suite("t.notIncludesLoose()", function () {
         test("checks numbers", function () {
-            fail("doesNotIncludeLoose", [1, 2, 3, 4, 5], 1)
-            fail("doesNotIncludeLoose", [1, 2, 3, 4, 5], [1])
+            fail("notIncludesLoose", [1, 2, 3, 4, 5], 1)
+            fail("notIncludesLoose", [1, 2, 3, 4, 5], [1])
         })
 
         test("is loose", function () {
-            fail("doesNotIncludeLoose", ["1", 2, 3, 4, 5], [1])
+            fail("notIncludesLoose", ["1", 2, 3, 4, 5], [1])
         })
 
         test("checks objects", function () {
@@ -306,19 +306,19 @@ suite("assertions (includes)", function () {
             var obj2 = {}
             var obj3 = {}
 
-            fail("doesNotIncludeLoose", [obj1, 3, obj3, "foo"], [obj1, obj3])
-            fail("doesNotIncludeLoose", [obj1, obj2, obj3], [obj1, obj2, obj3])
-            fail("doesNotIncludeLoose",
+            fail("notIncludesLoose", [obj1, 3, obj3, "foo"], [obj1, obj3])
+            fail("notIncludesLoose", [obj1, obj2, obj3], [obj1, obj2, obj3])
+            fail("notIncludesLoose",
                 [obj1, 3, obj3, "foo"], [obj1, obj2, obj3])
         })
 
         test("checks nothing", function () {
-            t.doesNotIncludeLoose([{}, {}], [])
+            t.notIncludesLoose([{}, {}], [])
         })
 
         test("checks missing numbers", function () {
-            t.doesNotIncludeLoose([1, 2, 3, 4, 5], 10)
-            t.doesNotIncludeLoose([1, 2, 3, 4, 5], [10])
+            t.notIncludesLoose([1, 2, 3, 4, 5], 10)
+            t.notIncludesLoose([1, 2, 3, 4, 5], [10])
         })
 
         test("checks missing objects", function () {
@@ -326,9 +326,9 @@ suite("assertions (includes)", function () {
             var obj2 = {}
             var obj3 = {}
 
-            t.doesNotIncludeLoose([obj1, obj2, 3, "foo", {}], [{}])
-            t.doesNotIncludeLoose([obj1, obj2, obj3], [{}])
-            t.doesNotIncludeLoose([obj1, obj2, obj3], [[]])
+            t.notIncludesLoose([obj1, obj2, 3, "foo", {}], [{}])
+            t.notIncludesLoose([obj1, obj2, obj3], [{}])
+            t.notIncludesLoose([obj1, obj2, obj3], [[]])
         })
     })
 
@@ -373,35 +373,35 @@ suite("assertions (includes)", function () {
         })
     })
 
-    suite("t.doesNotIncludeDeepAll()", function () {
+    suite("t.notIncludesDeepAll()", function () {
         test("checks numbers", function () {
-            fail("doesNotIncludeDeepAll", [1, 2, 3, 4, 5], 1)
-            fail("doesNotIncludeDeepAll", [1, 2, 3, 4, 5], [1])
+            fail("notIncludesDeepAll", [1, 2, 3, 4, 5], 1)
+            fail("notIncludesDeepAll", [1, 2, 3, 4, 5], [1])
         })
 
         test("is strict", function () {
-            t.doesNotIncludeDeepAll(["1", 2, 3, 4, 5], [1])
+            t.notIncludesDeepAll(["1", 2, 3, 4, 5], [1])
         })
 
         test("checks objects", function () {
-            t.doesNotIncludeDeepAll([{foo: 1}, 3, "foo"], ["foo", 1])
-            t.doesNotIncludeDeepAll([{foo: 1}, {bar: 2}], [{foo: 1}, {bar: 1}])
-            fail("doesNotIncludeDeepAll",
+            t.notIncludesDeepAll([{foo: 1}, 3, "foo"], ["foo", 1])
+            t.notIncludesDeepAll([{foo: 1}, {bar: 2}], [{foo: 1}, {bar: 1}])
+            fail("notIncludesDeepAll",
                 [{foo: 1}, {bar: 2}], [{foo: 1}, {bar: 2}])
         })
 
         test("checks nothing", function () {
-            t.doesNotIncludeDeepAll([{}, {}], [])
+            t.notIncludesDeepAll([{}, {}], [])
         })
 
         test("checks missing numbers", function () {
-            t.doesNotIncludeDeepAll([1, 2, 3, 4, 5], 10)
-            t.doesNotIncludeDeepAll([1, 2, 3, 4, 5], [10])
+            t.notIncludesDeepAll([1, 2, 3, 4, 5], 10)
+            t.notIncludesDeepAll([1, 2, 3, 4, 5], [10])
         })
 
         test("checks missing objects", function () {
-            t.doesNotIncludeDeepAll([{foo: 1}, {bar: 2}, {}], [[]])
-            t.doesNotIncludeDeepAll([{foo: 1}, {bar: 2}, {}], [[], {foo: 1}])
+            t.notIncludesDeepAll([{foo: 1}, {bar: 2}, {}], [[]])
+            t.notIncludesDeepAll([{foo: 1}, {bar: 2}, {}], [[], {foo: 1}])
         })
     })
 
@@ -436,38 +436,38 @@ suite("assertions (includes)", function () {
         })
     })
 
-    suite("t.doesNotIncludeDeep()", function () {
+    suite("t.notIncludesDeep()", function () {
         test("checks numbers", function () {
-            fail("doesNotIncludeDeep", [1, 2, 3, 4, 5], 1)
-            fail("doesNotIncludeDeep", [1, 2, 3, 4, 5], [1])
+            fail("notIncludesDeep", [1, 2, 3, 4, 5], 1)
+            fail("notIncludesDeep", [1, 2, 3, 4, 5], [1])
         })
 
         test("is strict", function () {
-            t.doesNotIncludeDeep(["1", 2, 3, 4, 5], [1])
+            t.notIncludesDeep(["1", 2, 3, 4, 5], [1])
         })
 
         test("checks objects", function () {
-            fail("doesNotIncludeDeep", [{foo: 1}, 3, "foo"], ["foo", 1])
+            fail("notIncludesDeep", [{foo: 1}, 3, "foo"], ["foo", 1])
 
-            fail("doesNotIncludeDeep",
+            fail("notIncludesDeep",
                 [{foo: 1}, {bar: 2}], [{foo: 1}, {bar: 1}])
 
-            fail("doesNotIncludeDeep",
+            fail("notIncludesDeep",
                 [{foo: 1}, {bar: 2}], [{foo: 1}, {bar: 2}])
         })
 
         test("checks nothing", function () {
-            t.doesNotIncludeDeep([{}, {}], [])
+            t.notIncludesDeep([{}, {}], [])
         })
 
         test("checks missing numbers", function () {
-            t.doesNotIncludeDeep([1, 2, 3, 4, 5], 10)
-            t.doesNotIncludeDeep([1, 2, 3, 4, 5], [10])
+            t.notIncludesDeep([1, 2, 3, 4, 5], 10)
+            t.notIncludesDeep([1, 2, 3, 4, 5], [10])
         })
 
         test("checks missing objects", function () {
-            t.doesNotIncludeDeep([{foo: 1}, {bar: 2}, {}], [[]])
-            fail("doesNotIncludeDeep", [{foo: 1}, {bar: 2}, {}], [[], {foo: 1}])
+            t.notIncludesDeep([{foo: 1}, {bar: 2}, {}], [[]])
+            fail("notIncludesDeep", [{foo: 1}, {bar: 2}, {}], [[], {foo: 1}])
         })
     })
 
@@ -512,37 +512,37 @@ suite("assertions (includes)", function () {
         })
     })
 
-    suite("t.doesNotIncludeLooseDeepAll()", function () {
+    suite("t.notIncludesLooseDeepAll()", function () {
         test("checks numbers", function () {
-            fail("doesNotIncludeLooseDeepAll", [1, 2, 3, 4, 5], 1)
-            fail("doesNotIncludeLooseDeepAll", [1, 2, 3, 4, 5], [1])
+            fail("notIncludesLooseDeepAll", [1, 2, 3, 4, 5], 1)
+            fail("notIncludesLooseDeepAll", [1, 2, 3, 4, 5], [1])
         })
 
         test("is loose", function () {
-            fail("doesNotIncludeLooseDeepAll", ["1", 2, 3, 4, 5], [1])
+            fail("notIncludesLooseDeepAll", ["1", 2, 3, 4, 5], [1])
         })
 
         test("checks objects", function () {
-            t.doesNotIncludeLooseDeepAll([{foo: 1}, 3, "foo"], ["foo", 1])
-            t.doesNotIncludeLooseDeepAll(
+            t.notIncludesLooseDeepAll([{foo: 1}, 3, "foo"], ["foo", 1])
+            t.notIncludesLooseDeepAll(
                 [{foo: 1}, {bar: 2}], [{foo: 1}, {bar: 1}])
 
-            fail("doesNotIncludeLooseDeepAll",
+            fail("notIncludesLooseDeepAll",
                 [{foo: 1}, {bar: 2}], [{foo: 1}, {bar: 2}])
         })
 
         test("checks nothing", function () {
-            t.doesNotIncludeLooseDeepAll([{}, {}], [])
+            t.notIncludesLooseDeepAll([{}, {}], [])
         })
 
         test("checks missing numbers", function () {
-            t.doesNotIncludeLooseDeepAll([1, 2, 3, 4, 5], 10)
-            t.doesNotIncludeLooseDeepAll([1, 2, 3, 4, 5], [10])
+            t.notIncludesLooseDeepAll([1, 2, 3, 4, 5], 10)
+            t.notIncludesLooseDeepAll([1, 2, 3, 4, 5], [10])
         })
 
         test("checks missing objects", function () {
-            t.doesNotIncludeLooseDeepAll([{foo: 1}, {bar: 2}, {}], [[]])
-            t.doesNotIncludeLooseDeepAll(
+            t.notIncludesLooseDeepAll([{foo: 1}, {bar: 2}, {}], [[]])
+            t.notIncludesLooseDeepAll(
                 [{foo: 1}, {bar: 2}, {}], [[], {foo: 1}])
         })
     })
@@ -578,38 +578,38 @@ suite("assertions (includes)", function () {
         })
     })
 
-    suite("t.doesNotIncludeLooseDeep()", function () {
+    suite("t.notIncludesLooseDeep()", function () {
         test("checks numbers", function () {
-            fail("doesNotIncludeLooseDeep", [1, 2, 3, 4, 5], 1)
-            fail("doesNotIncludeLooseDeep", [1, 2, 3, 4, 5], [1])
+            fail("notIncludesLooseDeep", [1, 2, 3, 4, 5], 1)
+            fail("notIncludesLooseDeep", [1, 2, 3, 4, 5], [1])
         })
 
         test("is loose", function () {
-            fail("doesNotIncludeLooseDeep", ["1", 2, 3, 4, 5], [1])
+            fail("notIncludesLooseDeep", ["1", 2, 3, 4, 5], [1])
         })
 
         test("checks objects", function () {
-            fail("doesNotIncludeLooseDeep", [{foo: 1}, 3, "foo"], ["foo", 1])
+            fail("notIncludesLooseDeep", [{foo: 1}, 3, "foo"], ["foo", 1])
 
-            fail("doesNotIncludeLooseDeep",
+            fail("notIncludesLooseDeep",
                 [{foo: 1}, {bar: 2}], [{foo: 1}, {bar: 1}])
 
-            fail("doesNotIncludeLooseDeep",
+            fail("notIncludesLooseDeep",
                 [{foo: 1}, {bar: 2}], [{foo: 1}, {bar: 2}])
         })
 
         test("checks nothing", function () {
-            t.doesNotIncludeLooseDeep([{}, {}], [])
+            t.notIncludesLooseDeep([{}, {}], [])
         })
 
         test("checks missing numbers", function () {
-            t.doesNotIncludeLooseDeep([1, 2, 3, 4, 5], 10)
-            t.doesNotIncludeLooseDeep([1, 2, 3, 4, 5], [10])
+            t.notIncludesLooseDeep([1, 2, 3, 4, 5], 10)
+            t.notIncludesLooseDeep([1, 2, 3, 4, 5], [10])
         })
 
         test("checks missing objects", function () {
-            t.doesNotIncludeLooseDeep([{foo: 1}, {bar: 2}, {}], [[]])
-            fail("doesNotIncludeLooseDeep",
+            t.notIncludesLooseDeep([{foo: 1}, {bar: 2}, {}], [[]])
+            fail("notIncludesLooseDeep",
                 [{foo: 1}, {bar: 2}, {}], [[], {foo: 1}])
         })
     })

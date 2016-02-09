@@ -150,13 +150,13 @@ suite("assertions (has keys)", function () {
     }
 
     shallow("hasKeys", {all: true})
-    shallow("doesNotHaveAllKeys", {all: true, invert: true})
+    shallow("notHasAllKeys", {all: true, invert: true})
     shallow("hasAnyKeys", {})
-    shallow("doesNotHaveKeys", {invert: true})
+    shallow("notHasKeys", {invert: true})
     shallow("hasLooseKeys", {loose: true, all: true})
-    shallow("doesNotHaveLooseAllKeys", {loose: true, all: true, invert: true})
+    shallow("notHasLooseAllKeys", {loose: true, all: true, invert: true})
     shallow("hasLooseAnyKeys", {loose: true})
-    shallow("doesNotHaveLooseKeys", {loose: true, invert: true})
+    shallow("notHasLooseKeys", {loose: true, invert: true})
 
     /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
@@ -287,11 +287,11 @@ suite("assertions (has keys)", function () {
     }
 
     deep("hasDeepKeys", {all: true})
-    deep("doesNotHaveDeepAllKeys", {invert: true, all: true})
+    deep("notHasDeepAllKeys", {invert: true, all: true})
     deep("hasDeepAnyKeys", {})
-    deep("doesNotHaveDeepKeys", {invert: true})
+    deep("notHasDeepKeys", {invert: true})
     deep("hasLooseDeepKeys", {loose: true, all: true})
-    deep("doesNotHaveLooseDeepAllKeys", {loose: true, invert: true, all: true})
+    deep("notHasLooseDeepAllKeys", {loose: true, invert: true, all: true})
     deep("hasLooseDeepAnyKeys", {loose: true})
-    deep("doesNotHaveLooseDeepKeys", {loose: true, invert: true})
+    deep("notHasLooseDeepKeys", {loose: true, invert: true})
 })

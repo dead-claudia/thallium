@@ -16,22 +16,54 @@ suite("assertions (computation)", function () {
         fail("throws", function () {})
     })
 
-    basic("t.doesNotThrow()", function () {
-        fail("doesNotThrow", function () {
+    basic("t.notThrows()", function () {
+        fail("notThrows", function () {
             throw new Error("fail")
         })
 
-        fail("doesNotThrow", function () {
+        fail("notThrows", function () {
             throw new TypeError("fail")
         }, TypeError)
 
-        fail("doesNotThrow", function () {
+        fail("notThrows", function () {
             throw new TypeError("fail")
         }, Error)
 
-        t.doesNotThrow(function () { throw new Error("fail") }, TypeError)
-        t.doesNotThrow(function () {}, Error)
-        t.doesNotThrow(function () {})
+        t.notThrows(function () { throw new Error("fail") }, TypeError)
+        t.notThrows(function () {}, Error)
+        t.notThrows(function () {})
+    })
+
+    basic("t.throwsMatch()", function () {
+        var sentinel = new Error("sentinel")
+
+        function test() { throw sentinel }
+        function not(x) { return x !== sentinel }
+
+        t.throwsMatch(test, function (e) { return e === sentinel })
+        t.throwsMatch(test, "sentinel")
+        t.throwsMatch(test, /sent/)
+
+        fail("throwsMatch", test, not)
+        fail("throwsMatch", function () {}, not)
+        fail("throwsMatch", test, "nope")
+        fail("throwsMatch", test, /hi/)
+    })
+
+    basic("t.notThrowsMatch()", function () {
+        var sentinel = new Error("sentinel")
+
+        function test() { throw sentinel }
+        function not(x) { return x !== sentinel }
+
+        fail("notThrowsMatch", test, function (e) { return e === sentinel })
+        fail("notThrowsMatch", test, "sentinel")
+        fail("notThrowsMatch", test, /sent/)
+
+        t.notThrowsMatch(test, not)
+        t.notThrowsMatch(function () {}, not)
+        t.notThrowsMatch(test, "nope")
+        t.notThrowsMatch(test, /hi/)
     })
 
     basic("t.length()", function () {
@@ -47,13 +79,8 @@ suite("assertions (computation)", function () {
         fail("length", [], NaN)
         fail("length", [], -1)
 
-        t.throws(function () {
-            t.length(null, -1)
-        }, TypeError)
-
-        t.throws(function () {
-            t.length(undefined, -1)
-        }, TypeError)
+        t.throws(function () { t.length(null, -1) }, TypeError)
+        t.throws(function () { t.length(undefined, -1) }, TypeError)
     })
 
     basic("t.notLength()", function () {
@@ -70,13 +97,8 @@ suite("assertions (computation)", function () {
         t.notLength([], NaN)
         t.notLength([], -1)
 
-        t.throws(function () {
-            t.notLength(null, -1)
-        }, TypeError)
-
-        t.throws(function () {
-            t.notLength(undefined, -1)
-        }, TypeError)
+        t.throws(function () { t.notLength(null, -1) }, TypeError)
+        t.throws(function () { t.notLength(undefined, -1) }, TypeError)
     })
 
     suite("t.closeTo()", function () {
