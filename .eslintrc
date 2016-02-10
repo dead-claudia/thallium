@@ -1,2 +1,4 @@
 ---
 extends: isiahmeadows
+rules:
+    no-unused-expressions: 2
