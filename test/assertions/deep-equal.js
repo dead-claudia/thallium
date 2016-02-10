@@ -1,7 +1,6 @@
 "use strict"
 
 var t = require("../../index.js")
-var util = require("../../lib/util.js")
 
 suite("assertions (deep equal)", function () {
     test("equal", function () {
@@ -86,7 +85,7 @@ suite("assertions (deep equal)", function () {
         t.looseDeepEqual(new A(), new A())
         t.looseDeepEqual(new A(), new B())
 
-        t.true(util.deepEqual(new A(), new A()))
+        t.looseDeepEqual(new A(), new A())
         t.notDeepEqual(new A(), new B())
     })
 
@@ -102,7 +101,7 @@ suite("assertions (deep equal)", function () {
         t.looseDeepEqual("foo", "foo")
         t.notLooseDeepEqual("foo", "bar")
 
-        t.true(util.deepEqual("foo", "foo"))
+        t.looseDeepEqual("foo", "foo")
         t.notDeepEqual("foo", "bar")
     })
 

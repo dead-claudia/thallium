@@ -1,17 +1,16 @@
 "use strict"
 
 var t = require("../index.js")
-var createBase = require("../lib/core.js")
 
 suite("add", function () {
     test("exists", function () {
-        var tt = createBase()
+        var tt = t.base()
         t.hasKey(tt, "wrap")
         t.function(tt.wrap)
     })
 
     test("works with string + function", function () {
-        var tt = createBase()
+        var tt = t.base()
 
         var sentinel = {}
 
@@ -35,7 +34,7 @@ suite("add", function () {
     })
 
     test("works with object", function () {
-        var tt = createBase()
+        var tt = t.base()
 
         var sentinel = {}
 

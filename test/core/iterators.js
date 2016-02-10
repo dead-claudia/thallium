@@ -1,7 +1,6 @@
 "use strict"
 
 var t = require("../../index.js")
-var createBase = require("../../lib/core.js")
 var util = require("../../test-util/base.js")
 var n = util.n
 
@@ -24,7 +23,7 @@ suite("core (iterators)", function () {
                 },
             }
 
-            var tt = createBase()
+            var tt = t.base()
             var ret = []
 
             tt.reporter(util.push(ret))
@@ -60,7 +59,7 @@ suite("core (iterators)", function () {
                 },
             }
 
-            var tt = createBase()
+            var tt = t.base()
             var ret = []
 
             tt.reporter(util.push(ret))
@@ -104,7 +103,7 @@ suite("core (iterators)", function () {
                 },
             }
 
-            var tt = createBase()
+            var tt = t.base()
             var ret = []
 
             tt.reporter(util.push(ret))
@@ -146,7 +145,7 @@ suite("core (iterators)", function () {
                 },
             }
 
-            var tt = createBase()
+            var tt = t.base()
             var ret = []
 
             tt.reporter(util.push(ret))
@@ -184,7 +183,7 @@ suite("core (iterators)", function () {
                 },
             }
 
-            var tt = createBase()
+            var tt = t.base()
             var ret = []
 
             tt.reporter(util.push(ret))
@@ -218,7 +217,7 @@ suite("core (iterators)", function () {
                 },
             }
 
-            var tt = createBase()
+            var tt = t.base()
             var ret = []
 
             tt.reporter(util.push(ret))
@@ -260,7 +259,7 @@ suite("core (iterators)", function () {
                 },
             }
 
-            var tt = createBase()
+            var tt = t.base()
             var ret = []
 
             tt.reporter(util.push(ret))
@@ -300,7 +299,7 @@ suite("core (iterators)", function () {
                 },
             }
 
-            var tt = createBase()
+            var tt = t.base()
             var ret = []
 
             tt.reporter(util.push(ret))
@@ -342,7 +341,7 @@ suite("core (iterators)", function () {
                 },
             }
 
-            var tt = createBase()
+            var tt = t.base()
             var ret = []
 
             tt.reporter(util.push(ret))
@@ -380,7 +379,7 @@ suite("core (iterators)", function () {
                 },
             }
 
-            var tt = createBase()
+            var tt = t.base()
             var ret = []
 
             tt.reporter(util.push(ret))
@@ -426,7 +425,7 @@ suite("core (iterators)", function () {
                 },
             }
 
-            var tt = createBase()
+            var tt = t.base()
             var ret = []
 
             tt.reporter(util.push(ret))
@@ -470,7 +469,7 @@ suite("core (iterators)", function () {
                 },
             }
 
-            var tt = createBase()
+            var tt = t.base()
             var ret = []
 
             tt.reporter(util.push(ret))
@@ -515,7 +514,7 @@ suite("core (iterators)", function () {
                 },
             }
 
-            var tt = createBase()
+            var tt = t.base()
             var ret = []
 
             tt.reporter(util.push(ret))
@@ -556,7 +555,7 @@ suite("core (iterators)", function () {
                 },
             }
 
-            var tt = createBase()
+            var tt = t.base()
             var ret = []
 
             tt.reporter(util.push(ret))
@@ -602,7 +601,7 @@ suite("core (iterators)", function () {
                 },
             }
 
-            var tt = createBase()
+            var tt = t.base()
             var ret = []
 
             tt.reporter(util.push(ret))
@@ -645,7 +644,7 @@ suite("core (iterators)", function () {
                 },
             }
 
-            var tt = createBase()
+            var tt = t.base()
             var ret = []
 
             tt.reporter(util.push(ret))
@@ -702,7 +701,7 @@ suite("core (iterators)", function () {
                 },
             }
 
-            var tt = createBase()
+            var tt = t.base()
             var ret = []
 
             tt.reporter(util.push(ret))
@@ -738,7 +737,7 @@ suite("core (iterators)", function () {
                 },
             }
 
-            var tt = createBase()
+            var tt = t.base()
             var ret = []
 
             tt.reporter(util.push(ret))
@@ -782,7 +781,7 @@ suite("core (iterators)", function () {
                 },
             }
 
-            var tt = createBase()
+            var tt = t.base()
             var ret = []
 
             tt.reporter(util.push(ret))
@@ -824,7 +823,7 @@ suite("core (iterators)", function () {
                 },
             }
 
-            var tt = createBase()
+            var tt = t.base()
             var ret = []
 
             tt.reporter(util.push(ret))
@@ -866,7 +865,7 @@ suite("core (iterators)", function () {
                 },
             }
 
-            var tt = createBase()
+            var tt = t.base()
             var ret = []
 
             tt.reporter(util.push(ret))
@@ -903,7 +902,7 @@ suite("core (iterators)", function () {
                 },
             }
 
-            var tt = createBase()
+            var tt = t.base()
             var ret = []
 
             tt.reporter(util.push(ret))
@@ -949,7 +948,7 @@ suite("core (iterators)", function () {
                 },
             }
 
-            var tt = createBase()
+            var tt = t.base()
             var ret = []
 
             tt.reporter(util.push(ret))
@@ -992,7 +991,7 @@ suite("core (iterators)", function () {
                 },
             }
 
-            var tt = createBase()
+            var tt = t.base()
             var ret = []
 
             tt.reporter(util.push(ret))
@@ -1035,7 +1034,7 @@ suite("core (iterators)", function () {
                 },
             }
 
-            var tt = createBase()
+            var tt = t.base()
             var ret = []
 
             tt.reporter(util.push(ret))
@@ -1073,7 +1072,7 @@ suite("core (iterators)", function () {
                 },
             }
 
-            var tt = createBase()
+            var tt = t.base()
             var ret = []
 
             tt.reporter(util.push(ret))
@@ -1120,7 +1119,7 @@ suite("core (iterators)", function () {
                 },
             }
 
-            var tt = createBase()
+            var tt = t.base()
             var ret = []
 
             tt.reporter(util.push(ret))
@@ -1164,7 +1163,7 @@ suite("core (iterators)", function () {
                 },
             }
 
-            var tt = createBase()
+            var tt = t.base()
             var ret = []
 
             tt.reporter(util.push(ret))
@@ -1209,7 +1208,7 @@ suite("core (iterators)", function () {
                 },
             }
 
-            var tt = createBase()
+            var tt = t.base()
             var ret = []
 
             tt.reporter(util.push(ret))
@@ -1250,7 +1249,7 @@ suite("core (iterators)", function () {
                 },
             }
 
-            var tt = createBase()
+            var tt = t.base()
             var ret = []
 
             tt.reporter(util.push(ret))
@@ -1297,7 +1296,7 @@ suite("core (iterators)", function () {
                 },
             }
 
-            var tt = createBase()
+            var tt = t.base()
             var ret = []
 
             tt.reporter(util.push(ret))
@@ -1340,7 +1339,7 @@ suite("core (iterators)", function () {
                 },
             }
 
-            var tt = createBase()
+            var tt = t.base()
             var ret = []
 
             tt.reporter(util.push(ret))
@@ -1398,7 +1397,7 @@ suite("core (iterators)", function () {
                 },
             }
 
-            var tt = createBase()
+            var tt = t.base()
             var ret = []
 
             tt.reporter(util.push(ret))
@@ -1434,7 +1433,7 @@ suite("core (iterators)", function () {
                 },
             }
 
-            var tt = createBase()
+            var tt = t.base()
             var ret = []
 
             tt.reporter(util.push(ret))
@@ -1478,7 +1477,7 @@ suite("core (iterators)", function () {
                 },
             }
 
-            var tt = createBase()
+            var tt = t.base()
             var ret = []
 
             tt.reporter(util.push(ret))
@@ -1520,7 +1519,7 @@ suite("core (iterators)", function () {
                 },
             }
 
-            var tt = createBase()
+            var tt = t.base()
             var ret = []
 
             tt.reporter(util.push(ret))
@@ -1562,7 +1561,7 @@ suite("core (iterators)", function () {
                 },
             }
 
-            var tt = createBase()
+            var tt = t.base()
             var ret = []
 
             tt.reporter(util.push(ret))
@@ -1599,7 +1598,7 @@ suite("core (iterators)", function () {
                 },
             }
 
-            var tt = createBase()
+            var tt = t.base()
             var ret = []
 
             tt.reporter(util.push(ret))
@@ -1654,7 +1653,7 @@ suite("core (iterators)", function () {
                 },
             }
 
-            var tt = createBase()
+            var tt = t.base()
             var ret = []
 
             tt.reporter(util.push(ret))
@@ -1713,7 +1712,7 @@ suite("core (iterators)", function () {
                 },
             }
 
-            var tt = createBase()
+            var tt = t.base()
             var ret = []
 
             tt.reporter(util.push(ret))
@@ -1770,7 +1769,7 @@ suite("core (iterators)", function () {
                 },
             }
 
-            var tt = createBase()
+            var tt = t.base()
             var ret = []
 
             tt.reporter(util.push(ret))
@@ -1829,7 +1828,7 @@ suite("core (iterators)", function () {
                 },
             }
 
-            var tt = createBase()
+            var tt = t.base()
             var ret = []
 
             tt.reporter(util.push(ret))
@@ -1882,7 +1881,7 @@ suite("core (iterators)", function () {
                 },
             }
 
-            var tt = createBase()
+            var tt = t.base()
             var ret = []
 
             tt.reporter(util.push(ret))
@@ -1937,7 +1936,7 @@ suite("core (iterators)", function () {
                 },
             }
 
-            var tt = createBase()
+            var tt = t.base()
             var ret = []
 
             tt.reporter(util.push(ret))
@@ -1981,7 +1980,7 @@ suite("core (iterators)", function () {
                 },
             }
 
-            var tt = createBase()
+            var tt = t.base()
             var ret = []
 
             tt.reporter(util.push(ret))
@@ -2036,7 +2035,7 @@ suite("core (iterators)", function () {
                 },
             }
 
-            var tt = createBase()
+            var tt = t.base()
             var ret = []
 
             tt.reporter(util.push(ret))
@@ -2077,7 +2076,7 @@ suite("core (iterators)", function () {
                 },
             }
 
-            var tt = createBase()
+            var tt = t.base()
             var ret = []
 
             tt.reporter(util.push(ret))
@@ -2124,7 +2123,7 @@ suite("core (iterators)", function () {
                 },
             }
 
-            var tt = createBase()
+            var tt = t.base()
             var ret = []
 
             tt.reporter(util.push(ret))
@@ -2181,7 +2180,7 @@ suite("core (iterators)", function () {
                 },
             }
 
-            var tt = createBase()
+            var tt = t.base()
             var ret = []
 
             tt.reporter(util.push(ret))
@@ -2241,7 +2240,7 @@ suite("core (iterators)", function () {
                 },
             }
 
-            var tt = createBase()
+            var tt = t.base()
             var ret = []
 
             tt.reporter(util.push(ret))
@@ -2312,7 +2311,7 @@ suite("core (iterators)", function () {
                 },
             }
 
-            var tt = createBase()
+            var tt = t.base()
             var ret = []
 
             tt.reporter(util.push(ret))
@@ -2385,7 +2384,7 @@ suite("core (iterators)", function () {
                 },
             }
 
-            var tt = createBase()
+            var tt = t.base()
             var ret = []
 
             tt.reporter(util.push(ret))
@@ -2449,7 +2448,7 @@ suite("core (iterators)", function () {
                 },
             }
 
-            var tt = createBase()
+            var tt = t.base()
             var ret = []
 
             tt.reporter(util.push(ret))
@@ -2504,7 +2503,7 @@ suite("core (iterators)", function () {
                 },
             }
 
-            var tt = createBase()
+            var tt = t.base()
             var ret = []
 
             tt.reporter(util.push(ret))
@@ -2560,7 +2559,7 @@ suite("core (iterators)", function () {
                 },
             }
 
-            var tt = createBase()
+            var tt = t.base()
             var ret = []
 
             tt.reporter(util.push(ret))
@@ -2606,7 +2605,7 @@ suite("core (iterators)", function () {
                 },
             }
 
-            var tt = createBase()
+            var tt = t.base()
             var ret = []
 
             tt.reporter(util.push(ret))
@@ -2647,7 +2646,7 @@ suite("core (iterators)", function () {
                 },
             }
 
-            var tt = createBase()
+            var tt = t.base()
             var ret = []
 
             tt.reporter(util.push(ret))
@@ -2694,7 +2693,7 @@ suite("core (iterators)", function () {
                 },
             }
 
-            var tt = createBase()
+            var tt = t.base()
             var ret = []
 
             tt.reporter(util.push(ret))
@@ -2737,7 +2736,7 @@ suite("core (iterators)", function () {
                 },
             }
 
-            var tt = createBase()
+            var tt = t.base()
             var ret = []
 
             tt.reporter(util.push(ret))

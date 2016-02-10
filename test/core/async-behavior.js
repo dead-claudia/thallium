@@ -3,12 +3,11 @@
 /* global setTimeout */
 
 var t = require("../../index.js")
-var createBase = require("../../lib/core.js")
 var util = require("../../test-util/base.js")
 
 suite("core (asynchronous behavior)", function () {
     test("with normal tests", function (done) {
-        var tt = createBase()
+        var tt = t.base()
         var called = false
 
         tt.test("test", function () { called = true })
@@ -17,7 +16,7 @@ suite("core (asynchronous behavior)", function () {
     })
 
     test("with shorthand tests", function (done) {
-        var tt = createBase()
+        var tt = t.base()
         var called = false
 
         tt.define("assert", function () {
@@ -31,7 +30,7 @@ suite("core (asynchronous behavior)", function () {
     })
 
     test("with async tests + sync done call", function (done) {
-        var tt = createBase()
+        var tt = t.base()
         var called = false
 
         tt.async("test", function (_, done) {
@@ -44,7 +43,7 @@ suite("core (asynchronous behavior)", function () {
     })
 
     test("with async tests + async done call", function (done) {
-        var tt = createBase()
+        var tt = t.base()
         var called = false
 
         tt.async("test", function (_, done) {
@@ -58,7 +57,7 @@ suite("core (asynchronous behavior)", function () {
     })
 
     test("returns thenable without callback", function (done) {
-        var tt = createBase()
+        var tt = t.base()
         var called = false
 
         tt.async("test", function (_, done) {

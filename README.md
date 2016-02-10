@@ -23,10 +23,9 @@ To be completed. See the source, tests, and TypeScript definition file for now.
 ## Remaining work
 
 1. Finish + test the CLI. It's still a work in progress, mostly in testing.
-2. Remove Promise dependency, but still keep the stack down between tests.
-3. Self-host this module's tests like what Mocha does.
-4. Update TypeScript definitions
-5. Write the documentation for this project, including the many core assertions.
+2. Self-host this module's tests like what Mocha does.
+3. Update TypeScript definitions
+4. Write the documentation for this project, including the many core assertions.
 
 ## License
 

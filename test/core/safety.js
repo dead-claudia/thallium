@@ -1,14 +1,13 @@
 "use strict"
 
 var t = require("../../index.js")
-var createBase = require("../../lib/core.js")
 var util = require("../../test-util/base.js")
 var p = util.p
 var n = util.n
 
 suite("core (safety)", function () {
     test("disallows non-nullish non-functions as `test` impls", function () {
-        var tt = createBase()
+        var tt = t.base()
         t.throws(function () { tt.test("test", 1) }, TypeError)
         t.throws(function () { tt.test("test", 0) }, TypeError)
         t.throws(function () { tt.test("test", true) }, TypeError)
@@ -46,7 +45,7 @@ suite("core (safety)", function () {
     })
 
     test("disallows non-functions as `async` impls", function () {
-        var tt = createBase()
+        var tt = t.base()
         t.throws(function () { tt.async("test", 1) }, TypeError)
         t.throws(function () { tt.async("test", 0) }, TypeError)
         t.throws(function () { tt.async("test", true) }, TypeError)
@@ -86,7 +85,7 @@ suite("core (safety)", function () {
     })
 
     test("catches unsafe access", function (done) {
-        var tt = createBase()
+        var tt = t.base()
         var ret = []
 
         tt.reporter(util.push(ret))
@@ -187,7 +186,7 @@ suite("core (safety)", function () {
     })
 
     test("reports extraneous async done", function (done) {
-        var tt = createBase()
+        var tt = t.base()
         var ret = []
 
         var sentinel = new Error("true")
@@ -211,33 +210,39 @@ suite("core (safety)", function () {
         }
 
         tt.run(util.wrap(done, function () {
-            t.deepEqual(ret, [
-                n("start", undefined, -1),
-                n("start", "test", 0),
-                n("start", "inner", 0, p("test", 0)),
-                n("start", "fail", 0, p("inner", 0, p("test", 0))),
-                n("extra", "fail", 0, [r("test", 0), r("inner", 0)], {
-                    count: 2,
-                    value: undefined,
-                }),
-                n("extra", "fail", 0, [r("test", 0), r("inner", 0)], {
-                    count: 3,
-                    value: sentinel,
-                }),
-                n("end", "fail", 0, p("inner", 0, p("test", 0))),
-                n("pass", "fail", 0, p("inner", 0, p("test", 0))),
-                n("end", "inner", 0, p("test", 0)),
-                n("pass", "inner", 0, p("test", 0)),
-                n("end", "test", 0),
-                n("pass", "test", 0),
-                n("end", undefined, -1),
-                n("exit", undefined, 0),
-            ])
+            t.includesDeepAny([4, 5, 6, 7, 8, 9, 10, 11, 12].map(function (i) {
+                var splice1 = n("extra", "fail", 0,
+                    [r("test", 0), r("inner", 0)],
+                    {count: 2, value: undefined})
+
+                var splice2 = n("extra", "fail", 0,
+                    [r("test", 0), r("inner", 0)],
+                    {count: 3, value: sentinel})
+
+                var nodes = [
+                    n("start", undefined, -1),
+                    n("start", "test", 0),
+                    n("start", "inner", 0, p("test", 0)),
+                    n("start", "fail", 0, p("inner", 0, p("test", 0))),
+                    // Extras should first appear here.
+                    n("end", "fail", 0, p("inner", 0, p("test", 0))),
+                    n("pass", "fail", 0, p("inner", 0, p("test", 0))),
+                    n("end", "inner", 0, p("test", 0)),
+                    n("pass", "inner", 0, p("test", 0)),
+                    n("end", "test", 0),
+                    n("pass", "test", 0),
+                    n("end", undefined, -1),
+                    n("exit", undefined, 0),
+                ]
+
+                nodes.splice(i, 0, splice1, splice2)
+                return nodes
+            }), [ret])
         }))
     })
 
     test("catches concurrent runs", function () {
-        var tt = createBase()
+        var tt = t.base()
         tt.reporter(function (_, done) { done() })
         var p = tt.run()
         t.throws(function () { tt.run() }, Error)

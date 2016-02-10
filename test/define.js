@@ -1,18 +1,16 @@
 "use strict"
 
 var t = require("../index.js")
-var inspect = require("../lib/inspect.js")
-var createBase = require("../lib/core.js")
 
 suite("define", function () {
     test("exists", function () {
-        var tt = createBase()
+        var tt = t.base()
         t.hasKey(tt, "define")
         t.function(tt.define)
     })
 
     test("works with string + function", function () {
-        var tt = createBase()
+        var tt = t.base()
 
         tt.define("assert", function (test, expected, actual) {
             return {
@@ -25,7 +23,6 @@ suite("define", function () {
 
         var expected = {}
         var actual = {}
-        var message = inspect(expected) + " :: " + inspect(actual)
 
         try {
             tt.assert(false, expected, actual)
@@ -34,7 +31,7 @@ suite("define", function () {
             t.hasKeys(e, {
                 expected: expected,
                 actual: actual,
-                message: message,
+                message: "{} :: {}",
             })
             return
         }
@@ -43,7 +40,7 @@ suite("define", function () {
     })
 
     test("works with object", function () {
-        var tt = createBase()
+        var tt = t.base()
 
         tt.define({
             assert: function (test, expected, actual) {
@@ -58,7 +55,7 @@ suite("define", function () {
 
         var expected = {}
         var actual = {}
-        var message = inspect(expected) + " :: " + inspect(actual)
+        var message = "{} :: {}"
 
         try {
             tt.assert(false, expected, actual)
@@ -76,7 +73,7 @@ suite("define", function () {
     })
 
     test("allows arbitrary properties to be used in the message", function () {
-        var tt = createBase()
+        var tt = t.base()
 
         tt.define("assert", function (test, extra) {
             return {test: test, extra: extra, message: "{extra}"}

@@ -1,7 +1,5 @@
 "use strict"
 
-/* global suite, test */
-
 var t = require("../index.js")
 
 exports.fail = function (name) {

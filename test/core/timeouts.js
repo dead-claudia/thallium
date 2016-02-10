@@ -3,14 +3,13 @@
 /* global setTimeout */
 
 var t = require("../../index.js")
-var createBase = require("../../lib/core.js")
 var util = require("../../test-util/base.js")
 var p = util.p
 var n = util.n
 
 suite("core (timeouts)", function () {
     test("succeeds with own", function (done) {
-        var tt = createBase()
+        var tt = t.base()
         var ret = []
         tt.reporter(util.push(ret))
 
@@ -32,7 +31,7 @@ suite("core (timeouts)", function () {
     })
 
     test("fails with own", function (done) {
-        var tt = createBase()
+        var tt = t.base()
         var ret = []
         tt.reporter(util.push(ret))
 
@@ -57,7 +56,7 @@ suite("core (timeouts)", function () {
     })
 
     test("succeeds with inherited", function (done) {
-        var tt = createBase()
+        var tt = t.base()
         var ret = []
         tt.reporter(util.push(ret))
 
@@ -81,7 +80,7 @@ suite("core (timeouts)", function () {
     })
 
     test("fails with inherited", function (done) {
-        var tt = createBase()
+        var tt = t.base()
         var ret = []
         tt.reporter(util.push(ret))
 
@@ -110,7 +109,7 @@ suite("core (timeouts)", function () {
     })
 
     test("gets own set timeout", function (done) {
-        var tt = createBase()
+        var tt = t.base()
         var timeout
 
         tt.test("test", function (tt) {
@@ -124,7 +123,7 @@ suite("core (timeouts)", function () {
     })
 
     test("gets own set timeout", function (done) {
-        var tt = createBase()
+        var tt = t.base()
         var timeout
 
         tt.test("test")
@@ -137,7 +136,7 @@ suite("core (timeouts)", function () {
     })
 
     test("gets own sync inner timeout", function (done) {
-        var tt = createBase()
+        var tt = t.base()
 
         var timeout = tt.test("test")
         .timeout(50)
@@ -149,7 +148,7 @@ suite("core (timeouts)", function () {
     })
 
     test("gets default timeout", function (done) {
-        var tt = createBase()
+        var tt = t.base()
         var timeout
 
         tt.test("test", function (tt) {

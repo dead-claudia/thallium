@@ -1,17 +1,16 @@
 "use strict"
 
 var t = require("../index.js")
-var createBase = require("../lib/core.js")
 
 suite("add", function () {
     test("exists", function () {
-        var tt = createBase()
+        var tt = t.base()
         t.hasKey(tt, "add")
         t.function(tt.add)
     })
 
     test("works with string + function", function () {
-        var tt = createBase()
+        var tt = t.base()
 
         tt.add("foo", /** @this */ function () { return this })
         tt.add("bar", function (ttt) { return ttt })
@@ -25,7 +24,7 @@ suite("add", function () {
     })
 
     test("works with object", function () {
-        var tt = createBase()
+        var tt = t.base()
 
         tt.add({
             foo: function () { return this },

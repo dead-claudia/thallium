@@ -1,4 +1,7 @@
 ---
-extends: ../.eslintrc
+extends:
+    - ../.eslintrc
+    - isiahmeadows/node
+
 env:
     node: true

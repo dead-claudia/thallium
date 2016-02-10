@@ -21,13 +21,9 @@
     "tdd",
     "techtonic"
   ],
-  "browser": {
-    "./lib/timers.js": "./lib/browser-timers.js"
-  },
   "author": "Isiah Meadows <me@isiahmeadows.com>",
   "license": "ISC",
   "devDependencies": {
-    "bluebird": "^3.2.2",
     "eslint": "^1.10.3",
     "eslint-config-isiahmeadows": "0.0.2",
     "mocha": "^2.3.4"

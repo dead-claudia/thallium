@@ -3,21 +3,36 @@
 /* global setTimeout */
 
 var t = require("../../index.js")
-var createBase = require("../../lib/core.js")
 var util = require("../../test-util/base.js")
 var p = util.p
 var n = util.n
 
 suite("core (reporters)", function () {
+    function resolve(value) {
+        return {
+            then: function (resolve) {
+                resolve(value)
+            },
+        }
+    }
+
+    function reject(value) {
+        return {
+            then: function (resolve, reject) {
+                reject(value)
+            },
+        }
+    }
+
     test("added individually correctly", function () {
-        var tt = createBase()
+        var tt = t.base()
         function plugin() {}
         tt.reporter(plugin)
         t.deepEqual(tt.reporters(), [plugin])
     })
 
     test("added in batches correctly", function () {
-        var tt = createBase()
+        var tt = t.base()
         function plugin1() {}
         function plugin2() {}
         function plugin3() {}
@@ -30,7 +45,7 @@ suite("core (reporters)", function () {
     })
 
     test("added on children correctly", function () {
-        var tt = createBase()
+        var tt = t.base()
         function plugin1() {}
         function plugin2() {}
         function plugin3() {}
@@ -51,7 +66,7 @@ suite("core (reporters)", function () {
     })
 
     test("read on children correctly", function () {
-        var tt = createBase()
+        var tt = t.base()
         function plugin1() {}
         function plugin2() {}
         function plugin3() {}
@@ -67,7 +82,7 @@ suite("core (reporters)", function () {
     })
 
     test("only added once", function () {
-        var tt = createBase()
+        var tt = t.base()
         function plugin1() {}
         function plugin2() {}
         function plugin3() {}
@@ -81,7 +96,7 @@ suite("core (reporters)", function () {
     })
 
     test("called correctly with sync passing", function (done) {
-        var tt = createBase()
+        var tt = t.base()
 
         var ret = []
 
@@ -106,7 +121,7 @@ suite("core (reporters)", function () {
     })
 
     test("called correctly with sync failing", function (done) {
-        var tt = createBase()
+        var tt = t.base()
 
         var ret = []
         var sentinel = new Error("sentinel")
@@ -137,7 +152,7 @@ suite("core (reporters)", function () {
     })
 
     test("called correctly with sync both", function (done) {
-        var tt = createBase()
+        var tt = t.base()
 
         var ret = []
         var sentinel = new Error("sentinel")
@@ -168,7 +183,7 @@ suite("core (reporters)", function () {
     })
 
     test("called correctly with async passing", function (done) {
-        var tt = createBase()
+        var tt = t.base()
 
         var ret = []
 
@@ -193,7 +208,7 @@ suite("core (reporters)", function () {
     })
 
     test("called correctly with async failing", function (done) {
-        var tt = createBase()
+        var tt = t.base()
 
         var ret = []
         var sentinel = new Error("sentinel")
@@ -224,7 +239,7 @@ suite("core (reporters)", function () {
     })
 
     test("called correctly with async both", function (done) {
-        var tt = createBase()
+        var tt = t.base()
 
         var ret = []
         var sentinel = new Error("sentinel")
@@ -255,13 +270,13 @@ suite("core (reporters)", function () {
     })
 
     test("called correctly with async + promise passing", function (done) {
-        var tt = createBase()
+        var tt = t.base()
 
         var ret = []
 
         tt.reporter(util.push(ret))
 
-        tt.async("test", function () { return Promise.resolve() })
+        tt.async("test", function () { return resolve() })
         tt.test("test", function () {})
 
         tt.run(util.wrap(done, function () {
@@ -280,7 +295,7 @@ suite("core (reporters)", function () {
     })
 
     test("called correctly with async + promise failing", function (done) {
-        var tt = createBase()
+        var tt = t.base()
 
         var ret = []
         var sentinel = new Error("sentinel")
@@ -289,7 +304,7 @@ suite("core (reporters)", function () {
 
         tt.reporter(util.push(ret))
 
-        tt.async("one", function () { return Promise.reject(sentinel) })
+        tt.async("one", function () { return reject(sentinel) })
         tt.test("two", function () { throw sentinel })
 
         tt.run(util.wrap(done, function () {
@@ -311,7 +326,7 @@ suite("core (reporters)", function () {
     })
 
     test("called correctly with async + promise both", function (done) {
-        var tt = createBase()
+        var tt = t.base()
 
         var ret = []
         var sentinel = new Error("sentinel")
@@ -320,8 +335,8 @@ suite("core (reporters)", function () {
 
         tt.reporter(util.push(ret))
 
-        tt.async("one", function () { return Promise.reject(sentinel) })
-        tt.async("two", function () { return Promise.resolve() })
+        tt.async("one", function () { return reject(sentinel) })
+        tt.async("two", function () { return resolve() })
 
         tt.run(util.wrap(done, function () {
             t.deepEqual(ret, [
@@ -342,7 +357,7 @@ suite("core (reporters)", function () {
     })
 
     test("called correctly with child passing tests", function (done) {
-        var tt = createBase()
+        var tt = t.base()
 
         var ret = []
 
@@ -376,7 +391,7 @@ suite("core (reporters)", function () {
     })
 
     test("called correctly with child failing tests", function (done) {
-        var tt = createBase()
+        var tt = t.base()
 
         var ret = []
         var sentinel1 = new Error("sentinel one")
@@ -435,7 +450,7 @@ suite("core (reporters)", function () {
     })
 
     test("called correctly with child both", function (done) {
-        var tt = createBase()
+        var tt = t.base()
 
         var ret = []
         var sentinel1 = new Error("sentinel one")
@@ -493,15 +508,31 @@ suite("core (reporters)", function () {
         }))
     })
 
-    test("called correctly with unsafe test access", function () {
-        var tt = createBase()
+    test("called correctly with subtest run", function (done) {
+        var tt = t.base()
 
         var ret = []
         tt.reporter(util.push(ret))
+
+        var ttt = tt.test("test")
+
+        ttt.test("foo", function () {})
+
+        ttt.run(util.wrap(done, function () {
+            t.deepEqual(ret, [
+                n("start", "test", -1),
+                n("start", "foo", 0, p("test", 0)),
+                n("end", "foo", 0, p("test", 0)),
+                n("pass", "foo", 0, p("test", 0)),
+                n("end", "test", -1),
+                n("pass", "test", -1),
+                n("exit", "test", 0),
+            ])
+        }))
     })
 
     test("called correctly with complex sequence", function (done) {
-        var tt = createBase()
+        var tt = t.base()
 
         var ret = []
         // Something that can only be checked with identity.
@@ -529,11 +560,13 @@ suite("core (reporters)", function () {
             })
 
             tt.async("baz()", function () {
-                return new Promise(function (resolve) {
-                    setTimeout(resolve, 0)
-                }).then(function () {
-                    throw sentinel
-                })
+                return {
+                    then: function (resolve, reject) {
+                        setTimeout(function () {
+                            reject(sentinel)
+                        }, 0)
+                    },
+                }
             })
 
             tt.test("nested", function (tt) {
