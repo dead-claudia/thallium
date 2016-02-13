@@ -1,4 +1,4 @@
 ---
-extends: isiahmeadows
+extends: isiahmeadows/node
 rules:
     no-unused-expressions: 2

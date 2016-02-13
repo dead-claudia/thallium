@@ -122,7 +122,7 @@ function parseArgs(oldCwd) {
 
     if (!set.config) {
         // Take the first item to infer the file from.
-        args.config = path.join(globParent(args.files[0]), ".config")
+        args.config = path.join(globParent(args.files[0]), ".techtonic")
     }
 
     return {args: args, set: set}

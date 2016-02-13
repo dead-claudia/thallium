@@ -1,12 +1,36 @@
 /* tslint:disable */
 
 declare module "techtonic/core" {
-    interface NestedReporterArray extends Array<NestedReporter> {}
-    type NestedReporter = Reporter | NestedReporterArray;
+    interface NestedArray<T> extends Array<T> {}
+    type Nested<T> = T | NestedArray<T>;
 
     type Callback = (err?: Error) => any;
 
     export interface ParentData {
+        name: string;
+        index: number;
+        parent: ParentData | void;
+    }
+
+    export interface StartReport {
+        type: "start";
+        value: void;
+        name: string;
+        index: number;
+        parent: ParentData | void;
+    }
+
+    export interface EndReport {
+        type: "end";
+        value: void;
+        name: string;
+        index: number;
+        parent: ParentData | void;
+    }
+
+    export interface PassReport {
+        type: "pass";
+        value: void;
         name: string;
         index: number;
         parent: ParentData | void;
@@ -17,15 +41,23 @@ declare module "techtonic/core" {
         value: any;
         name: string;
         index: number;
-        parent: ParentData;
+        parent: ParentData | void;
     }
 
-    export interface PassReport {
-        type: "pass";
+    export interface PendingReport {
+        type: "pending";
         value: void;
         name: string;
         index: number;
-        parent: ParentData;
+        parent: ParentData | void;
+    }
+
+    export interface ExitReport {
+        type: "exit";
+        value: void;
+        name: string;
+        index: number;
+        parent: void;
     }
 
     export interface ExtraReportEntry {
@@ -46,50 +78,65 @@ declare module "techtonic/core" {
         parent: ExtraReportEntry[];
     }
 
-    type TestReport = FailReport | PassReport | ExtraReport;
+    type TestReport =
+        StartReport |
+        EndReport |
+        ExitReport |
+        PassReport |
+        FailReport |
+        ExtraReport;
 
     export interface Reporter {
         (item: TestReport, done: (err?: Error) => void): any;
+
+        // Whether this needs to block everything else. Useful if you need to
+        // have sole access of a resource, and you can't get a lock for it.
+        block?: boolean;
     }
 
     export interface TestResult {
         [key: string]: any;
-        actual: any;
+
+        // These are required.
+        test: boolean;
+        message: string;
+
+        // These are optional, but will be added to the assertion error if the
+        // `test` returns false.
+        actual?: any;
+        expected?: any;
+    }
+
+    type AsyncDone = (err?: Error) => void;
+    type Plugin = (t: Test) => any;
+
+    export interface AssertionErrorJson {
+        name: string;
+        message: string;
         expected: any;
+        actual: any;
+        stack: string | void;
+    }
+
+    export interface AssertionErrorJsonWithStack extends AssertionErrorJson {
+        stack: string | void;
+    }
+
+    export class AssertionError extends Error {
         message: string;
-    }
+        expected: any;
+        found: any;
 
-    export interface AsyncDone {
-        (err?: Error): void;
-    }
-
-    export interface Plugin {
-        (t: Test): any;
-    }
-
-    export interface AssertionErrorJsonResult<T, U> {
-        name: string;
-        message: string;
-        expected: T;
-        actual: U;
-        stack?: string;
-    }
-
-    export class AssertionError<T, U> extends Error {
-        message: string;
-        expected: T;
-        found: U;
-
-        constructor(message: string, expected: T, actual: U);
+        constructor(message: string, expected: any, actual: any);
 
         name: string;
 
-        toJSON(includeStack?: boolean): AssertionErrorJsonResult<T, U>;
+        toJSON(): AssertionErrorJson;
+        toJSON(includeStack?: boolean): AssertionErrorJsonWithStack;
     }
 
     type AssertionErrorConstructor =
-        new <T, U>(message: string, expected: T, actual: U) =>
-            AssertionError<T, U>;
+        new (message: string, expected: any, actual: any) => AssertionError;
 
     var base: Test;
     export default base;
@@ -102,39 +149,92 @@ declare module "techtonic/core" {
     type Iterator = {
         next(value?: any): IteratorResult;
         return?(value?: any): IteratorResult;
-        throw?(e?: any): IteratorResult;
+        throw?(err?: any): IteratorResult;
     }
 
     type Thenable = {
-        then(
-            onresolve: (value: any) => void,
-            onreject: (value: any) => void
-        ): any;
+        then(resolve: (value: any) => void, reject: (value: any) => void): any;
+    }
+
+    type ObjectMap<T> = {
+        [name: string]: T;
     }
 
     export interface Test {
         AssertionError: AssertionErrorConstructor;
 
-        // Use a plugin
-        use(plugin: Plugin): this;
+        // Exposed for testing, but might be interesting for consumers.
+        base(): Test;
 
-        // Define an assertion method on this instance
+        // Only run tests that match these selectors.
+        only(...selectors: string[][]): this;
+
+        // Use one or more plugins.
+        use(...plugins: Nested<Plugin>[]): this;
+
+        // Add one or more reporters.
+        reporter(...reporters: Nested<Reporter>[]): this;
+
+        // Get a list of all reporters used for this instance.
+        reporters(): Reporter;
+
+        // Define one or more assertion methods on this instance. All the
+        // tracking of errors, even in inline tests, are automatically taken
+        // care of. `checkInit()` is also called here, so you don't have to.
+        //
+        // This is also used internally to define the built-in assertions very
+        // concisely.
         define(name: string, impl: (...args: any[]) => TestResult): this;
+        define(methods: ObjectMap<(...args: any[]) => TestResult>): this;
 
-        // Define many assertion methods on this instance
-        define(methods: {[name: string]: (...args: any[]) => TestResult}): this;
+        // Wrap one or more methods on this instance.
+        wrap(name: string, impl: (...args: any[]) => any): this;
+        wrap(methods: ObjectMap<(...args: any[]) => any>): this;
+
+        // Add one or more methods on this instance. The first argument and
+        // `this` both reference the current instance, and the rest are the
+        // other arguments.
+        wrap(name: string, impl: (test: this, ...args: any[]) => any): this;
+        wrap(methods: ObjectMap<(test: this, ...args: any[]) => any>): this;
+
+        // Get the parent test.
+        parent(): Test;
+
+        // Set the timeout for async tests.
+        timeout(timeout: number): this;
+
+        // Get the current timeout. If this returns 0, then it inherits from the
+        // parent.
+        timeout(): number;
+
+        // Ensure this is within the initialization stage. This should *always*
+        // be used by plugin authors if a test method can modify state or throw
+        // an exception during normal execution. If you use `define`, `wrap` or
+        // `add`, this is already done for you.
+        checkInit(): this;
+
+        // Run the tests. This is the only void-returning function that doesn't
+        // return the current instance instead, since chaining is probably a
+        // mistake.
+        run(callback: (err?: Error) => any): void;
+
+        // New shorthand sync test, use testSkip to skip it.
+        test(name: string): Test;
+        testSkip(name: string): Test;
+
+        // New sync test, returns the current instance, use testSkip to skip it.
+        test(name: string, run: (test: this) => any): this;
+        testSkip(name: string, run: (test: this) => any): this;
 
         // Define an async test. This may return a promise, a generator, or call
-        // `done` with a possible error.
+        // `done` with a possible error. Use asyncSkip to skip it.
         async(name: string, run: (test: this, done: AsyncDone) => any): this;
         async(name: string, run: (test: this) => Thenable): this;
         async(name: string, run: (test: this) => Iterator): this;
 
-        // New sync test, assertion shorthand
-        test(name: string): this;
-
-        // New sync test, returns the current instance
-        test(name: string, run: (test: this) => any): this;
+        asyncSkip(name: string, run: (test: this, done: AsyncDone) => any): this;
+        asyncSkip(name: string, run: (test: this) => Thenable): this;
+        asyncSkip(name: string, run: (test: this) => Iterator): this;
     }
 }
 
@@ -161,21 +261,6 @@ declare module "techtonic/assertions" {
 
         ok(cond: any): this;
         notOk(cond: any): this;
-
-        equal<T>(a: T, b: T): this;
-        notEqual<T>(a: T, b: T): this;
-
-        looseEqual<T>(a: T, b: T): this;
-        notLooseEqual<T>(a: T, b: T): this;
-
-        deepEqual<T>(a: T, b: T): this;
-        notDeepEqual<T>(a: T, b: T): this;
-
-        looseDeepEqual<T>(a: T, b: T): this;
-        notLooseDeepEqual<T>(a: T, b: T): this;
-
-        type(object: any, type: TypeofValue): this;
-        notType(object: any, type: TypeofValue): this;
 
         boolean(object: any): this;
         notBoolean(object: any): this;
@@ -213,8 +298,23 @@ declare module "techtonic/assertions" {
         array(object: any): this;
         notArray(object: any): this;
 
+        type(object: any, type: TypeofValue): this;
+        notType(object: any, type: TypeofValue): this;
+
         instanceof(object: any, Type: new (...args: any[]) => any): this;
         notInstanceof(object: any, Type: new (...args: any[]) => any): this;
+
+        equal<T>(a: T, b: T): this;
+        notEqual<T>(a: T, b: T): this;
+
+        looseEqual<T>(a: T, b: T): this;
+        notLooseEqual<T>(a: T, b: T): this;
+
+        deepEqual<T>(a: T, b: T): this;
+        notDeepEqual<T>(a: T, b: T): this;
+
+        looseDeepEqual<T>(a: T, b: T): this;
+        notLooseDeepEqual<T>(a: T, b: T): this;
 
         // TODO: enable the symbol variants once TypeScript supports these
         hasOwn(object: {[key: string]: any}, key: string, value?: any): this;
@@ -237,9 +337,9 @@ declare module "techtonic/assertions" {
         hasKey(object: {[key: number]: any}, key: number, value?: any): this;
         // hasKey(object: {[key: symbol]: any}, key: symbol, value?: any): this;
 
-        notHaveKey(object: {[key: string]: any}, key: string, value?: any): this;
-        notHaveKey(object: {[key: number]: any}, key: number, value?: any): this;
-        // notHaveKey(object: {[key: symbol]: any}, key: symbol, value?: any): this;
+        notHasKey(object: {[key: string]: any}, key: string, value?: any): this;
+        notHasKey(object: {[key: number]: any}, key: number, value?: any): this;
+        // notHasKey(object: {[key: symbol]: any}, key: symbol, value?: any): this;
 
         looseHasKey(object: {[key: string]: any}, key: string, value?: any): this;
         looseHasKey(object: {[key: number]: any}, key: number, value?: any): this;
@@ -257,6 +357,12 @@ declare module "techtonic/assertions" {
 
         length(object: {length: number}, length: number): this;
         notLength(object: {length: number}, length: number): this;
+
+        // Note: these always fail with NaNs.
+        lengthAtLeast(object: {length: number}, length: number): this;
+        lengthAtMost(object: {length: number}, length: number): this;
+        lengthAbove(object: {length: number}, length: number): this;
+        lengthBelow(object: {length: number}, length: number): this;
 
         // Note: these two always fail with NaNs.
         closeTo(actual: number, expected: number, delta: number): this;
@@ -314,17 +420,20 @@ declare module "techtonic" {
 
     export {
         AssertionError,
+        AssertionErrorJson,
+        AssertionErrorJsonWithStack,
         ParentData,
-        FailReport,
+        StartReport,
+        EndReport,
         PassReport,
+        FailReport,
+        PendingReport,
+        ExitReport,
         ExtraReportEntry,
         ExtraReportValue,
         ExtraReport,
         Reporter,
         TestResult,
-        AsyncDone,
-        Plugin,
-        AssertionErrorJsonResult,
     } from "techtonic/core";
 
     import {Assertions} from "techtonic/assertions";

@@ -7,7 +7,7 @@ var util = require("../../test-util/base.js")
 var p = util.p
 var n = util.n
 
-suite("core (reporters)", function () {
+suite("core (reporters)", function () { // eslint-disable-line max-statements
     function resolve(value) {
         return {
             then: function (resolve) {
@@ -663,7 +663,7 @@ suite("core (reporters)", function () {
 
         tt.test("module-2", function (tt) {
             tt.test("1 === 2").equal(1, 2)
-            tt.test("expandos don't transfer").notHaveKey(tt, "foo")
+            tt.test("expandos don't transfer").notHasKey(tt, "foo")
         })
 
         tt.run(util.wrap(done, function () {
@@ -720,5 +720,60 @@ suite("core (reporters)", function () {
                 n("exit", undefined, 0),
             ])
         }))
+    })
+
+    test("can return a resolving thenable", function (done) {
+        var tt = t.base()
+
+        var ret = []
+
+        tt.reporter(function (entry) {
+            return {
+                then: function (resolve) {
+                    ret.push(entry)
+                    resolve()
+                },
+            }
+        })
+
+        tt.test("test", function () {})
+        tt.test("test", function () {})
+
+        tt.run(util.wrap(done, function () {
+            t.deepEqual(ret, [
+                n("start", undefined, -1),
+                n("start", "test", 0),
+                n("end", "test", 0),
+                n("pass", "test", 0),
+                n("start", "test", 1),
+                n("end", "test", 1),
+                n("pass", "test", 1),
+                n("end", undefined, -1),
+                n("exit", undefined, 0),
+            ])
+        }))
+    })
+
+    test("can return a rejecting thenable", function (done) {
+        var tt = t.base()
+
+        var sentinel = new Error("sentinel")
+
+        tt.reporter(function () {
+            return {
+                then: function (resolve, reject) {
+                    reject(sentinel)
+                },
+            }
+        })
+
+        tt.test("test", function () {})
+        tt.test("test", function () {})
+
+        tt.run(function (err) {
+            util.wrap(done, function () {
+                t.equal(err, sentinel)
+            })()
+        })
     })
 })

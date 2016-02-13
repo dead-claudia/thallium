@@ -241,12 +241,11 @@ suite("core (safety)", function () {
         }))
     })
 
-    test("catches concurrent runs", function () {
+    test("catches concurrent runs", function (done) {
         var tt = t.base()
         tt.reporter(function (_, done) { done() })
-        var p = tt.run()
+        tt.run(done)
         t.throws(function () { tt.run() }, Error)
-        return p
     })
 
     test("allows non-concurrent runs with reporter error", function (done) {

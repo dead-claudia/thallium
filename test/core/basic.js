@@ -15,6 +15,13 @@ suite("core (basic)", function () {
         t.function(tt.test)
     })
 
+    test("has `parent()`", function () {
+        var tt = t.base()
+        t.hasKey(tt, "parent")
+        t.function(tt.parent)
+        t.equal(tt.test("test").parent(), tt)
+    })
+
     test("can accept a string + function", function () {
         var tt = t.base()
         tt.test("test", function () {})

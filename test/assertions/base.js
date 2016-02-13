@@ -344,23 +344,23 @@ suite("assertions (base)", function () {
         fail("hasKey", new F(), "value", 2)
     })
 
-    basic("t.notHaveKey()", function () {
+    basic("t.notHasKey()", function () {
         function F() {
             this.value = 1
         }
         F.prototype.prop = 1
 
-        fail("notHaveKey", {prop: 1}, "prop")
-        fail("notHaveKey", {prop: 1}, "prop", 1)
-        fail("notHaveKey", new F(), "value", 1)
-        fail("notHaveKey", {prop: 1}, "toString")
-        fail("notHaveKey", new F(), "prop")
-        fail("notHaveKey", new F(), "prop", 1)
+        fail("notHasKey", {prop: 1}, "prop")
+        fail("notHasKey", {prop: 1}, "prop", 1)
+        fail("notHasKey", new F(), "value", 1)
+        fail("notHasKey", {prop: 1}, "toString")
+        fail("notHasKey", new F(), "prop")
+        fail("notHasKey", new F(), "prop", 1)
 
-        t.notHaveKey({prop: 1}, "value")
-        t.notHaveKey({prop: 1}, "prop", 2)
-        t.notHaveKey({prop: 1}, "prop", "1")
-        t.notHaveKey(new F(), "value", 2)
+        t.notHasKey({prop: 1}, "value")
+        t.notHasKey({prop: 1}, "prop", 2)
+        t.notHasKey({prop: 1}, "prop", "1")
+        t.notHasKey(new F(), "value", 2)
     })
 
     basic("t.looseHasKey()", function () {
