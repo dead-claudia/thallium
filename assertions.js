@@ -599,17 +599,19 @@
     }
 
     define("throwsMatch", function (func, matcher) {
-        var test = false
+        var test, error
         try {
             func()
         } catch (e) {
-            test = tryMatch(matcher, e)
+            test = tryMatch(matcher, error = e)
         }
         return {
             test: test,
             expected: matcher,
             func: func,
-            message: "Expected {func} to match {expected}",
+            error: error,
+            message: "Expected {func} to throw an error that matches {expected} but found " + // eslint-disable-line max-len
+                (test !== undefined ? "{error}" : "no error"),
         }
     })
 
@@ -624,7 +626,7 @@
             test: test,
             expected: matcher,
             func: func,
-            message: "Expected {func} to not match {expected}",
+            message: "Expected {func} to not throw an error that matches {expected}", // eslint-disable-line max-len
         }
     })
 

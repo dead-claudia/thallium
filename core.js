@@ -22,6 +22,42 @@
     }
 })(this, function (global, undefined) { // eslint-disable-line
     "use strict"
+    var hasOwn = {}.hasOwnProperty
+    var toString = {}.toString
+
+    var messages = {
+        /* eslint-disable max-len */
+        unsafeInitCall: "It is only safe to call test methods during initialization",
+        unsafeRun: "Can't run the same test concurrently",
+        makeSetterName: "name must be a string if func exists",
+        // badOnlyType: "Expected the only path to be either all arrays or all strings",
+        testName: "Expected name to be a string",
+        testCallback: "Expected callback to be a function or not exist",
+        asyncCallback: "Expected callback to be a function or generator",
+        reporterImpl: "Expected reporter to be a function",
+        iteratorNext: "Iterator next() must return an object",
+        iteratorThrow: "Iterator throw() must return an object",
+        iteratorReturn: "Iterator return() must return an object",
+        /* eslint-enable max-len */
+    }
+
+    var templates = {
+        defineBadImplType: function (name) {
+            return "Expected body of t." + name + " to be a function"
+        },
+
+        defineBadReturnType: function (name) {
+            return "Expected result for t." + name + " to be an object"
+        },
+
+        wrapMissingMethod: function (name) {
+            return "Expected t." + name + " to already be a function"
+        },
+
+        timeoutFail: function (timeout) {
+            return "Timeout of " + timeout + " reached."
+        },
+    }
 
     var inspect = (function () {
         /**
@@ -157,9 +193,6 @@
             }
         }
 
-        var hasOwn = {}.hasOwnProperty
-        var toString = {}.toString
-
         function isError(e) {
             return e != null &&
                 (toString.call(e) === "[object Error]" || e instanceof Error)
@@ -202,9 +235,9 @@
             return "[" + errorToString.call(value) + "]"
         }
 
-        var regexpToString = /./.toString
-        var dateToString = new Date().toString
-        var dateToUTCString = new Date().toUTCString
+        var regexpToString = RegExp.prototype.toString
+        var dateToString = Date.prototype.toString
+        var dateToUTCString = Date.prototype.toUTCString
 
         function formatValue(ctx, value, recurseTimes) { // eslint-disable-line max-statements, max-len
             // Provide a hook for user-specified inspect functions.
@@ -531,53 +564,37 @@
     var poll, nextTick
 
     (function () {
+        var queue = []
+
+        function pull() {
+            // This optimization really helps engines speed up function
+            // execution.
+            var last = queue.shift()
+            var func = last.func
+            var args = last.args
+            switch (args.length) {
+            case 0: return func()
+            case 1: return func(args[0])
+            case 2: return func(args[0], args[1])
+            case 3: return func(args[0], args[1], args[2])
+            case 4: return func(args[0], args[1], args[2], args[3])
+            default: return func.apply(undefined, args)
+            }
+        }
+
         function dispatcher(defer, arg) {
             return function (func) {
-                var x1, x2, x3, x4
-                switch (arguments.length) {
-                case 0: throw new TypeError("Expected at least a function!")
-                case 1: defer(func, arg); return
-
-                case 2:
-                    x1 = arguments[1]
-                    defer(function () {
-                        return func(x1)
-                    }, arg)
-                    return
-
-                case 3:
-                    x1 = arguments[1]
-                    x2 = arguments[2]
-                    defer(function () {
-                        return func(x1, x2)
-                    }, arg)
-                    return
-
-                case 4:
-                    x1 = arguments[1]
-                    x2 = arguments[2]
-                    x3 = arguments[3]
-                    defer(function () {
-                        return func(x1, x2, x3)
-                    }, arg)
-                    return
-
-                case 5:
-                    x1 = arguments[1]
-                    x2 = arguments[2]
-                    x3 = arguments[3]
-                    x4 = arguments[4]
-                    defer(function () {
-                        return func(x1, x2, x3, x4)
-                    }, arg)
-                    return
-
-                default:
-                    var args = rest.apply(null, arguments)
-                    defer(function () {
-                        return func.apply(null, args)
-                    }, arg)
+                // Don't actually allocate a callable closure. Just allocate
+                // what is needed.
+                var args = new Array(arguments.length - 1)
+                for (var i = 1; i < arguments.length; i++) {
+                    args[i - 1] = arguments[i]
                 }
+                queue.push({func: func, args: args})
+                // Even though this may not seem safe (the browser might call
+                // things out of order), it is as long as the caller doesn't
+                // rely on the order of execution of event loop primitives.
+                defer(pull, arg)
             }
         }
 
@@ -589,46 +606,95 @@
                 : global.process.nextTick
 
             poll = global.setImmediate
-        } else {
+            return
+        }
+
+        if (typeof global.window === "object") {
             // rAF doesn't work well for polling, since it blocks rendering, and
             // thus may block normal execution. It might be preferable in
             // browsers to include a setImmediate polyfill if the polling runs
             // too slow, but the performance needs tested first.
 
-            if (typeof global.requestAnimationFrame === "function") {
+            // Use MutationObservers if possible. That is far faster than
+            // anything else in the browser.
+            //
+            // Largely borrowed from Bluebird. The second check is to guard
+            // against iOS standalone apps which do not fire DOM mutation events
+            // for some reason on iOS 8.3+.
+            if (typeof global.MutationObserver === "function" &&
+                    !global.navigator && !global.navigator.standalone) {
+                // Note that MutationObservers can fire multiple events at once.
+                // These are tallied and called accordingly.
+
+                var el = global.document.createElement("div")
+                var count = 0
+
+                new global.MutationObserver(function () {
+                    while (count !== 0) {
+                        count--
+                        pull()
+                    }
+                }).observe(el, {attributes: true, attributeFilter: ["x"]})
+
+                nextTick = dispatcher(function (_, el) {
+                    count++
+                    el.className = "x"
+                }, el)
+            } else if (typeof global.MessageChannel === "function") {
+                var channel = new global.MessageChannel()
+                channel.port1.onmessage = pull
+
+                channel.port1.start()
+                channel.port2.start()
+
+                nextTick = dispatcher(function () {
+                    channel.port2.postMessage(0)
+                })
+            } else if (typeof global.requestAnimationFrame === "function") {
+                // This is okay.
                 nextTick = dispatcher(global.requestAnimationFrame)
             }
 
-            if (typeof global.window.setImmediate === "function") {
-                poll = dispatcher(global.window.setImmediate)
+            if (typeof global.setImmediate === "function") {
+                poll = dispatcher(global.setImmediate)
             } else {
-                poll = dispatcher(global.setTimeout, 4)
+                poll = dispatcher(global.setTimeout, 0)
             }
 
             nextTick = nextTick || poll
         }
     })()
 
+    function r(type, index, value) {
+        return {
+            type: type,
+            index: index,
+            value: value,
+        }
+    }
+
     // Only use this if it's already known to be a thenable.
     function resolveKnownThenable(value, pass, fail) {
         var resolved = false
-        return value.then(function (value) {
-            if (resolved) return
-            resolved = true
-            return poll(pass, value)
-        }, function (err) {
-            if (resolved) return
-            resolved = true
-            return poll(fail, err)
-        })
+        return value.then(
+            function (value) {
+                if (resolved) return
+                resolved = true
+                return poll(pass, value)
+            },
+            function (err) {
+                if (resolved) return
+                resolved = true
+                return poll(fail, err)
+            })
     }
 
     function resolveThenable(value, callback) {
         try {
             return resolveKnownThenable(
                 value,
-                callback.bind(null, true),
-                callback.bind(null, false))
+                function (v) { return callback(true, v) },
+                function (v) { return callback(false, v) })
         } catch (err) {
             return callback(false, err)
         }
@@ -654,63 +720,8 @@
 
     function checkInit(ctx) {
         if (!ctx.initializing) {
-            throw new ReferenceError(
-                "It is only safe to call test methods during initialization")
+            throw new ReferenceError(messages.unsafeInitCall)
         }
-    }
-
-    function run(ctx, init, isMain, callback) {
-        if (ctx.running) {
-            throw new Error("Can't run the same test concurrently")
-        }
-
-        ctx.running = true
-
-        var index = isMain ? -1 : ctx.index
-
-        function finish(err) {
-            if (err != null) return callback(err)
-            if (isMain) {
-                return report(ctx, {type: "exit", index: 0}, function (err) {
-                    if (err != null) return callback(err)
-                    ctx.running = false
-                    return callback()
-                })
-            } else {
-                ctx.running = false
-                return callback()
-            }
-        }
-
-        function next(err) {
-            if (err != null) return callback(err)
-            ctx.initializing = true
-            return init(ctx, function (err, res) {
-                if (err != null) return callback(err)
-                ctx.initializing = false
-
-                for (var i = 0; i < ctx.deinit.length; i++) {
-                    ctx.deinit[i].initializing = false
-                }
-
-                return runTests(ctx, res, function (err, res) {
-                    if (err != null) return callback(err)
-                    return report(ctx, {
-                        type: "end",
-                        index: index,
-                    }, function (err) {
-                        if (err != null) return callback(err)
-                        return report(ctx, {
-                            type: res.type,
-                            index: index,
-                            value: res.value,
-                        }, finish)
-                    })
-                })
-            })
-        }
-
-        nextTick(report, ctx, {type: "start", index: index}, next)
     }
 
     function activeReporters(ctx) {
@@ -778,8 +789,12 @@
             }
 
             try {
+                // Don't mutate the object. Reporters should be able to assume
+                // a fresh instance each time.
                 return nodeifyThen(reporter, {
-                    type: args.type, index: args.index, value: args.value,
+                    type: args.type,
+                    index: args.index,
+                    value: args.value,
                     name: ctx.name,
                     parent: parent,
                 }, callback)
@@ -827,121 +842,219 @@
 
     var DEFAULT_TIMEOUT = 2000
 
-    function factory(create, init) {
-        return function () {
-            var data = create.apply(null, arguments)
-            if (data.parent == null) data.parent = data.methods._
-            data.plugins = []
+    function Test() {
+        this.plugins = []
 
-            // This is a placeholder, in case a subtest gets its own reporters.
-            // data.reporters = null
-            data.tests = []
+        // This is a placeholder, in case a subtest gets its own reporters.
+        // test.reporters = null
+        this.tests = []
 
-            // In case this is called out of its own init, that error is caught.
-            // Don't override an existing `true`, though.
-            data.initializing = !!data.initializing
+        // In case this is called out of its own init, that error is caught.
+        // Don't override an existing `true`, though.
+        this.initializing = !!this.initializing
 
-            // Keep this from being run multiple times concurrently.
-            data.running = false
+        // Keep this from being run multiple times concurrently.
+        this.running = false
 
-            // Necessary for inline tests, which need explicitly marked.
-            data.deinit = []
+        // Necessary for inline tests, which need explicitly marked.
+        this.deinit = []
 
-            // 0 means inherit timeout
-            data.timeout = 0
+        // 0 means inherit timeout
+        this.timeout = 0
 
-            // If a custom runner is provided, use that.
-            data.run = data.run || run.bind(null, data, init)
-
-            return data
-        }
+        // Placeholder for pretty shape
+        this.parent = null
     }
 
-    var baseTest = factory(function (methods) {
-        return {
-            methods: methods,
-            index: 0,
-            reporters: [],
-            isBase: true,
-            initializing: true,
-
-            run: function (_, callback) {
-                this.running = true
-
-                var self = this
-
-                function finish(err) {
-                    if (err != null) return callback(err)
-                    return report(self, {
-                        type: "exit",
-                        index: 0,
-                    }, function (err) {
-                        if (err != null) return callback(err)
-                        self.running = false
-                        return callback()
-                    })
-                }
-
-                function next(err) {
-                    if (err != null) return callback(err)
-
-                    // Only unset it to run the tests.
-                    self.initializing = false
-
-                    return runTests(self, {type: "pass"}, function (err) {
-                        if (err != null) return callback(err)
-                        self.initializing = true
-                        return report(self, {type: "end", index: -1}, finish)
-                    })
-                }
-
-                nextTick(report, self, {type: "start", index: -1}, next)
-            },
+    // Set up the default runner.
+    Test.prototype.run = function (isMain, callback) {
+        if (this.running) {
+            throw new Error(messages.unsafeRun)
         }
-    })
 
-    var inlineTest = factory(function (methods, name, index) {
-        // Initialize the test now, because the methods are immediately
-        // returned, instead of being revealed through the callback.
-        var data = {
-            methods: Object.create(methods),
-            parent: methods._,
-            name: name,
-            index: index,
-            inline: [],
-            initializing: true,
+        this.running = true
+
+        var index = isMain ? -1 : this.index
+        var self = this
+
+        function exit(err) {
+            // This has to be unset regardless of errors.
+            self.running = false
+            return callback(err)
         }
-        methods._.deinit.push(data)
-        data.methods._ = data
-        return data
-    }, function (ctx, callback) {
-        for (var i = 0; i < ctx.inline.length; i++) {
-            var inline = ctx.inline[i]
-            try {
-                inline.run.apply(null, inline.args)
-            } catch (e) {
-                // If an assertion failed, then this has already failed.
-                return nextTick(callback, null, {type: "fail", value: e})
+
+        function end(err) {
+            if (err != null) return exit(err)
+            if (isMain) {
+                return report(self, r("exit", 0), exit)
+            } else {
+                return exit()
             }
         }
 
-        return nextTick(callback, null, {type: "pass"})
-    })
+        nextTick(report, this, r("start", index), function (err) {
+            if (err != null) return exit(err)
+            self.initializing = true
+            return self.init(function (err, res) {
+                // If an error occurs, the initialization has already finished
+                // (albeit unsuccessfully)
+                self.initializing = false
+                if (err != null) return exit(err)
 
-    var blockTest = factory(function (methods, name, index, callback) {
-        return {methods: methods, name: name, index: index, callback: callback}
-    }, function (ctx, callback) {
-        var methods = Object.create(ctx.methods)
-        methods._ = ctx
+                for (var i = 0; i < self.deinit.length; i++) {
+                    self.deinit[i].initializing = false
+                }
 
-        try {
-            ctx.callback.call(methods, methods)
-        } catch (e) {
-            return nextTick(callback, null, {type: "fail", value: e})
+                return runTests(self, res, function (err, res) {
+                    if (err != null) return exit(err)
+                    return report(self, r("end", index), function (err) {
+                        if (err != null) return exit(err)
+                        return report(self, r(res.type, index, res.value), end)
+                    })
+                })
+            })
+        })
+    }
+
+    function BaseTest(methods) {
+        Test.call(this)
+        this.methods = methods
+        this.index = 0
+        this.reporters = []
+        this.isBase = true
+        this.initializing = true
+    }
+
+    BaseTest.prototype = Object.create(Test.prototype)
+
+    BaseTest.prototype.run = function (_, callback) {
+        this.running = true
+
+        var self = this
+
+        function exit(err) {
+            self.running = false
+            return callback(err)
         }
 
-        return nextTick(callback, null, {type: "pass"})
-    })
+        nextTick(report, self, r("start", -1), function (err) {
+            if (err != null) return exit(err)
+
+            // Only unset it to run the tests.
+            self.initializing = false
+
+            return runTests(self, r("pass", 0), function (err) {
+                // If an error occurs, the tests have already been run
+                // (albeit unsuccessfully)
+                self.initializing = true
+                if (err != null) return exit(err)
+                return report(self, r("end", -1), function (err) {
+                    if (err != null) return exit(err)
+                    return report(self, r("exit", 0), exit)
+                })
+            })
+        })
+    }
+
+    function InlineTest(methods, name, index) {
+        Test.call(this)
+
+        // Initialize the test now, because the methods are immediately
+        // returned, instead of being revealed through the callback.
+
+        this.name = name
+        this.index = index
+        this.parent = methods._
+        this.methods = Object.create(methods)
+        this.methods._ = this
+        this.inline = []
+        this.initializing = true
+    }
+
+    InlineTest.prototype = Object.create(Test.prototype)
+
+    InlineTest.prototype.init = function (callback) {
+        for (var i = 0; i < this.inline.length; i++) {
+            var inline = this.inline[i]
+            try {
+                inline.run.apply(null, inline.args)
+            } catch (e) {
+                // Don't run all the assertions.
+                return nextTick(callback, null,
+                    r("fail", this.index, e))
+            }
+        }
+
+        return nextTick(callback, null, r("pass", this.index))
+    }
+
+    function BlockTest(methods, name, index, callback) {
+        Test.call(this)
+        this.methods = methods
+        this.name = name
+        this.index = index
+        this.callback = callback
+        this.parent = methods._
+    }
+
+    BlockTest.prototype = Object.create(Test.prototype)
+
+    BlockTest.prototype.init = function (callback) {
+        var methods = Object.create(this.methods)
+        methods._ = this
+
+        try {
+            this.callback.call(methods, methods)
+        } catch (e) {
+            return nextTick(callback, null, r("fail", this.index, e))
+        }
+
+        return nextTick(callback, null, r("pass", this.index))
+    }
+
+    function runPendingTest(ctx, isMain, callback) {
+        ctx.running = true
+        var index = isMain ? -1 : ctx.index
+        return report(ctx, r("pending", index), function (err) {
+            ctx.running = false
+            return callback(err)
+        })
+    }
+
+    // Initialize the test as an inline test, because the methods still have
+    // to be exposed.
+    function InlineSkipTest(methods, name, index) {
+        InlineTest.call(this, methods, name, index)
+    }
+
+    InlineSkipTest.prototype = Object.create(InlineTest.prototype)
+    InlineSkipTest.prototype.run = function (isMain, callback) {
+        return runPendingTest(this, isMain, callback)
+    }
+
+    function BlockSkipTest(methods, name, index) {
+        Test.call(this)
+        this.methods = methods
+        this.name = name
+        this.index = index
+        this.parent = methods._
+    }
+
+    BlockSkipTest.prototype = Object.create(Test.prototype)
+    BlockSkipTest.prototype.run = function (isMain, callback) {
+        return runPendingTest(this, isMain, callback)
+    }
+
+    function AsyncTest(methods, name, index, callback) {
+        Test.call(this)
+        this.methods = methods
+        this.name = name
+        this.index = index
+        this.callback = callback
+        this.parent = methods._
+    }
+
+    AsyncTest.prototype = Object.create(Test.prototype)
 
     // Note: this doesn't save the parent, because either it uses a shared
     // reference, which may surprise some consumers, or it creates a redundant
@@ -962,52 +1075,51 @@
         return ret
     }
 
-    function getTimeout(ctx) {
-        // 0 means inherit timeout
-        if (ctx.timeout || ctx.isBase) {
-            return {isSelf: true, timeout: ctx.timeout || DEFAULT_TIMEOUT}
-        }
+    AsyncTest.prototype.getTimeout = function () {
+        var ctx = this // eslint-disable-line consistent-this
 
+        // 0 means inherit timeout
         while (!ctx.timeout && !ctx.isBase) {
             ctx = ctx.parent
         }
-        return {isSelf: false, timeout: ctx.timeout || DEFAULT_TIMEOUT}
+
+        return ctx.timeout || DEFAULT_TIMEOUT
     }
 
-    // Note: do *not* add any other variables to this, as Node and this only
-    // optimizes up to 4 arguments (and polling has to be as quick as possible).
-    //
-    // This doesn't use `nextTick`, because that will prevent I/O, which may
-    // occur during the test.
+    function AsyncTimer(onfail) {
+        this.timeout = 0
+        this.initial = 0
+        this.onfail = onfail
+        this.resolved = false
+    }
 
-    // The polling is organized as a set of asynchronous coroutines to minimize
-    // state and allocation.
-    function pollParentTimeout(timeout, ctx, start, data) {
-        if (data.resolved) return
+    // The polling is slightly performance-sensitive, since it's used to keep
+    // track of time (and needs to be relatively accurate). The reason
+    // `setTimeout` isn't used by default is because other things can interfere
+    // with reasonable timing (like heavy use of this very function), and the
+    // other event loop primitives are almost always faster and more precise.
+    function continuePoll(ctx) {
+        return ctx.poll()
+    }
 
-        if (ctx.timeout) {
-            // Stop inheriting
-            return pollThisTimeout(timeout, ctx, start, data)
-        } else if (+new Date() - start >= timeout) {
-            return data.timerFail(timeout)
+    AsyncTimer.prototype.poll = function () {
+        if (this.resolved) return
+
+        if (Date.now() - this.initial >= this.timeout) {
+            return this.timerFail()
         } else {
-            return poll(pollParentTimeout, timeout, ctx, start, data)
+            return poll(continuePoll, this)
         }
     }
 
-    function pollThisTimeout(timeout, ctx, start, data) {
-        if (data.resolved) return
+    AsyncTimer.prototype.timerFail = function () {
+        return (0, this.onfail)(new Error(templates.timeoutFail(this.timeout)))
+    }
 
-        if (ctx.timeout) {
-            if (+new Date() - start >= ctx.timeout) {
-                return data.timerFail(ctx.timeout)
-            } else {
-                return poll(pollThisTimeout, timeout, ctx, start, data)
-            }
-        } else {
-            // Start inheriting
-            return pollParentTimeout(timeout, ctx, start, data)
-        }
+    AsyncTimer.prototype.start = function (timeout) {
+        this.timeout = timeout
+        this.initial = Date.now()
+        this.poll()
     }
 
     function isThenable(value) {
@@ -1040,8 +1152,7 @@
                 try {
                     result = gen.return()
                     if (result == null || typeof result !== "object") {
-                        return fail(new TypeError(
-                            "Iterator return() must return an object"))
+                        return fail(new TypeError(messages.iteratorReturn))
                     }
 
                     value = result.value
@@ -1066,8 +1177,8 @@
                     if (isThenable(thenable)) {
                         return resolveKnownThenable(
                             thenable,
-                            fail.bind(null, value),
-                            fail.bind(null, value))
+                            function () { return fail(value) },
+                            function () { return fail(value) })
                     }
                 }
             } catch (_) {
@@ -1101,8 +1212,8 @@
         function handle(success, result) {
             if (result == null || typeof result !== "object") {
                 var message = success
-                    ? "Iterator next() must return an object"
-                    : "Iterator throw() must return an object"
+                    ? messages.iteratorNext
+                    : messages.iteratorThrow
                 return nextTick(tryHandle, false, new TypeError(message))
             }
 
@@ -1132,81 +1243,60 @@
         return handle(true, initial)
     }
 
-    var asyncTest = factory(function (methods, name, index, callback) {
-        return {methods: methods, name: name, index: index, callback: callback}
-    }, function (ctx, callback) {
-        var methods = Object.create(ctx.methods)
-        methods._ = ctx
+    AsyncTest.prototype.init = function (callback) {
+        var methods = Object.create(this.methods)
+        methods._ = this
 
-        var pollData = {
-            resolved: false,
-            timerFail: function (timeout) {
-                return fail(new Error("Timeout of " + timeout + " reached."))
-            },
-        }
-
+        var self = this
+        var timer = new AsyncTimer(fail)
         var count = 0
 
         function pass() {
-            if (pollData.resolved) return
-            pollData.resolved = true
-            return nextTick(callback, null, {type: "pass"})
+            if (timer.resolved) return
+            timer.resolved = true
+            return nextTick(callback, null, r("pass", self.index))
         }
 
         function fail(err) {
-            if (pollData.resolved) return
-            pollData.resolved = true
-            return nextTick(callback, null, {type: "fail", value: err})
+            if (timer.resolved) return
+            timer.resolved = true
+            return nextTick(callback, null, r("fail", self.index, err))
         }
 
         function done(err) {
             if (count++) {
-                // Since this can't really give this through the standard
-                // sequence, the full path is required. Error are ignored in
-                // this callback, since there is no reliable way to handle them.
-                nextTick(report, ctx, {
+                // Since the standard sequence has already moved on,
+                // the full path is required. Error are ignored in
+                // this callback, since there is no reliable way to
+                // handle them before the test ends.
+                nextTick(report, self, {
                     type: "extra",
-                    index: ctx.index,
-                    value: {
-                        count: count,
-                        value: err,
-                    },
-                    parent: getPath(ctx.parent),
+                    index: self.index,
+                    value: {count: count, value: err},
+                    parent: getPath(self.parent),
                 }, function () {})
             } else {
                 return err != null ? fail(err) : pass()
             }
         }
 
-        var timeoutData = getTimeout(ctx)
-
-        if (timeoutData.isSelf) {
-            pollParentTimeout(timeoutData.timeout, ctx, +new Date(), pollData)
-        } else {
-            pollThisTimeout(timeoutData.timeout, ctx, +new Date(), pollData)
-        }
-
         try {
-            var res = ctx.callback.call(methods, methods, done)
+            var res = this.callback.call(methods, methods, done)
             if (res != null) {
-                // Thenable
-                if (isThenable(res)) {
-                    res.then(pass, fail)
-                    return
-                }
-
-                // Generator
-                if (isIterator(res)) {
-                    runIterator(res, pass, fail)
-                    return
-                }
+                if (isThenable(res)) res.then(pass, fail)
+                else if (isIterator(res)) runIterator(res, pass, fail)
             }
         } catch (e) {
-            // Synchronous failures when initializing an async test are test
-            // failures, not fatal errors.
+            // Synchronous failures when initializing an async test
+            // are test failures, not fatal errors.
             return nextTick(fail, e)
         }
-    })
+
+        // Start the polling after the initialization. The timeout *must* be
+        // synchronously set, but the timer won't be affected by a slow
+        // initialization.
+        timer.start(this.getTimeout())
+    }
 
     /**
      * Primitive for defining test assertions.
@@ -1234,13 +1324,69 @@
                 }
             } else {
                 if (typeof name !== "string") {
-                    throw new TypeError("name must be a string if func exists")
+                    throw new TypeError(messages.makeSetterName)
                 }
 
                 run(this, name, func)
             }
             return this
         }
+    }
+
+    function makeTest(Inline, Block) {
+        return /** @this */ function (name, callback) {
+            if (typeof name !== "string") {
+                throw new TypeError(messages.testName)
+            }
+
+            if (typeof callback !== "function" && callback != null) {
+                throw new TypeError(messages.testCallback)
+            }
+
+            checkInit(this._)
+
+            var index = this._.tests.length
+
+            if (callback == null) {
+                var t = new Inline(this, name, index)
+                this._.tests.push(t)
+                return t.methods
+            } else {
+                this._.tests.push(new Block(this, name, index, callback))
+                return this
+            }
+        }
+    }
+
+    function makeAsync(Test) {
+        return /** @this */ function (name, callback) {
+            if (typeof name !== "string") {
+                throw new TypeError(messages.testName)
+            }
+
+            if (typeof callback !== "function" && !isIterator(callback)) {
+                throw new TypeError(messages.asyncCallback)
+            }
+
+            checkInit(this._)
+
+            var index = this._.tests.length
+
+            this._.tests.push(new Test(this, name, index, callback))
+            return this
+        }
+    }
+
+    /**
+     * Factory for creating Testiphile instances
+     */
+    function Techtonic() {
+        this._ = new BaseTest(this)
+    }
+
+    // Exposed for testing, but might be interesting for consumers.
+    Techtonic.prototype.base = function () {
+        return new Techtonic()
     }
 
     function iterateCall(func) {
@@ -1260,233 +1406,182 @@
         }
     }
 
-    /**
-     * Factory for creating Testiphile instances
-     */
-
-    function techtonic() {
-        var ret = {
-            // Placeholder for a circular reference
-            _: null,
-
-            // Exposed for testing, but might be interesting for consumers.
-            base: techtonic,
-
-            use: iterateCall(function (ctx, plugin) {
-                if (ctx._.plugins.indexOf(plugin) < 0) {
-                    // Add plugin before calling it.
-                    ctx._.plugins.push(plugin)
-                    plugin.call(ctx, ctx)
-                }
-            }),
-
-            define: makeSetter(function (base, name, func) {
-                if (typeof func !== "function") {
-                    throw new TypeError("Expected body of t." + name +
-                        " to be a function")
-                }
-
-                function run() {
-                    var res = func.apply(null, arguments)
-
-                    if (typeof res !== "object" || res == null) {
-                        throw new TypeError("Expected result for t." + name +
-                            " to be an object")
-                    }
-
-                    if (!res.test) {
-                        throw new AssertionError(format(res), res.expected,
-                            res.actual)
-                    }
-                }
-
-                base[name] = function () {
-                    checkInit(this._)
-                    if (this._.inline) {
-                        var args = rest.apply(null, arguments)
-                        this._.inline.push({run: run, args: args})
-                    } else {
-                        run.apply(null, arguments)
-                    }
-
-                    return this
-                }
-            }),
-
-            wrap: makeSetter(function (base, name, func) {
-                if (typeof func !== "function") {
-                    throw new TypeError("Expected body of t." + name +
-                        " to be a function")
-                }
-
-                var old = base[name]
-
-                if (typeof old !== "function") {
-                    throw new TypeError("Expected t." + name +
-                        " to already be a function")
-                }
-
-                base[name] = function () {
-                    checkInit(this._)
-                    var args = rest.apply([old.bind(this), this], arguments)
-                    var ret = func.apply(this, args)
-                    return ret !== undefined ? ret : this
-                }
-            }),
-
-            add: makeSetter(function add(base, name, func) {
-                if (typeof func !== "function") {
-                    throw new TypeError("Expected body of t." + name +
-                        " to be a function")
-                }
-
-                base[name] = function () {
-                    checkInit(this._)
-                    var ret = func.apply(this, rest.apply([this], arguments))
-                    return ret !== undefined ? ret : this
-                }
-            }),
-
-            // 0 means inherit the parent.
-            timeout: function (timeout) {
-                checkInit(this._)
-                if (arguments.length) {
-                    if (timeout < 0) timeout = 0
-                    this._.timeout = timeout
-                    return this
-                } else {
-                    var ctx = this._
-                    while (!ctx.timeout && !ctx.isBase) {
-                        ctx = ctx.parent
-                    }
-                    return ctx.timeout || DEFAULT_TIMEOUT
-                }
-            },
-
-            // This should *always* be used by plugin authors if a test method
-            // modifies state. If you use `define`, `wrap` or `add`, this is
-            // already done for you.
-            checkInit: function () {
-                checkInit(this._)
-                return this
-            },
-
-            // This returns a thenable unless given a callback. The callback is
-            // called with a single possible error argument.
-            run: function (callback) {
-                checkInit(this._)
-
-                if (this._.running) {
-                    throw new Error("Can't run the same test concurrently")
-                }
-
-                if (typeof callback === "function") {
-                    this._.run(true, callback)
-                } else {
-                    var state = {
-                        ready: false,
-                        error: null,
-                        pass: null,
-                        fail: null,
-                    }
-
-                    this._.run(true, function (err) {
-                        if (state.ready) {
-                            return err != null
-                                ? (0, state.fail)(err)
-                                : (0, state.pass)()
-                        } else {
-                            state.ready = true
-                            state.error = err
-                        }
-                    })
-
-                    return {
-                        then: function (resolve, reject) {
-                            if (state.ready) {
-                                return state.err != null
-                                    ? reject(state.err)
-                                    : resolve()
-                            } else {
-                                state.ready = true
-                                state.pass = resolve
-                                state.fail = reject
-                            }
-                        },
-                    }
-                }
-            },
-
-            test: function (name, callback) {
-                if (typeof name !== "string") {
-                    throw new TypeError("Expected name to be a string")
-                }
-
-                if (typeof callback !== "function" && callback != null) {
-                    throw new TypeError(
-                        "Expected callback to be a function or not exist")
-                }
-
-                checkInit(this._)
-
-                var index = this._.tests.length
-
-                if (callback == null) {
-                    var t = inlineTest(this, name, index)
-                    this._.tests.push(t)
-                    return t.methods
-                } else {
-                    this._.tests.push(blockTest(this, name, index, callback))
-                    return this
-                }
-            },
-
-            async: function (name, callback) {
-                if (typeof name !== "string") {
-                    throw new TypeError("Expected name to be a string")
-                }
-
-                if (typeof callback !== "function" && !isIterator(callback)) {
-                    throw new TypeError(
-                        "Expected callback to be a function or iterator")
-                }
-
-                checkInit(this._)
-
-                var index = this._.tests.length
-
-                this._.tests.push(asyncTest(this, name, index, callback))
-                return this
-            },
-
-            // Call to get a list of active reporters, either on this instance
-            // or on the closest parent. This is the *only* method that can be
-            // called at any point, as the result is a different reference.
-            reporters: function () {
-                return activeReporters(this._).slice()
-            },
-
-            // Add a single reporter. Multiple calls to this are allowed, and
-            // this may be passed either a single reporter or any number of
-            // possibly nested lists of them.
-            reporter: iterateCall(function (ctx, reporter) {
-                if (typeof reporter !== "function") {
-                    throw new TypeError("Expected reporter to be a function")
-                }
-
-                if (ctx._.reporters == null) {
-                    ctx._.reporters = [reporter]
-                } else if (ctx._.reporters.indexOf(reporter) < 0) {
-                    ctx._.reporters.push(reporter)
-                }
-            }),
-
-            // Export the AssertionError constructor
-            AssertionError: AssertionError,
+    Techtonic.prototype.use = iterateCall(function (ctx, plugin) {
+        if (ctx._.plugins.indexOf(plugin) < 0) {
+            // Add plugin before calling it.
+            ctx._.plugins.push(plugin)
+            plugin.call(ctx, ctx)
         }
-        ret._ = baseTest(ret)
-        return ret
+    })
+
+    // Add a single reporter. Multiple calls to this are allowed, and
+    // this may be passed either a single reporter or any number of
+    // possibly nested lists of them.
+    Techtonic.prototype.reporter = iterateCall(function (ctx, reporter) {
+        if (typeof reporter !== "function") {
+            throw new TypeError(messages.reporterImpl)
+        }
+
+        if (ctx._.reporters == null) {
+            ctx._.reporters = [reporter]
+        } else if (ctx._.reporters.indexOf(reporter) < 0) {
+            ctx._.reporters.push(reporter)
+        }
+    })
+
+    Techtonic.prototype.define = makeSetter(function (base, name, func) {
+        if (typeof func !== "function") {
+            throw new TypeError(templates.defineBadImplType(name))
+        }
+
+        function run() {
+            var res = func.apply(null, arguments)
+
+            if (typeof res !== "object" || res == null) {
+                throw new TypeError(templates.defineBadReturnType(name))
+            }
+
+            if (!res.test) {
+                throw new AssertionError(format(res), res.expected,
+                    res.actual)
+            }
+        }
+
+        base[name] = function () {
+            checkInit(this._)
+            if (this._.inline) {
+                var args = rest.apply(null, arguments)
+                this._.inline.push({run: run, args: args})
+            } else {
+                run.apply(null, arguments)
+            }
+
+            return this
+        }
+    })
+
+    Techtonic.prototype.wrap = makeSetter(function (base, name, func) {
+        if (typeof func !== "function") {
+            throw new TypeError(templates.defineBadImplType(name))
+        }
+
+        var old = base[name]
+
+        if (typeof old !== "function") {
+            throw new TypeError(templates.wrapMissingMethod(name))
+        }
+
+        base[name] = function () {
+            checkInit(this._)
+            var self = this
+            function bound() {
+                return old.apply(self, arguments)
+            }
+            var args = rest.apply([bound, this], arguments)
+            var ret = func.apply(this, args)
+            return ret !== undefined ? ret : this
+        }
+    })
+
+    Techtonic.prototype.add = makeSetter(function (base, name, func) {
+        if (typeof func !== "function") {
+            throw new TypeError(templates.defineBadImplType(name))
+        }
+
+        base[name] = function () {
+            checkInit(this._)
+            var ret = func.apply(this, rest.apply([this], arguments))
+            return ret !== undefined ? ret : this
+        }
+    })
+
+    // 0 means inherit the parent.
+    Techtonic.prototype.timeout = function (timeout) {
+        checkInit(this._)
+        if (arguments.length) {
+            if (timeout < 0) timeout = 0
+            this._.timeout = timeout
+            return this
+        } else {
+            var ctx = this._
+            while (!ctx.timeout && !ctx.isBase) {
+                ctx = ctx.parent
+            }
+            return ctx.timeout || DEFAULT_TIMEOUT
+        }
     }
 
-    return techtonic()
+    // This should *always* be used by plugin authors if a test method
+    // modifies state. If you use `define`, `wrap` or `add`, this is
+    // already done for you.
+    Techtonic.prototype.checkInit = function () {
+        checkInit(this._)
+        return this
+    }
+
+    // This returns a thenable unless given a callback. The callback is
+    // called with a single possible error argument.
+    Techtonic.prototype.run = function (callback) {
+        checkInit(this._)
+
+        if (this._.running) {
+            throw new Error(messages.unsafeRun)
+        }
+
+        if (typeof callback === "function") {
+            this._.run(true, callback)
+        } else {
+            var state = {
+                ready: false,
+                error: null,
+                pass: null,
+                fail: null,
+            }
+
+            this._.run(true, function (err) {
+                if (state.ready) {
+                    return err != null
+                        ? (0, state.fail)(err)
+                        : (0, state.pass)()
+                } else {
+                    state.ready = true
+                    state.error = err
+                }
+            })
+
+            return {
+                then: function (resolve, reject) {
+                    if (state.ready) {
+                        return state.err != null
+                            ? reject(state.err)
+                            : resolve()
+                    } else {
+                        state.ready = true
+                        state.pass = resolve
+                        state.fail = reject
+                    }
+                },
+            }
+        }
+    }
+
+    Techtonic.prototype.testSkip = makeTest(InlineSkipTest, BlockSkipTest)
+
+    Techtonic.prototype.asyncSkip = makeAsync(BlockSkipTest)
+
+    Techtonic.prototype.test = makeTest(InlineTest, BlockTest)
+
+    Techtonic.prototype.async = makeAsync(AsyncTest)
+
+    // Call to get a list of active reporters, either on this instance
+    // or on the closest parent. This is the *only* method that can be
+    // called at any point, as the result is a different reference.
+    Techtonic.prototype.reporters = function () {
+        return activeReporters(this._).slice()
+    }
+
+    // Export the AssertionError constructor
+    Techtonic.prototype.AssertionError = AssertionError
+
+    return new Techtonic()
 })

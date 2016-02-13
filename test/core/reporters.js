@@ -182,6 +182,91 @@ suite("core (reporters)", function () {
         }))
     })
 
+    test("called correctly with inline passing", function (done) {
+        var tt = t.base()
+
+        var ret = []
+
+        tt.reporter(util.push(ret))
+
+        tt.test("test")
+        tt.test("test")
+
+        tt.run(util.wrap(done, function () {
+            t.deepEqual(ret, [
+                n("start", undefined, -1),
+                n("start", "test", 0),
+                n("end", "test", 0),
+                n("pass", "test", 0),
+                n("start", "test", 1),
+                n("end", "test", 1),
+                n("pass", "test", 1),
+                n("end", undefined, -1),
+                n("exit", undefined, 0),
+            ])
+        }))
+    })
+
+    test("called correctly with inline failing", function (done) {
+        var tt = t.base()
+
+        var ret = []
+
+        tt.reporter(util.push(ret))
+
+        tt.define("fail", function () { return {test: false, message: "fail"} })
+
+        tt.test("one").fail()
+        tt.test("two").fail()
+
+        tt.run(util.wrap(done, function () {
+            t.deepEqual(ret, [
+                n("start", undefined, -1),
+
+                n("start", "one", 0),
+                n("end", "one", 0),
+                n("fail", "one", 0, undefined, new t.AssertionError("fail")),
+
+                n("start", "two", 1),
+                n("end", "two", 1),
+                n("fail", "two", 1, undefined, new t.AssertionError("fail")),
+
+                n("end", undefined, -1),
+                n("exit", undefined, 0),
+            ])
+        }))
+    })
+
+    test("called correctly with inline both", function (done) {
+        var tt = t.base()
+
+        var ret = []
+
+        tt.reporter(util.push(ret))
+
+        tt.define("fail", function () { return {test: false, message: "fail"} })
+
+        tt.test("one").fail()
+        tt.test("two", function () {})
+
+        tt.run(util.wrap(done, function () {
+            t.deepEqual(ret, [
+                n("start", undefined, -1),
+
+                n("start", "one", 0),
+                n("end", "one", 0),
+                n("fail", "one", 0, undefined, new t.AssertionError("fail")),
+
+                n("start", "two", 1),
+                n("end", "two", 1),
+                n("pass", "two", 1),
+
+                n("end", undefined, -1),
+                n("exit", undefined, 0),
+            ])
+        }))
+    })
+
     test("called correctly with async passing", function (done) {
         var tt = t.base()
 

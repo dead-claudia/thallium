@@ -1,5 +1,4 @@
 "use strict"
-/* eslint-env node */
 var fs = require("fs")
 var path = require("path")
 

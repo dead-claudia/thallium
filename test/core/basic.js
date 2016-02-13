@@ -1,8 +1,9 @@
 "use strict"
 
 var t = require("../../index.js")
+var util = require("../../test-util/base.js")
 
-suite("core (basics)", function () {
+suite("core (basic)", function () {
     test("has `base()`", function () {
         t.hasKey(t, "base")
         t.equal(t.base().base, t.base)
@@ -35,5 +36,39 @@ suite("core (basics)", function () {
         var test = tt.test("test")
         t.notEqual(test, tt)
         t.equal(Object.getPrototypeOf(test), tt)
+    })
+
+    test("runs block tests within tests", function (done) {
+        var tt = t.base()
+        var called = false
+        tt.test("test", function (tt) {
+            tt.test("foo", function () {
+                called = true
+            })
+        })
+
+        tt.run(util.wrap(done, function () {
+            t.true(called)
+        }))
+    })
+
+    test("runs successful inline tests within tests", function (done) {
+        var tt = t.base()
+        var err
+
+        tt.reporter(function (res, done) {
+            if (res.type === "fail") {
+                err = res.value
+            }
+            done()
+        })
+
+        tt.test("test", function (tt) {
+            tt.test("foo").use(function () {})
+        })
+
+        tt.run(util.wrap(done, function () {
+            t.notOk(err)
+        }))
     })
 })

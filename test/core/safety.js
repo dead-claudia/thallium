@@ -248,4 +248,26 @@ suite("core (safety)", function () {
         t.throws(function () { tt.run() }, Error)
         return p
     })
+
+    test("allows non-concurrent runs with reporter error", function (done) {
+        var tt = t.base()
+        var sentinel = new Error("fail")
+        tt.reporter(function (_, done) { done(sentinel) })
+
+        tt.run(function (err) {
+            try {
+                t.equal(err, sentinel)
+                tt.run(function (err) {
+                    try {
+                        t.equal(err, sentinel)
+                    } catch (e) {
+                        return done(e)
+                    }
+                    return done()
+                })
+            } catch (e) {
+                return done(e)
+            }
+        })
+    })
 })

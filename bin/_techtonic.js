@@ -1,7 +1,5 @@
 "use strict"
 
-/* eslint-env node */
-
 if (require.main !== module) {
     throw new Error("This is not a module!")
 }
