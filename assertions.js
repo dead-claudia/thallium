@@ -8,7 +8,7 @@
 var hasOwn = {}.hasOwnProperty
 var toString = {}.toString
 
-var util = require("./lib/util.js")
+var util = require("./lib/util/util.js")
 var deepEqualImpl = require("./lib/deep-equal.js")
 
 function looseDeepEqual(actual, expected) {

@@ -37,7 +37,7 @@ Options:
     precedence.
 
 -m [module], --module [module]
-    Use this module to represent Testiphile instead of the one installed in the
+    Use this module to represent Techtonic instead of the one installed in the
     closest node_modules to the config. This is resolved to the current working
     directory, and it must be a full path to the module.
 

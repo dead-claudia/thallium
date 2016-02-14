@@ -5,7 +5,7 @@ process.title = "techtonic"
 
 var cp = require("child_process")
 var path = require("path")
-var help = require("./cli-help.js")
+var help = require("../lib/cli/help.js")
 
 var args = {
     config: null,

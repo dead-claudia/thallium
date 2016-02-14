@@ -26,7 +26,8 @@
   "devDependencies": {
     "eslint": "^1.10.3",
     "eslint-config-isiahmeadows": "0.0.2",
-    "mocha": "^2.3.4"
+    "mocha": "^2.3.4",
+    "mockery": "^1.4.0"
   },
   "dependencies": {
     "glob-parent": "^2.0.0",
