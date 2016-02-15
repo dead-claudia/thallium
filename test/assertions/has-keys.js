@@ -8,16 +8,20 @@ suite("assertions (has keys)", function () {
     function shallow(name, opts) {
         function run(succeed) {
             var args = []
+
             if (!succeed) args.push(name)
+
             for (var i = 1; i < arguments.length; i++) {
                 args.push(arguments[i])
             }
+
             if (succeed) {
                 return t[name].apply(t, args)
             } else {
                 return fail.apply(null, args)
             }
         }
+
         suite("t." + name + "()", function () {
             test("checks numbers", function () {
                 run(!opts.invert, {1: true, 2: true, 3: false}, 1)
@@ -163,16 +167,20 @@ suite("assertions (has keys)", function () {
     function deep(name, opts) {
         function run(succeed) {
             var args = []
+
             if (!succeed) args.push(name)
+
             for (var i = 1; i < arguments.length; i++) {
                 args.push(arguments[i])
             }
+
             if (succeed) {
                 return t[name].apply(t, args)
             } else {
                 return fail.apply(null, args)
             }
         }
+
         suite("t." + name + "()", function () {
             test("checks numbers", function () {
                 run(!opts.invert, {1: true, 2: false, 3: 0}, 1)

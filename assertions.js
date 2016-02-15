@@ -8,8 +8,8 @@
 var hasOwn = {}.hasOwnProperty
 var toString = {}.toString
 
-var util = require("./lib/util/util.js")
-var deepEqualImpl = require("./lib/deep-equal.js")
+var is = require("./lib/util/is.js")
+var deepEqualImpl = require("./lib/util/deep-equal.js")
 
 function looseDeepEqual(actual, expected) {
     return deepEqualImpl(actual, expected, false)
@@ -161,12 +161,12 @@ define("notInstanceof", function (object, Type) {
     }
 })
 
-binary("equal", util.strictIs, [
+binary("equal", is.strict, [
     "Expected {actual} to equal {expected}",
     "Expected {actual} to not equal {expected}",
 ])
 
-binary("looseEqual", util.looseIs, [
+binary("looseEqual", is.loose, [
     "Expected {actual} to loosely equal {expected}",
     "Expected {actual} to not loosely equal {expected}",
 ])
@@ -184,6 +184,7 @@ binary("looseDeepEqual", looseDeepEqual, [
 function has(name, is, check, messages) {
     define(name, function (object, key, value) {
         var test = check(object, key)
+
         if (arguments.length === 3) {
             return {
                 test: test && is(object[key], value),
@@ -205,6 +206,7 @@ function has(name, is, check, messages) {
 
     define(negate(name), function (object, key, value) {
         var test = !check(object, key)
+
         if (arguments.length === 3) {
             return {
                 test: test || !is(object[key], value),
@@ -224,28 +226,28 @@ function has(name, is, check, messages) {
     })
 }
 
-has("hasOwn", util.strictIs, hasOwn.call.bind(hasOwn), [
+has("hasOwn", is.strict, hasOwn.call.bind(hasOwn), [
     "Expected {object} to have own key {key} equal to {expected}, but found {actual}", // eslint-disable-line max-len
     "Expected {actual} to have own key {expected}",
     "Expected {object} to not have own key {key} equal to {actual}",
     "Expected {actual} to not have own key {expected}",
 ])
 
-has("looseHasOwn", util.looseIs, hasOwn.call.bind(hasOwn), [
+has("looseHasOwn", is.loose, hasOwn.call.bind(hasOwn), [
     "Expected {object} to have own key {key} loosely equal to {expected}, but found {actual}", // eslint-disable-line max-len
     "Expected {actual} to have own key {expected}",
     "Expected {object} to not have own key {key} loosely equal to {actual}",
     "Expected {actual} to not have own key {expected}",
 ])
 
-has("hasKey", util.strictIs, function (obj, key) { return key in obj }, [
+has("hasKey", is.strict, function (obj, key) { return key in obj }, [
     "Expected {object} to have key {key} equal to {expected}, but found {actual}", // eslint-disable-line max-len
     "Expected {actual} to have key {expected}",
     "Expected {object} to not have key {key} equal to {actual}",
     "Expected {actual} to not have key {expected}",
 ])
 
-has("looseHasKey", util.looseIs, function (obj, key) { return key in obj }, [
+has("looseHasKey", is.loose, function (obj, key) { return key in obj }, [
     "Expected {object} to have key {key} loosely equal to {expected}, but found {actual}", // eslint-disable-line max-len
     "Expected {actual} to have key {expected}",
     "Expected {object} to not have key {key} loosely equal to {actual}",
@@ -287,6 +289,7 @@ throws("throws", function (Type, e) {
     return Type == null || e instanceof Type
 }, function (Type, invert) {
     var str = "Expected {func} to " + (invert ? "not " : "") + "throw"
+
     if (Type != null) str += " an instance of " + getName(Type)
     return str
 })
@@ -327,12 +330,14 @@ function len(name, compare, message) {
 
 // Note: these always fail with NaNs.
 /* eslint-disable max-len */
+
 len("length", function (a, b) { return a === b }, "Expected {object} to have length {expected}, but found {actual}")
 len("notLength", function (a, b) { return a !== b }, "Expected {object} to not have length {acutal}")
 len("lengthAtLeast", function (a, b) { return a >= b }, "Expected {object} to have length at least {expected}, but found {actual}")
 len("lengthAtMost", function (a, b) { return a <= b }, "Expected {object} to have length at most {expected}, but found {actual}")
 len("lengthAbove", function (a, b) { return a > b }, "Expected {object} to have length above {expected}, but found {actual}")
 len("lengthBelow", function (a, b) { return a > b }, "Expected {object} to have length below {expected}, but found {actual}")
+
 /* eslint-enable max-len */
 
 // Note: these two always fail when dealing with NaNs.
@@ -408,44 +413,52 @@ function defineIncludes(name, func, invert, message) {
     })
 }
 
-var includesAll = makeIncludes(true, util.strictIs)
-var includesAny = makeIncludes(false, util.strictIs)
+var includesAll = makeIncludes(true, is.strict)
+var includesAny = makeIncludes(false, is.strict)
 
 /* eslint-disable max-len */
+
 defineIncludes("includes", includesAll, false, "Expected {actual} to have all values in {keys}")
 defineIncludes("notIncludesAll", includesAll, true, "Expected {actual} to not have all values in {keys}")
 defineIncludes("includesAny", includesAny, false, "Expected {actual} to have any value in {keys}")
 defineIncludes("notIncludes", includesAny, true, "Expected {actual} to not have any value in {keys}")
+
 /* eslint-enable max-len */
 
-var includesLooseAll = makeIncludes(true, util.looseIs)
-var includesLooseAny = makeIncludes(false, util.looseIs)
+var includesLooseAll = makeIncludes(true, is.loose)
+var includesLooseAny = makeIncludes(false, is.loose)
 
 /* eslint-disable max-len */
+
 defineIncludes("includesLoose", includesLooseAll, false, "Expected {actual} to loosely have all values in {keys}")
 defineIncludes("notIncludesLooseAll", includesLooseAll, true, "Expected {actual} to loosely not have all values in {keys}")
 defineIncludes("includesLooseAny", includesLooseAny, false, "Expected {actual} to loosely have any value in {keys}")
 defineIncludes("notIncludesLoose", includesLooseAny, true, "Expected {actual} to loosely not have any value in {keys}")
+
 /* eslint-enable max-len */
 
 var includesDeepAll = makeIncludes(true, deepEqual)
 var includesDeepAny = makeIncludes(false, deepEqual)
 
 /* eslint-disable max-len */
+
 defineIncludes("includesDeep", includesDeepAll, false, "Expected {actual} to match all values in {keys}")
 defineIncludes("notIncludesDeepAll", includesDeepAll, true, "Expected {actual} to not match all values in {keys}")
 defineIncludes("includesDeepAny", includesDeepAny, false, "Expected {actual} to match any value in {keys}")
 defineIncludes("notIncludesDeep", includesDeepAny, true, "Expected {actual} to not match any value in {keys}")
+
 /* eslint-enable max-len */
 
 var includesLooseDeepAll = makeIncludes(true, looseDeepEqual)
 var includesLooseDeepAny = makeIncludes(false, looseDeepEqual)
 
 /* eslint-disable max-len */
+
 defineIncludes("includesLooseDeep", includesLooseDeepAll, false, "Expected {actual} to loosely match all values in {keys}")
 defineIncludes("notIncludesLooseDeepAll", includesLooseDeepAll, true, "Expected {actual} to loosely not match all values in {keys}")
 defineIncludes("includesLooseDeepAny", includesLooseDeepAny, false, "Expected {actual} to loosely match any value in {keys}")
 defineIncludes("notIncludesLooseDeep", includesLooseDeepAny, true, "Expected {actual} to loosely not match any value in {keys}")
+
 /* eslint-enable max-len */
 
 function isEmpty(object) {
@@ -482,8 +495,11 @@ function hasKeysType(all, func) {
             function f(k) {
                 return hasOwn.call(object, k) && func(keys[k], object[k])
             }
+
             if (typeof keys !== "object" || keys == null) return true
+
             var list = Object.keys(keys)
+
             return all ? list.every(f) : list.some(f)
         },
 
@@ -496,42 +512,50 @@ function hasKeysType(all, func) {
     }
 }
 
-var hasAllKeys = hasKeysType(true, util.strictIs)
-var hasAnyKeys = hasKeysType(false, util.strictIs)
+var hasAllKeys = hasKeysType(true, is.strict)
+var hasAnyKeys = hasKeysType(false, is.strict)
 
 /* eslint-disable max-len */
+
 makeHasKeys("hasKeys", hasAllKeys, false, "Expected {actual} to have all keys in {keys}")
 makeHasKeys("notHasAllKeys", hasAllKeys, true, "Expected {actual} to not have all keys in {keys}")
 makeHasKeys("hasAnyKeys", hasAnyKeys, false, "Expected {actual} to have any key in {keys}")
 makeHasKeys("notHasKeys", hasAnyKeys, true, "Expected {actual} to not have any key in {keys}")
+
 /* eslint-enable max-len */
 
-var hasLooseAllKeys = hasKeysType(true, util.looseIs)
-var hasLooseAnyKeys = hasKeysType(false, util.looseIs)
+var hasLooseAllKeys = hasKeysType(true, is.loose)
+var hasLooseAnyKeys = hasKeysType(false, is.loose)
 
 /* eslint-disable max-len */
+
 makeHasKeys("hasLooseKeys", hasLooseAllKeys, false, "Expected {actual} to loosely have all keys in {keys}")
 makeHasKeys("notHasLooseAllKeys", hasLooseAllKeys, true, "Expected {actual} to loosely not have all keys in {keys}")
 makeHasKeys("hasLooseAnyKeys", hasLooseAnyKeys, false, "Expected {actual} to loosely have any key in {keys}")
 makeHasKeys("notHasLooseKeys", hasLooseAnyKeys, true, "Expected {actual} to loosely not have any key in {keys}")
+
 /* eslint-enable max-len */
 
 var hasDeepAllKeys = hasKeysType(true, deepEqual)
 var hasDeepAnyKeys = hasKeysType(false, deepEqual)
 
 /* eslint-disable max-len */
+
 makeHasKeys("hasDeepKeys", hasDeepAllKeys, false, "Expected {actual} to match all keys in {keys}")
 makeHasKeys("notHasDeepAllKeys", hasDeepAllKeys, true, "Expected {actual} to not match all keys in {keys}")
 makeHasKeys("hasDeepAnyKeys", hasDeepAnyKeys, false, "Expected {actual} to match any key in {keys}")
 makeHasKeys("notHasDeepKeys", hasDeepAnyKeys, true, "Expected {actual} to not match any key in {keys}")
+
 /* eslint-enable max-len */
 
 var hasLooseDeepAllKeys = hasKeysType(true, looseDeepEqual)
 var hasLooseDeepAnyKeys = hasKeysType(false, looseDeepEqual)
 
 /* eslint-disable max-len */
+
 makeHasKeys("hasLooseDeepKeys", hasLooseDeepAllKeys, false, "Expected {actual} to loosely match all keys in {keys}")
 makeHasKeys("notHasLooseDeepAllKeys", hasLooseDeepAllKeys, true, "Expected {actual} to loosely not match all keys in {keys}")
 makeHasKeys("hasLooseDeepAnyKeys", hasLooseDeepAnyKeys, false, "Expected {actual} to loosely match any key in {keys}")
 makeHasKeys("notHasLooseDeepKeys", hasLooseDeepAnyKeys, true, "Expected {actual} to loosely not match any key in {keys}")
+
 /* eslint-enable max-len */

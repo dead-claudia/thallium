@@ -170,7 +170,9 @@ suite("core (iterators)", function () {
 
         test("throws initially", function (done) {
             var sentinel = new Error("sentinel")
+
             sentinel.marker = function () {}
+
             var iter = {
                 list: [],
                 index: 0,
@@ -207,7 +209,9 @@ suite("core (iterators)", function () {
 
         test("throws initially + no `throw`", function (done) {
             var sentinel = new Error("sentinel")
+
             sentinel.marker = function () {}
+
             var iter = {
                 list: [],
                 index: 0,
@@ -242,7 +246,9 @@ suite("core (iterators)", function () {
         test("`return` + throw initially", function (done) {
             var returned = 0
             var sentinel = new Error("sentinel")
+
             sentinel.marker = function () {}
+
             var iter = {
                 list: [],
                 index: 0,
@@ -285,7 +291,9 @@ suite("core (iterators)", function () {
         test("no `throw` + `return` + throw initially", function (done) {
             var returned = 0
             var sentinel = new Error("sentinel")
+
             sentinel.marker = function () {}
+
             var iter = {
                 list: [],
                 index: 0,
@@ -324,7 +332,9 @@ suite("core (iterators)", function () {
 
         test("throws in middle", function (done) {
             var sentinel = new Error("sentinel")
+
             sentinel.marker = function () {}
+
             var iter = {
                 list: [],
                 index: 0,
@@ -365,7 +375,9 @@ suite("core (iterators)", function () {
 
         test("throws in middle + no `throw`", function (done) {
             var sentinel = new Error("sentinel")
+
             sentinel.marker = function () {}
+
             var iter = {
                 list: [],
                 index: 0,
@@ -404,7 +416,9 @@ suite("core (iterators)", function () {
         test("`return` + throw in middle", function (done) {
             var returned = 0
             var sentinel = new Error("sentinel")
+
             sentinel.marker = function () {}
+
             var iter = {
                 list: [],
                 index: 0,
@@ -451,7 +465,9 @@ suite("core (iterators)", function () {
         test("no `throw` + `return` + throw in middle", function (done) {
             var returned = 0
             var sentinel = new Error("sentinel")
+
             sentinel.marker = function () {}
+
             var iter = {
                 list: [],
                 index: 0,
@@ -494,7 +510,9 @@ suite("core (iterators)", function () {
 
         test("throw in `return`", function (done) {
             var sentinel = new Error("sentinel")
+
             sentinel.marker = function () {}
+
             var iter = {
                 list: [],
                 index: 0,
@@ -538,7 +556,9 @@ suite("core (iterators)", function () {
 
         test("throw in `return` + no `throw`", function (done) {
             var sentinel = new Error("sentinel")
+
             sentinel.marker = function () {}
+
             var iter = {
                 list: [],
                 index: 0,
@@ -579,9 +599,13 @@ suite("core (iterators)", function () {
 
         test("throw in middle + throw in `return`", function (done) {
             var sentinel1 = new Error("sentinel1")
+
             sentinel1.marker = function () {}
+
             var sentinel2 = new Error("sentinel2")
+
             sentinel2.marker = function () {}
+
             var iter = {
                 list: [],
                 index: 0,
@@ -625,9 +649,13 @@ suite("core (iterators)", function () {
 
         test("throw in middle + throw in `return` + no `throw`", function (done) { // eslint-disable-line max-len
             var sentinel1 = new Error("sentinel1")
+
             sentinel1.marker = function () {}
+
             var sentinel2 = new Error("sentinel2")
+
             sentinel2.marker = function () {}
+
             var iter = {
                 list: [],
                 index: 0,
@@ -848,7 +876,9 @@ suite("core (iterators)", function () {
 
         test("rejects initially", function (done) {
             var sentinel = new Error("sentinel")
+
             sentinel.marker = function () {}
+
             var iter = {
                 list: [],
                 index: 0,
@@ -889,7 +919,9 @@ suite("core (iterators)", function () {
 
         test("rejects initially + no `throw`", function (done) {
             var sentinel = new Error("sentinel")
+
             sentinel.marker = function () {}
+
             var iter = {
                 list: [],
                 index: 0,
@@ -927,7 +959,9 @@ suite("core (iterators)", function () {
         test("`return` + throw initially", function (done) {
             var returned = 0
             var sentinel = new Error("sentinel")
+
             sentinel.marker = function () {}
+
             var iter = {
                 list: [],
                 index: 0,
@@ -974,7 +1008,9 @@ suite("core (iterators)", function () {
         test("`return` + no `throw` + throw initially", function (done) {
             var returned = 0
             var sentinel = new Error("sentinel")
+
             sentinel.marker = function () {}
+
             var iter = {
                 list: [],
                 index: 0,
@@ -1016,7 +1052,9 @@ suite("core (iterators)", function () {
 
         test("rejects in middle", function (done) {
             var sentinel = new Error("sentinel")
+
             sentinel.marker = function () {}
+
             var iter = {
                 list: [],
                 index: 0,
@@ -1058,7 +1096,9 @@ suite("core (iterators)", function () {
 
         test("rejects in middle + no `throw`", function (done) {
             var sentinel = new Error("sentinel")
+
             sentinel.marker = function () {}
+
             var iter = {
                 list: [],
                 index: 0,
@@ -1097,7 +1137,9 @@ suite("core (iterators)", function () {
         test("`return` + reject in middle", function (done) {
             var returned = 0
             var sentinel = new Error("sentinel")
+
             sentinel.marker = function () {}
+
             var iter = {
                 list: [],
                 index: 0,
@@ -1145,7 +1187,9 @@ suite("core (iterators)", function () {
         test("no `throw` + `return` + reject in middle", function (done) {
             var returned = 0
             var sentinel = new Error("sentinel")
+
             sentinel.marker = function () {}
+
             var iter = {
                 list: [],
                 index: 0,
@@ -1188,7 +1232,9 @@ suite("core (iterators)", function () {
 
         test("throw in `return`", function (done) {
             var sentinel = new Error("sentinel")
+
             sentinel.marker = function () {}
+
             var iter = {
                 list: [],
                 index: 0,
@@ -1232,7 +1278,9 @@ suite("core (iterators)", function () {
 
         test("throw in `return` + no `throw`", function (done) {
             var sentinel = new Error("sentinel")
+
             sentinel.marker = function () {}
+
             var iter = {
                 list: [],
                 index: 0,
@@ -1273,9 +1321,13 @@ suite("core (iterators)", function () {
 
         test("reject in middle + throw in `return`", function (done) {
             var sentinel1 = new Error("sentinel1")
+
             sentinel1.marker = function () {}
+
             var sentinel2 = new Error("sentinel2")
+
             sentinel2.marker = function () {}
+
             var iter = {
                 list: [],
                 index: 0,
@@ -1320,9 +1372,13 @@ suite("core (iterators)", function () {
 
         test("reject in middle + throw in `return` + no `throw`", function (done) { // eslint-disable-line max-len
             var sentinel1 = new Error("sentinel1")
+
             sentinel1.marker = function () {}
+
             var sentinel2 = new Error("sentinel2")
+
             sentinel2.marker = function () {}
+
             var iter = {
                 list: [],
                 index: 0,
@@ -1544,7 +1600,9 @@ suite("core (iterators)", function () {
 
         test("rejects initially, but returns promise", function (done) {
             var sentinel = new Error("sentinel")
+
             sentinel.marker = function () {}
+
             var iter = {
                 list: [],
                 index: 0,
@@ -1585,7 +1643,9 @@ suite("core (iterators)", function () {
 
         test("rejects initially + no `throw`", function (done) {
             var sentinel = new Error("sentinel")
+
             sentinel.marker = function () {}
+
             var iter = {
                 list: [],
                 index: 0,
@@ -1624,7 +1684,9 @@ suite("core (iterators)", function () {
             var returned = 0
             var called = 0
             var sentinel = new Error("sentinel")
+
             sentinel.marker = function () {}
+
             var iter = {
                 list: [],
                 index: 0,
@@ -1681,9 +1743,13 @@ suite("core (iterators)", function () {
             var returned = 0
             var called = 0
             var sentinel1 = new Error("sentinel1")
+
             sentinel1.marker = function () {}
+
             var sentinel2 = new Error("sentinel2")
+
             sentinel2.marker = function () {}
+
             var iter = {
                 list: [],
                 index: 0,
@@ -1740,7 +1806,9 @@ suite("core (iterators)", function () {
             var returned = 0
             var called = 0
             var sentinel = new Error("sentinel")
+
             sentinel.marker = function () {}
+
             var iter = {
                 list: [],
                 index: 0,
@@ -1797,9 +1865,13 @@ suite("core (iterators)", function () {
             var returned = 0
             var called = 0
             var sentinel1 = new Error("sentinel1")
+
             sentinel1.marker = function () {}
+
             var sentinel2 = new Error("sentinel2")
+
             sentinel2.marker = function () {}
+
             var iter = {
                 list: [],
                 index: 0,
@@ -1856,7 +1928,9 @@ suite("core (iterators)", function () {
             var returned = 0
             var called = 0
             var sentinel = new Error("sentinel")
+
             sentinel.marker = function () {}
+
             var iter = {
                 list: [],
                 index: 0,
@@ -1909,9 +1983,13 @@ suite("core (iterators)", function () {
             var returned = 0
             var called = 0
             var sentinel1 = new Error("sentinel1")
+
             sentinel1.marker = function () {}
+
             var sentinel2 = new Error("sentinel2")
+
             sentinel2.marker = function () {}
+
             var iter = {
                 list: [],
                 index: 0,
@@ -1962,7 +2040,9 @@ suite("core (iterators)", function () {
 
         test("rejects in middle", function (done) {
             var sentinel = new Error("sentinel")
+
             sentinel.marker = function () {}
+
             var iter = {
                 list: [],
                 index: 0,
@@ -2006,9 +2086,13 @@ suite("core (iterators)", function () {
             var returned = 0
             var called = 0
             var sentinel1 = new Error("sentinel1")
+
             sentinel1.marker = function () {}
+
             var sentinel2 = new Error("sentinel2")
+
             sentinel2.marker = function () {}
+
             var iter = {
                 list: [],
                 index: 0,
@@ -2062,7 +2146,9 @@ suite("core (iterators)", function () {
 
         test("rejects in middle + no `throw`", function (done) {
             var sentinel = new Error("sentinel")
+
             sentinel.marker = function () {}
+
             var iter = {
                 list: [],
                 index: 0,
@@ -2101,7 +2187,9 @@ suite("core (iterators)", function () {
         test("`return` + reject in middle", function (done) {
             var returned = 0
             var sentinel = new Error("sentinel")
+
             sentinel.marker = function () {}
+
             var iter = {
                 list: [],
                 index: 0,
@@ -2150,7 +2238,9 @@ suite("core (iterators)", function () {
             var returned = 0
             var called = 0
             var sentinel = new Error("sentinel")
+
             sentinel.marker = function () {}
+
             var iter = {
                 list: [],
                 index: 0,
@@ -2208,9 +2298,13 @@ suite("core (iterators)", function () {
             var returned = 0
             var called = 0
             var sentinel1 = new Error("sentinel1")
+
             sentinel1.marker = function () {}
+
             var sentinel2 = new Error("sentinel2")
+
             sentinel2.marker = function () {}
+
             var iter = {
                 list: [],
                 index: 0,
@@ -2270,9 +2364,13 @@ suite("core (iterators)", function () {
             var called1 = 0
             var called2 = 0
             var sentinel1 = new Error("sentinel1")
+
             sentinel1.marker = function () {}
+
             var sentinel2 = new Error("sentinel2")
+
             sentinel2.marker = function () {}
+
             var iter = {
                 list: [],
                 index: 0,
@@ -2343,9 +2441,13 @@ suite("core (iterators)", function () {
             var called1 = 0
             var called2 = 0
             var sentinel1 = new Error("sentinel1")
+
             sentinel1.marker = function () {}
+
             var sentinel2 = new Error("sentinel2")
+
             sentinel2.marker = function () {}
+
             var iter = {
                 list: [],
                 index: 0,
@@ -2415,9 +2517,13 @@ suite("core (iterators)", function () {
             var returned = 0
             var called2 = 0
             var sentinel1 = new Error("sentinel1")
+
             sentinel1.marker = function () {}
+
             var sentinel2 = new Error("sentinel2")
+
             sentinel2.marker = function () {}
+
             var iter = {
                 list: [],
                 index: 0,
@@ -2477,7 +2583,9 @@ suite("core (iterators)", function () {
             var returned = 0
             var called = 0
             var sentinel = new Error("sentinel")
+
             sentinel.marker = function () {}
+
             var iter = {
                 list: [],
                 index: 0,
@@ -2531,9 +2639,13 @@ suite("core (iterators)", function () {
             var returned = 0
             var called = 0
             var sentinel1 = new Error("sentinel1")
+
             sentinel1.marker = function () {}
+
             var sentinel2 = new Error("sentinel2")
+
             sentinel2.marker = function () {}
+
             var iter = {
                 list: [],
                 index: 0,
@@ -2585,7 +2697,9 @@ suite("core (iterators)", function () {
 
         test("throw in `return` + resolved thenable", function (done) {
             var sentinel = new Error("sentinel")
+
             sentinel.marker = function () {}
+
             var iter = {
                 list: [],
                 index: 0,
@@ -2629,7 +2743,9 @@ suite("core (iterators)", function () {
 
         test("throw in `return` + no `throw` + resolved thenable", function (done) { // eslint-disable-line max-len
             var sentinel = new Error("sentinel")
+
             sentinel.marker = function () {}
+
             var iter = {
                 list: [],
                 index: 0,
@@ -2670,9 +2786,13 @@ suite("core (iterators)", function () {
 
         test("reject in middle + throw in `return`", function (done) {
             var sentinel1 = new Error("sentinel1")
+
             sentinel1.marker = function () {}
+
             var sentinel2 = new Error("sentinel2")
+
             sentinel2.marker = function () {}
+
             var iter = {
                 list: [],
                 index: 0,
@@ -2717,9 +2837,13 @@ suite("core (iterators)", function () {
 
         test("reject in middle + throw in `return` + no `throw`", function (done) { // eslint-disable-line max-len
             var sentinel1 = new Error("sentinel1")
+
             sentinel1.marker = function () {}
+
             var sentinel2 = new Error("sentinel2")
+
             sentinel2.marker = function () {}
+
             var iter = {
                 list: [],
                 index: 0,

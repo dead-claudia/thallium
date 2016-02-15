@@ -8,6 +8,7 @@ var n = util.n
 suite("core (safety)", function () {
     test("disallows non-nullish non-functions as `test` impls", function () {
         var tt = t.base()
+
         t.throws(function () { tt.test("test", 1) }, TypeError)
         t.throws(function () { tt.test("test", 0) }, TypeError)
         t.throws(function () { tt.test("test", true) }, TypeError)
@@ -33,10 +34,12 @@ suite("core (safety)", function () {
         tt.test("test", function () {})
 
         /* eslint-disable no-unused-vars */
+
         tt.test("test", function (t) {})
 
         // it also ignores too many arguments
         tt.test("test", function (t, done) {})
+
         /* eslint-enable no-unused-vars */
 
         tt.test("test", function () {
@@ -46,6 +49,7 @@ suite("core (safety)", function () {
 
     test("disallows non-functions as `async` impls", function () {
         var tt = t.base()
+
         t.throws(function () { tt.async("test", 1) }, TypeError)
         t.throws(function () { tt.async("test", 0) }, TypeError)
         t.throws(function () { tt.async("test", true) }, TypeError)
@@ -72,11 +76,13 @@ suite("core (safety)", function () {
         tt.async("test", function () {})
 
         /* eslint-disable no-unused-vars */
+
         tt.async("test", function (t) {})
         tt.async("test", function (t, done) {})
 
         // it also ignores too many arguments
         tt.async("test", function (t, done, wtf) {})
+
         /* eslint-enable no-unused-vars */
 
         tt.async("test", function () {
@@ -190,7 +196,7 @@ suite("core (safety)", function () {
         var ret = []
 
         var sentinel = new Error("true")
-        // Only unique property
+
         sentinel.marker = function () {}
 
         tt.reporter(util.push(ret))
@@ -198,9 +204,13 @@ suite("core (safety)", function () {
         tt.test("test", function (tt) {
             tt.test("inner", function (tt) {
                 tt.async("fail", function (tt, done) {
+                    /* eslint-disable callback-return */
+
                     done()
                     done()
                     done(sentinel)
+
+                    /* eslint-enable callback-return */
                 })
             })
         })
@@ -243,6 +253,7 @@ suite("core (safety)", function () {
 
     test("catches concurrent runs", function (done) {
         var tt = t.base()
+
         tt.reporter(function (_, done) { done() })
         tt.run(done)
         t.throws(function () { tt.run() }, Error)
@@ -251,6 +262,7 @@ suite("core (safety)", function () {
     test("allows non-concurrent runs with reporter error", function (done) {
         var tt = t.base()
         var sentinel = new Error("fail")
+
         tt.reporter(function (_, done) { done(sentinel) })
 
         tt.run(function (err) {
@@ -267,6 +279,8 @@ suite("core (safety)", function () {
             } catch (e) {
                 return done(e)
             }
+
+            return undefined
         })
     })
 })

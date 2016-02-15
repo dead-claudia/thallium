@@ -11,6 +11,7 @@ suite("core (timeouts)", function () {
     test("succeeds with own", function (done) {
         var tt = t.base()
         var ret = []
+
         tt.reporter(util.push(ret))
 
         tt.async("test", function (tt, done) {
@@ -33,6 +34,7 @@ suite("core (timeouts)", function () {
     test("fails with own", function (done) {
         var tt = t.base()
         var ret = []
+
         tt.reporter(util.push(ret))
 
         tt.async("test", function (tt, done) {
@@ -58,6 +60,7 @@ suite("core (timeouts)", function () {
     test("succeeds with inherited", function (done) {
         var tt = t.base()
         var ret = []
+
         tt.reporter(util.push(ret))
 
         tt.test("test")
@@ -82,6 +85,7 @@ suite("core (timeouts)", function () {
     test("fails with inherited", function (done) {
         var tt = t.base()
         var ret = []
+
         tt.reporter(util.push(ret))
 
         tt.test("test")

@@ -120,6 +120,7 @@ suite("assertions (includes)", function () {
             var obj1 = {}
             var obj2 = {}
             var obj3 = {}
+
             fail("includesAny", [obj1, obj2, 3, "foo", {}], [{}])
             fail("includesAny", [obj1, obj2, obj3], [{}])
             fail("includesAny", [obj1, obj2, obj3], [[]])
@@ -285,6 +286,7 @@ suite("assertions (includes)", function () {
             var obj1 = {}
             var obj2 = {}
             var obj3 = {}
+
             fail("includesLooseAny", [obj1, obj2, 3, "foo", {}], [{}])
             fail("includesLooseAny", [obj1, obj2, obj3], [{}])
             fail("includesLooseAny", [obj1, obj2, obj3], [[]])

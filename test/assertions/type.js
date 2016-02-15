@@ -1,5 +1,7 @@
 "use strict"
 
+/* global Symbol */
+
 var t = require("../../index.js")
 var util = require("../../test-util/assertions.js")
 var fail = util.fail

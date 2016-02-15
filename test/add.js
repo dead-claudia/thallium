@@ -5,6 +5,7 @@ var t = require("../index.js")
 suite("add", function () {
     test("exists", function () {
         var tt = t.base()
+
         t.hasKey(tt, "add")
         t.function(tt.add)
     })
@@ -20,6 +21,7 @@ suite("add", function () {
         t.equal(tt.bar(), tt)
 
         var obj = {}
+
         t.equal(tt.baz(obj), obj)
     })
 
@@ -36,6 +38,7 @@ suite("add", function () {
         t.equal(tt.bar(), tt)
 
         var obj = {}
+
         t.equal(tt.baz(obj), obj)
     })
 })
