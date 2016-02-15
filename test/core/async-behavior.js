@@ -82,6 +82,7 @@ suite("core (asynchronous behavior)", function () {
         var called = false
         var ret = []
         var sentinel = new Error("sentinel")
+
         sentinel.marker = function () {}
 
         tt.reporter(util.push(ret))
@@ -116,6 +117,7 @@ suite("core (asynchronous behavior)", function () {
         var called = false
         var ret = []
         var sentinel = new Error("sentinel")
+
         sentinel.marker = function () {}
 
         tt.reporter(util.push(ret))
@@ -151,6 +153,7 @@ suite("core (asynchronous behavior)", function () {
         var called = false
         var ret = []
         var sentinel = new Error("sentinel")
+
         sentinel.marker = function () {}
 
         tt.reporter(util.push(ret))

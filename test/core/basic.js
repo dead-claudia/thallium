@@ -11,12 +11,14 @@ suite("core (basic)", function () {
 
     test("has `test()`", function () {
         var tt = t.base()
+
         t.hasKey(tt, "test")
         t.function(tt.test)
     })
 
     test("has `parent()`", function () {
         var tt = t.base()
+
         t.hasKey(tt, "parent")
         t.function(tt.parent)
         t.equal(tt.test("test").parent(), tt)
@@ -24,23 +26,27 @@ suite("core (basic)", function () {
 
     test("can accept a string + function", function () {
         var tt = t.base()
+
         tt.test("test", function () {})
     })
 
     test("can accept a string", function () {
         var tt = t.base()
+
         tt.test("test")
     })
 
     test("returns the current instance when given a callback", function () {
         var tt = t.base()
         var test = tt.test("test", function () {})
+
         t.equal(test, tt)
     })
 
     test("returns a prototypal clone when given a callback", function () {
         var tt = t.base()
         var test = tt.test("test")
+
         t.notEqual(test, tt)
         t.equal(Object.getPrototypeOf(test), tt)
     })
@@ -48,6 +54,7 @@ suite("core (basic)", function () {
     test("runs block tests within tests", function (done) {
         var tt = t.base()
         var called = false
+
         tt.test("test", function (tt) {
             tt.test("foo", function () {
                 called = true

@@ -4,6 +4,7 @@ var t = require("../index.js")
 
 exports.fail = function (name) {
     var args = []
+
     for (var i = 1; i < arguments.length; i++) {
         args.push(arguments[i])
     }

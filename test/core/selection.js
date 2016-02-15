@@ -12,8 +12,8 @@ suite("core (selection)", function () {
 
     test("skips tests with callbacks", function (done) {
         var tt = t.base().use(fail)
-
         var ret = []
+
         tt.reporter(util.push(ret))
 
         tt.test("one", function (tt) {
@@ -53,8 +53,8 @@ suite("core (selection)", function () {
 
     test("skips tests without callbacks", function (done) {
         var tt = t.base().use(fail)
-
         var ret = []
+
         tt.reporter(util.push(ret))
 
         tt.test("one", function (tt) {
@@ -94,8 +94,8 @@ suite("core (selection)", function () {
 
     test("skips async tests", function (done) {
         var tt = t.base().use(fail)
-
         var ret = []
+
         tt.reporter(util.push(ret))
 
         tt.test("one", function (tt) {
@@ -135,8 +135,8 @@ suite("core (selection)", function () {
 
     test("only tests with callbacks", function (done) {
         var tt = t.base().use(fail)
-
         var ret = []
+
         tt.reporter(util.push(ret))
         tt.only(["one", "inner"])
 
@@ -167,8 +167,8 @@ suite("core (selection)", function () {
 
     test("only tests without callbacks", function (done) {
         var tt = t.base().use(fail)
-
         var ret = []
+
         tt.reporter(util.push(ret))
         tt.only(["one", "inner"])
 
@@ -199,8 +199,8 @@ suite("core (selection)", function () {
 
     test("only async tests", function (done) {
         var tt = t.base().use(fail)
-
         var ret = []
+
         tt.reporter(util.push(ret))
         tt.only(["one", "inner"])
 
@@ -231,8 +231,8 @@ suite("core (selection)", function () {
 
     test("only tests as index with callbacks", function (done) {
         var tt = t.base().use(fail)
-
         var ret = []
+
         tt.reporter(util.push(ret))
         tt.only(["one", "inner"])
 
@@ -257,8 +257,8 @@ suite("core (selection)", function () {
 
     test("only tests as index index without callbacks", function (done) {
         var tt = t.base().use(fail)
-
         var ret = []
+
         tt.reporter(util.push(ret))
         tt.only(["one", "inner"])
 
@@ -283,8 +283,8 @@ suite("core (selection)", function () {
 
     test("only async tests as index", function (done) {
         var tt = t.base().use(fail)
-
         var ret = []
+
         tt.reporter(util.push(ret))
         tt.only(["one", "inner"])
 

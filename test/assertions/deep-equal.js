@@ -1,5 +1,7 @@
 "use strict"
 
+/* global Symbol */
+
 var t = require("../../index.js")
 
 suite("assertions (deep equal)", function () {
@@ -41,12 +43,12 @@ suite("assertions (deep equal)", function () {
 
     test("arguments class", function () {
         t.looseDeepEqual(
-            (function (){ return arguments })(1, 2, 3),
-            (function (){ return arguments })(1, 2, 3)
+            (function () { return arguments })(1, 2, 3),
+            (function () { return arguments })(1, 2, 3)
         )
 
         t.notLooseDeepEqual(
-            (function (){ return arguments })(1, 2, 3),
+            (function () { return arguments })(1, 2, 3),
             [1, 2, 3]
         )
     })
@@ -54,6 +56,7 @@ suite("assertions (deep equal)", function () {
     test("dates", function () {
         var d0 = new Date(1387585278000)
         var d1 = new Date("Fri Dec 20 2013 16:21:18 GMT-0800 (PST)")
+
         t.looseDeepEqual(d0, d1)
     })
 

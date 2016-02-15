@@ -1,0 +1,5 @@
+---
+extends: ../.eslintrc.yml
+
+rules:
+    no-process-exit: 0

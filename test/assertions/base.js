@@ -1,5 +1,7 @@
 "use strict"
 
+/* global Symbol */
+
 var t = require("../../index.js")
 var util = require("../../test-util/assertions.js")
 var fail = util.fail
@@ -16,6 +18,7 @@ suite("assertions (base)", function () {
                     t.equal(e.message, message)
                 }
             }
+
             t.assert(true)
             t.assert(1)
             t.assert(Infinity)
@@ -92,6 +95,7 @@ suite("assertions (base)", function () {
         t.equal("foo", "foo")
 
         var obj = {}
+
         t.equal(obj, obj)
 
         fail("equal", {}, {})
@@ -111,6 +115,7 @@ suite("assertions (base)", function () {
         fail("notEqual", "foo", "foo")
 
         var obj = {}
+
         fail("notEqual", obj, obj)
 
         t.notEqual({}, {})
@@ -132,6 +137,7 @@ suite("assertions (base)", function () {
         t.looseEqual(1, "1")
 
         var obj = {}
+
         t.looseEqual(obj, obj)
 
         fail("looseEqual", {}, {})
@@ -151,6 +157,7 @@ suite("assertions (base)", function () {
         fail("notLooseEqual", 1, "1")
 
         var obj = {}
+
         fail("notLooseEqual", obj, obj)
 
         t.notLooseEqual({}, {})
@@ -168,6 +175,7 @@ suite("assertions (base)", function () {
         t.deepEqual("foo", "foo")
 
         var obj = {}
+
         t.deepEqual(obj, obj)
 
         t.deepEqual({}, {})
@@ -191,6 +199,7 @@ suite("assertions (base)", function () {
         fail("notDeepEqual", "foo", "foo")
 
         var obj = {}
+
         fail("notDeepEqual", obj, obj)
 
         fail("notDeepEqual", {}, {})
@@ -214,6 +223,7 @@ suite("assertions (base)", function () {
         t.looseDeepEqual("foo", "foo")
 
         var obj = {}
+
         t.looseDeepEqual(obj, obj)
 
         t.looseDeepEqual({}, {})
@@ -237,6 +247,7 @@ suite("assertions (base)", function () {
         fail("notLooseDeepEqual", "foo", "foo")
 
         var obj = {}
+
         fail("notLooseDeepEqual", obj, obj)
 
         fail("notLooseDeepEqual", {}, {})

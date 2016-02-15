@@ -16,9 +16,9 @@ var args = {
 
 var node = []
 var rest = []
-var last
+var last, i
 
-for (var i = 2; i < process.argv.length; i++) {
+for (i = 2; i < process.argv.length; i++) {
     var arg = process.argv[i]
 
     if (last != null) {

@@ -1,9 +1,8 @@
 "use strict"
 
-/* global setTimeout */
-
 var t = require("../../index.js")
 var util = require("../../test-util/base.js")
+var assertions = require("../../assertions.js")
 var p = util.p
 var n = util.n
 
@@ -26,6 +25,7 @@ suite("core (reporters)", function () { // eslint-disable-line max-statements
 
     test("added individually correctly", function () {
         var tt = t.base()
+
         function plugin() {}
         tt.reporter(plugin)
         t.deepEqual(tt.reporters(), [plugin])
@@ -33,6 +33,7 @@ suite("core (reporters)", function () { // eslint-disable-line max-statements
 
     test("added in batches correctly", function () {
         var tt = t.base()
+
         function plugin1() {}
         function plugin2() {}
         function plugin3() {}
@@ -46,6 +47,7 @@ suite("core (reporters)", function () { // eslint-disable-line max-statements
 
     test("added on children correctly", function () {
         var tt = t.base()
+
         function plugin1() {}
         function plugin2() {}
         function plugin3() {}
@@ -67,6 +69,7 @@ suite("core (reporters)", function () { // eslint-disable-line max-statements
 
     test("read on children correctly", function () {
         var tt = t.base()
+
         function plugin1() {}
         function plugin2() {}
         function plugin3() {}
@@ -83,6 +86,7 @@ suite("core (reporters)", function () { // eslint-disable-line max-statements
 
     test("only added once", function () {
         var tt = t.base()
+
         function plugin1() {}
         function plugin2() {}
         function plugin3() {}
@@ -97,7 +101,6 @@ suite("core (reporters)", function () { // eslint-disable-line max-statements
 
     test("called correctly with sync passing", function (done) {
         var tt = t.base()
-
         var ret = []
 
         tt.reporter(util.push(ret))
@@ -122,10 +125,9 @@ suite("core (reporters)", function () { // eslint-disable-line max-statements
 
     test("called correctly with sync failing", function (done) {
         var tt = t.base()
-
         var ret = []
         var sentinel = new Error("sentinel")
-        // Something that can only be checked with identity.
+
         sentinel.marker = function () {}
 
         tt.reporter(util.push(ret))
@@ -153,10 +155,9 @@ suite("core (reporters)", function () { // eslint-disable-line max-statements
 
     test("called correctly with sync both", function (done) {
         var tt = t.base()
-
         var ret = []
         var sentinel = new Error("sentinel")
-        // Something that can only be checked with identity.
+
         sentinel.marker = function () {}
 
         tt.reporter(util.push(ret))
@@ -184,7 +185,6 @@ suite("core (reporters)", function () { // eslint-disable-line max-statements
 
     test("called correctly with inline passing", function (done) {
         var tt = t.base()
-
         var ret = []
 
         tt.reporter(util.push(ret))
@@ -209,7 +209,6 @@ suite("core (reporters)", function () { // eslint-disable-line max-statements
 
     test("called correctly with inline failing", function (done) {
         var tt = t.base()
-
         var ret = []
 
         tt.reporter(util.push(ret))
@@ -239,7 +238,6 @@ suite("core (reporters)", function () { // eslint-disable-line max-statements
 
     test("called correctly with inline both", function (done) {
         var tt = t.base()
-
         var ret = []
 
         tt.reporter(util.push(ret))
@@ -269,7 +267,6 @@ suite("core (reporters)", function () { // eslint-disable-line max-statements
 
     test("called correctly with async passing", function (done) {
         var tt = t.base()
-
         var ret = []
 
         tt.reporter(util.push(ret))
@@ -294,10 +291,9 @@ suite("core (reporters)", function () { // eslint-disable-line max-statements
 
     test("called correctly with async failing", function (done) {
         var tt = t.base()
-
         var ret = []
         var sentinel = new Error("sentinel")
-        // Something that can only be checked with identity.
+
         sentinel.marker = function () {}
 
         tt.reporter(util.push(ret))
@@ -325,10 +321,9 @@ suite("core (reporters)", function () { // eslint-disable-line max-statements
 
     test("called correctly with async both", function (done) {
         var tt = t.base()
-
         var ret = []
         var sentinel = new Error("sentinel")
-        // Something that can only be checked with identity.
+
         sentinel.marker = function () {}
 
         tt.reporter(util.push(ret))
@@ -356,7 +351,6 @@ suite("core (reporters)", function () { // eslint-disable-line max-statements
 
     test("called correctly with async + promise passing", function (done) {
         var tt = t.base()
-
         var ret = []
 
         tt.reporter(util.push(ret))
@@ -381,10 +375,9 @@ suite("core (reporters)", function () { // eslint-disable-line max-statements
 
     test("called correctly with async + promise failing", function (done) {
         var tt = t.base()
-
         var ret = []
         var sentinel = new Error("sentinel")
-        // Something that can only be checked with identity.
+
         sentinel.marker = function () {}
 
         tt.reporter(util.push(ret))
@@ -412,10 +405,9 @@ suite("core (reporters)", function () { // eslint-disable-line max-statements
 
     test("called correctly with async + promise both", function (done) {
         var tt = t.base()
-
         var ret = []
         var sentinel = new Error("sentinel")
-        // Something that can only be checked with identity.
+
         sentinel.marker = function () {}
 
         tt.reporter(util.push(ret))
@@ -443,7 +435,6 @@ suite("core (reporters)", function () { // eslint-disable-line max-statements
 
     test("called correctly with child passing tests", function (done) {
         var tt = t.base()
-
         var ret = []
 
         tt.reporter(util.push(ret))
@@ -477,14 +468,13 @@ suite("core (reporters)", function () { // eslint-disable-line max-statements
 
     test("called correctly with child failing tests", function (done) {
         var tt = t.base()
-
         var ret = []
         var sentinel1 = new Error("sentinel one")
-        // Something that can only be checked with identity.
+
         sentinel1.marker = function () {}
 
         var sentinel2 = new Error("sentinel two")
-        // Something that can only be checked with identity.
+
         sentinel2.marker = function () {}
 
         tt.reporter(util.push(ret))
@@ -536,14 +526,13 @@ suite("core (reporters)", function () { // eslint-disable-line max-statements
 
     test("called correctly with child both", function (done) {
         var tt = t.base()
-
         var ret = []
         var sentinel1 = new Error("sentinel one")
-        // Something that can only be checked with identity.
+
         sentinel1.marker = function () {}
 
         var sentinel2 = new Error("sentinel two")
-        // Something that can only be checked with identity.
+
         sentinel2.marker = function () {}
 
         tt.reporter(util.push(ret))
@@ -595,8 +584,8 @@ suite("core (reporters)", function () { // eslint-disable-line max-statements
 
     test("called correctly with subtest run", function (done) {
         var tt = t.base()
-
         var ret = []
+
         tt.reporter(util.push(ret))
 
         var ttt = tt.test("test")
@@ -618,17 +607,14 @@ suite("core (reporters)", function () { // eslint-disable-line max-statements
 
     test("called correctly with complex sequence", function (done) {
         var tt = t.base()
-
         var ret = []
-        // Something that can only be checked with identity.
         var sentinel = new Error("sentinel")
+
         sentinel.marker = function () {}
 
         tt.reporter(util.push(ret))
 
-        /* eslint-disable global-require */
-        tt.use(require("../../assertions.js"))
-        /* eslint-enable global-require */
+        tt.use(assertions)
 
         tt.test("module-1", function (tt) {
             tt.test("1 === 1").equal(1, 1)
@@ -724,7 +710,6 @@ suite("core (reporters)", function () { // eslint-disable-line max-statements
 
     test("can return a resolving thenable", function (done) {
         var tt = t.base()
-
         var ret = []
 
         tt.reporter(function (entry) {

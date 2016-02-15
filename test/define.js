@@ -5,6 +5,7 @@ var t = require("../index.js")
 suite("define", function () {
     test("exists", function () {
         var tt = t.base()
+
         t.hasKey(tt, "define")
         t.function(tt.define)
     })

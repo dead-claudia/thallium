@@ -5,13 +5,13 @@ var t = require("../index.js")
 suite("add", function () {
     test("exists", function () {
         var tt = t.base()
+
         t.hasKey(tt, "wrap")
         t.function(tt.wrap)
     })
 
     test("works with string + function", function () {
         var tt = t.base()
-
         var sentinel = {}
 
         tt.f1 = function () {}
@@ -35,7 +35,6 @@ suite("add", function () {
 
     test("works with object", function () {
         var tt = t.base()
-
         var sentinel = {}
 
         tt.f1 = function () {}
