@@ -6,7 +6,6 @@ var requireUncached = require("require-uncached")
 var t = require("../../index.js")
 var assertions = require("../../assertions.js")
 var util = require("../../test-util/base.js")
-var n = util.n
 
 var hasOwn = {}.hasOwnProperty
 
@@ -58,19 +57,19 @@ suite("cli (basic)", function () {
         mockery.resetCache()
     })
 
-    test.skip("works with no config", function (done) {
+    test("fails with no config", function (done) {
         var ret = []
 
         index.reporter(util.push(ret))
-        cli(util.fixture("cli/no-config"), [], util.wrap(done, function () {
-            t.deepEqual(ret, [
-                n("start", undefined, -1),
-                n("start", "test", 0),
-                n("end", "test", 0),
-                n("pass", "test", 0),
-                n("end", undefined, -1),
-                n("exit", undefined, 0),
-            ])
-        }))
+        cli(util.fixture("cli/no-config"), [], function (err) {
+            try {
+                t.ok(err)
+                t.hasOwn(err, "code", "ENOTESTCONFIG")
+            } catch (e) {
+                return done(e)
+            }
+
+            return done()
+        })
     })
 })
