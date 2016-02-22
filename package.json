@@ -43,7 +43,7 @@
     "example": "./docs/examples"
   },
   "engines": {
-    "node": ">=0.8"
+    "node": ">=0.10"
   },
   "repository": "isiahmeadows/techtonic",
   "bugs": "https://github.com/isiahmeadows/techtonic/issues",
