@@ -2,7 +2,7 @@
 
 var t = require("../index.js")
 
-suite("AssertionError", function () {
+suite("class AssertionError", function () {
     test("exists", function () {
         t.function(t.AssertionError)
     })

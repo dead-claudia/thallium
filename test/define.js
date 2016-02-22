@@ -2,7 +2,7 @@
 
 var t = require("../index.js")
 
-suite("define", function () {
+suite("define()", function () {
     test("exists", function () {
         var tt = t.base()
 
@@ -12,8 +12,10 @@ suite("define", function () {
 
     test("works with string + function", function () {
         var tt = t.base()
+        var self // eslint-disable-line consistent-this
 
-        tt.define("assert", function (test, expected, actual) {
+        tt.define("assert", /** @this */ function (test, expected, actual) {
+            self = this
             return {
                 test: test, expected: expected, actual: actual,
                 message: "{expected} :: {actual}",
@@ -21,6 +23,7 @@ suite("define", function () {
         })
 
         tt.assert(true, {}, {})
+        t.undefined(self)
 
         var expected = {}
         var actual = {}
@@ -28,6 +31,7 @@ suite("define", function () {
         try {
             tt.assert(false, expected, actual)
         } catch (e) {
+            t.undefined(self)
             t.instanceof(e, t.AssertionError)
             t.hasKeys(e, {
                 expected: expected,

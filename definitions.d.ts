@@ -15,7 +15,7 @@ declare module "techtonic/core" {
     export interface StartReport {
         type: "start";
         value: void;
-        name: string;
+        name: string | void;
         index: number;
         parent: ParentData | void;
     }
@@ -23,7 +23,7 @@ declare module "techtonic/core" {
     export interface EndReport {
         type: "end";
         value: void;
-        name: string;
+        name: string | void;
         index: number;
         parent: ParentData | void;
     }
@@ -55,7 +55,7 @@ declare module "techtonic/core" {
     export interface ExitReport {
         type: "exit";
         value: void;
-        name: string;
+        name: string | void;
         index: number;
         parent: void;
     }
@@ -72,7 +72,7 @@ declare module "techtonic/core" {
 
     export interface ExtraReport {
         type: "extra";
-        name: string;
+        name: string | void;
         value: ExtraReportValue;
         index: number;
         parent: ExtraReportEntry[];
@@ -138,9 +138,6 @@ declare module "techtonic/core" {
     type AssertionErrorConstructor =
         new (message: string, expected: any, actual: any) => AssertionError;
 
-    var base: Test;
-    export default base;
-
     type IteratorResult = {
         done: boolean;
         value: any;
@@ -160,6 +157,8 @@ declare module "techtonic/core" {
         [name: string]: T;
     }
 
+    type WrapperImpl = (f: (...args: any[]) => any, ...args: any[]) => any;
+
     export interface Test {
         AssertionError: AssertionErrorConstructor;
 
@@ -176,7 +175,7 @@ declare module "techtonic/core" {
         reporter(...reporters: Nested<Reporter>[]): this;
 
         // Get a list of all reporters used for this instance.
-        reporters(): Reporter;
+        reporters(): Reporter[];
 
         // Define one or more assertion methods on this instance. All the
         // tracking of errors, even in inline tests, are automatically taken
@@ -188,17 +187,17 @@ declare module "techtonic/core" {
         define(methods: ObjectMap<(...args: any[]) => TestResult>): this;
 
         // Wrap one or more methods on this instance.
-        wrap(name: string, impl: (...args: any[]) => any): this;
-        wrap(methods: ObjectMap<(...args: any[]) => any>): this;
+        wrap(name: string, impl: WrapperImpl): this;
+        wrap(methods: ObjectMap<WrapperImpl>): this;
 
         // Add one or more methods on this instance. The first argument and
         // `this` both reference the current instance, and the rest are the
         // other arguments.
-        wrap(name: string, impl: (test: this, ...args: any[]) => any): this;
-        wrap(methods: ObjectMap<(test: this, ...args: any[]) => any>): this;
+        add(name: string, impl: (test: this, ...args: any[]) => any): this;
+        add(methods: ObjectMap<(test: this, ...args: any[]) => any>): this;
 
-        // Get the parent test.
-        parent(): Test;
+        // Get the parent test. Exposed for plugins.
+        parent(): Test | void;
 
         // Set the timeout for async tests.
         timeout(timeout: number): this;
@@ -235,7 +234,15 @@ declare module "techtonic/core" {
         asyncSkip(name: string, run: (test: this, done: AsyncDone) => any): this;
         asyncSkip(name: string, run: (test: this) => Thenable): this;
         asyncSkip(name: string, run: (test: this) => Iterator): this;
+
+        // Run a block when assertions are run. This exists primarily for
+        // inline tests, in case they have specific setup to do.
+        do(func: () => any): this;
+        block(func: () => any): this;
     }
+
+    var base: Test;
+    export default base;
 }
 
 declare module "techtonic/assertions" {

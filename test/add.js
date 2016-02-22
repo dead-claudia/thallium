@@ -2,7 +2,7 @@
 
 var t = require("../index.js")
 
-suite("add", function () {
+suite("add()", function () {
     test("exists", function () {
         var tt = t.base()
 

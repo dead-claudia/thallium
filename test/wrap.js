@@ -2,7 +2,7 @@
 
 var t = require("../index.js")
 
-suite("add", function () {
+suite("wrap()", function () {
     test("exists", function () {
         var tt = t.base()
 
@@ -10,51 +10,69 @@ suite("add", function () {
         t.function(tt.wrap)
     })
 
+    function spy(f) {
+        /** @this */ function g() {
+            g.called = true
+            return f.apply(this, arguments)
+        }
+
+        g.called = false
+        return g
+    }
+
     test("works with string + function", function () {
         var tt = t.base()
         var sentinel = {}
 
-        tt.f1 = function () {}
-        tt.f2 = function (x) { t.equal(x, sentinel) }
-        tt.f3 = function () { t.equal(this, tt) }
-        tt.f4 = function () {}
-        tt.f5 = function () {}
+        var f1 = tt.f1 = spy(function () {})
+        var f2 = tt.f2 = spy(function (x) { t.equal(x, sentinel) })
+        var f3 = tt.f3 = spy(/** @this */ function () { t.equal(this, tt) })
+        var f4 = tt.f4 = spy(function () {})
 
-        tt.wrap("f1", /** @this */ function () { return this })
+        tt.wrap("f1", /** @this */ function () { t.undefined(this) })
         tt.wrap("f2", function (f) { return f(sentinel) })
         tt.wrap("f3", function (f) { return f() })
-        tt.wrap("f4", function (f, ctx) { t.equal(ctx, tt) })
-        tt.wrap("f5", function (f, ctx, x) { return x })
+        tt.wrap("f4", function (f, x) { return x })
 
-        t.equal(tt.f1(), tt)
+        tt.f1()
+        t.false(f1.called)
+
         tt.f2()
+        t.true(f2.called)
+
         tt.f3()
-        tt.f4()
-        t.equal(tt.f5(sentinel), sentinel)
+        t.true(f3.called)
+
+        t.equal(tt.f4(sentinel), sentinel)
+        t.false(f4.called)
     })
 
     test("works with object", function () {
         var tt = t.base()
         var sentinel = {}
 
-        tt.f1 = function () {}
-        tt.f2 = function (x) { t.equal(x, sentinel) }
-        tt.f3 = function () { t.equal(this, tt) }
-        tt.f4 = function () {}
-        tt.f5 = function () {}
+        var f1 = tt.f1 = spy(function () {})
+        var f2 = tt.f2 = spy(function (x) { t.equal(x, sentinel) })
+        var f3 = tt.f3 = spy(/** @this */ function () { t.equal(this, tt) })
+        var f4 = tt.f4 = spy(function () {})
 
         tt.wrap({
-            f1: function () { return this },
+            f1: function () { t.undefined(this) },
             f2: function (f) { return f(sentinel) },
             f3: function (f) { return f() },
-            f4: function (f, ctx) { t.equal(ctx, tt) },
-            f5: function (f, ctx, x) { return x },
+            f4: function (f, x) { return x },
         })
 
-        t.equal(tt.f1(), tt)
+        tt.f1()
+        t.false(f1.called)
+
         tt.f2()
+        t.true(f2.called)
+
         tt.f3()
-        tt.f4()
-        t.equal(tt.f5(sentinel), sentinel)
+        t.true(f3.called)
+
+        t.equal(tt.f4(sentinel), sentinel)
+        t.false(f4.called)
     })
 })

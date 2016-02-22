@@ -14,7 +14,9 @@ npm install --save-dev techtonic
 
 ## Usage
 
-To be completed. This is waiting on the completion of the CLI, but for now, you can look at the tests.
+This is waiting on the completion of the CLI, but for now, you can look at the
+[documentation](./docs/README.md) and [tests](./test/), which use Techtonic's
+assertions themselves.
 
 Couple specific notes:
 
@@ -32,6 +34,7 @@ Couple specific notes:
         })
 
         const tt = t.test("inner 2")
+
         tt.hasOwn(tt, "foo")
     })
 
@@ -40,17 +43,16 @@ Couple specific notes:
 
 ## API
 
-To be completed. See the source, tests, and TypeScript definition file for now.
+See the [documentation](./docs/README.md).
 
 ## Remaining work
 
 1. Finish + test the CLI. It's still a work in progress, mostly in testing.
-2. Update TypeScript definitions.
-3. Write the documentation for this project, including the many core assertions.
-4. Self-host this module's tests like what Mocha does.
-5. Port this to the browser.
-6. Write a few plugins for `describe`/`it`, `before{,Each}`/`after{,Each}` hooks, etc.
-7. Write lots of blog posts. :smile:
+2. Finish documenting this project. This mainly includes the core assertions and CLI.
+3. Self-host this module's tests like what Mocha does.
+4. Port this to the browser.
+5. Write a few plugins for `describe`/`it`, `before{,Each}`/`after{,Each}` hooks, etc.
+6. Write lots of blog posts. :smile:
 
 ## License
 

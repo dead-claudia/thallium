@@ -22,6 +22,7 @@ suite("core (basic)", function () {
         t.hasKey(tt, "parent")
         t.function(tt.parent)
         t.equal(tt.test("test").parent(), tt)
+        t.undefined(tt.parent())
     })
 
     test("can accept a string + function", function () {
