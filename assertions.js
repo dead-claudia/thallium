@@ -39,7 +39,6 @@ function negate(name) {
 
 // The basic assert. It's almost there for looks, given how easy it is to
 // define your own assertions.
-
 function sanitize(message) {
     if (message) {
         return (message + "").replace(/(\{\w+\})/g, "\\$1")
@@ -97,12 +96,12 @@ function binary(name, func, messages) {
     })
 }
 
-unary("ok", function (a) { return !!a }, [
+unary("ok", function (a) { return a }, [
     "Expected {actual} to be ok",
     "Expected {actual} to not be ok",
 ])
 
-"boolean function number object string symbol undefined"
+"boolean function number object string symbol"
 .split(" ")
 .forEach(function (type) {
     unary(type, function (x) { return typeof x === type }, [
@@ -148,7 +147,7 @@ define("instanceof", function (object, Type) {
         expected: Type,
         actual: object.constructor,
         o: object,
-        message: "Expected typeof {o} to be {expected}, but found {actual}",
+        message: "Expected {o} to be an instance of {expected}, but found {actual}", // eslint-disable-line max-len
     }
 })
 
@@ -157,7 +156,7 @@ define("notInstanceof", function (object, Type) {
         test: !(object instanceof Type),
         expected: Type,
         o: object,
-        message: "Expected typeof {o} to not be {expected}",
+        message: "Expected {o} to not be an instance of {expected}",
     }
 })
 
@@ -185,7 +184,7 @@ function has(name, is, check, messages) {
     define(name, function (object, key, value) {
         var test = check(object, key)
 
-        if (arguments.length === 3) {
+        if (arguments.length >= 3) {
             return {
                 test: test && is(object[key], value),
                 expected: value,
@@ -207,7 +206,7 @@ function has(name, is, check, messages) {
     define(negate(name), function (object, key, value) {
         var test = !check(object, key)
 
-        if (arguments.length === 3) {
+        if (arguments.length >= 3) {
             return {
                 test: test || !is(object[key], value),
                 actual: value,
@@ -301,7 +300,7 @@ throws("throwsMatch", function (matcher, e) {
         return matcher.test(e.message)
     }
 
-    // Don't accept objects yet.
+    // Not accepting objects yet.
     if (typeof matcher !== "function") {
         throw new TypeError("Unexpected matcher type: " + typeof matcher)
     }
@@ -332,11 +331,11 @@ function len(name, compare, message) {
 /* eslint-disable max-len */
 
 len("length", function (a, b) { return a === b }, "Expected {object} to have length {expected}, but found {actual}")
-len("notLength", function (a, b) { return a !== b }, "Expected {object} to not have length {acutal}")
+len("notLength", function (a, b) { return a !== b }, "Expected {object} to not have length {actual}")
 len("lengthAtLeast", function (a, b) { return a >= b }, "Expected {object} to have length at least {expected}, but found {actual}")
 len("lengthAtMost", function (a, b) { return a <= b }, "Expected {object} to have length at most {expected}, but found {actual}")
 len("lengthAbove", function (a, b) { return a > b }, "Expected {object} to have length above {expected}, but found {actual}")
-len("lengthBelow", function (a, b) { return a > b }, "Expected {object} to have length below {expected}, but found {actual}")
+len("lengthBelow", function (a, b) { return a < b }, "Expected {object} to have length below {expected}, but found {actual}")
 
 /* eslint-enable max-len */
 
@@ -479,12 +478,12 @@ function makeHasKeys(name, methods, invert, message) {
         }
     }
 
-    define(name, function (array, keys) {
+    define(name, function (object, keys) {
         if (typeof keys !== "object") keys = [keys]
         return {
             // exclusive or to invert the result if `invert` is true
-            test: isEmpty(keys) || invert ^ base(array, keys, methods),
-            actual: array, keys: keys, message: message,
+            test: isEmpty(keys) || invert ^ base(object, keys, methods),
+            actual: object, keys: keys, message: message,
         }
     })
 }

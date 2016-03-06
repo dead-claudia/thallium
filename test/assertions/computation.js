@@ -101,6 +101,182 @@ suite("assertions (computation)", function () {
         t.throws(function () { t.notLength(undefined, -1) }, TypeError)
     })
 
+    suite("t.lengthAtLeast()", function () {
+        test("works", function () {
+            t.lengthAtLeast([], 0)
+            t.lengthAtLeast([1], 0)
+            t.lengthAtLeast([1], 1)
+            t.lengthAtLeast([1, 2, 3], 1)
+            t.lengthAtLeast([], -1)
+
+            fail("lengthAtLeast", [], 1)
+            fail("lengthAtLeast", [1], 3)
+            fail("lengthAtLeast", [1, 2, 3], 10)
+
+            t.lengthAtLeast({length: 0}, 0)
+            t.lengthAtLeast({length: 1}, 0)
+            t.lengthAtLeast({length: 1}, 1)
+            t.lengthAtLeast({length: 3}, 1)
+            t.lengthAtLeast({length: 0}, -1)
+
+            fail("lengthAtLeast", {length: 0}, 1)
+            fail("lengthAtLeast", {length: 1}, 3)
+            fail("lengthAtLeast", {length: 3}, 10)
+        })
+
+        test("works with Infinities", function () {
+            t.lengthAtLeast([], -Infinity)
+            t.lengthAtLeast({length: -Infinity}, -Infinity)
+            t.lengthAtLeast({length: Infinity}, -Infinity)
+            fail("lengthAtLeast", [1], Infinity)
+            t.lengthAtLeast({length: Infinity}, Infinity)
+        })
+
+        test("fails with NaNs", function () {
+            fail("lengthAtLeast", [], NaN)
+            fail("lengthAtLeast", [1], NaN)
+            fail("lengthAtLeast", {length: Infinity}, NaN)
+            fail("lengthAtLeast", {length: -Infinity}, NaN)
+            fail("lengthAtLeast", {length: NaN}, NaN)
+            fail("lengthAtLeast", {length: NaN}, 0)
+            fail("lengthAtLeast", {length: NaN}, 1)
+            fail("lengthAtLeast", {length: NaN}, -Infinity)
+            fail("lengthAtLeast", {length: NaN}, Infinity)
+        })
+    })
+
+    suite("t.lengthAtMost()", function () {
+        test("works", function () {
+            t.lengthAtMost([], 0)
+            fail("lengthAtMost", [1], 0)
+            t.lengthAtMost([1], 1)
+            fail("lengthAtMost", [1, 2, 3], 1)
+            fail("lengthAtMost", [], -1)
+
+            t.lengthAtMost([], 1)
+            t.lengthAtMost([1], 3)
+            t.lengthAtMost([1, 2, 3], 10)
+
+            t.lengthAtMost({length: 0}, 0)
+            fail("lengthAtMost", {length: 1}, 0)
+            t.lengthAtMost({length: 1}, 1)
+            fail("lengthAtMost", {length: 3}, 1)
+            fail("lengthAtMost", {length: 0}, -1)
+
+            t.lengthAtMost({length: 0}, 1)
+            t.lengthAtMost({length: 1}, 3)
+            t.lengthAtMost({length: 3}, 10)
+        })
+
+        test("works with Infinities", function () {
+            fail("lengthAtMost", [], -Infinity)
+            t.lengthAtMost({length: -Infinity}, -Infinity)
+            fail("lengthAtMost", {length: Infinity}, -Infinity)
+            t.lengthAtMost([1], Infinity)
+            t.lengthAtMost({length: Infinity}, Infinity)
+        })
+
+        test("fails with NaNs", function () {
+            fail("lengthAtMost", [], NaN)
+            fail("lengthAtMost", [1], NaN)
+            fail("lengthAtMost", {length: Infinity}, NaN)
+            fail("lengthAtMost", {length: -Infinity}, NaN)
+            fail("lengthAtMost", {length: NaN}, NaN)
+            fail("lengthAtMost", {length: NaN}, 0)
+            fail("lengthAtMost", {length: NaN}, 1)
+            fail("lengthAtMost", {length: NaN}, -Infinity)
+            fail("lengthAtMost", {length: NaN}, Infinity)
+        })
+    })
+
+    suite("t.lengthAbove()", function () {
+        test("works", function () {
+            fail("lengthAbove", [], 0)
+            t.lengthAbove([1], 0)
+            fail("lengthAbove", [1], 1)
+            t.lengthAbove([1, 2, 3], 1)
+            t.lengthAbove([], -1)
+
+            fail("lengthAbove", [], 1)
+            fail("lengthAbove", [1], 3)
+            fail("lengthAbove", [1, 2, 3], 10)
+
+            fail("lengthAbove", {length: 0}, 0)
+            t.lengthAbove({length: 1}, 0)
+            fail("lengthAbove", {length: 1}, 1)
+            t.lengthAbove({length: 3}, 1)
+            t.lengthAbove({length: 0}, -1)
+
+            fail("lengthAbove", {length: 0}, 1)
+            fail("lengthAbove", {length: 1}, 3)
+            fail("lengthAbove", {length: 3}, 10)
+        })
+
+        test("works with Infinities", function () {
+            t.lengthAbove([], -Infinity)
+            fail("lengthAbove", {length: -Infinity}, -Infinity)
+            t.lengthAbove({length: Infinity}, -Infinity)
+            fail("lengthAbove", [1], Infinity)
+            fail("lengthAbove", {length: Infinity}, Infinity)
+        })
+
+        test("fails with NaNs", function () {
+            fail("lengthAbove", [], NaN)
+            fail("lengthAbove", [1], NaN)
+            fail("lengthAbove", {length: Infinity}, NaN)
+            fail("lengthAbove", {length: -Infinity}, NaN)
+            fail("lengthAbove", {length: NaN}, NaN)
+            fail("lengthAbove", {length: NaN}, 0)
+            fail("lengthAbove", {length: NaN}, 1)
+            fail("lengthAbove", {length: NaN}, -Infinity)
+            fail("lengthAbove", {length: NaN}, Infinity)
+        })
+    })
+
+    suite("t.lengthBelow()", function () {
+        test("works", function () {
+            fail("lengthBelow", [], 0)
+            fail("lengthBelow", [1], 0)
+            fail("lengthBelow", [1], 1)
+            fail("lengthBelow", [1, 2, 3], 1)
+            fail("lengthBelow", [], -1)
+
+            t.lengthBelow([], 1)
+            t.lengthBelow([1], 3)
+            t.lengthBelow([1, 2, 3], 10)
+
+            fail("lengthBelow", {length: 0}, 0)
+            fail("lengthBelow", {length: 1}, 0)
+            fail("lengthBelow", {length: 1}, 1)
+            fail("lengthBelow", {length: 3}, 1)
+            fail("lengthBelow", {length: 0}, -1)
+
+            t.lengthBelow({length: 0}, 1)
+            t.lengthBelow({length: 1}, 3)
+            t.lengthBelow({length: 3}, 10)
+        })
+
+        test("works with Infinities", function () {
+            fail("lengthBelow", [], -Infinity)
+            fail("lengthBelow", {length: -Infinity}, -Infinity)
+            fail("lengthBelow", {length: Infinity}, -Infinity)
+            t.lengthBelow([1], Infinity)
+            fail("lengthBelow", {length: Infinity}, Infinity)
+        })
+
+        test("fails with NaNs", function () {
+            fail("lengthBelow", [], NaN)
+            fail("lengthBelow", [1], NaN)
+            fail("lengthBelow", {length: Infinity}, NaN)
+            fail("lengthBelow", {length: -Infinity}, NaN)
+            fail("lengthBelow", {length: NaN}, NaN)
+            fail("lengthBelow", {length: NaN}, 0)
+            fail("lengthBelow", {length: NaN}, 1)
+            fail("lengthBelow", {length: NaN}, -Infinity)
+            fail("lengthBelow", {length: NaN}, Infinity)
+        })
+    })
+
     suite("t.closeTo()", function () {
         test("works", function () {
             t.closeTo(0, 0, 0)
