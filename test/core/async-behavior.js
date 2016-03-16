@@ -5,6 +5,7 @@
 var t = require("../../index.js")
 var util = require("../../test-util/base.js")
 var n = util.n
+var p = util.p
 
 suite("core (asynchronous behavior)", function () {
     test("with normal tests", function (done) {
@@ -100,12 +101,12 @@ suite("core (asynchronous behavior)", function () {
 
         tt.run(util.wrap(done, function () {
             t.deepEqual(ret, [
-                n("start", undefined, -1),
-                n("start", "test", 0),
-                n("end", "test", 0),
-                n("fail", "test", 0, undefined, sentinel),
-                n("end", undefined, -1),
-                n("exit", undefined, 0),
+                n("start", []),
+                n("start", [p("test", 0)]),
+                n("end", [p("test", 0)]),
+                n("fail", [p("test", 0)], sentinel),
+                n("end", []),
+                n("exit", []),
             ])
         }))
 
@@ -136,12 +137,12 @@ suite("core (asynchronous behavior)", function () {
 
         tt.run(util.wrap(done, function () {
             t.deepEqual(ret, [
-                n("start", undefined, -1),
-                n("start", "test", 0),
-                n("end", "test", 0),
-                n("pass", "test", 0),
-                n("end", undefined, -1),
-                n("exit", undefined, 0),
+                n("start", []),
+                n("start", [p("test", 0)]),
+                n("end", [p("test", 0)]),
+                n("pass", [p("test", 0)]),
+                n("end", []),
+                n("exit", []),
             ])
         }))
 
@@ -172,12 +173,12 @@ suite("core (asynchronous behavior)", function () {
 
         tt.run(util.wrap(done, function () {
             t.deepEqual(ret, [
-                n("start", undefined, -1),
-                n("start", "test", 0),
-                n("end", "test", 0),
-                n("fail", "test", 0, undefined, sentinel),
-                n("end", undefined, -1),
-                n("exit", undefined, 0),
+                n("start", []),
+                n("start", [p("test", 0)]),
+                n("end", [p("test", 0)]),
+                n("fail", [p("test", 0)], sentinel),
+                n("end", []),
+                n("exit", []),
             ])
         }))
 

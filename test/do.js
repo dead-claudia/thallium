@@ -4,6 +4,7 @@
 var t = require("../index.js")
 var util = require("../test-util/base.js")
 var n = util.n
+var p = util.p
 
 run("do")
 run("block")
@@ -35,12 +36,12 @@ function run(name) {
                 t.undefined(self)
                 t.equal(len, 0)
                 t.deepEqual(ret, [
-                    n("start", undefined, -1),
-                    n("start", "test", 0),
-                    n("end", "test", 0),
-                    n("pass", "test", 0),
-                    n("end", undefined, -1),
-                    n("exit", undefined, 0),
+                    n("start", []),
+                    n("start", [p("test", 0)]),
+                    n("end", [p("test", 0)]),
+                    n("pass", [p("test", 0)]),
+                    n("end", []),
+                    n("exit", []),
                 ])
             }))
         })
@@ -60,12 +61,12 @@ function run(name) {
 
             tt.run(util.wrap(done, function () {
                 t.deepEqual(ret, [
-                    n("start", undefined, -1),
-                    n("start", "test", 0),
-                    n("end", "test", 0),
-                    n("fail", "test", 0, undefined, sentinel),
-                    n("end", undefined, -1),
-                    n("exit", undefined, 0),
+                    n("start", []),
+                    n("start", [p("test", 0)]),
+                    n("end", [p("test", 0)]),
+                    n("fail", [p("test", 0)], sentinel),
+                    n("end", []),
+                    n("exit", []),
                 ])
             }))
         })
@@ -89,12 +90,12 @@ function run(name) {
                 t.undefined(self)
                 t.equal(len, 0)
                 t.deepEqual(ret, [
-                    n("start", undefined, -1),
-                    n("start", "test", 0),
-                    n("end", "test", 0),
-                    n("pass", "test", 0),
-                    n("end", undefined, -1),
-                    n("exit", undefined, 0),
+                    n("start", []),
+                    n("start", [p("test", 0)]),
+                    n("end", [p("test", 0)]),
+                    n("pass", [p("test", 0)]),
+                    n("end", []),
+                    n("exit", []),
                 ])
             }))
         })
@@ -115,12 +116,12 @@ function run(name) {
 
             tt.run(util.wrap(done, function () {
                 t.deepEqual(ret, [
-                    n("start", undefined, -1),
-                    n("start", "test", 0),
-                    n("end", "test", 0),
-                    n("fail", "test", 0, undefined, sentinel),
-                    n("end", undefined, -1),
-                    n("exit", undefined, 0),
+                    n("start", []),
+                    n("start", [p("test", 0)]),
+                    n("end", [p("test", 0)]),
+                    n("fail", [p("test", 0)], sentinel),
+                    n("end", []),
+                    n("exit", []),
                 ])
             }))
         })
@@ -141,12 +142,12 @@ function run(name) {
                 t.undefined(self)
                 t.equal(len, 0)
                 t.deepEqual(ret, [
-                    n("start", undefined, -1),
-                    n("start", "test", 0),
-                    n("end", "test", 0),
-                    n("pass", "test", 0),
-                    n("end", undefined, -1),
-                    n("exit", undefined, 0),
+                    n("start", []),
+                    n("start", [p("test", 0)]),
+                    n("end", [p("test", 0)]),
+                    n("pass", [p("test", 0)]),
+                    n("end", []),
+                    n("exit", []),
                 ])
             }))
         })
@@ -164,12 +165,12 @@ function run(name) {
 
             tt.run(util.wrap(done, function () {
                 t.deepEqual(ret, [
-                    n("start", undefined, -1),
-                    n("start", "test", 0),
-                    n("end", "test", 0),
-                    n("fail", "test", 0, undefined, sentinel),
-                    n("end", undefined, -1),
-                    n("exit", undefined, 0),
+                    n("start", []),
+                    n("start", [p("test", 0)]),
+                    n("end", [p("test", 0)]),
+                    n("fail", [p("test", 0)], sentinel),
+                    n("end", []),
+                    n("exit", []),
                 ])
             }))
         })

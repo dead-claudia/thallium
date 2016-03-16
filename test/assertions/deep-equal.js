@@ -104,8 +104,13 @@ suite("assertions (deep equal)", function () {
         t.looseDeepEqual("foo", "foo")
         t.notLooseDeepEqual("foo", "bar")
 
-        t.looseDeepEqual("foo", "foo")
+        t.deepEqual("foo", "foo")
         t.notDeepEqual("foo", "bar")
+    })
+
+    test("differing keys", function () {
+        t.notDeepEqual({a: 1, b: 2}, {b: 1, c: 2})
+        t.notLooseDeepEqual({a: 1, b: 2}, {b: 1, c: 2})
     })
 
     if (typeof Symbol === "function") {

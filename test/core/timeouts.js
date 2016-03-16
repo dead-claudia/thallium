@@ -21,12 +21,12 @@ suite("core (timeouts)", function () {
 
         tt.run(util.wrap(done, function () {
             t.deepEqual(ret, [
-                n("start", undefined, -1),
-                n("start", "test", 0),
-                n("end", "test", 0),
-                n("pass", "test", 0),
-                n("end", undefined, -1),
-                n("exit", undefined, 0),
+                n("start", []),
+                n("start", [p("test", 0)]),
+                n("end", [p("test", 0)]),
+                n("pass", [p("test", 0)]),
+                n("end", []),
+                n("exit", []),
             ])
         }))
     })
@@ -46,13 +46,12 @@ suite("core (timeouts)", function () {
 
         tt.run(util.wrap(done, function () {
             t.deepEqual(ret, [
-                n("start", undefined, -1),
-                n("start", "test", 0),
-                n("end", "test", 0),
-                n("fail", "test", 0, undefined,
-                    new Error("Timeout of 50 reached.")),
-                n("end", undefined, -1),
-                n("exit", undefined, 0),
+                n("start", []),
+                n("start", [p("test", 0)]),
+                n("end", [p("test", 0)]),
+                n("fail", [p("test", 0)], new Error("Timeout of 50 reached.")),
+                n("end", []),
+                n("exit", []),
             ])
         }))
     })
@@ -69,15 +68,15 @@ suite("core (timeouts)", function () {
 
         tt.run(util.wrap(done, function () {
             t.deepEqual(ret, [
-                n("start", undefined, -1),
-                n("start", "test", 0),
-                n("start", "inner", 0, p("test", 0)),
-                n("end", "inner", 0, p("test", 0)),
-                n("pass", "inner", 0, p("test", 0)),
-                n("end", "test", 0),
-                n("pass", "test", 0),
-                n("end", undefined, -1),
-                n("exit", undefined, 0),
+                n("start", []),
+                n("start", [p("test", 0)]),
+                n("start", [p("test", 0), p("inner", 0)]),
+                n("end", [p("test", 0), p("inner", 0)]),
+                n("pass", [p("test", 0), p("inner", 0)]),
+                n("end", [p("test", 0)]),
+                n("pass", [p("test", 0)]),
+                n("end", []),
+                n("exit", []),
             ])
         }))
     })
@@ -98,16 +97,16 @@ suite("core (timeouts)", function () {
 
         tt.run(util.wrap(done, function () {
             t.deepEqual(ret, [
-                n("start", undefined, -1),
-                n("start", "test", 0),
-                n("start", "inner", 0, p("test", 0)),
-                n("end", "inner", 0, p("test", 0)),
-                n("fail", "inner", 0, p("test", 0),
+                n("start", []),
+                n("start", [p("test", 0)]),
+                n("start", [p("test", 0), p("inner", 0)]),
+                n("end", [p("test", 0), p("inner", 0)]),
+                n("fail", [p("test", 0), p("inner", 0)],
                     new Error("Timeout of 50 reached.")),
-                n("end", "test", 0),
-                n("pass", "test", 0),
-                n("end", undefined, -1),
-                n("exit", undefined, 0),
+                n("end", [p("test", 0)]),
+                n("pass", [p("test", 0)]),
+                n("end", []),
+                n("exit", []),
             ])
         }))
     })

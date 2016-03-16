@@ -5,8 +5,11 @@ Options:
 -h, --help
     Show this help prompt.
 
--hh, --help-detailed
+-H, --help-detailed
     Show a more detailed help prompt, suitable for a console pager like `less`.
+
+--cwd [directory]
+    Set the current working directory for Techtonic to use.
 
 -c [file], --config [file]
     Use a custom config file.

@@ -5,12 +5,16 @@ Options:
 -h, --help
     Show a simpler help prompt.
 
--hh, --help-detailed
+-H, --help-detailed
     Show this help prompt, suitable for a console pager like `less`.
+
+--cwd [directory]
+    Set the current working directory for Techtonic to use. By default, it's
+    inherited.
 
 -c [file], --config [file]
     Use a custom config file. By default, this is inferred from the first file
-    glob, for example `test/.config.js` from a glob of `test/**`. If the
+    glob, for example `test/.techtonic.js` from a glob of `test/**`. If the
     extension does not match anything, this will first try to infer it from the
     glob before giving up.
 
@@ -34,7 +38,8 @@ Options:
         Register `ext`, requiring from `module`.
 
     Note that if the same extension is passed multiple times, the last takes
-    precedence.
+    precedence. Also, note that this module is loaded regardless of if it's
+    actually used.
 
 -m [module], --module [module]
     Use this module to represent Techtonic instead of the one installed in the

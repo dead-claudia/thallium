@@ -9,7 +9,7 @@ var util = require("../../test-util/base.js")
 
 var hasOwn = {}.hasOwnProperty
 
-suite("cli (basic)", function () {
+suite.skip("cli (basic)", function () {
     var core, index, cli
 
     setup(function () {
@@ -58,9 +58,6 @@ suite("cli (basic)", function () {
     })
 
     test("fails with no config", function (done) {
-        var ret = []
-
-        index.reporter(util.push(ret))
         cli(util.fixture("cli/no-config"), [], function (err) {
             try {
                 t.ok(err)

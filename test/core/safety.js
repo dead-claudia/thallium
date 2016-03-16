@@ -141,52 +141,39 @@ suite("core (safety)", function () {
 
         tt.run(util.wrap(done, function () {
             t.deepEqual(ret, [
-                n("start", undefined, -1),
-
-                n("start", "one", 0),
-                n("end", "one", 0),
-                n("fail", "one", 0, undefined, error),
-
-                n("start", "two", 1),
-                n("end", "two", 1),
-                n("fail", "two", 1, undefined, error),
-
-                n("start", "three", 2),
-                n("end", "three", 2),
-                n("fail", "three", 2, undefined, error),
-
-                n("start", "four", 3),
-                n("end", "four", 3),
-                n("fail", "four", 3, undefined, error),
-
-                n("start", "five", 4),
-
-                n("start", "inner", 0, p("five", 4)),
-                n("end", "inner", 0, p("five", 4)),
-                n("fail", "inner", 0, p("five", 4), error),
-
-                n("end", "five", 4),
-                n("pass", "five", 4),
-
-                n("start", "six", 5),
-
-                n("start", "inner", 0, p("six", 5)),
-                n("end", "inner", 0, p("six", 5)),
-                n("fail", "inner", 0, p("six", 5), error),
-
-                n("end", "six", 5),
-                n("pass", "six", 5),
-
-                n("start", "seven", 6),
-                n("end", "seven", 6),
-                n("fail", "seven", 6, undefined, error),
-
-                n("start", "eight", 7),
-                n("end", "eight", 7),
-                n("fail", "eight", 7, undefined, error),
-
-                n("end", undefined, -1),
-                n("exit", undefined, 0),
+                n("start", []),
+                n("start", [p("one", 0)]),
+                n("end", [p("one", 0)]),
+                n("fail", [p("one", 0)], error),
+                n("start", [p("two", 1)]),
+                n("end", [p("two", 1)]),
+                n("fail", [p("two", 1)], error),
+                n("start", [p("three", 2)]),
+                n("end", [p("three", 2)]),
+                n("fail", [p("three", 2)], error),
+                n("start", [p("four", 3)]),
+                n("end", [p("four", 3)]),
+                n("fail", [p("four", 3)], error),
+                n("start", [p("five", 4)]),
+                n("start", [p("five", 4), p("inner", 0)]),
+                n("end", [p("five", 4), p("inner", 0)]),
+                n("fail", [p("five", 4), p("inner", 0)], error),
+                n("end", [p("five", 4)]),
+                n("pass", [p("five", 4)]),
+                n("start", [p("six", 5)]),
+                n("start", [p("six", 5), p("inner", 0)]),
+                n("end", [p("six", 5), p("inner", 0)]),
+                n("fail", [p("six", 5), p("inner", 0)], error),
+                n("end", [p("six", 5)]),
+                n("pass", [p("six", 5)]),
+                n("start", [p("seven", 6)]),
+                n("end", [p("seven", 6)]),
+                n("fail", [p("seven", 6)], error),
+                n("start", [p("eight", 7)]),
+                n("end", [p("eight", 7)]),
+                n("fail", [p("eight", 7)], error),
+                n("end", []),
+                n("exit", []),
             ])
         }))
     })
@@ -215,34 +202,30 @@ suite("core (safety)", function () {
             })
         })
 
-        function r(name, index) {
-            return {name: name, index: index}
-        }
-
         tt.run(util.wrap(done, function () {
             t.includesDeepAny([4, 5, 6, 7, 8, 9, 10, 11, 12].map(function (i) {
-                var splice1 = n("extra", "fail", 0,
-                    [r("test", 0), r("inner", 0)],
+                var splice1 = n("extra",
+                    [p("test", 0), p("inner", 0), p("fail", 0)],
                     {count: 2, value: undefined})
 
-                var splice2 = n("extra", "fail", 0,
-                    [r("test", 0), r("inner", 0)],
+                var splice2 = n("extra",
+                    [p("test", 0), p("inner", 0), p("fail", 0)],
                     {count: 3, value: sentinel})
 
                 var nodes = [
-                    n("start", undefined, -1),
-                    n("start", "test", 0),
-                    n("start", "inner", 0, p("test", 0)),
-                    n("start", "fail", 0, p("inner", 0, p("test", 0))),
+                    n("start", []),
+                    n("start", [p("test", 0)]),
+                    n("start", [p("test", 0), p("inner", 0)]),
+                    n("start", [p("test", 0), p("inner", 0), p("fail", 0)]),
                     // Extras should first appear here.
-                    n("end", "fail", 0, p("inner", 0, p("test", 0))),
-                    n("pass", "fail", 0, p("inner", 0, p("test", 0))),
-                    n("end", "inner", 0, p("test", 0)),
-                    n("pass", "inner", 0, p("test", 0)),
-                    n("end", "test", 0),
-                    n("pass", "test", 0),
-                    n("end", undefined, -1),
-                    n("exit", undefined, 0),
+                    n("end", [p("test", 0), p("inner", 0), p("fail", 0)]),
+                    n("pass", [p("test", 0), p("inner", 0), p("fail", 0)]),
+                    n("end", [p("test", 0), p("inner", 0)]),
+                    n("pass", [p("test", 0), p("inner", 0)]),
+                    n("end", [p("test", 0)]),
+                    n("pass", [p("test", 0)]),
+                    n("end", []),
+                    n("exit", []),
                 ]
 
                 nodes.splice(i, 0, splice1, splice2)

@@ -6,95 +6,42 @@ declare module "techtonic/core" {
 
     type Callback = (err?: Error) => any;
 
-    export interface ParentData {
-        name: string;
-        index: number;
-        parent: ParentData | void;
-    }
+    type TestType =
+        "start" | "end" | "pass" | "fail" | "pending" | "exit" | "extra";
 
-    export interface StartReport {
-        type: "start";
-        value: void;
-        name: string | void;
-        index: number;
-        parent: ParentData | void;
-    }
-
-    export interface EndReport {
-        type: "end";
-        value: void;
-        name: string | void;
-        index: number;
-        parent: ParentData | void;
-    }
-
-    export interface PassReport {
-        type: "pass";
-        value: void;
-        name: string;
-        index: number;
-        parent: ParentData | void;
-    }
-
-    export interface FailReport {
-        type: "fail";
-        value: any;
-        name: string;
-        index: number;
-        parent: ParentData | void;
-    }
-
-    export interface PendingReport {
-        type: "pending";
-        value: void;
-        name: string;
-        index: number;
-        parent: ParentData | void;
-    }
-
-    export interface ExitReport {
-        type: "exit";
-        value: void;
-        name: string | void;
-        index: number;
-        parent: void;
-    }
-
-    export interface ExtraReportEntry {
+    export interface TestLocation {
         name: string;
         index: number;
     }
 
-    export interface ExtraReportValue {
+    export interface TestReport<T extends TestType, U> {
+        type: T;
+        value: U;
+        path: TestLocation[];
+    }
+
+    export interface ExtraReportData {
         count: number;
         value: any;
     }
 
-    export interface ExtraReport {
-        type: "extra";
-        name: string | void;
-        value: ExtraReportValue;
-        index: number;
-        parent: ExtraReportEntry[];
-    }
-
-    type TestReport =
-        StartReport |
-        EndReport |
-        ExitReport |
-        PassReport |
-        FailReport |
-        ExtraReport;
+    export interface StartReport extends TestReport<"start", void> {}
+    export interface EndReport extends TestReport<"end", void> {}
+    export interface PassReport extends TestReport<"pass", void> {}
+    export interface FailReport extends TestReport<"fail", any> {}
+    export interface PendingReport extends TestReport<"pending", void> {}
+    export interface ExitReport extends TestReport<"exit", void> {}
+    export interface ExtraReport extends TestReport<"extra", ExtraReportData> {}
 
     export interface Reporter {
-        (item: TestReport, done: (err?: Error) => void): any;
+        (item: TestReport<TestType, any>, done: (err?: Error) => void): any;
 
         // Whether this needs to block everything else. Useful if you need to
         // have sole access of a resource, and you can't get a lock for it.
         block?: boolean;
     }
 
-    export interface TestResult {
+    export interface AssertionResult {
         [key: string]: any;
 
         // These are required.
@@ -115,24 +62,19 @@ declare module "techtonic/core" {
         message: string;
         expected: any;
         actual: any;
-        stack: string | void;
-    }
-
-    export interface AssertionErrorJsonWithStack extends AssertionErrorJson {
-        stack: string | void;
+        stack?: string;
     }
 
     export class AssertionError extends Error {
+        name: string;
+
         message: string;
         expected: any;
         found: any;
 
         constructor(message: string, expected: any, actual: any);
 
-        name: string;
-
-        toJSON(): AssertionErrorJson;
-        toJSON(includeStack?: boolean): AssertionErrorJsonWithStack;
+        toJSON(includeStack?: boolean): AssertionErrorJson;
     }
 
     type AssertionErrorConstructor =
@@ -183,8 +125,8 @@ declare module "techtonic/core" {
         //
         // This is also used internally to define the built-in assertions very
         // concisely.
-        define(name: string, impl: (...args: any[]) => TestResult): this;
-        define(methods: ObjectMap<(...args: any[]) => TestResult>): this;
+        define(name: string, impl: (...args: any[]) => AssertionResult): this;
+        define(methods: ObjectMap<(...args: any[]) => AssertionResult>): this;
 
         // Wrap one or more methods on this instance.
         wrap(name: string, impl: WrapperImpl): this;
@@ -197,7 +139,7 @@ declare module "techtonic/core" {
         add(methods: ObjectMap<(test: this, ...args: any[]) => any>): this;
 
         // Get the parent test. Exposed for plugins.
-        parent(): Test | void;
+        parent(): Test;
 
         // Set the timeout for async tests.
         timeout(timeout: number): this;
@@ -428,19 +370,18 @@ declare module "techtonic" {
     export {
         AssertionError,
         AssertionErrorJson,
-        AssertionErrorJsonWithStack,
-        ParentData,
+        TestLocation,
+        TestReport,
+        ExtraReportData,
         StartReport,
         EndReport,
         PassReport,
         FailReport,
         PendingReport,
         ExitReport,
-        ExtraReportEntry,
-        ExtraReportValue,
         ExtraReport,
         Reporter,
-        TestResult,
+        AssertionResult,
     } from "techtonic/core";
 
     import {Assertions} from "techtonic/assertions";

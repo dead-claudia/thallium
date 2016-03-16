@@ -8,6 +8,7 @@ Notes:
 - The CLI is a work in progress, but it will be documented as soon as it is finished.
 - `techtonic` and `techtonic/core` are completely independent from each other, but otherwise carry the same API. The only difference is that the former includes the `techtonic/assertions` plugin (i.e. the core asssertions).
 - If you're using Babel, this only exports a single default export.
+- `t.define()`, `t.wrap()`, `t.add()`, etc. can accept Symbols as well as strings. The property is passed through unmodified. This allows for private assertions.
 
 ## Base methods
 
@@ -270,7 +271,7 @@ t.test "define", ->
 t.myAssert 1, 1 # Fails, method not defined here
 ```
 
-Ad-hoc assertions are most definitely permitted, and the API is made for this to be both possible and practical.
+Ad-hoc assertions are most definitely permitted, and the API is made for this to be easy.
 
 This returns the current Techtonic instance, for chaining.
 

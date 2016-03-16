@@ -28,25 +28,25 @@ suite("core (selection)", function () {
 
         tt.run(util.wrap(done, function () {
             t.deepEqual(ret, [
-                n("start", undefined, -1),
-                n("start", "one", 0),
-                n("pending", "inner", 0, p("one", 0)),
-                n("start", "other", 1, p("one", 0)),
-                n("end", "other", 1, p("one", 0)),
-                n("pass", "other", 1, p("one", 0)),
-                n("end", "one", 0),
-                n("pass", "one", 0),
-                n("start", "two", 1),
-                n("start", "inner", 0, p("two", 1)),
-                n("end", "inner", 0, p("two", 1)),
-                n("pass", "inner", 0, p("two", 1)),
-                n("start", "other", 1, p("two", 1)),
-                n("end", "other", 1, p("two", 1)),
-                n("pass", "other", 1, p("two", 1)),
-                n("end", "two", 1),
-                n("pass", "two", 1),
-                n("end", undefined, -1),
-                n("exit", undefined, 0),
+                n("start", []),
+                n("start", [p("one", 0)]),
+                n("pending", [p("one", 0), p("inner", 0)]),
+                n("start", [p("one", 0), p("other", 1)]),
+                n("end", [p("one", 0), p("other", 1)]),
+                n("pass", [p("one", 0), p("other", 1)]),
+                n("end", [p("one", 0)]),
+                n("pass", [p("one", 0)]),
+                n("start", [p("two", 1)]),
+                n("start", [p("two", 1), p("inner", 0)]),
+                n("end", [p("two", 1), p("inner", 0)]),
+                n("pass", [p("two", 1), p("inner", 0)]),
+                n("start", [p("two", 1), p("other", 1)]),
+                n("end", [p("two", 1), p("other", 1)]),
+                n("pass", [p("two", 1), p("other", 1)]),
+                n("end", [p("two", 1)]),
+                n("pass", [p("two", 1)]),
+                n("end", []),
+                n("exit", []),
             ])
         }))
     })
@@ -69,25 +69,25 @@ suite("core (selection)", function () {
 
         tt.run(util.wrap(done, function () {
             t.deepEqual(ret, [
-                n("start", undefined, -1),
-                n("start", "one", 0),
-                n("pending", "inner", 0, p("one", 0)),
-                n("start", "other", 1, p("one", 0)),
-                n("end", "other", 1, p("one", 0)),
-                n("pass", "other", 1, p("one", 0)),
-                n("end", "one", 0),
-                n("pass", "one", 0),
-                n("start", "two", 1),
-                n("start", "inner", 0, p("two", 1)),
-                n("end", "inner", 0, p("two", 1)),
-                n("pass", "inner", 0, p("two", 1)),
-                n("start", "other", 1, p("two", 1)),
-                n("end", "other", 1, p("two", 1)),
-                n("pass", "other", 1, p("two", 1)),
-                n("end", "two", 1),
-                n("pass", "two", 1),
-                n("end", undefined, -1),
-                n("exit", undefined, 0),
+                n("start", []),
+                n("start", [p("one", 0)]),
+                n("pending", [p("one", 0), p("inner", 0)]),
+                n("start", [p("one", 0), p("other", 1)]),
+                n("end", [p("one", 0), p("other", 1)]),
+                n("pass", [p("one", 0), p("other", 1)]),
+                n("end", [p("one", 0)]),
+                n("pass", [p("one", 0)]),
+                n("start", [p("two", 1)]),
+                n("start", [p("two", 1), p("inner", 0)]),
+                n("end", [p("two", 1), p("inner", 0)]),
+                n("pass", [p("two", 1), p("inner", 0)]),
+                n("start", [p("two", 1), p("other", 1)]),
+                n("end", [p("two", 1), p("other", 1)]),
+                n("pass", [p("two", 1), p("other", 1)]),
+                n("end", [p("two", 1)]),
+                n("pass", [p("two", 1)]),
+                n("end", []),
+                n("exit", []),
             ])
         }))
     })
@@ -110,25 +110,25 @@ suite("core (selection)", function () {
 
         tt.run(util.wrap(done, function () {
             t.deepEqual(ret, [
-                n("start", undefined, -1),
-                n("start", "one", 0),
-                n("pending", "inner", 0, p("one", 0)),
-                n("start", "other", 1, p("one", 0)),
-                n("end", "other", 1, p("one", 0)),
-                n("pass", "other", 1, p("one", 0)),
-                n("end", "one", 0),
-                n("pass", "one", 0),
-                n("start", "two", 1),
-                n("start", "inner", 0, p("two", 1)),
-                n("end", "inner", 0, p("two", 1)),
-                n("pass", "inner", 0, p("two", 1)),
-                n("start", "other", 1, p("two", 1)),
-                n("end", "other", 1, p("two", 1)),
-                n("pass", "other", 1, p("two", 1)),
-                n("end", "two", 1),
-                n("pass", "two", 1),
-                n("end", undefined, -1),
-                n("exit", undefined, 0),
+                n("start", []),
+                n("start", [p("one", 0)]),
+                n("pending", [p("one", 0), p("inner", 0)]),
+                n("start", [p("one", 0), p("other", 1)]),
+                n("end", [p("one", 0), p("other", 1)]),
+                n("pass", [p("one", 0), p("other", 1)]),
+                n("end", [p("one", 0)]),
+                n("pass", [p("one", 0)]),
+                n("start", [p("two", 1)]),
+                n("start", [p("two", 1), p("inner", 0)]),
+                n("end", [p("two", 1), p("inner", 0)]),
+                n("pass", [p("two", 1), p("inner", 0)]),
+                n("start", [p("two", 1), p("other", 1)]),
+                n("end", [p("two", 1), p("other", 1)]),
+                n("pass", [p("two", 1), p("other", 1)]),
+                n("end", [p("two", 1)]),
+                n("pass", [p("two", 1)]),
+                n("end", []),
+                n("exit", []),
             ])
         }))
     })
@@ -152,15 +152,15 @@ suite("core (selection)", function () {
 
         tt.run(util.wrap(done, function () {
             t.deepEqual(ret, [
-                n("start", undefined, -1),
-                n("start", "one", 0),
-                n("start", "inner", 0, p("one", 0)),
-                n("end", "inner", 0, p("one", 0)),
-                n("pass", "inner", 0, p("one", 0)),
-                n("end", "one", 0),
-                n("pass", "one", 0),
-                n("end", undefined, -1),
-                n("exit", undefined, 0),
+                n("start", []),
+                n("start", [p("one", 0)]),
+                n("start", [p("one", 0), p("inner", 0)]),
+                n("end", [p("one", 0), p("inner", 0)]),
+                n("pass", [p("one", 0), p("inner", 0)]),
+                n("end", [p("one", 0)]),
+                n("pass", [p("one", 0)]),
+                n("end", []),
+                n("exit", []),
             ])
         }))
     })
@@ -184,15 +184,15 @@ suite("core (selection)", function () {
 
         tt.run(util.wrap(done, function () {
             t.deepEqual(ret, [
-                n("start", undefined, -1),
-                n("start", "one", 0),
-                n("start", "inner", 0, p("one", 0)),
-                n("end", "inner", 0, p("one", 0)),
-                n("pass", "inner", 0, p("one", 0)),
-                n("end", "one", 0),
-                n("pass", "one", 0),
-                n("end", undefined, -1),
-                n("exit", undefined, 0),
+                n("start", []),
+                n("start", [p("one", 0)]),
+                n("start", [p("one", 0), p("inner", 0)]),
+                n("end", [p("one", 0), p("inner", 0)]),
+                n("pass", [p("one", 0), p("inner", 0)]),
+                n("end", [p("one", 0)]),
+                n("pass", [p("one", 0)]),
+                n("end", []),
+                n("exit", []),
             ])
         }))
     })
@@ -216,15 +216,15 @@ suite("core (selection)", function () {
 
         tt.run(util.wrap(done, function () {
             t.deepEqual(ret, [
-                n("start", undefined, -1),
-                n("start", "one", 0),
-                n("start", "inner", 0, p("one", 0)),
-                n("end", "inner", 0, p("one", 0)),
-                n("pass", "inner", 0, p("one", 0)),
-                n("end", "one", 0),
-                n("pass", "one", 0),
-                n("end", undefined, -1),
-                n("exit", undefined, 0),
+                n("start", []),
+                n("start", [p("one", 0)]),
+                n("start", [p("one", 0), p("inner", 0)]),
+                n("end", [p("one", 0), p("inner", 0)]),
+                n("pass", [p("one", 0), p("inner", 0)]),
+                n("end", [p("one", 0)]),
+                n("pass", [p("one", 0)]),
+                n("end", []),
+                n("exit", []),
             ])
         }))
     })
@@ -248,9 +248,9 @@ suite("core (selection)", function () {
 
         tt.run(util.wrap(done, function () {
             t.deepEqual(ret, [
-                n("start", undefined, -1),
-                n("end", undefined, -1),
-                n("exit", undefined, 0),
+                n("start", []),
+                n("end", []),
+                n("exit", []),
             ])
         }))
     })
@@ -274,9 +274,9 @@ suite("core (selection)", function () {
 
         tt.run(util.wrap(done, function () {
             t.deepEqual(ret, [
-                n("start", undefined, -1),
-                n("end", undefined, -1),
-                n("exit", undefined, 0),
+                n("start", []),
+                n("end", []),
+                n("exit", []),
             ])
         }))
     })
@@ -300,9 +300,41 @@ suite("core (selection)", function () {
 
         tt.run(util.wrap(done, function () {
             t.deepEqual(ret, [
-                n("start", undefined, -1),
-                n("end", undefined, -1),
-                n("exit", undefined, 0),
+                n("start", []),
+                n("end", []),
+                n("exit", []),
+            ])
+        }))
+    })
+
+    test("only against regexp", function (done) {
+        var tt = t.base().use(fail)
+        var ret = []
+
+        tt.reporter(util.push(ret))
+        tt.only([/^one$/, "inner"])
+
+        tt.test("one", function (tt) {
+            tt.test("inner", function () {})
+            tt.test("other", function (tt) { tt.fail() })
+        })
+
+        tt.test("two", function (tt) {
+            tt.test("inner", function (tt) { tt.fail() })
+            tt.test("other", function (tt) { tt.fail() })
+        })
+
+        tt.run(util.wrap(done, function () {
+            t.deepEqual(ret, [
+                n("start", []),
+                n("start", [p("one", 0)]),
+                n("start", [p("one", 0), p("inner", 0)]),
+                n("end", [p("one", 0), p("inner", 0)]),
+                n("pass", [p("one", 0), p("inner", 0)]),
+                n("end", [p("one", 0)]),
+                n("pass", [p("one", 0)]),
+                n("end", []),
+                n("exit", []),
             ])
         }))
     })

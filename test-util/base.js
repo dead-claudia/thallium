@@ -37,16 +37,14 @@ exports.push = function (ret) {
     }
 }
 
-exports.n = function (type, name, index, parent, value) { // eslint-disable-line max-params, max-len
+exports.n = function (type, path, value) {
     return {
         type: type,
-        name: name,
-        index: index,
-        parent: parent,
+        path: path,
         value: value,
     }
 }
 
-exports.p = function (name, index, parent) {
-    return {name: name, index: index, parent: parent}
+exports.p = function (name, index) {
+    return {name: name, index: index}
 }

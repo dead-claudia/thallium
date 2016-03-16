@@ -3,6 +3,7 @@
 var t = require("../../index.js")
 var util = require("../../test-util/base.js")
 var n = util.n
+var p = util.p
 
 suite("core (iterators)", function () {
     suite("raw", function () {
@@ -33,12 +34,12 @@ suite("core (iterators)", function () {
 
             tt.run(util.wrap(done, function () {
                 t.deepEqual(ret, [
-                    n("start", undefined, -1),
-                    n("start", "test", 0),
-                    n("end", "test", 0),
-                    n("pass", "test", 0),
-                    n("end", undefined, -1),
-                    n("exit", undefined, 0),
+                    n("start", []),
+                    n("start", [p("test", 0)]),
+                    n("end", [p("test", 0)]),
+                    n("pass", [p("test", 0)]),
+                    n("end", []),
+                    n("exit", []),
                 ])
 
                 t.deepEqual(iter.list, [undefined, 0, 1, 2, 3, 4])
@@ -69,12 +70,12 @@ suite("core (iterators)", function () {
 
             tt.run(util.wrap(done, function () {
                 t.deepEqual(ret, [
-                    n("start", undefined, -1),
-                    n("start", "test", 0),
-                    n("end", "test", 0),
-                    n("pass", "test", 0),
-                    n("end", undefined, -1),
-                    n("exit", undefined, 0),
+                    n("start", []),
+                    n("start", [p("test", 0)]),
+                    n("end", [p("test", 0)]),
+                    n("pass", [p("test", 0)]),
+                    n("end", []),
+                    n("exit", []),
                 ])
 
                 t.deepEqual(iter.list, [undefined, 0, 1, 2, 3, 4])
@@ -113,12 +114,12 @@ suite("core (iterators)", function () {
 
             tt.run(util.wrap(done, function () {
                 t.deepEqual(ret, [
-                    n("start", undefined, -1),
-                    n("start", "test", 0),
-                    n("end", "test", 0),
-                    n("pass", "test", 0),
-                    n("end", undefined, -1),
-                    n("exit", undefined, 0),
+                    n("start", []),
+                    n("start", [p("test", 0)]),
+                    n("end", [p("test", 0)]),
+                    n("pass", [p("test", 0)]),
+                    n("end", []),
+                    n("exit", []),
                 ])
 
                 t.deepEqual(iter.list, [undefined, 0, 1, 2, 3, 4])
@@ -155,12 +156,12 @@ suite("core (iterators)", function () {
 
             tt.run(util.wrap(done, function () {
                 t.deepEqual(ret, [
-                    n("start", undefined, -1),
-                    n("start", "test", 0),
-                    n("end", "test", 0),
-                    n("pass", "test", 0),
-                    n("end", undefined, -1),
-                    n("exit", undefined, 0),
+                    n("start", []),
+                    n("start", [p("test", 0)]),
+                    n("end", [p("test", 0)]),
+                    n("pass", [p("test", 0)]),
+                    n("end", []),
+                    n("exit", []),
                 ])
 
                 t.deepEqual(iter.list, [undefined, 0, 1, 2, 3, 4])
@@ -195,12 +196,12 @@ suite("core (iterators)", function () {
 
             tt.run(util.wrap(done, function () {
                 t.deepEqual(ret, [
-                    n("start", undefined, -1),
-                    n("start", "test", 0),
-                    n("end", "test", 0),
-                    n("fail", "test", 0, undefined, sentinel),
-                    n("end", undefined, -1),
-                    n("exit", undefined, 0),
+                    n("start", []),
+                    n("start", [p("test", 0)]),
+                    n("end", [p("test", 0)]),
+                    n("fail", [p("test", 0)], sentinel),
+                    n("end", []),
+                    n("exit", []),
                 ])
 
                 t.deepEqual(iter.list, [undefined])
@@ -231,12 +232,12 @@ suite("core (iterators)", function () {
 
             tt.run(util.wrap(done, function () {
                 t.deepEqual(ret, [
-                    n("start", undefined, -1),
-                    n("start", "test", 0),
-                    n("end", "test", 0),
-                    n("fail", "test", 0, undefined, sentinel),
-                    n("end", undefined, -1),
-                    n("exit", undefined, 0),
+                    n("start", []),
+                    n("start", [p("test", 0)]),
+                    n("end", [p("test", 0)]),
+                    n("fail", [p("test", 0)], sentinel),
+                    n("end", []),
+                    n("exit", []),
                 ])
 
                 t.deepEqual(iter.list, [undefined])
@@ -275,12 +276,12 @@ suite("core (iterators)", function () {
 
             tt.run(util.wrap(done, function () {
                 t.deepEqual(ret, [
-                    n("start", undefined, -1),
-                    n("start", "test", 0),
-                    n("end", "test", 0),
-                    n("fail", "test", 0, undefined, sentinel),
-                    n("end", undefined, -1),
-                    n("exit", undefined, 0),
+                    n("start", []),
+                    n("start", [p("test", 0)]),
+                    n("end", [p("test", 0)]),
+                    n("fail", [p("test", 0)], sentinel),
+                    n("end", []),
+                    n("exit", []),
                 ])
 
                 t.deepEqual(iter.list, [undefined])
@@ -317,12 +318,12 @@ suite("core (iterators)", function () {
 
             tt.run(util.wrap(done, function () {
                 t.deepEqual(ret, [
-                    n("start", undefined, -1),
-                    n("start", "test", 0),
-                    n("end", "test", 0),
-                    n("fail", "test", 0, undefined, sentinel),
-                    n("end", undefined, -1),
-                    n("exit", undefined, 0),
+                    n("start", []),
+                    n("start", [p("test", 0)]),
+                    n("end", [p("test", 0)]),
+                    n("fail", [p("test", 0)], sentinel),
+                    n("end", []),
+                    n("exit", []),
                 ])
 
                 t.deepEqual(iter.list, [undefined])
@@ -361,12 +362,12 @@ suite("core (iterators)", function () {
 
             tt.run(util.wrap(done, function () {
                 t.deepEqual(ret, [
-                    n("start", undefined, -1),
-                    n("start", "test", 0),
-                    n("end", "test", 0),
-                    n("fail", "test", 0, undefined, sentinel),
-                    n("end", undefined, -1),
-                    n("exit", undefined, 0),
+                    n("start", []),
+                    n("start", [p("test", 0)]),
+                    n("end", [p("test", 0)]),
+                    n("fail", [p("test", 0)], sentinel),
+                    n("end", []),
+                    n("exit", []),
                 ])
 
                 t.deepEqual(iter.list, [undefined, 0])
@@ -401,12 +402,12 @@ suite("core (iterators)", function () {
 
             tt.run(util.wrap(done, function () {
                 t.deepEqual(ret, [
-                    n("start", undefined, -1),
-                    n("start", "test", 0),
-                    n("end", "test", 0),
-                    n("fail", "test", 0, undefined, sentinel),
-                    n("end", undefined, -1),
-                    n("exit", undefined, 0),
+                    n("start", []),
+                    n("start", [p("test", 0)]),
+                    n("end", [p("test", 0)]),
+                    n("fail", [p("test", 0)], sentinel),
+                    n("end", []),
+                    n("exit", []),
                 ])
 
                 t.deepEqual(iter.list, [undefined, 0])
@@ -449,12 +450,12 @@ suite("core (iterators)", function () {
 
             tt.run(util.wrap(done, function () {
                 t.deepEqual(ret, [
-                    n("start", undefined, -1),
-                    n("start", "test", 0),
-                    n("end", "test", 0),
-                    n("fail", "test", 0, undefined, sentinel),
-                    n("end", undefined, -1),
-                    n("exit", undefined, 0),
+                    n("start", []),
+                    n("start", [p("test", 0)]),
+                    n("end", [p("test", 0)]),
+                    n("fail", [p("test", 0)], sentinel),
+                    n("end", []),
+                    n("exit", []),
                 ])
 
                 t.deepEqual(iter.list, [undefined, 0])
@@ -495,12 +496,12 @@ suite("core (iterators)", function () {
 
             tt.run(util.wrap(done, function () {
                 t.deepEqual(ret, [
-                    n("start", undefined, -1),
-                    n("start", "test", 0),
-                    n("end", "test", 0),
-                    n("fail", "test", 0, undefined, sentinel),
-                    n("end", undefined, -1),
-                    n("exit", undefined, 0),
+                    n("start", []),
+                    n("start", [p("test", 0)]),
+                    n("end", [p("test", 0)]),
+                    n("fail", [p("test", 0)], sentinel),
+                    n("end", []),
+                    n("exit", []),
                 ])
 
                 t.deepEqual(iter.list, [undefined, 0])
@@ -542,12 +543,12 @@ suite("core (iterators)", function () {
 
             tt.run(util.wrap(done, function () {
                 t.deepEqual(ret, [
-                    n("start", undefined, -1),
-                    n("start", "test", 0),
-                    n("end", "test", 0),
-                    n("fail", "test", 0, undefined, sentinel),
-                    n("end", undefined, -1),
-                    n("exit", undefined, 0),
+                    n("start", []),
+                    n("start", [p("test", 0)]),
+                    n("end", [p("test", 0)]),
+                    n("fail", [p("test", 0)], sentinel),
+                    n("end", []),
+                    n("exit", []),
                 ])
 
                 t.deepEqual(iter.list, [undefined, 0, 1, 2, 3, 4])
@@ -585,12 +586,12 @@ suite("core (iterators)", function () {
 
             tt.run(util.wrap(done, function () {
                 t.deepEqual(ret, [
-                    n("start", undefined, -1),
-                    n("start", "test", 0),
-                    n("end", "test", 0),
-                    n("fail", "test", 0, undefined, sentinel),
-                    n("end", undefined, -1),
-                    n("exit", undefined, 0),
+                    n("start", []),
+                    n("start", [p("test", 0)]),
+                    n("end", [p("test", 0)]),
+                    n("fail", [p("test", 0)], sentinel),
+                    n("end", []),
+                    n("exit", []),
                 ])
 
                 t.deepEqual(iter.list, [undefined, 0, 1, 2, 3, 4])
@@ -635,12 +636,12 @@ suite("core (iterators)", function () {
 
             tt.run(util.wrap(done, function () {
                 t.deepEqual(ret, [
-                    n("start", undefined, -1),
-                    n("start", "test", 0),
-                    n("end", "test", 0),
-                    n("fail", "test", 0, undefined, sentinel1),
-                    n("end", undefined, -1),
-                    n("exit", undefined, 0),
+                    n("start", []),
+                    n("start", [p("test", 0)]),
+                    n("end", [p("test", 0)]),
+                    n("fail", [p("test", 0)], sentinel1),
+                    n("end", []),
+                    n("exit", []),
                 ])
 
                 t.deepEqual(iter.list, [undefined, 0])
@@ -682,12 +683,12 @@ suite("core (iterators)", function () {
 
             tt.run(util.wrap(done, function () {
                 t.deepEqual(ret, [
-                    n("start", undefined, -1),
-                    n("start", "test", 0),
-                    n("end", "test", 0),
-                    n("fail", "test", 0, undefined, sentinel1),
-                    n("end", undefined, -1),
-                    n("exit", undefined, 0),
+                    n("start", []),
+                    n("start", [p("test", 0)]),
+                    n("end", [p("test", 0)]),
+                    n("fail", [p("test", 0)], sentinel1),
+                    n("end", []),
+                    n("exit", []),
                 ])
 
                 t.deepEqual(iter.list, [undefined, 0])
@@ -739,12 +740,12 @@ suite("core (iterators)", function () {
 
             tt.run(util.wrap(done, function () {
                 t.deepEqual(ret, [
-                    n("start", undefined, -1),
-                    n("start", "test", 0),
-                    n("end", "test", 0),
-                    n("pass", "test", 0),
-                    n("end", undefined, -1),
-                    n("exit", undefined, 0),
+                    n("start", []),
+                    n("start", [p("test", 0)]),
+                    n("end", [p("test", 0)]),
+                    n("pass", [p("test", 0)]),
+                    n("end", []),
+                    n("exit", []),
                 ])
 
                 t.deepEqual(iter.list, [undefined, 0, 1, 2, 3, 4])
@@ -775,12 +776,12 @@ suite("core (iterators)", function () {
 
             tt.run(util.wrap(done, function () {
                 t.deepEqual(ret, [
-                    n("start", undefined, -1),
-                    n("start", "test", 0),
-                    n("end", "test", 0),
-                    n("pass", "test", 0),
-                    n("end", undefined, -1),
-                    n("exit", undefined, 0),
+                    n("start", []),
+                    n("start", [p("test", 0)]),
+                    n("end", [p("test", 0)]),
+                    n("pass", [p("test", 0)]),
+                    n("end", []),
+                    n("exit", []),
                 ])
 
                 t.deepEqual(iter.list, [undefined, 0, 1, 2, 3, 4])
@@ -819,12 +820,12 @@ suite("core (iterators)", function () {
 
             tt.run(util.wrap(done, function () {
                 t.deepEqual(ret, [
-                    n("start", undefined, -1),
-                    n("start", "test", 0),
-                    n("end", "test", 0),
-                    n("pass", "test", 0),
-                    n("end", undefined, -1),
-                    n("exit", undefined, 0),
+                    n("start", []),
+                    n("start", [p("test", 0)]),
+                    n("end", [p("test", 0)]),
+                    n("pass", [p("test", 0)]),
+                    n("end", []),
+                    n("exit", []),
                 ])
 
                 t.deepEqual(iter.list, [undefined, 0, 1, 2, 3, 4])
@@ -861,12 +862,12 @@ suite("core (iterators)", function () {
 
             tt.run(util.wrap(done, function () {
                 t.deepEqual(ret, [
-                    n("start", undefined, -1),
-                    n("start", "test", 0),
-                    n("end", "test", 0),
-                    n("pass", "test", 0),
-                    n("end", undefined, -1),
-                    n("exit", undefined, 0),
+                    n("start", []),
+                    n("start", [p("test", 0)]),
+                    n("end", [p("test", 0)]),
+                    n("pass", [p("test", 0)]),
+                    n("end", []),
+                    n("exit", []),
                 ])
 
                 t.deepEqual(iter.list, [undefined, 0, 1, 2, 3, 4])
@@ -905,12 +906,12 @@ suite("core (iterators)", function () {
 
             tt.run(util.wrap(done, function () {
                 t.deepEqual(ret, [
-                    n("start", undefined, -1),
-                    n("start", "test", 0),
-                    n("end", "test", 0),
-                    n("pass", "test", 0),
-                    n("end", undefined, -1),
-                    n("exit", undefined, 0),
+                    n("start", []),
+                    n("start", [p("test", 0)]),
+                    n("end", [p("test", 0)]),
+                    n("pass", [p("test", 0)]),
+                    n("end", []),
+                    n("exit", []),
                 ])
 
                 t.deepEqual(iter.list, [undefined])
@@ -944,12 +945,12 @@ suite("core (iterators)", function () {
 
             tt.run(util.wrap(done, function () {
                 t.deepEqual(ret, [
-                    n("start", undefined, -1),
-                    n("start", "test", 0),
-                    n("end", "test", 0),
-                    n("fail", "test", 0, undefined, sentinel),
-                    n("end", undefined, -1),
-                    n("exit", undefined, 0),
+                    n("start", []),
+                    n("start", [p("test", 0)]),
+                    n("end", [p("test", 0)]),
+                    n("fail", [p("test", 0)], sentinel),
+                    n("end", []),
+                    n("exit", []),
                 ])
 
                 t.deepEqual(iter.list, [undefined])
@@ -992,12 +993,12 @@ suite("core (iterators)", function () {
 
             tt.run(util.wrap(done, function () {
                 t.deepEqual(ret, [
-                    n("start", undefined, -1),
-                    n("start", "test", 0),
-                    n("end", "test", 0),
-                    n("pass", "test", 0),
-                    n("end", undefined, -1),
-                    n("exit", undefined, 0),
+                    n("start", []),
+                    n("start", [p("test", 0)]),
+                    n("end", [p("test", 0)]),
+                    n("pass", [p("test", 0)]),
+                    n("end", []),
+                    n("exit", []),
                 ])
 
                 t.deepEqual(iter.list, [undefined])
@@ -1037,12 +1038,12 @@ suite("core (iterators)", function () {
 
             tt.run(util.wrap(done, function () {
                 t.deepEqual(ret, [
-                    n("start", undefined, -1),
-                    n("start", "test", 0),
-                    n("end", "test", 0),
-                    n("fail", "test", 0, undefined, sentinel),
-                    n("end", undefined, -1),
-                    n("exit", undefined, 0),
+                    n("start", []),
+                    n("start", [p("test", 0)]),
+                    n("end", [p("test", 0)]),
+                    n("fail", [p("test", 0)], sentinel),
+                    n("end", []),
+                    n("exit", []),
                 ])
 
                 t.deepEqual(iter.list, [undefined])
@@ -1082,12 +1083,12 @@ suite("core (iterators)", function () {
 
             tt.run(util.wrap(done, function () {
                 t.deepEqual(ret, [
-                    n("start", undefined, -1),
-                    n("start", "test", 0),
-                    n("end", "test", 0),
-                    n("pass", "test", 0),
-                    n("end", undefined, -1),
-                    n("exit", undefined, 0),
+                    n("start", []),
+                    n("start", [p("test", 0)]),
+                    n("end", [p("test", 0)]),
+                    n("pass", [p("test", 0)]),
+                    n("end", []),
+                    n("exit", []),
                 ])
 
                 t.deepEqual(iter.list, [undefined, 0])
@@ -1122,12 +1123,12 @@ suite("core (iterators)", function () {
 
             tt.run(util.wrap(done, function () {
                 t.deepEqual(ret, [
-                    n("start", undefined, -1),
-                    n("start", "test", 0),
-                    n("end", "test", 0),
-                    n("fail", "test", 0, undefined, sentinel),
-                    n("end", undefined, -1),
-                    n("exit", undefined, 0),
+                    n("start", []),
+                    n("start", [p("test", 0)]),
+                    n("end", [p("test", 0)]),
+                    n("fail", [p("test", 0)], sentinel),
+                    n("end", []),
+                    n("exit", []),
                 ])
 
                 t.deepEqual(iter.list, [undefined, 0])
@@ -1171,12 +1172,12 @@ suite("core (iterators)", function () {
 
             tt.run(util.wrap(done, function () {
                 t.deepEqual(ret, [
-                    n("start", undefined, -1),
-                    n("start", "test", 0),
-                    n("end", "test", 0),
-                    n("pass", "test", 0),
-                    n("end", undefined, -1),
-                    n("exit", undefined, 0),
+                    n("start", []),
+                    n("start", [p("test", 0)]),
+                    n("end", [p("test", 0)]),
+                    n("pass", [p("test", 0)]),
+                    n("end", []),
+                    n("exit", []),
                 ])
 
                 t.deepEqual(iter.list, [undefined, 0])
@@ -1217,12 +1218,12 @@ suite("core (iterators)", function () {
 
             tt.run(util.wrap(done, function () {
                 t.deepEqual(ret, [
-                    n("start", undefined, -1),
-                    n("start", "test", 0),
-                    n("end", "test", 0),
-                    n("fail", "test", 0, undefined, sentinel),
-                    n("end", undefined, -1),
-                    n("exit", undefined, 0),
+                    n("start", []),
+                    n("start", [p("test", 0)]),
+                    n("end", [p("test", 0)]),
+                    n("fail", [p("test", 0)], sentinel),
+                    n("end", []),
+                    n("exit", []),
                 ])
 
                 t.deepEqual(iter.list, [undefined, 0])
@@ -1264,12 +1265,12 @@ suite("core (iterators)", function () {
 
             tt.run(util.wrap(done, function () {
                 t.deepEqual(ret, [
-                    n("start", undefined, -1),
-                    n("start", "test", 0),
-                    n("end", "test", 0),
-                    n("fail", "test", 0, undefined, sentinel),
-                    n("end", undefined, -1),
-                    n("exit", undefined, 0),
+                    n("start", []),
+                    n("start", [p("test", 0)]),
+                    n("end", [p("test", 0)]),
+                    n("fail", [p("test", 0)], sentinel),
+                    n("end", []),
+                    n("exit", []),
                 ])
 
                 t.deepEqual(iter.list, [undefined, 0, 1, 2, 3, 4])
@@ -1307,12 +1308,12 @@ suite("core (iterators)", function () {
 
             tt.run(util.wrap(done, function () {
                 t.deepEqual(ret, [
-                    n("start", undefined, -1),
-                    n("start", "test", 0),
-                    n("end", "test", 0),
-                    n("fail", "test", 0, undefined, sentinel),
-                    n("end", undefined, -1),
-                    n("exit", undefined, 0),
+                    n("start", []),
+                    n("start", [p("test", 0)]),
+                    n("end", [p("test", 0)]),
+                    n("fail", [p("test", 0)], sentinel),
+                    n("end", []),
+                    n("exit", []),
                 ])
 
                 t.deepEqual(iter.list, [undefined, 0, 1, 2, 3, 4])
@@ -1358,12 +1359,12 @@ suite("core (iterators)", function () {
 
             tt.run(util.wrap(done, function () {
                 t.deepEqual(ret, [
-                    n("start", undefined, -1),
-                    n("start", "test", 0),
-                    n("end", "test", 0),
-                    n("fail", "test", 0, undefined, sentinel2),
-                    n("end", undefined, -1),
-                    n("exit", undefined, 0),
+                    n("start", []),
+                    n("start", [p("test", 0)]),
+                    n("end", [p("test", 0)]),
+                    n("fail", [p("test", 0)], sentinel2),
+                    n("end", []),
+                    n("exit", []),
                 ])
 
                 t.deepEqual(iter.list, [undefined, 0])
@@ -1405,12 +1406,12 @@ suite("core (iterators)", function () {
 
             tt.run(util.wrap(done, function () {
                 t.deepEqual(ret, [
-                    n("start", undefined, -1),
-                    n("start", "test", 0),
-                    n("end", "test", 0),
-                    n("fail", "test", 0, undefined, sentinel1),
-                    n("end", undefined, -1),
-                    n("exit", undefined, 0),
+                    n("start", []),
+                    n("start", [p("test", 0)]),
+                    n("end", [p("test", 0)]),
+                    n("fail", [p("test", 0)], sentinel1),
+                    n("end", []),
+                    n("exit", []),
                 ])
 
                 t.deepEqual(iter.list, [undefined, 0])
@@ -1463,12 +1464,12 @@ suite("core (iterators)", function () {
 
             tt.run(util.wrap(done, function () {
                 t.deepEqual(ret, [
-                    n("start", undefined, -1),
-                    n("start", "test", 0),
-                    n("end", "test", 0),
-                    n("pass", "test", 0),
-                    n("end", undefined, -1),
-                    n("exit", undefined, 0),
+                    n("start", []),
+                    n("start", [p("test", 0)]),
+                    n("end", [p("test", 0)]),
+                    n("pass", [p("test", 0)]),
+                    n("end", []),
+                    n("exit", []),
                 ])
 
                 t.deepEqual(iter.list, [undefined, 0, 1, 2, 3, 4])
@@ -1499,12 +1500,12 @@ suite("core (iterators)", function () {
 
             tt.run(util.wrap(done, function () {
                 t.deepEqual(ret, [
-                    n("start", undefined, -1),
-                    n("start", "test", 0),
-                    n("end", "test", 0),
-                    n("pass", "test", 0),
-                    n("end", undefined, -1),
-                    n("exit", undefined, 0),
+                    n("start", []),
+                    n("start", [p("test", 0)]),
+                    n("end", [p("test", 0)]),
+                    n("pass", [p("test", 0)]),
+                    n("end", []),
+                    n("exit", []),
                 ])
 
                 t.deepEqual(iter.list, [undefined, 0, 1, 2, 3, 4])
@@ -1543,12 +1544,12 @@ suite("core (iterators)", function () {
 
             tt.run(util.wrap(done, function () {
                 t.deepEqual(ret, [
-                    n("start", undefined, -1),
-                    n("start", "test", 0),
-                    n("end", "test", 0),
-                    n("pass", "test", 0),
-                    n("end", undefined, -1),
-                    n("exit", undefined, 0),
+                    n("start", []),
+                    n("start", [p("test", 0)]),
+                    n("end", [p("test", 0)]),
+                    n("pass", [p("test", 0)]),
+                    n("end", []),
+                    n("exit", []),
                 ])
 
                 t.deepEqual(iter.list, [undefined, 0, 1, 2, 3, 4])
@@ -1585,12 +1586,12 @@ suite("core (iterators)", function () {
 
             tt.run(util.wrap(done, function () {
                 t.deepEqual(ret, [
-                    n("start", undefined, -1),
-                    n("start", "test", 0),
-                    n("end", "test", 0),
-                    n("pass", "test", 0),
-                    n("end", undefined, -1),
-                    n("exit", undefined, 0),
+                    n("start", []),
+                    n("start", [p("test", 0)]),
+                    n("end", [p("test", 0)]),
+                    n("pass", [p("test", 0)]),
+                    n("end", []),
+                    n("exit", []),
                 ])
 
                 t.deepEqual(iter.list, [undefined, 0, 1, 2, 3, 4])
@@ -1629,12 +1630,12 @@ suite("core (iterators)", function () {
 
             tt.run(util.wrap(done, function () {
                 t.deepEqual(ret, [
-                    n("start", undefined, -1),
-                    n("start", "test", 0),
-                    n("end", "test", 0),
-                    n("pass", "test", 0),
-                    n("end", undefined, -1),
-                    n("exit", undefined, 0),
+                    n("start", []),
+                    n("start", [p("test", 0)]),
+                    n("end", [p("test", 0)]),
+                    n("pass", [p("test", 0)]),
+                    n("end", []),
+                    n("exit", []),
                 ])
 
                 t.deepEqual(iter.list, [undefined])
@@ -1668,12 +1669,12 @@ suite("core (iterators)", function () {
 
             tt.run(util.wrap(done, function () {
                 t.deepEqual(ret, [
-                    n("start", undefined, -1),
-                    n("start", "test", 0),
-                    n("end", "test", 0),
-                    n("fail", "test", 0, undefined, sentinel),
-                    n("end", undefined, -1),
-                    n("exit", undefined, 0),
+                    n("start", []),
+                    n("start", [p("test", 0)]),
+                    n("end", [p("test", 0)]),
+                    n("fail", [p("test", 0)], sentinel),
+                    n("end", []),
+                    n("exit", []),
                 ])
 
                 t.deepEqual(iter.list, [undefined])
@@ -1725,12 +1726,12 @@ suite("core (iterators)", function () {
 
             tt.run(util.wrap(done, function () {
                 t.deepEqual(ret, [
-                    n("start", undefined, -1),
-                    n("start", "test", 0),
-                    n("end", "test", 0),
-                    n("pass", "test", 0),
-                    n("end", undefined, -1),
-                    n("exit", undefined, 0),
+                    n("start", []),
+                    n("start", [p("test", 0)]),
+                    n("end", [p("test", 0)]),
+                    n("pass", [p("test", 0)]),
+                    n("end", []),
+                    n("exit", []),
                 ])
 
                 t.deepEqual(iter.list, [undefined])
@@ -1788,12 +1789,12 @@ suite("core (iterators)", function () {
 
             tt.run(util.wrap(done, function () {
                 t.deepEqual(ret, [
-                    n("start", undefined, -1),
-                    n("start", "test", 0),
-                    n("end", "test", 0),
-                    n("fail", "test", 0, undefined, sentinel2),
-                    n("end", undefined, -1),
-                    n("exit", undefined, 0),
+                    n("start", []),
+                    n("start", [p("test", 0)]),
+                    n("end", [p("test", 0)]),
+                    n("fail", [p("test", 0)], sentinel2),
+                    n("end", []),
+                    n("exit", []),
                 ])
 
                 t.deepEqual(iter.list, [undefined])
@@ -1847,12 +1848,12 @@ suite("core (iterators)", function () {
 
             tt.run(util.wrap(done, function () {
                 t.deepEqual(ret, [
-                    n("start", undefined, -1),
-                    n("start", "test", 0),
-                    n("end", "test", 0),
-                    n("pass", "test", 0),
-                    n("end", undefined, -1),
-                    n("exit", undefined, 0),
+                    n("start", []),
+                    n("start", [p("test", 0)]),
+                    n("end", [p("test", 0)]),
+                    n("pass", [p("test", 0)]),
+                    n("end", []),
+                    n("exit", []),
                 ])
 
                 t.deepEqual(iter.list, [undefined])
@@ -1910,12 +1911,12 @@ suite("core (iterators)", function () {
 
             tt.run(util.wrap(done, function () {
                 t.deepEqual(ret, [
-                    n("start", undefined, -1),
-                    n("start", "test", 0),
-                    n("end", "test", 0),
-                    n("fail", "test", 0, undefined, sentinel2),
-                    n("end", undefined, -1),
-                    n("exit", undefined, 0),
+                    n("start", []),
+                    n("start", [p("test", 0)]),
+                    n("end", [p("test", 0)]),
+                    n("fail", [p("test", 0)], sentinel2),
+                    n("end", []),
+                    n("exit", []),
                 ])
 
                 t.deepEqual(iter.list, [undefined])
@@ -1965,12 +1966,12 @@ suite("core (iterators)", function () {
 
             tt.run(util.wrap(done, function () {
                 t.deepEqual(ret, [
-                    n("start", undefined, -1),
-                    n("start", "test", 0),
-                    n("end", "test", 0),
-                    n("fail", "test", 0, undefined, sentinel),
-                    n("end", undefined, -1),
-                    n("exit", undefined, 0),
+                    n("start", []),
+                    n("start", [p("test", 0)]),
+                    n("end", [p("test", 0)]),
+                    n("fail", [p("test", 0)], sentinel),
+                    n("end", []),
+                    n("exit", []),
                 ])
 
                 t.deepEqual(iter.list, [undefined])
@@ -2024,12 +2025,12 @@ suite("core (iterators)", function () {
 
             tt.run(util.wrap(done, function () {
                 t.deepEqual(ret, [
-                    n("start", undefined, -1),
-                    n("start", "test", 0),
-                    n("end", "test", 0),
-                    n("fail", "test", 0, undefined, sentinel1),
-                    n("end", undefined, -1),
-                    n("exit", undefined, 0),
+                    n("start", []),
+                    n("start", [p("test", 0)]),
+                    n("end", [p("test", 0)]),
+                    n("fail", [p("test", 0)], sentinel1),
+                    n("end", []),
+                    n("exit", []),
                 ])
 
                 t.deepEqual(iter.list, [undefined])
@@ -2070,12 +2071,12 @@ suite("core (iterators)", function () {
 
             tt.run(util.wrap(done, function () {
                 t.deepEqual(ret, [
-                    n("start", undefined, -1),
-                    n("start", "test", 0),
-                    n("end", "test", 0),
-                    n("pass", "test", 0),
-                    n("end", undefined, -1),
-                    n("exit", undefined, 0),
+                    n("start", []),
+                    n("start", [p("test", 0)]),
+                    n("end", [p("test", 0)]),
+                    n("pass", [p("test", 0)]),
+                    n("end", []),
+                    n("exit", []),
                 ])
 
                 t.deepEqual(iter.list, [undefined, 0])
@@ -2129,12 +2130,12 @@ suite("core (iterators)", function () {
 
             tt.run(util.wrap(done, function () {
                 t.deepEqual(ret, [
-                    n("start", undefined, -1),
-                    n("start", "test", 0),
-                    n("end", "test", 0),
-                    n("fail", "test", 0, undefined, sentinel2),
-                    n("end", undefined, -1),
-                    n("exit", undefined, 0),
+                    n("start", []),
+                    n("start", [p("test", 0)]),
+                    n("end", [p("test", 0)]),
+                    n("fail", [p("test", 0)], sentinel2),
+                    n("end", []),
+                    n("exit", []),
                 ])
 
                 t.deepEqual(iter.list, [undefined, 0])
@@ -2172,12 +2173,12 @@ suite("core (iterators)", function () {
 
             tt.run(util.wrap(done, function () {
                 t.deepEqual(ret, [
-                    n("start", undefined, -1),
-                    n("start", "test", 0),
-                    n("end", "test", 0),
-                    n("fail", "test", 0, undefined, sentinel),
-                    n("end", undefined, -1),
-                    n("exit", undefined, 0),
+                    n("start", []),
+                    n("start", [p("test", 0)]),
+                    n("end", [p("test", 0)]),
+                    n("fail", [p("test", 0)], sentinel),
+                    n("end", []),
+                    n("exit", []),
                 ])
 
                 t.deepEqual(iter.list, [undefined, 0])
@@ -2221,12 +2222,12 @@ suite("core (iterators)", function () {
 
             tt.run(util.wrap(done, function () {
                 t.deepEqual(ret, [
-                    n("start", undefined, -1),
-                    n("start", "test", 0),
-                    n("end", "test", 0),
-                    n("pass", "test", 0),
-                    n("end", undefined, -1),
-                    n("exit", undefined, 0),
+                    n("start", []),
+                    n("start", [p("test", 0)]),
+                    n("end", [p("test", 0)]),
+                    n("pass", [p("test", 0)]),
+                    n("end", []),
+                    n("exit", []),
                 ])
 
                 t.deepEqual(iter.list, [undefined, 0])
@@ -2280,12 +2281,12 @@ suite("core (iterators)", function () {
 
             tt.run(util.wrap(done, function () {
                 t.deepEqual(ret, [
-                    n("start", undefined, -1),
-                    n("start", "test", 0),
-                    n("end", "test", 0),
-                    n("pass", "test", 0),
-                    n("end", undefined, -1),
-                    n("exit", undefined, 0),
+                    n("start", []),
+                    n("start", [p("test", 0)]),
+                    n("end", [p("test", 0)]),
+                    n("pass", [p("test", 0)]),
+                    n("end", []),
+                    n("exit", []),
                 ])
 
                 t.deepEqual(iter.list, [undefined, 0])
@@ -2344,12 +2345,12 @@ suite("core (iterators)", function () {
 
             tt.run(util.wrap(done, function () {
                 t.deepEqual(ret, [
-                    n("start", undefined, -1),
-                    n("start", "test", 0),
-                    n("end", "test", 0),
-                    n("fail", "test", 0, undefined, sentinel2),
-                    n("end", undefined, -1),
-                    n("exit", undefined, 0),
+                    n("start", []),
+                    n("start", [p("test", 0)]),
+                    n("end", [p("test", 0)]),
+                    n("fail", [p("test", 0)], sentinel2),
+                    n("end", []),
+                    n("exit", []),
                 ])
 
                 t.deepEqual(iter.list, [undefined, 0])
@@ -2419,12 +2420,12 @@ suite("core (iterators)", function () {
 
             tt.run(util.wrap(done, function () {
                 t.deepEqual(ret, [
-                    n("start", undefined, -1),
-                    n("start", "test", 0),
-                    n("end", "test", 0),
-                    n("fail", "test", 0, undefined, sentinel2),
-                    n("end", undefined, -1),
-                    n("exit", undefined, 0),
+                    n("start", []),
+                    n("start", [p("test", 0)]),
+                    n("end", [p("test", 0)]),
+                    n("fail", [p("test", 0)], sentinel2),
+                    n("end", []),
+                    n("exit", []),
                 ])
 
                 t.deepEqual(iter.list, [undefined, 0])
@@ -2496,12 +2497,12 @@ suite("core (iterators)", function () {
 
             tt.run(util.wrap(done, function () {
                 t.deepEqual(ret, [
-                    n("start", undefined, -1),
-                    n("start", "test", 0),
-                    n("end", "test", 0),
-                    n("fail", "test", 0, undefined, sentinel2),
-                    n("end", undefined, -1),
-                    n("exit", undefined, 0),
+                    n("start", []),
+                    n("start", [p("test", 0)]),
+                    n("end", [p("test", 0)]),
+                    n("fail", [p("test", 0)], sentinel2),
+                    n("end", []),
+                    n("exit", []),
                 ])
 
                 t.deepEqual(iter.list, [undefined, 0])
@@ -2564,12 +2565,12 @@ suite("core (iterators)", function () {
 
             tt.run(util.wrap(done, function () {
                 t.deepEqual(ret, [
-                    n("start", undefined, -1),
-                    n("start", "test", 0),
-                    n("end", "test", 0),
-                    n("fail", "test", 0, undefined, sentinel2),
-                    n("end", undefined, -1),
-                    n("exit", undefined, 0),
+                    n("start", []),
+                    n("start", [p("test", 0)]),
+                    n("end", [p("test", 0)]),
+                    n("fail", [p("test", 0)], sentinel2),
+                    n("end", []),
+                    n("exit", []),
                 ])
 
                 t.deepEqual(iter.list, [undefined, 0])
@@ -2621,12 +2622,12 @@ suite("core (iterators)", function () {
 
             tt.run(util.wrap(done, function () {
                 t.deepEqual(ret, [
-                    n("start", undefined, -1),
-                    n("start", "test", 0),
-                    n("end", "test", 0),
-                    n("fail", "test", 0, undefined, sentinel),
-                    n("end", undefined, -1),
-                    n("exit", undefined, 0),
+                    n("start", []),
+                    n("start", [p("test", 0)]),
+                    n("end", [p("test", 0)]),
+                    n("fail", [p("test", 0)], sentinel),
+                    n("end", []),
+                    n("exit", []),
                 ])
 
                 t.deepEqual(iter.list, [undefined, 0])
@@ -2681,12 +2682,12 @@ suite("core (iterators)", function () {
 
             tt.run(util.wrap(done, function () {
                 t.deepEqual(ret, [
-                    n("start", undefined, -1),
-                    n("start", "test", 0),
-                    n("end", "test", 0),
-                    n("fail", "test", 0, undefined, sentinel1),
-                    n("end", undefined, -1),
-                    n("exit", undefined, 0),
+                    n("start", []),
+                    n("start", [p("test", 0)]),
+                    n("end", [p("test", 0)]),
+                    n("fail", [p("test", 0)], sentinel1),
+                    n("end", []),
+                    n("exit", []),
                 ])
 
                 t.deepEqual(iter.list, [undefined, 0])
@@ -2729,12 +2730,12 @@ suite("core (iterators)", function () {
 
             tt.run(util.wrap(done, function () {
                 t.deepEqual(ret, [
-                    n("start", undefined, -1),
-                    n("start", "test", 0),
-                    n("end", "test", 0),
-                    n("fail", "test", 0, undefined, sentinel),
-                    n("end", undefined, -1),
-                    n("exit", undefined, 0),
+                    n("start", []),
+                    n("start", [p("test", 0)]),
+                    n("end", [p("test", 0)]),
+                    n("fail", [p("test", 0)], sentinel),
+                    n("end", []),
+                    n("exit", []),
                 ])
 
                 t.deepEqual(iter.list, [undefined, 0, 1, 2, 3, 4])
@@ -2772,12 +2773,12 @@ suite("core (iterators)", function () {
 
             tt.run(util.wrap(done, function () {
                 t.deepEqual(ret, [
-                    n("start", undefined, -1),
-                    n("start", "test", 0),
-                    n("end", "test", 0),
-                    n("fail", "test", 0, undefined, sentinel),
-                    n("end", undefined, -1),
-                    n("exit", undefined, 0),
+                    n("start", []),
+                    n("start", [p("test", 0)]),
+                    n("end", [p("test", 0)]),
+                    n("fail", [p("test", 0)], sentinel),
+                    n("end", []),
+                    n("exit", []),
                 ])
 
                 t.deepEqual(iter.list, [undefined, 0, 1, 2, 3, 4])
@@ -2823,12 +2824,12 @@ suite("core (iterators)", function () {
 
             tt.run(util.wrap(done, function () {
                 t.deepEqual(ret, [
-                    n("start", undefined, -1),
-                    n("start", "test", 0),
-                    n("end", "test", 0),
-                    n("fail", "test", 0, undefined, sentinel2),
-                    n("end", undefined, -1),
-                    n("exit", undefined, 0),
+                    n("start", []),
+                    n("start", [p("test", 0)]),
+                    n("end", [p("test", 0)]),
+                    n("fail", [p("test", 0)], sentinel2),
+                    n("end", []),
+                    n("exit", []),
                 ])
 
                 t.deepEqual(iter.list, [undefined, 0])
@@ -2870,12 +2871,12 @@ suite("core (iterators)", function () {
 
             tt.run(util.wrap(done, function () {
                 t.deepEqual(ret, [
-                    n("start", undefined, -1),
-                    n("start", "test", 0),
-                    n("end", "test", 0),
-                    n("fail", "test", 0, undefined, sentinel1),
-                    n("end", undefined, -1),
-                    n("exit", undefined, 0),
+                    n("start", []),
+                    n("start", [p("test", 0)]),
+                    n("end", [p("test", 0)]),
+                    n("fail", [p("test", 0)], sentinel1),
+                    n("end", []),
+                    n("exit", []),
                 ])
 
                 t.deepEqual(iter.list, [undefined, 0])

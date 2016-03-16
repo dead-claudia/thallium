@@ -110,15 +110,15 @@ suite("core (reporters)", function () { // eslint-disable-line max-statements
 
         tt.run(util.wrap(done, function () {
             t.deepEqual(ret, [
-                n("start", undefined, -1),
-                n("start", "test", 0),
-                n("end", "test", 0),
-                n("pass", "test", 0),
-                n("start", "test", 1),
-                n("end", "test", 1),
-                n("pass", "test", 1),
-                n("end", undefined, -1),
-                n("exit", undefined, 0),
+                n("start", []),
+                n("start", [p("test", 0)]),
+                n("end", [p("test", 0)]),
+                n("pass", [p("test", 0)]),
+                n("start", [p("test", 1)]),
+                n("end", [p("test", 1)]),
+                n("pass", [p("test", 1)]),
+                n("end", []),
+                n("exit", []),
             ])
         }))
     })
@@ -137,18 +137,15 @@ suite("core (reporters)", function () { // eslint-disable-line max-statements
 
         tt.run(util.wrap(done, function () {
             t.deepEqual(ret, [
-                n("start", undefined, -1),
-
-                n("start", "one", 0),
-                n("end", "one", 0),
-                n("fail", "one", 0, undefined, sentinel),
-
-                n("start", "two", 1),
-                n("end", "two", 1),
-                n("fail", "two", 1, undefined, sentinel),
-
-                n("end", undefined, -1),
-                n("exit", undefined, 0),
+                n("start", []),
+                n("start", [p("one", 0)]),
+                n("end", [p("one", 0)]),
+                n("fail", [p("one", 0)], sentinel),
+                n("start", [p("two", 1)]),
+                n("end", [p("two", 1)]),
+                n("fail", [p("two", 1)], sentinel),
+                n("end", []),
+                n("exit", []),
             ])
         }))
     })
@@ -167,18 +164,15 @@ suite("core (reporters)", function () { // eslint-disable-line max-statements
 
         tt.run(util.wrap(done, function () {
             t.deepEqual(ret, [
-                n("start", undefined, -1),
-
-                n("start", "one", 0),
-                n("end", "one", 0),
-                n("fail", "one", 0, undefined, sentinel),
-
-                n("start", "two", 1),
-                n("end", "two", 1),
-                n("pass", "two", 1),
-
-                n("end", undefined, -1),
-                n("exit", undefined, 0),
+                n("start", []),
+                n("start", [p("one", 0)]),
+                n("end", [p("one", 0)]),
+                n("fail", [p("one", 0)], sentinel),
+                n("start", [p("two", 1)]),
+                n("end", [p("two", 1)]),
+                n("pass", [p("two", 1)]),
+                n("end", []),
+                n("exit", []),
             ])
         }))
     })
@@ -194,15 +188,15 @@ suite("core (reporters)", function () { // eslint-disable-line max-statements
 
         tt.run(util.wrap(done, function () {
             t.deepEqual(ret, [
-                n("start", undefined, -1),
-                n("start", "test", 0),
-                n("end", "test", 0),
-                n("pass", "test", 0),
-                n("start", "test", 1),
-                n("end", "test", 1),
-                n("pass", "test", 1),
-                n("end", undefined, -1),
-                n("exit", undefined, 0),
+                n("start", []),
+                n("start", [p("test", 0)]),
+                n("end", [p("test", 0)]),
+                n("pass", [p("test", 0)]),
+                n("start", [p("test", 1)]),
+                n("end", [p("test", 1)]),
+                n("pass", [p("test", 1)]),
+                n("end", []),
+                n("exit", []),
             ])
         }))
     })
@@ -220,18 +214,15 @@ suite("core (reporters)", function () { // eslint-disable-line max-statements
 
         tt.run(util.wrap(done, function () {
             t.deepEqual(ret, [
-                n("start", undefined, -1),
-
-                n("start", "one", 0),
-                n("end", "one", 0),
-                n("fail", "one", 0, undefined, new t.AssertionError("fail")),
-
-                n("start", "two", 1),
-                n("end", "two", 1),
-                n("fail", "two", 1, undefined, new t.AssertionError("fail")),
-
-                n("end", undefined, -1),
-                n("exit", undefined, 0),
+                n("start", []),
+                n("start", [p("one", 0)]),
+                n("end", [p("one", 0)]),
+                n("fail", [p("one", 0)], new t.AssertionError("fail")),
+                n("start", [p("two", 1)]),
+                n("end", [p("two", 1)]),
+                n("fail", [p("two", 1)], new t.AssertionError("fail")),
+                n("end", []),
+                n("exit", []),
             ])
         }))
     })
@@ -249,18 +240,15 @@ suite("core (reporters)", function () { // eslint-disable-line max-statements
 
         tt.run(util.wrap(done, function () {
             t.deepEqual(ret, [
-                n("start", undefined, -1),
-
-                n("start", "one", 0),
-                n("end", "one", 0),
-                n("fail", "one", 0, undefined, new t.AssertionError("fail")),
-
-                n("start", "two", 1),
-                n("end", "two", 1),
-                n("pass", "two", 1),
-
-                n("end", undefined, -1),
-                n("exit", undefined, 0),
+                n("start", []),
+                n("start", [p("one", 0)]),
+                n("end", [p("one", 0)]),
+                n("fail", [p("one", 0)], new t.AssertionError("fail")),
+                n("start", [p("two", 1)]),
+                n("end", [p("two", 1)]),
+                n("pass", [p("two", 1)]),
+                n("end", []),
+                n("exit", []),
             ])
         }))
     })
@@ -276,15 +264,15 @@ suite("core (reporters)", function () { // eslint-disable-line max-statements
 
         tt.run(util.wrap(done, function () {
             t.deepEqual(ret, [
-                n("start", undefined, -1),
-                n("start", "test", 0),
-                n("end", "test", 0),
-                n("pass", "test", 0),
-                n("start", "test", 1),
-                n("end", "test", 1),
-                n("pass", "test", 1),
-                n("end", undefined, -1),
-                n("exit", undefined, 0),
+                n("start", []),
+                n("start", [p("test", 0)]),
+                n("end", [p("test", 0)]),
+                n("pass", [p("test", 0)]),
+                n("start", [p("test", 1)]),
+                n("end", [p("test", 1)]),
+                n("pass", [p("test", 1)]),
+                n("end", []),
+                n("exit", []),
             ])
         }))
     })
@@ -303,18 +291,15 @@ suite("core (reporters)", function () { // eslint-disable-line max-statements
 
         tt.run(util.wrap(done, function () {
             t.deepEqual(ret, [
-                n("start", undefined, -1),
-
-                n("start", "one", 0),
-                n("end", "one", 0),
-                n("fail", "one", 0, undefined, sentinel),
-
-                n("start", "two", 1),
-                n("end", "two", 1),
-                n("fail", "two", 1, undefined, sentinel),
-
-                n("end", undefined, -1),
-                n("exit", undefined, 0),
+                n("start", []),
+                n("start", [p("one", 0)]),
+                n("end", [p("one", 0)]),
+                n("fail", [p("one", 0)], sentinel),
+                n("start", [p("two", 1)]),
+                n("end", [p("two", 1)]),
+                n("fail", [p("two", 1)], sentinel),
+                n("end", []),
+                n("exit", []),
             ])
         }))
     })
@@ -333,18 +318,15 @@ suite("core (reporters)", function () { // eslint-disable-line max-statements
 
         tt.run(util.wrap(done, function () {
             t.deepEqual(ret, [
-                n("start", undefined, -1),
-
-                n("start", "one", 0),
-                n("end", "one", 0),
-                n("fail", "one", 0, undefined, sentinel),
-
-                n("start", "two", 1),
-                n("end", "two", 1),
-                n("pass", "two", 1),
-
-                n("end", undefined, -1),
-                n("exit", undefined, 0),
+                n("start", []),
+                n("start", [p("one", 0)]),
+                n("end", [p("one", 0)]),
+                n("fail", [p("one", 0)], sentinel),
+                n("start", [p("two", 1)]),
+                n("end", [p("two", 1)]),
+                n("pass", [p("two", 1)]),
+                n("end", []),
+                n("exit", []),
             ])
         }))
     })
@@ -360,15 +342,15 @@ suite("core (reporters)", function () { // eslint-disable-line max-statements
 
         tt.run(util.wrap(done, function () {
             t.deepEqual(ret, [
-                n("start", undefined, -1),
-                n("start", "test", 0),
-                n("end", "test", 0),
-                n("pass", "test", 0),
-                n("start", "test", 1),
-                n("end", "test", 1),
-                n("pass", "test", 1),
-                n("end", undefined, -1),
-                n("exit", undefined, 0),
+                n("start", []),
+                n("start", [p("test", 0)]),
+                n("end", [p("test", 0)]),
+                n("pass", [p("test", 0)]),
+                n("start", [p("test", 1)]),
+                n("end", [p("test", 1)]),
+                n("pass", [p("test", 1)]),
+                n("end", []),
+                n("exit", []),
             ])
         }))
     })
@@ -387,18 +369,15 @@ suite("core (reporters)", function () { // eslint-disable-line max-statements
 
         tt.run(util.wrap(done, function () {
             t.deepEqual(ret, [
-                n("start", undefined, -1),
-
-                n("start", "one", 0),
-                n("end", "one", 0),
-                n("fail", "one", 0, undefined, sentinel),
-
-                n("start", "two", 1),
-                n("end", "two", 1),
-                n("fail", "two", 1, undefined, sentinel),
-
-                n("end", undefined, -1),
-                n("exit", undefined, 0),
+                n("start", []),
+                n("start", [p("one", 0)]),
+                n("end", [p("one", 0)]),
+                n("fail", [p("one", 0)], sentinel),
+                n("start", [p("two", 1)]),
+                n("end", [p("two", 1)]),
+                n("fail", [p("two", 1)], sentinel),
+                n("end", []),
+                n("exit", []),
             ])
         }))
     })
@@ -417,18 +396,15 @@ suite("core (reporters)", function () { // eslint-disable-line max-statements
 
         tt.run(util.wrap(done, function () {
             t.deepEqual(ret, [
-                n("start", undefined, -1),
-
-                n("start", "one", 0),
-                n("end", "one", 0),
-                n("fail", "one", 0, undefined, sentinel),
-
-                n("start", "two", 1),
-                n("end", "two", 1),
-                n("pass", "two", 1),
-
-                n("end", undefined, -1),
-                n("exit", undefined, 0),
+                n("start", []),
+                n("start", [p("one", 0)]),
+                n("end", [p("one", 0)]),
+                n("fail", [p("one", 0)], sentinel),
+                n("start", [p("two", 1)]),
+                n("end", [p("two", 1)]),
+                n("pass", [p("two", 1)]),
+                n("end", []),
+                n("exit", []),
             ])
         }))
     })
@@ -446,22 +422,18 @@ suite("core (reporters)", function () { // eslint-disable-line max-statements
 
         tt.run(util.wrap(done, function () {
             t.deepEqual(ret, [
-                n("start", undefined, -1),
-                n("start", "test", 0),
-
-                n("start", "one", 0, p("test", 0)),
-                n("end", "one", 0, p("test", 0)),
-                n("pass", "one", 0, p("test", 0)),
-
-                n("start", "two", 1, p("test", 0)),
-                n("end", "two", 1, p("test", 0)),
-                n("pass", "two", 1, p("test", 0)),
-
-                n("end", "test", 0),
-                n("pass", "test", 0),
-
-                n("end", undefined, -1),
-                n("exit", undefined, 0),
+                n("start", []),
+                n("start", [p("test", 0)]),
+                n("start", [p("test", 0), p("one", 0)]),
+                n("end", [p("test", 0), p("one", 0)]),
+                n("pass", [p("test", 0), p("one", 0)]),
+                n("start", [p("test", 0), p("two", 1)]),
+                n("end", [p("test", 0), p("two", 1)]),
+                n("pass", [p("test", 0), p("two", 1)]),
+                n("end", [p("test", 0)]),
+                n("pass", [p("test", 0)]),
+                n("end", []),
+                n("exit", []),
             ])
         }))
     })
@@ -491,35 +463,27 @@ suite("core (reporters)", function () { // eslint-disable-line max-statements
 
         tt.run(util.wrap(done, function () {
             t.deepEqual(ret, [
-                n("start", undefined, -1),
-                n("start", "parent one", 0),
-
-                n("start", "child one", 0, p("parent one", 0)),
-                n("end", "child one", 0, p("parent one", 0)),
-                n("fail", "child one", 0, p("parent one", 0), sentinel1),
-
-                n("start", "child two", 1, p("parent one", 0)),
-                n("end", "child two", 1, p("parent one", 0)),
-                n("fail", "child two", 1, p("parent one", 0), sentinel1),
-
-                n("end", "parent one", 0),
-                n("pass", "parent one", 0),
-
-                n("start", "parent two", 1),
-
-                n("start", "child one", 0, p("parent two", 1)),
-                n("end", "child one", 0, p("parent two", 1)),
-                n("fail", "child one", 0, p("parent two", 1), sentinel2),
-
-                n("start", "child two", 1, p("parent two", 1)),
-                n("end", "child two", 1, p("parent two", 1)),
-                n("fail", "child two", 1, p("parent two", 1), sentinel2),
-
-                n("end", "parent two", 1),
-                n("pass", "parent two", 1),
-
-                n("end", undefined, -1),
-                n("exit", undefined, 0),
+                n("start", []),
+                n("start", [p("parent one", 0)]),
+                n("start", [p("parent one", 0), p("child one", 0)]),
+                n("end", [p("parent one", 0), p("child one", 0)]),
+                n("fail", [p("parent one", 0), p("child one", 0)], sentinel1),
+                n("start", [p("parent one", 0), p("child two", 1)]),
+                n("end", [p("parent one", 0), p("child two", 1)]),
+                n("fail", [p("parent one", 0), p("child two", 1)], sentinel1),
+                n("end", [p("parent one", 0)]),
+                n("pass", [p("parent one", 0)]),
+                n("start", [p("parent two", 1)]),
+                n("start", [p("parent two", 1), p("child one", 0)]),
+                n("end", [p("parent two", 1), p("child one", 0)]),
+                n("fail", [p("parent two", 1), p("child one", 0)], sentinel2),
+                n("start", [p("parent two", 1), p("child two", 1)]),
+                n("end", [p("parent two", 1), p("child two", 1)]),
+                n("fail", [p("parent two", 1), p("child two", 1)], sentinel2),
+                n("end", [p("parent two", 1)]),
+                n("pass", [p("parent two", 1)]),
+                n("end", []),
+                n("exit", []),
             ])
         }))
     })
@@ -549,35 +513,27 @@ suite("core (reporters)", function () { // eslint-disable-line max-statements
 
         tt.run(util.wrap(done, function () {
             t.deepEqual(ret, [
-                n("start", undefined, -1),
-                n("start", "parent one", 0),
-
-                n("start", "child one", 0, p("parent one", 0)),
-                n("end", "child one", 0, p("parent one", 0)),
-                n("fail", "child one", 0, p("parent one", 0), sentinel1),
-
-                n("start", "child two", 1, p("parent one", 0)),
-                n("end", "child two", 1, p("parent one", 0)),
-                n("pass", "child two", 1, p("parent one", 0)),
-
-                n("end", "parent one", 0),
-                n("pass", "parent one", 0),
-
-                n("start", "parent two", 1),
-
-                n("start", "child one", 0, p("parent two", 1)),
-                n("end", "child one", 0, p("parent two", 1)),
-                n("fail", "child one", 0, p("parent two", 1), sentinel2),
-
-                n("start", "child two", 1, p("parent two", 1)),
-                n("end", "child two", 1, p("parent two", 1)),
-                n("pass", "child two", 1, p("parent two", 1)),
-
-                n("end", "parent two", 1),
-                n("pass", "parent two", 1),
-
-                n("end", undefined, -1),
-                n("exit", undefined, 0),
+                n("start", []),
+                n("start", [p("parent one", 0)]),
+                n("start", [p("parent one", 0), p("child one", 0)]),
+                n("end", [p("parent one", 0), p("child one", 0)]),
+                n("fail", [p("parent one", 0), p("child one", 0)], sentinel1),
+                n("start", [p("parent one", 0), p("child two", 1)]),
+                n("end", [p("parent one", 0), p("child two", 1)]),
+                n("pass", [p("parent one", 0), p("child two", 1)]),
+                n("end", [p("parent one", 0)]),
+                n("pass", [p("parent one", 0)]),
+                n("start", [p("parent two", 1)]),
+                n("start", [p("parent two", 1), p("child one", 0)]),
+                n("end", [p("parent two", 1), p("child one", 0)]),
+                n("fail", [p("parent two", 1), p("child one", 0)], sentinel2),
+                n("start", [p("parent two", 1), p("child two", 1)]),
+                n("end", [p("parent two", 1), p("child two", 1)]),
+                n("pass", [p("parent two", 1), p("child two", 1)]),
+                n("end", [p("parent two", 1)]),
+                n("pass", [p("parent two", 1)]),
+                n("end", []),
+                n("exit", []),
             ])
         }))
     })
@@ -594,13 +550,13 @@ suite("core (reporters)", function () { // eslint-disable-line max-statements
 
         ttt.run(util.wrap(done, function () {
             t.deepEqual(ret, [
-                n("start", "test", -1),
-                n("start", "foo", 0, p("test", 0)),
-                n("end", "foo", 0, p("test", 0)),
-                n("pass", "foo", 0, p("test", 0)),
-                n("end", "test", -1),
-                n("pass", "test", -1),
-                n("exit", "test", 0),
+                n("start", [p("test", 0)]),
+                n("start", [p("test", 0), p("foo", 0)]),
+                n("end", [p("test", 0), p("foo", 0)]),
+                n("pass", [p("test", 0), p("foo", 0)]),
+                n("end", [p("test", 0)]),
+                n("pass", [p("test", 0)]),
+                n("exit", [p("test", 0)]),
             ])
         }))
     })
@@ -652,58 +608,44 @@ suite("core (reporters)", function () { // eslint-disable-line max-statements
             tt.test("expandos don't transfer").notHasKey(tt, "foo")
         })
 
+        var fail1 = new t.AssertionError("Expected 1 to not equal 1", 1, 1)
+        var fail2 = new t.AssertionError("Expected 1 to equal 2", 2, 1)
+
         tt.run(util.wrap(done, function () {
             t.deepEqual(ret, [
-                n("start", undefined, -1),
-
-                n("start", "module-1", 0),
-
-                n("start", "1 === 1", 0, p("module-1", 0)),
-                n("end", "1 === 1", 0, p("module-1", 0)),
-                n("pass", "1 === 1", 0, p("module-1", 0)),
-
-                n("start", "foo()", 1, p("module-1", 0)),
-                n("end", "foo()", 1, p("module-1", 0)),
-                n("fail", "foo()", 1, p("module-1", 0),
-                    new t.AssertionError("Expected 1 to not equal 1",
-                        1, 1)),
-
-                n("start", "bar()", 2, p("module-1", 0)),
-                n("end", "bar()", 2, p("module-1", 0)),
-                n("fail", "bar()", 2, p("module-1", 0), new Error("fail")),
-
-                n("start", "baz()", 3, p("module-1", 0)),
-                n("end", "baz()", 3, p("module-1", 0)),
-                n("fail", "baz()", 3, p("module-1", 0), sentinel),
-
-                n("start", "nested", 4, p("module-1", 0)),
-
-                n("start", "nested 2", 0, p("nested", 4, p("module-1", 0))),
-                n("end", "nested 2", 0, p("nested", 4, p("module-1", 0))),
-                n("pass", "nested 2", 0, p("nested", 4, p("module-1", 0))),
-
-                n("end", "nested", 4, p("module-1", 0)),
-                n("pass", "nested", 4, p("module-1", 0)),
-
-                n("end", "module-1", 0),
-                n("pass", "module-1", 0),
-
-                n("start", "module-2", 1),
-
-                n("start", "1 === 2", 0, p("module-2", 1)),
-                n("end", "1 === 2", 0, p("module-2", 1)),
-                n("fail", "1 === 2", 0, p("module-2", 1),
-                    new t.AssertionError("Expected 1 to equal 2", 2, 1)),
-
-                n("start", "expandos don't transfer", 1, p("module-2", 1)),
-                n("end", "expandos don't transfer", 1, p("module-2", 1)),
-                n("pass", "expandos don't transfer", 1, p("module-2", 1)),
-
-                n("end", "module-2", 1),
-                n("pass", "module-2", 1),
-
-                n("end", undefined, -1),
-                n("exit", undefined, 0),
+                n("start", []),
+                n("start", [p("module-1", 0)]),
+                n("start", [p("module-1", 0), p("1 === 1", 0)]),
+                n("end", [p("module-1", 0), p("1 === 1", 0)]),
+                n("pass", [p("module-1", 0), p("1 === 1", 0)]),
+                n("start", [p("module-1", 0), p("foo()", 1)]),
+                n("end", [p("module-1", 0), p("foo()", 1)]),
+                n("fail", [p("module-1", 0), p("foo()", 1)], fail1),
+                n("start", [p("module-1", 0), p("bar()", 2)]),
+                n("end", [p("module-1", 0), p("bar()", 2)]),
+                n("fail", [p("module-1", 0), p("bar()", 2)], new Error("fail")),
+                n("start", [p("module-1", 0), p("baz()", 3)]),
+                n("end", [p("module-1", 0), p("baz()", 3)]),
+                n("fail", [p("module-1", 0), p("baz()", 3)], sentinel),
+                n("start", [p("module-1", 0), p("nested", 4)]),
+                n("start", [p("module-1", 0), p("nested", 4), p("nested 2", 0)]), // eslint-disable-line max-len
+                n("end", [p("module-1", 0), p("nested", 4), p("nested 2", 0)]),
+                n("pass", [p("module-1", 0), p("nested", 4), p("nested 2", 0)]),
+                n("end", [p("module-1", 0), p("nested", 4)]),
+                n("pass", [p("module-1", 0), p("nested", 4)]),
+                n("end", [p("module-1", 0)]),
+                n("pass", [p("module-1", 0)]),
+                n("start", [p("module-2", 1)]),
+                n("start", [p("module-2", 1), p("1 === 2", 0)]),
+                n("end", [p("module-2", 1), p("1 === 2", 0)]),
+                n("fail", [p("module-2", 1), p("1 === 2", 0)], fail2),
+                n("start", [p("module-2", 1), p("expandos don't transfer", 1)]),
+                n("end", [p("module-2", 1), p("expandos don't transfer", 1)]),
+                n("pass", [p("module-2", 1), p("expandos don't transfer", 1)]),
+                n("end", [p("module-2", 1)]),
+                n("pass", [p("module-2", 1)]),
+                n("end", []),
+                n("exit", []),
             ])
         }))
     })
@@ -726,15 +668,15 @@ suite("core (reporters)", function () { // eslint-disable-line max-statements
 
         tt.run(util.wrap(done, function () {
             t.deepEqual(ret, [
-                n("start", undefined, -1),
-                n("start", "test", 0),
-                n("end", "test", 0),
-                n("pass", "test", 0),
-                n("start", "test", 1),
-                n("end", "test", 1),
-                n("pass", "test", 1),
-                n("end", undefined, -1),
-                n("exit", undefined, 0),
+                n("start", []),
+                n("start", [p("test", 0)]),
+                n("end", [p("test", 0)]),
+                n("pass", [p("test", 0)]),
+                n("start", [p("test", 1)]),
+                n("end", [p("test", 1)]),
+                n("pass", [p("test", 1)]),
+                n("end", []),
+                n("exit", []),
             ])
         }))
     })
