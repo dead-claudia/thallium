@@ -18,7 +18,7 @@ function run(name) {
             t.function(tt[name])
         })
 
-        test("runs blocks in sync tests", function (done) {
+        test("runs blocks in sync tests", function () {
             var tt = t.base()
             var len, self // eslint-disable-line consistent-this
             var ret = []
@@ -32,7 +32,7 @@ function run(name) {
                 })
             })
 
-            tt.run(util.wrap(done, function () {
+            tt.run().then(function () {
                 t.undefined(self)
                 t.equal(len, 0)
                 t.deepEqual(ret, [
@@ -43,10 +43,10 @@ function run(name) {
                     n("end", []),
                     n("exit", []),
                 ])
-            }))
+            })
         })
 
-        test("propagates errors from blocks in sync tests", function (done) {
+        test("propagates errors from blocks in sync tests", function () {
             var tt = t.base()
             var ret = []
             var sentinel = new Error("sentinel")
@@ -59,7 +59,7 @@ function run(name) {
                 tt[name](function () { throw sentinel })
             })
 
-            tt.run(util.wrap(done, function () {
+            tt.run().then(function () {
                 t.deepEqual(ret, [
                     n("start", []),
                     n("start", [p("test", 0)]),
@@ -68,10 +68,10 @@ function run(name) {
                     n("end", []),
                     n("exit", []),
                 ])
-            }))
+            })
         })
 
-        test("runs blocks in async tests", function (done) {
+        test("runs blocks in async tests", function () {
             var tt = t.base()
             var len, self // eslint-disable-line consistent-this
             var ret = []
@@ -86,7 +86,7 @@ function run(name) {
                 done()
             })
 
-            tt.run(util.wrap(done, function () {
+            tt.run().then(function () {
                 t.undefined(self)
                 t.equal(len, 0)
                 t.deepEqual(ret, [
@@ -97,10 +97,10 @@ function run(name) {
                     n("end", []),
                     n("exit", []),
                 ])
-            }))
+            })
         })
 
-        test("propagates errors from blocks in async tests", function (done) {
+        test("propagates errors from blocks in async tests", function () {
             var tt = t.base()
             var ret = []
             var sentinel = new Error("sentinel")
@@ -114,7 +114,7 @@ function run(name) {
                 done()
             })
 
-            tt.run(util.wrap(done, function () {
+            tt.run().then(function () {
                 t.deepEqual(ret, [
                     n("start", []),
                     n("start", [p("test", 0)]),
@@ -123,10 +123,10 @@ function run(name) {
                     n("end", []),
                     n("exit", []),
                 ])
-            }))
+            })
         })
 
-        test("runs blocks in inline sync tests", function (done) {
+        test("runs blocks in inline sync tests", function () {
             var tt = t.base()
             var len, self // eslint-disable-line consistent-this
             var ret = []
@@ -138,7 +138,7 @@ function run(name) {
                 self = this // eslint-disable-line no-invalid-this
             })
 
-            tt.run(util.wrap(done, function () {
+            tt.run().then(function () {
                 t.undefined(self)
                 t.equal(len, 0)
                 t.deepEqual(ret, [
@@ -149,10 +149,10 @@ function run(name) {
                     n("end", []),
                     n("exit", []),
                 ])
-            }))
+            })
         })
 
-        test("propagates errors from blocks in inline sync tests", function (done) { // eslint-disable-line max-len
+        test("propagates errors from blocks in inline sync tests", function () {
             var tt = t.base()
             var ret = []
             var sentinel = new Error("sentinel")
@@ -163,7 +163,7 @@ function run(name) {
 
             tt.test("test")[name](function () { throw sentinel })
 
-            tt.run(util.wrap(done, function () {
+            tt.run().then(function () {
                 t.deepEqual(ret, [
                     n("start", []),
                     n("start", [p("test", 0)]),
@@ -172,7 +172,7 @@ function run(name) {
                     n("end", []),
                     n("exit", []),
                 ])
-            }))
+            })
         })
     })
 }

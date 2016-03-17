@@ -99,7 +99,7 @@ suite("core (reporters)", function () { // eslint-disable-line max-statements
         ])
     })
 
-    test("called correctly with sync passing", function (done) {
+    test("called correctly with sync passing", function () {
         var tt = t.base()
         var ret = []
 
@@ -108,7 +108,7 @@ suite("core (reporters)", function () { // eslint-disable-line max-statements
         tt.test("test", function () {})
         tt.test("test", function () {})
 
-        tt.run(util.wrap(done, function () {
+        tt.run().then(function () {
             t.deepEqual(ret, [
                 n("start", []),
                 n("start", [p("test", 0)]),
@@ -120,10 +120,10 @@ suite("core (reporters)", function () { // eslint-disable-line max-statements
                 n("end", []),
                 n("exit", []),
             ])
-        }))
+        })
     })
 
-    test("called correctly with sync failing", function (done) {
+    test("called correctly with sync failing", function () {
         var tt = t.base()
         var ret = []
         var sentinel = new Error("sentinel")
@@ -135,7 +135,7 @@ suite("core (reporters)", function () { // eslint-disable-line max-statements
         tt.test("one", function () { throw sentinel })
         tt.test("two", function () { throw sentinel })
 
-        tt.run(util.wrap(done, function () {
+        tt.run().then(function () {
             t.deepEqual(ret, [
                 n("start", []),
                 n("start", [p("one", 0)]),
@@ -147,10 +147,10 @@ suite("core (reporters)", function () { // eslint-disable-line max-statements
                 n("end", []),
                 n("exit", []),
             ])
-        }))
+        })
     })
 
-    test("called correctly with sync both", function (done) {
+    test("called correctly with sync both", function () {
         var tt = t.base()
         var ret = []
         var sentinel = new Error("sentinel")
@@ -162,7 +162,7 @@ suite("core (reporters)", function () { // eslint-disable-line max-statements
         tt.test("one", function () { throw sentinel })
         tt.test("two", function () {})
 
-        tt.run(util.wrap(done, function () {
+        tt.run().then(function () {
             t.deepEqual(ret, [
                 n("start", []),
                 n("start", [p("one", 0)]),
@@ -174,10 +174,10 @@ suite("core (reporters)", function () { // eslint-disable-line max-statements
                 n("end", []),
                 n("exit", []),
             ])
-        }))
+        })
     })
 
-    test("called correctly with inline passing", function (done) {
+    test("called correctly with inline passing", function () {
         var tt = t.base()
         var ret = []
 
@@ -186,7 +186,7 @@ suite("core (reporters)", function () { // eslint-disable-line max-statements
         tt.test("test")
         tt.test("test")
 
-        tt.run(util.wrap(done, function () {
+        tt.run().then(function () {
             t.deepEqual(ret, [
                 n("start", []),
                 n("start", [p("test", 0)]),
@@ -198,10 +198,10 @@ suite("core (reporters)", function () { // eslint-disable-line max-statements
                 n("end", []),
                 n("exit", []),
             ])
-        }))
+        })
     })
 
-    test("called correctly with inline failing", function (done) {
+    test("called correctly with inline failing", function () {
         var tt = t.base()
         var ret = []
 
@@ -212,7 +212,7 @@ suite("core (reporters)", function () { // eslint-disable-line max-statements
         tt.test("one").fail()
         tt.test("two").fail()
 
-        tt.run(util.wrap(done, function () {
+        tt.run().then(function () {
             t.deepEqual(ret, [
                 n("start", []),
                 n("start", [p("one", 0)]),
@@ -224,10 +224,10 @@ suite("core (reporters)", function () { // eslint-disable-line max-statements
                 n("end", []),
                 n("exit", []),
             ])
-        }))
+        })
     })
 
-    test("called correctly with inline both", function (done) {
+    test("called correctly with inline both", function () {
         var tt = t.base()
         var ret = []
 
@@ -238,7 +238,7 @@ suite("core (reporters)", function () { // eslint-disable-line max-statements
         tt.test("one").fail()
         tt.test("two", function () {})
 
-        tt.run(util.wrap(done, function () {
+        tt.run().then(function () {
             t.deepEqual(ret, [
                 n("start", []),
                 n("start", [p("one", 0)]),
@@ -250,10 +250,10 @@ suite("core (reporters)", function () { // eslint-disable-line max-statements
                 n("end", []),
                 n("exit", []),
             ])
-        }))
+        })
     })
 
-    test("called correctly with async passing", function (done) {
+    test("called correctly with async passing", function () {
         var tt = t.base()
         var ret = []
 
@@ -262,7 +262,7 @@ suite("core (reporters)", function () { // eslint-disable-line max-statements
         tt.async("test", function (t, done) { done() })
         tt.test("test", function () {})
 
-        tt.run(util.wrap(done, function () {
+        tt.run().then(function () {
             t.deepEqual(ret, [
                 n("start", []),
                 n("start", [p("test", 0)]),
@@ -274,10 +274,10 @@ suite("core (reporters)", function () { // eslint-disable-line max-statements
                 n("end", []),
                 n("exit", []),
             ])
-        }))
+        })
     })
 
-    test("called correctly with async failing", function (done) {
+    test("called correctly with async failing", function () {
         var tt = t.base()
         var ret = []
         var sentinel = new Error("sentinel")
@@ -289,7 +289,7 @@ suite("core (reporters)", function () { // eslint-disable-line max-statements
         tt.async("one", function (t, done) { done(sentinel) })
         tt.test("two", function () { throw sentinel })
 
-        tt.run(util.wrap(done, function () {
+        tt.run().then(function () {
             t.deepEqual(ret, [
                 n("start", []),
                 n("start", [p("one", 0)]),
@@ -301,10 +301,10 @@ suite("core (reporters)", function () { // eslint-disable-line max-statements
                 n("end", []),
                 n("exit", []),
             ])
-        }))
+        })
     })
 
-    test("called correctly with async both", function (done) {
+    test("called correctly with async both", function () {
         var tt = t.base()
         var ret = []
         var sentinel = new Error("sentinel")
@@ -316,7 +316,7 @@ suite("core (reporters)", function () { // eslint-disable-line max-statements
         tt.async("one", function (t, done) { done(sentinel) })
         tt.async("two", function (t, done) { done() })
 
-        tt.run(util.wrap(done, function () {
+        tt.run().then(function () {
             t.deepEqual(ret, [
                 n("start", []),
                 n("start", [p("one", 0)]),
@@ -328,10 +328,10 @@ suite("core (reporters)", function () { // eslint-disable-line max-statements
                 n("end", []),
                 n("exit", []),
             ])
-        }))
+        })
     })
 
-    test("called correctly with async + promise passing", function (done) {
+    test("called correctly with async + promise passing", function () {
         var tt = t.base()
         var ret = []
 
@@ -340,7 +340,7 @@ suite("core (reporters)", function () { // eslint-disable-line max-statements
         tt.async("test", function () { return resolve() })
         tt.test("test", function () {})
 
-        tt.run(util.wrap(done, function () {
+        tt.run().then(function () {
             t.deepEqual(ret, [
                 n("start", []),
                 n("start", [p("test", 0)]),
@@ -352,10 +352,10 @@ suite("core (reporters)", function () { // eslint-disable-line max-statements
                 n("end", []),
                 n("exit", []),
             ])
-        }))
+        })
     })
 
-    test("called correctly with async + promise failing", function (done) {
+    test("called correctly with async + promise failing", function () {
         var tt = t.base()
         var ret = []
         var sentinel = new Error("sentinel")
@@ -367,7 +367,7 @@ suite("core (reporters)", function () { // eslint-disable-line max-statements
         tt.async("one", function () { return reject(sentinel) })
         tt.test("two", function () { throw sentinel })
 
-        tt.run(util.wrap(done, function () {
+        tt.run().then(function () {
             t.deepEqual(ret, [
                 n("start", []),
                 n("start", [p("one", 0)]),
@@ -379,10 +379,10 @@ suite("core (reporters)", function () { // eslint-disable-line max-statements
                 n("end", []),
                 n("exit", []),
             ])
-        }))
+        })
     })
 
-    test("called correctly with async + promise both", function (done) {
+    test("called correctly with async + promise both", function () {
         var tt = t.base()
         var ret = []
         var sentinel = new Error("sentinel")
@@ -394,7 +394,7 @@ suite("core (reporters)", function () { // eslint-disable-line max-statements
         tt.async("one", function () { return reject(sentinel) })
         tt.async("two", function () { return resolve() })
 
-        tt.run(util.wrap(done, function () {
+        tt.run().then(function () {
             t.deepEqual(ret, [
                 n("start", []),
                 n("start", [p("one", 0)]),
@@ -406,10 +406,10 @@ suite("core (reporters)", function () { // eslint-disable-line max-statements
                 n("end", []),
                 n("exit", []),
             ])
-        }))
+        })
     })
 
-    test("called correctly with child passing tests", function (done) {
+    test("called correctly with child passing tests", function () {
         var tt = t.base()
         var ret = []
 
@@ -420,7 +420,7 @@ suite("core (reporters)", function () { // eslint-disable-line max-statements
             tt.test("two", function () {})
         })
 
-        tt.run(util.wrap(done, function () {
+        tt.run().then(function () {
             t.deepEqual(ret, [
                 n("start", []),
                 n("start", [p("test", 0)]),
@@ -435,10 +435,10 @@ suite("core (reporters)", function () { // eslint-disable-line max-statements
                 n("end", []),
                 n("exit", []),
             ])
-        }))
+        })
     })
 
-    test("called correctly with child failing tests", function (done) {
+    test("called correctly with child failing tests", function () {
         var tt = t.base()
         var ret = []
         var sentinel1 = new Error("sentinel one")
@@ -461,7 +461,7 @@ suite("core (reporters)", function () { // eslint-disable-line max-statements
             tt.test("child two", function () { throw sentinel2 })
         })
 
-        tt.run(util.wrap(done, function () {
+        tt.run().then(function () {
             t.deepEqual(ret, [
                 n("start", []),
                 n("start", [p("parent one", 0)]),
@@ -485,10 +485,10 @@ suite("core (reporters)", function () { // eslint-disable-line max-statements
                 n("end", []),
                 n("exit", []),
             ])
-        }))
+        })
     })
 
-    test("called correctly with child both", function (done) {
+    test("called correctly with child both", function () {
         var tt = t.base()
         var ret = []
         var sentinel1 = new Error("sentinel one")
@@ -511,7 +511,7 @@ suite("core (reporters)", function () { // eslint-disable-line max-statements
             tt.test("child two", function () {})
         })
 
-        tt.run(util.wrap(done, function () {
+        tt.run().then(function () {
             t.deepEqual(ret, [
                 n("start", []),
                 n("start", [p("parent one", 0)]),
@@ -535,10 +535,10 @@ suite("core (reporters)", function () { // eslint-disable-line max-statements
                 n("end", []),
                 n("exit", []),
             ])
-        }))
+        })
     })
 
-    test("called correctly with subtest run", function (done) {
+    test("called correctly with subtest run", function () {
         var tt = t.base()
         var ret = []
 
@@ -548,7 +548,7 @@ suite("core (reporters)", function () { // eslint-disable-line max-statements
 
         ttt.test("foo", function () {})
 
-        ttt.run(util.wrap(done, function () {
+        ttt.run().then(function () {
             t.deepEqual(ret, [
                 n("start", [p("test", 0)]),
                 n("start", [p("test", 0), p("foo", 0)]),
@@ -558,10 +558,10 @@ suite("core (reporters)", function () { // eslint-disable-line max-statements
                 n("pass", [p("test", 0)]),
                 n("exit", [p("test", 0)]),
             ])
-        }))
+        })
     })
 
-    test("called correctly with complex sequence", function (done) {
+    test("called correctly with complex sequence", function () {
         var tt = t.base()
         var ret = []
         var sentinel = new Error("sentinel")
@@ -611,7 +611,7 @@ suite("core (reporters)", function () { // eslint-disable-line max-statements
         var fail1 = new t.AssertionError("Expected 1 to not equal 1", 1, 1)
         var fail2 = new t.AssertionError("Expected 1 to equal 2", 2, 1)
 
-        tt.run(util.wrap(done, function () {
+        tt.run().then(function () {
             t.deepEqual(ret, [
                 n("start", []),
                 n("start", [p("module-1", 0)]),
@@ -647,10 +647,10 @@ suite("core (reporters)", function () { // eslint-disable-line max-statements
                 n("end", []),
                 n("exit", []),
             ])
-        }))
+        })
     })
 
-    test("can return a resolving thenable", function (done) {
+    test("can return a resolving thenable", function () {
         var tt = t.base()
         var ret = []
 
@@ -666,7 +666,7 @@ suite("core (reporters)", function () { // eslint-disable-line max-statements
         tt.test("test", function () {})
         tt.test("test", function () {})
 
-        tt.run(util.wrap(done, function () {
+        tt.run().then(function () {
             t.deepEqual(ret, [
                 n("start", []),
                 n("start", [p("test", 0)]),
@@ -678,10 +678,10 @@ suite("core (reporters)", function () { // eslint-disable-line max-statements
                 n("end", []),
                 n("exit", []),
             ])
-        }))
+        })
     })
 
-    test("can return a rejecting thenable", function (done) {
+    test("can return a rejecting thenable", function () {
         var tt = t.base()
 
         var sentinel = new Error("sentinel")
@@ -697,10 +697,8 @@ suite("core (reporters)", function () { // eslint-disable-line max-statements
         tt.test("test", function () {})
         tt.test("test", function () {})
 
-        tt.run(function (err) {
-            util.wrap(done, function () {
-                t.equal(err, sentinel)
-            })()
-        })
+        tt.run().then(
+            function () { t.fail("Expected a rejection") },
+            function (err) { t.equal(err, sentinel) })
     })
 })

@@ -1,7 +1,6 @@
 "use strict"
 
 var t = require("../../index.js")
-var util = require("../../test-util/base.js")
 
 suite("core (basic)", function () {
     test("has `base()`", function () {
@@ -52,7 +51,7 @@ suite("core (basic)", function () {
         t.equal(Object.getPrototypeOf(test), tt)
     })
 
-    test("runs block tests within tests", function (done) {
+    test("runs block tests within tests", function () {
         var tt = t.base()
         var called = false
 
@@ -62,12 +61,12 @@ suite("core (basic)", function () {
             })
         })
 
-        tt.run(util.wrap(done, function () {
+        tt.run().then(function () {
             t.true(called)
-        }))
+        })
     })
 
-    test("runs successful inline tests within tests", function (done) {
+    test("runs successful inline tests within tests", function () {
         var tt = t.base()
         var err
 
@@ -82,8 +81,28 @@ suite("core (basic)", function () {
             tt.test("foo").use(function () {})
         })
 
-        tt.run(util.wrap(done, function () {
+        tt.run().then(function () {
             t.notOk(err)
-        }))
+        })
+    })
+
+    test("accepts a callback with `t.run()`", function () {
+        var tt = t.base()
+        var err
+
+        tt.reporter(function (res, done) {
+            if (res.type === "fail") {
+                err = res.value
+            }
+            done()
+        })
+
+        tt.test("test", function (tt) {
+            tt.test("foo").use(function () {})
+        })
+
+        tt.run(function () {
+            t.notOk(err)
+        })
     })
 })

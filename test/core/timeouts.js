@@ -8,7 +8,7 @@ var p = util.p
 var n = util.n
 
 suite("core (timeouts)", function () {
-    test("succeeds with own", function (done) {
+    test("succeeds with own", function () {
         var tt = t.base()
         var ret = []
 
@@ -19,7 +19,7 @@ suite("core (timeouts)", function () {
             done()
         })
 
-        tt.run(util.wrap(done, function () {
+        tt.run().then(function () {
             t.deepEqual(ret, [
                 n("start", []),
                 n("start", [p("test", 0)]),
@@ -28,10 +28,10 @@ suite("core (timeouts)", function () {
                 n("end", []),
                 n("exit", []),
             ])
-        }))
+        })
     })
 
-    test("fails with own", function (done) {
+    test("fails with own", function () {
         var tt = t.base()
         var ret = []
 
@@ -44,7 +44,7 @@ suite("core (timeouts)", function () {
             setTimeout(function () { done() }, 200)
         })
 
-        tt.run(util.wrap(done, function () {
+        tt.run().then(function () {
             t.deepEqual(ret, [
                 n("start", []),
                 n("start", [p("test", 0)]),
@@ -53,10 +53,10 @@ suite("core (timeouts)", function () {
                 n("end", []),
                 n("exit", []),
             ])
-        }))
+        })
     })
 
-    test("succeeds with inherited", function (done) {
+    test("succeeds with inherited", function () {
         var tt = t.base()
         var ret = []
 
@@ -66,7 +66,7 @@ suite("core (timeouts)", function () {
         .timeout(50)
         .async("inner", function (tt, done) { done() })
 
-        tt.run(util.wrap(done, function () {
+        tt.run().then(function () {
             t.deepEqual(ret, [
                 n("start", []),
                 n("start", [p("test", 0)]),
@@ -78,10 +78,10 @@ suite("core (timeouts)", function () {
                 n("end", []),
                 n("exit", []),
             ])
-        }))
+        })
     })
 
-    test("fails with inherited", function (done) {
+    test("fails with inherited", function () {
         var tt = t.base()
         var ret = []
 
@@ -95,7 +95,7 @@ suite("core (timeouts)", function () {
             setTimeout(function () { done() }, 200)
         })
 
-        tt.run(util.wrap(done, function () {
+        tt.run().then(function () {
             t.deepEqual(ret, [
                 n("start", []),
                 n("start", [p("test", 0)]),
@@ -108,10 +108,10 @@ suite("core (timeouts)", function () {
                 n("end", []),
                 n("exit", []),
             ])
-        }))
+        })
     })
 
-    test("gets own set timeout", function (done) {
+    test("gets own set timeout", function () {
         var tt = t.base()
         var timeout
 
@@ -120,12 +120,12 @@ suite("core (timeouts)", function () {
             timeout = tt.timeout()
         })
 
-        tt.run(util.wrap(done, function () {
+        tt.run().then(function () {
             t.equal(timeout, 50)
-        }))
+        })
     })
 
-    test("gets own set timeout", function (done) {
+    test("gets own set timeout", function () {
         var tt = t.base()
         var timeout
 
@@ -133,24 +133,24 @@ suite("core (timeouts)", function () {
         .timeout(50)
         .test("inner", function (tt) { timeout = tt.timeout() })
 
-        tt.run(util.wrap(done, function () {
+        tt.run().then(function () {
             t.equal(timeout, 50)
-        }))
+        })
     })
 
-    test("gets own sync inner timeout", function (done) {
+    test("gets own sync inner timeout", function () {
         var tt = t.base()
 
         var timeout = tt.test("test")
         .timeout(50)
         .test("inner").timeout()
 
-        tt.run(util.wrap(done, function () {
+        tt.run().then(function () {
             t.equal(timeout, 50)
-        }))
+        })
     })
 
-    test("gets default timeout", function (done) {
+    test("gets default timeout", function () {
         var tt = t.base()
         var timeout
 
@@ -158,8 +158,8 @@ suite("core (timeouts)", function () {
             timeout = tt.timeout()
         })
 
-        tt.run(util.wrap(done, function () {
+        tt.run().then(function () {
             t.equal(timeout, 2000)
-        }))
+        })
     })
 })

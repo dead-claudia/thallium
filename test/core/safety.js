@@ -90,7 +90,7 @@ suite("core (safety)", function () {
         })
     })
 
-    test("catches unsafe access", function (done) {
+    test("catches unsafe access", function () {
         var tt = t.base()
         var ret = []
 
@@ -139,7 +139,7 @@ suite("core (safety)", function () {
             tt.wrap("test", function (func) { return func() })
         })
 
-        tt.run(util.wrap(done, function () {
+        tt.run().then(function () {
             t.deepEqual(ret, [
                 n("start", []),
                 n("start", [p("one", 0)]),
@@ -175,10 +175,10 @@ suite("core (safety)", function () {
                 n("end", []),
                 n("exit", []),
             ])
-        }))
+        })
     })
 
-    test("reports extraneous async done", function (done) {
+    test("reports extraneous async done", function () {
         var tt = t.base()
         var ret = []
 
@@ -202,7 +202,7 @@ suite("core (safety)", function () {
             })
         })
 
-        tt.run(util.wrap(done, function () {
+        tt.run().then(function () {
             t.includesDeepAny([4, 5, 6, 7, 8, 9, 10, 11, 12].map(function (i) {
                 var splice1 = n("extra",
                     [p("test", 0), p("inner", 0), p("fail", 0)],
@@ -231,10 +231,21 @@ suite("core (safety)", function () {
                 nodes.splice(i, 0, splice1, splice2)
                 return nodes
             }), [ret])
-        }))
+        })
     })
 
-    test("catches concurrent runs", function (done) {
+    test("catches concurrent runs", function () {
+        var tt = t.base()
+
+        tt.reporter(function (_, done) { done() })
+        var res = tt.run()
+
+        t.throws(function () { tt.run() }, Error)
+
+        return res
+    })
+
+    test("catches concurrent runs when given a callback", function (done) {
         var tt = t.base()
 
         tt.reporter(function (_, done) { done() })
@@ -242,28 +253,21 @@ suite("core (safety)", function () {
         t.throws(function () { tt.run() }, Error)
     })
 
-    test("allows non-concurrent runs with reporter error", function (done) {
+    test("allows non-concurrent runs with reporter error", function () {
         var tt = t.base()
         var sentinel = new Error("fail")
 
         tt.reporter(function (_, done) { done(sentinel) })
 
-        tt.run(function (err) {
-            try {
-                t.equal(err, sentinel)
-                tt.run(function (err) {
-                    try {
-                        t.equal(err, sentinel)
-                    } catch (e) {
-                        return done(e)
-                    }
-                    return done()
-                })
-            } catch (e) {
-                return done(e)
-            }
-
-            return undefined
+        tt.run()
+        .then(
+            function () { t.fail("Expected a rejection") },
+            function (err) { t.equal(err, sentinel) })
+        .then(function () {
+            tt.run()
+            .then(
+                function () { t.fail("Expected a rejection") },
+                function (err) { t.equal(err, sentinel) })
         })
     })
 })

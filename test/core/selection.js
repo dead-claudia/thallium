@@ -10,7 +10,7 @@ suite("core (selection)", function () {
         tt.define("fail", function () { return {test: false, message: "fail"} })
     }
 
-    test("skips tests with callbacks", function (done) {
+    test("skips tests with callbacks", function () {
         var tt = t.base().use(fail)
         var ret = []
 
@@ -26,7 +26,7 @@ suite("core (selection)", function () {
             tt.test("other")
         })
 
-        tt.run(util.wrap(done, function () {
+        tt.run().then(function () {
             t.deepEqual(ret, [
                 n("start", []),
                 n("start", [p("one", 0)]),
@@ -48,10 +48,10 @@ suite("core (selection)", function () {
                 n("end", []),
                 n("exit", []),
             ])
-        }))
+        })
     })
 
-    test("skips tests without callbacks", function (done) {
+    test("skips tests without callbacks", function () {
         var tt = t.base().use(fail)
         var ret = []
 
@@ -67,7 +67,7 @@ suite("core (selection)", function () {
             tt.test("other")
         })
 
-        tt.run(util.wrap(done, function () {
+        tt.run().then(function () {
             t.deepEqual(ret, [
                 n("start", []),
                 n("start", [p("one", 0)]),
@@ -89,10 +89,10 @@ suite("core (selection)", function () {
                 n("end", []),
                 n("exit", []),
             ])
-        }))
+        })
     })
 
-    test("skips async tests", function (done) {
+    test("skips async tests", function () {
         var tt = t.base().use(fail)
         var ret = []
 
@@ -108,7 +108,7 @@ suite("core (selection)", function () {
             tt.test("other")
         })
 
-        tt.run(util.wrap(done, function () {
+        tt.run().then(function () {
             t.deepEqual(ret, [
                 n("start", []),
                 n("start", [p("one", 0)]),
@@ -130,10 +130,23 @@ suite("core (selection)", function () {
                 n("end", []),
                 n("exit", []),
             ])
-        }))
+        })
     })
 
-    test("only tests with callbacks", function (done) {
+    test("skips inline tests run directly", function () {
+        var ret = []
+        var tt = t.base().reporter(util.push(ret))
+        var ttt = tt.testSkip("test")
+
+        ttt.run().then(function () {
+            t.deepEqual(ret, [
+                n("pending", [p("test", 0)]),
+                n("exit", [p("test", 0)]),
+            ])
+        })
+    })
+
+    test("only tests with callbacks", function () {
         var tt = t.base().use(fail)
         var ret = []
 
@@ -150,7 +163,7 @@ suite("core (selection)", function () {
             tt.test("other", function (tt) { tt.fail() })
         })
 
-        tt.run(util.wrap(done, function () {
+        tt.run().then(function () {
             t.deepEqual(ret, [
                 n("start", []),
                 n("start", [p("one", 0)]),
@@ -162,10 +175,10 @@ suite("core (selection)", function () {
                 n("end", []),
                 n("exit", []),
             ])
-        }))
+        })
     })
 
-    test("only tests without callbacks", function (done) {
+    test("only tests without callbacks", function () {
         var tt = t.base().use(fail)
         var ret = []
 
@@ -182,7 +195,7 @@ suite("core (selection)", function () {
             tt.test("other").fail()
         })
 
-        tt.run(util.wrap(done, function () {
+        tt.run().then(function () {
             t.deepEqual(ret, [
                 n("start", []),
                 n("start", [p("one", 0)]),
@@ -194,10 +207,10 @@ suite("core (selection)", function () {
                 n("end", []),
                 n("exit", []),
             ])
-        }))
+        })
     })
 
-    test("only async tests", function (done) {
+    test("only async tests", function () {
         var tt = t.base().use(fail)
         var ret = []
 
@@ -214,7 +227,7 @@ suite("core (selection)", function () {
             tt.async("other", function (tt) { tt.fail() })
         })
 
-        tt.run(util.wrap(done, function () {
+        tt.run().then(function () {
             t.deepEqual(ret, [
                 n("start", []),
                 n("start", [p("one", 0)]),
@@ -226,10 +239,10 @@ suite("core (selection)", function () {
                 n("end", []),
                 n("exit", []),
             ])
-        }))
+        })
     })
 
-    test("only tests as index with callbacks", function (done) {
+    test("only tests as index with callbacks", function () {
         var tt = t.base().use(fail)
         var ret = []
 
@@ -246,16 +259,16 @@ suite("core (selection)", function () {
             tt.test("other").fail()
         })
 
-        tt.run(util.wrap(done, function () {
+        tt.run().then(function () {
             t.deepEqual(ret, [
                 n("start", []),
                 n("end", []),
                 n("exit", []),
             ])
-        }))
+        })
     })
 
-    test("only tests as index index without callbacks", function (done) {
+    test("only tests as index index without callbacks", function () {
         var tt = t.base().use(fail)
         var ret = []
 
@@ -272,16 +285,16 @@ suite("core (selection)", function () {
             tt.test("other").fail()
         })
 
-        tt.run(util.wrap(done, function () {
+        tt.run().then(function () {
             t.deepEqual(ret, [
                 n("start", []),
                 n("end", []),
                 n("exit", []),
             ])
-        }))
+        })
     })
 
-    test("only async tests as index", function (done) {
+    test("only async tests as index", function () {
         var tt = t.base().use(fail)
         var ret = []
 
@@ -298,16 +311,16 @@ suite("core (selection)", function () {
             tt.async("other", function (tt) { tt.fail() })
         })
 
-        tt.run(util.wrap(done, function () {
+        tt.run().then(function () {
             t.deepEqual(ret, [
                 n("start", []),
                 n("end", []),
                 n("exit", []),
             ])
-        }))
+        })
     })
 
-    test("only against regexp", function (done) {
+    test("only against regexp", function () {
         var tt = t.base().use(fail)
         var ret = []
 
@@ -324,7 +337,7 @@ suite("core (selection)", function () {
             tt.test("other", function (tt) { tt.fail() })
         })
 
-        tt.run(util.wrap(done, function () {
+        tt.run().then(function () {
             t.deepEqual(ret, [
                 n("start", []),
                 n("start", [p("one", 0)]),
@@ -336,6 +349,6 @@ suite("core (selection)", function () {
                 n("end", []),
                 n("exit", []),
             ])
-        }))
+        })
     })
 })

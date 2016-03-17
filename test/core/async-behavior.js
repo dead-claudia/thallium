@@ -8,16 +8,16 @@ var n = util.n
 var p = util.p
 
 suite("core (asynchronous behavior)", function () {
-    test("with normal tests", function (done) {
+    test("with normal tests", function () {
         var tt = t.base()
         var called = false
 
         tt.test("test", function () { called = true })
-        tt.run(util.wrap(done, function () { t.true(called) }))
+        tt.run().then(function () { t.true(called) })
         t.false(called)
     })
 
-    test("with shorthand tests", function (done) {
+    test("with shorthand tests", function () {
         var tt = t.base()
         var called = false
 
@@ -27,11 +27,11 @@ suite("core (asynchronous behavior)", function () {
         })
 
         tt.test("test").assert()
-        tt.run(util.wrap(done, function () { t.true(called) }))
+        tt.run().then(function () { t.true(called) })
         t.false(called)
     })
 
-    test("with async tests + sync done call", function (done) {
+    test("with async tests + sync done call", function () {
         var tt = t.base()
         var called = false
 
@@ -39,12 +39,12 @@ suite("core (asynchronous behavior)", function () {
             called = true
             done()
         })
-        tt.run(util.wrap(done, function () { t.true(called) }))
+        tt.run().then(function () { t.true(called) })
 
         t.false(called)
     })
 
-    test("with async tests + async done call", function (done) {
+    test("with async tests + async done call", function () {
         var tt = t.base()
         var called = false
 
@@ -53,12 +53,12 @@ suite("core (asynchronous behavior)", function () {
             setTimeout(function () { return done() })
         })
 
-        tt.run(util.wrap(done, function () { t.true(called) }))
+        tt.run().then(function () { t.true(called) })
 
         t.false(called)
     })
 
-    test("with async tests + duplicate thenable resolution", function (done) {
+    test("with async tests + duplicate thenable resolution", function () {
         var tt = t.base()
         var called = false
 
@@ -73,12 +73,12 @@ suite("core (asynchronous behavior)", function () {
             }
         })
 
-        tt.run(util.wrap(done, function () { t.true(called) }))
+        tt.run().then(function () { t.true(called) })
 
         t.false(called)
     })
 
-    test("with async tests + duplicate thenable rejection", function (done) {
+    test("with async tests + duplicate thenable rejection", function () {
         var tt = t.base()
         var called = false
         var ret = []
@@ -99,7 +99,7 @@ suite("core (asynchronous behavior)", function () {
             }
         })
 
-        tt.run(util.wrap(done, function () {
+        tt.run().then(function () {
             t.deepEqual(ret, [
                 n("start", []),
                 n("start", [p("test", 0)]),
@@ -108,12 +108,12 @@ suite("core (asynchronous behavior)", function () {
                 n("end", []),
                 n("exit", []),
             ])
-        }))
+        })
 
         t.false(called)
     })
 
-    test("with async tests + mixed thenable (resolve first)", function (done) {
+    test("with async tests + mixed thenable (resolve first)", function () {
         var tt = t.base()
         var called = false
         var ret = []
@@ -135,7 +135,7 @@ suite("core (asynchronous behavior)", function () {
             }
         })
 
-        tt.run(util.wrap(done, function () {
+        tt.run().then(function () {
             t.deepEqual(ret, [
                 n("start", []),
                 n("start", [p("test", 0)]),
@@ -144,12 +144,12 @@ suite("core (asynchronous behavior)", function () {
                 n("end", []),
                 n("exit", []),
             ])
-        }))
+        })
 
         t.false(called)
     })
 
-    test("with async tests + mixed thenable (reject first)", function (done) {
+    test("with async tests + mixed thenable (reject first)", function () {
         var tt = t.base()
         var called = false
         var ret = []
@@ -171,7 +171,7 @@ suite("core (asynchronous behavior)", function () {
             }
         })
 
-        tt.run(util.wrap(done, function () {
+        tt.run().then(function () {
             t.deepEqual(ret, [
                 n("start", []),
                 n("start", [p("test", 0)]),
@@ -180,7 +180,7 @@ suite("core (asynchronous behavior)", function () {
                 n("end", []),
                 n("exit", []),
             ])
-        }))
+        })
 
         t.false(called)
     })
