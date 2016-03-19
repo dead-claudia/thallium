@@ -1,19 +1,9 @@
-"use strict"
+import t from "../src/index.js"
 
-var t = require("../index.js")
-
-exports.fail = function (name) {
-    var args = []
-
-    for (var i = 1; i < arguments.length; i++) {
-        args.push(arguments[i])
-    }
-
-    t.throws(function () {
-        t[name].apply(t, args)
-    }, t.AssertionError)
+export function fail(name, ...args) {
+    t.throws(() => t[name](...args), t.AssertionError)
 }
 
-exports.basic = function (desc, callback) {
-    suite(desc, function () { return test("works", callback) })
+export function basic(desc, callback) {
+    suite(desc, () => test("works", callback))
 }

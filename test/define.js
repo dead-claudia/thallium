@@ -1,23 +1,21 @@
-"use strict"
+import t from "../src/index.js"
 
-var t = require("../index.js")
-
-suite("define()", function () {
-    test("exists", function () {
-        var tt = t.base()
+suite("define()", () => {
+    test("exists", () => {
+        const tt = t.base()
 
         t.hasKey(tt, "define")
         t.function(tt.define)
     })
 
-    test("works with string + function", function () {
-        var tt = t.base()
-        var self // eslint-disable-line consistent-this
+    test("works with string + function", () => {
+        const tt = t.base()
+        let self // eslint-disable-line consistent-this
 
         tt.define("assert", /** @this */ function (test, expected, actual) {
             self = this
             return {
-                test: test, expected: expected, actual: actual,
+                test, expected, actual,
                 message: "{expected} :: {actual}",
             }
         })
@@ -25,8 +23,8 @@ suite("define()", function () {
         tt.assert(true, {}, {})
         t.undefined(self)
 
-        var expected = {}
-        var actual = {}
+        const expected = {}
+        const actual = {}
 
         try {
             tt.assert(false, expected, actual)
@@ -34,8 +32,7 @@ suite("define()", function () {
             t.undefined(self)
             t.instanceof(e, t.AssertionError)
             t.hasKeys(e, {
-                expected: expected,
-                actual: actual,
+                expected, actual,
                 message: "{} :: {}",
             })
             return
@@ -44,13 +41,13 @@ suite("define()", function () {
         throw new Error("Expected tt.assert to throw an error")
     })
 
-    test("works with object", function () {
-        var tt = t.base()
+    test("works with object", () => {
+        const tt = t.base()
 
         tt.define({
-            assert: function (test, expected, actual) {
+            assert(test, expected, actual) {
                 return {
-                    test: test, expected: expected, actual: actual,
+                    test, expected, actual,
                     message: "{expected} :: {actual}",
                 }
             },
@@ -58,30 +55,26 @@ suite("define()", function () {
 
         tt.assert(true, {}, {})
 
-        var expected = {}
-        var actual = {}
-        var message = "{} :: {}"
+        const expected = {}
+        const actual = {}
+        const message = "{} :: {}"
 
         try {
             tt.assert(false, expected, actual)
         } catch (e) {
             t.instanceof(e, t.AssertionError)
-            t.hasKeys(e, {
-                expected: expected,
-                actual: actual,
-                message: message,
-            })
+            t.hasKeys(e, {expected, actual, message})
             return
         }
 
         throw new Error("Expected tt.assert to throw an error")
     })
 
-    test("allows arbitrary properties to be used in the message", function () {
-        var tt = t.base()
+    test("allows arbitrary properties to be used in the message", () => {
+        const tt = t.base()
 
-        tt.define("assert", function (test, extra) {
-            return {test: test, extra: extra, message: "{extra}"}
+        tt.define("assert", (test, extra) => {
+            return {test, extra, message: "{extra}"}
         })
 
         try {

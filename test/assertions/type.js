@@ -1,15 +1,15 @@
-"use strict"
+import t from "../../src/index.js"
+import {fail, basic} from "../../test-util/assertions.js"
+import global from "../../src/global.js"
 
-/* global Symbol */
+const Symbol = typeof global.Symbol === "function" &&
+        typeof global.Symbol() === "symbol"
+    ? global.Symbol
+    : undefined
 
-var t = require("../../index.js")
-var util = require("../../test-util/assertions.js")
-var fail = util.fail
-var basic = util.basic
-
-suite("assertions (type)", function () {
-    suite("t.type()", function () {
-        test("checks good types", function () {
+suite("assertions (type)", () => {
+    suite("t.type()", () => {
+        test("checks good types", () => {
             t.type(true, "boolean")
             t.type(false, "boolean")
             t.type(0, "number")
@@ -21,12 +21,12 @@ suite("assertions (type)", function () {
             t.type(null, "object")
             t.type({}, "object")
             t.type([], "object")
-            t.type(function () {}, "function")
+            t.type(() => {}, "function")
             t.type(undefined, "undefined")
             if (typeof Symbol === "function") t.type(Symbol(), "symbol")
         })
 
-        test("checks bad types", function () {
+        test("checks bad types", () => {
             fail("type", true, "nope")
             fail("type", false, "nope")
             fail("type", 0, "nope")
@@ -38,14 +38,14 @@ suite("assertions (type)", function () {
             fail("type", null, "nope")
             fail("type", {}, "nope")
             fail("type", [], "nope")
-            fail("type", function () {}, "nope")
+            fail("type", () => {}, "nope")
             fail("type", undefined, "nope")
             if (typeof Symbol === "function") fail("type", Symbol(), "nope")
         })
     })
 
-    suite("t.notType()", function () {
-        test("checks good types", function () {
+    suite("t.notType()", () => {
+        test("checks good types", () => {
             fail("notType", true, "boolean")
             fail("notType", false, "boolean")
             fail("notType", 0, "number")
@@ -57,14 +57,14 @@ suite("assertions (type)", function () {
             fail("notType", null, "object")
             fail("notType", {}, "object")
             fail("notType", [], "object")
-            fail("notType", function () {}, "function")
+            fail("notType", () => {}, "function")
             fail("notType", undefined, "undefined")
             if (typeof Symbol === "function") {
                 fail("notType", Symbol(), "symbol")
             }
         })
 
-        test("checks bad types", function () {
+        test("checks bad types", () => {
             t.notType(true, "nope")
             t.notType(false, "nope")
             t.notType(0, "nope")
@@ -76,25 +76,25 @@ suite("assertions (type)", function () {
             t.notType(null, "nope")
             t.notType({}, "nope")
             t.notType([], "nope")
-            t.notType(function () {}, "nope")
+            t.notType(() => {}, "nope")
             t.notType(undefined, "nope")
             if (typeof Symbol === "function") t.notType(Symbol(), "nope")
         })
     })
 
     function testType(name, callback) {
-        basic("t." + name + "()", function () {
+        basic(`t.${name}()`, () => {
             callback(t[name].bind(t), fail.bind(null, name))
         })
 
-        var negated = "not" + name[0].toUpperCase() + name.slice(1)
+        const negated = `not${name[0].toUpperCase() + name.slice(1)}`
 
-        basic("t." + negated + "()", function () {
+        basic(`t.${negated}()`, () => {
             callback(fail.bind(null, negated), t[negated].bind(t))
         })
     }
 
-    testType("boolean", function (is, not) {
+    testType("boolean", (is, not) => {
         is(true)
         is(false)
         not(0)
@@ -106,13 +106,13 @@ suite("assertions (type)", function () {
         not(null)
         not({})
         not([])
-        not(function () {})
+        not(() => {})
         not(undefined)
         not()
         if (typeof Symbol === "function") not(Symbol())
     })
 
-    testType("number", function (is, not) {
+    testType("number", (is, not) => {
         not(true)
         not(false)
         is(0)
@@ -124,13 +124,13 @@ suite("assertions (type)", function () {
         not(null)
         not({})
         not([])
-        not(function () {})
+        not(() => {})
         not(undefined)
         not()
         if (typeof Symbol === "function") not(Symbol())
     })
 
-    testType("function", function (is, not) {
+    testType("function", (is, not) => {
         not(true)
         not(false)
         not(0)
@@ -142,13 +142,13 @@ suite("assertions (type)", function () {
         not(null)
         not({})
         not([])
-        is(function () {})
+        is(() => {})
         not(undefined)
         not()
         if (typeof Symbol === "function") not(Symbol())
     })
 
-    testType("object", function (is, not) {
+    testType("object", (is, not) => {
         not(true)
         not(false)
         not(0)
@@ -160,13 +160,13 @@ suite("assertions (type)", function () {
         is(null)
         is({})
         is([])
-        not(function () {})
+        not(() => {})
         not(undefined)
         not()
         if (typeof Symbol === "function") not(Symbol())
     })
 
-    testType("string", function (is, not) {
+    testType("string", (is, not) => {
         not(true)
         not(false)
         not(0)
@@ -178,13 +178,13 @@ suite("assertions (type)", function () {
         not(null)
         not({})
         not([])
-        not(function () {})
+        not(() => {})
         not(undefined)
         not()
         if (typeof Symbol === "function") not(Symbol())
     })
 
-    testType("symbol", function (is, not) {
+    testType("symbol", (is, not) => {
         not(true)
         not(false)
         not(0)
@@ -196,13 +196,13 @@ suite("assertions (type)", function () {
         not(null)
         not({})
         not([])
-        not(function () {})
+        not(() => {})
         not(undefined)
         not()
         if (typeof Symbol === "function") is(Symbol())
     })
 
-    testType("undefined", function (is, not) {
+    testType("undefined", (is, not) => {
         not(true)
         not(false)
         not(0)
@@ -214,13 +214,13 @@ suite("assertions (type)", function () {
         not(null)
         not({})
         not([])
-        not(function () {})
+        not(() => {})
         is(undefined)
         is()
         if (typeof Symbol === "function") not(Symbol())
     })
 
-    basic("t.true()", function () {
+    basic("t.true()", () => {
         t.true(true)
         fail("true", false)
         fail("true", null)
@@ -233,7 +233,7 @@ suite("assertions (type)", function () {
         fail("true", [])
     })
 
-    basic("t.notTrue()", function () {
+    basic("t.notTrue()", () => {
         fail("notTrue", true)
         t.notTrue(false)
         t.notTrue(null)
@@ -246,7 +246,7 @@ suite("assertions (type)", function () {
         t.notTrue([])
     })
 
-    basic("t.false()", function () {
+    basic("t.false()", () => {
         fail("false", true)
         t.false(false)
         fail("false", null)
@@ -259,7 +259,7 @@ suite("assertions (type)", function () {
         fail("false", [])
     })
 
-    basic("t.notFalse()", function () {
+    basic("t.notFalse()", () => {
         t.notFalse(true)
         fail("notFalse", false)
         t.notFalse(null)
@@ -272,7 +272,7 @@ suite("assertions (type)", function () {
         t.notFalse([])
     })
 
-    basic("t.null()", function () {
+    basic("t.null()", () => {
         fail("null", true)
         fail("null", false)
         t.null(null)
@@ -285,7 +285,7 @@ suite("assertions (type)", function () {
         fail("null", [])
     })
 
-    basic("t.notNull()", function () {
+    basic("t.notNull()", () => {
         t.notNull(true)
         t.notNull(false)
         fail("notNull", null)
@@ -298,7 +298,7 @@ suite("assertions (type)", function () {
         t.notNull([])
     })
 
-    basic("t.undefined()", function () {
+    basic("t.undefined()", () => {
         fail("undefined", true)
         fail("undefined", false)
         fail("undefined", null)
@@ -311,7 +311,7 @@ suite("assertions (type)", function () {
         fail("undefined", [])
     })
 
-    basic("t.notNull()", function () {
+    basic("t.notNull()", () => {
         t.notUndefined(true)
         t.notUndefined(false)
         t.notUndefined(null)
@@ -324,7 +324,7 @@ suite("assertions (type)", function () {
         t.notUndefined([])
     })
 
-    basic("t.array()", function () {
+    basic("t.array()", () => {
         fail("array", true)
         fail("array", false)
         fail("array", null)
@@ -337,7 +337,7 @@ suite("assertions (type)", function () {
         t.array([])
     })
 
-    basic("t.notArray()", function () {
+    basic("t.notArray()", () => {
         t.notArray(true)
         t.notArray(false)
         t.notArray(null)
@@ -350,13 +350,12 @@ suite("assertions (type)", function () {
         fail("notArray", [])
     })
 
-    basic("t.instanceof()", function () {
-        function A() {}
+    basic("t.instanceof()", () => {
+        class A {}
         t.instanceof(new A(), A)
         t.instanceof(new A(), Object)
 
-        function B() {}
-        B.prototype = new A()
+        class B extends A {}
 
         t.instanceof(new B(), B)
         t.instanceof(new B(), A)
@@ -365,13 +364,12 @@ suite("assertions (type)", function () {
         fail("instanceof", [], RegExp)
     })
 
-    basic("t.notInstanceof()", function () {
-        function A() {}
+    basic("t.notInstanceof()", () => {
+        class A {}
         fail("notInstanceof", new A(), A)
         fail("notInstanceof", new A(), Object)
 
-        function B() {}
-        B.prototype = new A()
+        class B extends A {}
 
         fail("notInstanceof", new B(), B)
         fail("notInstanceof", new B(), A)

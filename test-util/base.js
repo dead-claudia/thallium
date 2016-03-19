@@ -1,50 +1,31 @@
-"use strict"
+/* eslint-env node */
+import * as path from "path"
 
-var path = require("path")
+// This is merely to survive mocking this module
+import resolveAsync, {sync as resolve} from "resolve"
+export {resolve, resolveAsync}
 
-exports.fixture = function (directory) {
+export function fixture(directory) {
     return path.resolve(__dirname, "../test-fixtures", directory)
 }
 
-// This is merely to survive mocking this module
-var resolve = require("resolve")
-
-exports.resolve = resolve.sync
-exports.resolveAsync = resolve
-
-exports.paths = {
-    "techtonic": path.resolve(__dirname, "../index.js"),
-    "techtonic/core": path.resolve(__dirname, "../core.js"),
-    "techtonic/assertions": path.resolve(__dirname, "../assertions.js"),
+export const paths = {
+    "techtonic": path.resolve(__dirname, "../src/index.js"),
+    "techtonic/core": path.resolve(__dirname, "../src/core.js"),
+    "techtonic/assertions": path.resolve(__dirname, "../src/assertions.js"),
 }
 
-exports.wrap = function (done, func) {
-    return function (err) {
-        if (err != null) return done(err)
-        try {
-            func()
-        } catch (e) {
-            return done(e)
-        }
-        return done()
-    }
-}
-
-exports.push = function (ret) {
-    return function (arg, done) {
+export function push(ret) {
+    return (arg, done) => {
         ret.push(arg)
         return done()
     }
 }
 
-exports.n = function (type, path, value) {
-    return {
-        type: type,
-        path: path,
-        value: value,
-    }
+export function n(type, path, value) {
+    return {type, path, value}
 }
 
-exports.p = function (name, index) {
-    return {name: name, index: index}
+export function p(name, index) {
+    return {name, index}
 }

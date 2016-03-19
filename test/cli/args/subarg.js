@@ -1,22 +1,21 @@
-"use strict"
+import * as path from "path"
 
-var t = require("../../../index.js")
-var parseArgs = require("../../../lib/cli/parse-args.js")
-var ArgumentError = require("../../../lib/cli/argument-error.js")
-var path = require("path")
+import t from "../../../src/index.js"
+import parseArgs from "../../../src/cli/parse-args.js"
+import ArgumentError from "../../../src/cli/argument-error.js"
 
 // Pull it out to safely wrap.
-var test1 = test
+const test1 = test
 
-suite("cli arguments (subarg)", function () { // eslint-disable-line max-statements, max-len
+suite("cli arguments (subarg)", () => { // eslint-disable-line max-statements
     function set(set, value) {
-        return {set: set, value: value}
+        return {set, value}
     }
 
     function throws(description, str) {
         str = /^\s+$/.test(str) ? [] : str.split(/\s+/g)
-        test1(description, function () {
-            t.throws(function () { parseArgs("base", str) }, ArgumentError)
+        test1(description, () => {
+            t.throws(() => parseArgs("base", str), ArgumentError)
         })
     }
 
@@ -24,11 +23,11 @@ suite("cli arguments (subarg)", function () { // eslint-disable-line max-stateme
     function test(description, str, result) {
         str = /^\s+$/.test(str) ? [] : str.split(/\s+/g)
 
-        var list = Object.keys(result).map(function (key) {
+        const list = Object.keys(result).map(key => {
             return {module: key, args: result[key]}
         })
 
-        test1(description, function () {
+        test1(description, () => {
             t.deepEqual(parseArgs("base", str), {
                 config: set(false, path.join("test", ".techtonic")),
                 module: set(false, null),
@@ -67,8 +66,8 @@ suite("cli arguments (subarg)", function () { // eslint-disable-line max-stateme
         {foo: {bar: true, baz: "other"}})
 
     function numeric(name, string, number) {
-        test("works with a single object with " + name + " value",
-            "--reporter [ foo --bar " + string + " ]",
+        test(`works with a single object with ${name} value`,
+            `--reporter [ foo --bar ${string} ]`,
             {foo: {bar: number}})
     }
 

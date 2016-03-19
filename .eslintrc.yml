@@ -1,2 +1,2 @@
----
-extends: isiahmeadows/node
+root: true
+extends: isiahmeadows/es6

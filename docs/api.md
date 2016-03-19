@@ -9,6 +9,7 @@ Notes:
 - `techtonic` and `techtonic/core` are completely independent from each other, but otherwise carry the same API. The only difference is that the former includes the `techtonic/assertions` plugin (i.e. the core asssertions).
 - If you're using Babel, this only exports a single default export.
 - `t.define()`, `t.wrap()`, `t.add()`, etc. can accept Symbols as well as strings. The property is passed through unmodified. This allows for private assertions.
+- `t._` is reserved for internal use, so don't depend on anything in that, other than its possible existence.
 
 ## Base methods
 
@@ -20,7 +21,7 @@ The basic testing method, used for defining block tests. Should be familiar to y
 
 ```js
 // JavaScript
-t.test("1 should equal 1", function (t) {
+t.test("1 should equal 1", t => {
     t.equal(1, 1)
 })
 ```
@@ -57,11 +58,11 @@ You can skip inline tests with `t.testSkip("name")`, which is identical except t
 This defines an asynchronous test. The callback can either take an extra `done` argument, return a thenable, or return an iterator of thenables and/or plain objects. Generators work as callbacks.
 
 ```js
-var fs = require("fs")
+const fs = require("fs")
 
 // Traditional callback
-t.async("reads files correctly", function (t, done) {
-    fs.readFile("file.txt", "utf-8", function (err, data) {
+t.async("reads files correctly", (t, done) => {
+    fs.readFile("file.txt", "utf-8", (err, data) => {
         try {
             if (err != null) throw err
             t.equal(data, "contents\n")
@@ -73,17 +74,21 @@ t.async("reads files correctly", function (t, done) {
 })
 
 // Promises
-var pcall = require("promise-call")
+const pcall = require("promise-call")
 
-t.async("reads files correctly", function (t) {
-    return pcall(fs.readFile, "file.txt", "utf-8").then(function (data) {
-        t.equal(data, "contents\n")
-    })
-})
+t.async("reads files correctly", t =>
+    pcall(fs.readFile, "file.txt", "utf-8")
+    .then(data => t.equal(data, "contents\n")))
 
 // Generators
 t.async("reads files correctly", function *(t) {
-    var data = yield pcall(fs.readFile, "file.txt", "utf-8")
+    const data = yield pcall(fs.readFile, "file.txt", "utf-8")
+    t.equal(data, "contents\n")
+})
+
+// Async functions
+t.async("reads files correctly", async t => {
+    const data = await pcall(fs.readFile, "file.txt", "utf-8")
     t.equal(data, "contents\n")
 })
 ```
@@ -125,10 +130,11 @@ This returns the current Techtonic instance, for chaining.
 
 ### t.do(func), t.block(func)
 
-These run a function when the assertions are being run, and is guaranteed to report errors thrown as within that test. This is mostly useful for inline tests, for simple setup and/or cleanup within those (where a normal test would needlessly complicate things). `t.block()` is an ES3-compatible alias for `t.do()`.
+These run a function when the assertions are being run, and is guaranteed to report errors thrown as within that test. This is probably mostly useful for plugin authors dealing with inline tests, for simple setup and/or cleanup within those. `t.block()` is an ES3-compatible alias for `t.do()`.
 
 ```js
-t.test("test").do(foo.initValue)
+t.test("test")
+.do(foo.initValue)
 .equal(foo.getValue(), "something")
 ```
 
@@ -175,11 +181,11 @@ The `paths` are used as an exclusive union of tests and their children to run.
 ```js
 t.only(["one"], ["two", "inner 1"])
 
-t.test("one", function (t) {
+t.test("one", t => {
     t.test("inner").equal(1, 1)
 })
 
-t.test("two", function (t) {
+t.test("two", t => {
     t.test("inner 1").equal(0, 0)
 
     // Doesn't run
@@ -210,7 +216,7 @@ As an example of its usage:
 
 ```js
 // JavaScript
-t.define("equal", function (a, b) {
+t.define("equal", (a, b) => {
     return {
         test: a === b,
         actual: a,
@@ -239,8 +245,8 @@ Errors generated from this are automatically handled by Techtonic, and work just
 
 ```js
 // JavaScript
-t.test("define", function (t) {
-    t.define("myAssert", function (a, b) {
+t.test("define", t => {
+    t.define("myAssert", (a, b) => {
         return {
             test: a === b,
             actual: a,
@@ -253,7 +259,7 @@ t.test("define", function (t) {
     t.test("child").myAssert(1, 1) // Passes
 })
 
-t.myAssert(1, 1) // Fails, method not defined here
+t.myAssert(1, 1) // ReferenceError: method not defined here
 ```
 
 ```coffee
@@ -268,7 +274,7 @@ t.test "define", ->
     @myAssert 1, 1 # Passes
     @test("child").myAssert 1, 1 # Passes
 
-t.myAssert 1, 1 # Fails, method not defined here
+t.myAssert 1, 1 # ReferenceError: method not defined here
 ```
 
 Ad-hoc assertions are most definitely permitted, and the API is made for this to be easy.
@@ -301,6 +307,10 @@ Create a new, entirely separate Techtonic test instance. This is mostly used for
 
 Get the parent instance of this instance. If this is the base Techtonic instance (i.e. the result of `t.base()` or one of the core exports), then this will return `undefined`.
 
+### t.inline()
+
+Check if this is an inline test (i.e. defined as `t.test("test").equal(1, 1)`). This is mostly intended for plugin authors.
+
 ### t.checkInit()
 
 Assert that this test is still being initialized. Unless you're writing a [plugin](./plugins.md), you probably will never need this. An equivalent is called by every core method except for the following (all pure accessors except for `t.base()`):
@@ -309,5 +319,6 @@ Assert that this test is still being initialized. Unless you're writing a [plugi
 - `t.timeout()`
 - `t.base()`
 - `t.parent()`
+- `t.inline()`
 
 This aids in [safety](./safety.md), which this framework does help.

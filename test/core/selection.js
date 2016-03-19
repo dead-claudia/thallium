@@ -1,32 +1,28 @@
-"use strict"
+import t from "../../src/index.js"
+import {p, n, push} from "../../test-util/base.js"
 
-var t = require("../../index.js")
-var util = require("../../test-util/base.js")
-var p = util.p
-var n = util.n
-
-suite("core (selection)", function () {
+suite("core (selection)", () => {
     function fail(tt) {
-        tt.define("fail", function () { return {test: false, message: "fail"} })
+        tt.define("fail", () => ({test: false, message: "fail"}))
     }
 
-    test("skips tests with callbacks", function () {
-        var tt = t.base().use(fail)
-        var ret = []
+    test("skips tests with callbacks", () => {
+        const tt = t.base().use(fail)
+        const ret = []
 
-        tt.reporter(util.push(ret))
+        tt.reporter(push(ret))
 
-        tt.test("one", function (tt) {
-            tt.testSkip("inner", function (tt) { tt.fail() })
+        tt.test("one", tt => {
+            tt.testSkip("inner", tt => tt.fail())
             tt.test("other")
         })
 
-        tt.test("two", function (tt) {
+        tt.test("two", tt => {
             tt.test("inner")
             tt.test("other")
         })
 
-        tt.run().then(function () {
+        return tt.run().then(() => {
             t.deepEqual(ret, [
                 n("start", []),
                 n("start", [p("one", 0)]),
@@ -51,23 +47,23 @@ suite("core (selection)", function () {
         })
     })
 
-    test("skips tests without callbacks", function () {
-        var tt = t.base().use(fail)
-        var ret = []
+    test("skips tests without callbacks", () => {
+        const tt = t.base().use(fail)
+        const ret = []
 
-        tt.reporter(util.push(ret))
+        tt.reporter(push(ret))
 
-        tt.test("one", function (tt) {
+        tt.test("one", tt => {
             tt.testSkip("inner").fail()
             tt.test("other")
         })
 
-        tt.test("two", function (tt) {
+        tt.test("two", tt => {
             tt.test("inner")
             tt.test("other")
         })
 
-        tt.run().then(function () {
+        return tt.run().then(() => {
             t.deepEqual(ret, [
                 n("start", []),
                 n("start", [p("one", 0)]),
@@ -92,23 +88,23 @@ suite("core (selection)", function () {
         })
     })
 
-    test("skips async tests", function () {
-        var tt = t.base().use(fail)
-        var ret = []
+    test("skips async tests", () => {
+        const tt = t.base().use(fail)
+        const ret = []
 
-        tt.reporter(util.push(ret))
+        tt.reporter(push(ret))
 
-        tt.test("one", function (tt) {
-            tt.asyncSkip("inner", function (tt) { tt.fail() })
+        tt.test("one", tt => {
+            tt.asyncSkip("inner", tt => tt.fail())
             tt.test("other")
         })
 
-        tt.test("two", function (tt) {
+        tt.test("two", tt => {
             tt.test("inner")
             tt.test("other")
         })
 
-        tt.run().then(function () {
+        return tt.run().then(() => {
             t.deepEqual(ret, [
                 n("start", []),
                 n("start", [p("one", 0)]),
@@ -133,12 +129,12 @@ suite("core (selection)", function () {
         })
     })
 
-    test("skips inline tests run directly", function () {
-        var ret = []
-        var tt = t.base().reporter(util.push(ret))
-        var ttt = tt.testSkip("test")
+    test("skips inline tests run directly", () => {
+        const ret = []
+        const tt = t.base().reporter(push(ret))
+        const ttt = tt.testSkip("test")
 
-        ttt.run().then(function () {
+        return ttt.run().then(() => {
             t.deepEqual(ret, [
                 n("pending", [p("test", 0)]),
                 n("exit", [p("test", 0)]),
@@ -146,24 +142,24 @@ suite("core (selection)", function () {
         })
     })
 
-    test("only tests with callbacks", function () {
-        var tt = t.base().use(fail)
-        var ret = []
+    test("only tests with callbacks", () => {
+        const tt = t.base().use(fail)
+        const ret = []
 
-        tt.reporter(util.push(ret))
+        tt.reporter(push(ret))
         tt.only(["one", "inner"])
 
-        tt.test("one", function (tt) {
-            tt.test("inner", function () {})
-            tt.test("other", function (tt) { tt.fail() })
+        tt.test("one", tt => {
+            tt.test("inner", () => {})
+            tt.test("other", tt => tt.fail())
         })
 
-        tt.test("two", function (tt) {
-            tt.test("inner", function (tt) { tt.fail() })
-            tt.test("other", function (tt) { tt.fail() })
+        tt.test("two", tt => {
+            tt.test("inner", tt => tt.fail())
+            tt.test("other", tt => tt.fail())
         })
 
-        tt.run().then(function () {
+        return tt.run().then(() => {
             t.deepEqual(ret, [
                 n("start", []),
                 n("start", [p("one", 0)]),
@@ -178,24 +174,24 @@ suite("core (selection)", function () {
         })
     })
 
-    test("only tests without callbacks", function () {
-        var tt = t.base().use(fail)
-        var ret = []
+    test("only tests without callbacks", () => {
+        const tt = t.base().use(fail)
+        const ret = []
 
-        tt.reporter(util.push(ret))
+        tt.reporter(push(ret))
         tt.only(["one", "inner"])
 
-        tt.test("one", function (tt) {
+        tt.test("one", tt => {
             tt.test("inner")
             tt.test("other").fail()
         })
 
-        tt.test("two", function (tt) {
+        tt.test("two", tt => {
             tt.test("inner").fail()
             tt.test("other").fail()
         })
 
-        tt.run().then(function () {
+        return tt.run().then(() => {
             t.deepEqual(ret, [
                 n("start", []),
                 n("start", [p("one", 0)]),
@@ -210,24 +206,24 @@ suite("core (selection)", function () {
         })
     })
 
-    test("only async tests", function () {
-        var tt = t.base().use(fail)
-        var ret = []
+    test("only async tests", () => {
+        const tt = t.base().use(fail)
+        const ret = []
 
-        tt.reporter(util.push(ret))
+        tt.reporter(push(ret))
         tt.only(["one", "inner"])
 
-        tt.test("one", function (tt) {
-            tt.async("inner", function (_, done) { done() })
-            tt.async("other", function (tt) { tt.fail() })
+        tt.test("one", tt => {
+            tt.async("inner", (_, done) => done())
+            tt.async("other", tt => tt.fail())
         })
 
-        tt.test("two", function (tt) {
-            tt.async("inner", function (tt) { tt.fail() })
-            tt.async("other", function (tt) { tt.fail() })
+        tt.test("two", tt => {
+            tt.async("inner", tt => tt.fail())
+            tt.async("other", tt => tt.fail())
         })
 
-        tt.run().then(function () {
+        return tt.run().then(() => {
             t.deepEqual(ret, [
                 n("start", []),
                 n("start", [p("one", 0)]),
@@ -242,24 +238,24 @@ suite("core (selection)", function () {
         })
     })
 
-    test("only tests as index with callbacks", function () {
-        var tt = t.base().use(fail)
-        var ret = []
+    test("only tests as index with callbacks", () => {
+        const tt = t.base().use(fail)
+        const ret = []
 
-        tt.reporter(util.push(ret))
+        tt.reporter(push(ret))
         tt.only(["one", "inner"])
 
-        tt.test("0", function (tt) {
-            tt.test("inner", function () {})
+        tt.test("0", tt => {
+            tt.test("inner", () => {})
             tt.test("other").fail()
         })
 
-        tt.test("1", function (tt) {
+        tt.test("1", tt => {
             tt.test("inner").fail()
             tt.test("other").fail()
         })
 
-        tt.run().then(function () {
+        return tt.run().then(() => {
             t.deepEqual(ret, [
                 n("start", []),
                 n("end", []),
@@ -268,24 +264,24 @@ suite("core (selection)", function () {
         })
     })
 
-    test("only tests as index index without callbacks", function () {
-        var tt = t.base().use(fail)
-        var ret = []
+    test("only tests as index index without callbacks", () => {
+        const tt = t.base().use(fail)
+        const ret = []
 
-        tt.reporter(util.push(ret))
+        tt.reporter(push(ret))
         tt.only(["one", "inner"])
 
-        tt.test("0", function (tt) {
+        tt.test("0", tt => {
             tt.test("inner")
             tt.test("other").fail()
         })
 
-        tt.test("1", function (tt) {
+        tt.test("1", tt => {
             tt.test("inner").fail()
             tt.test("other").fail()
         })
 
-        tt.run().then(function () {
+        return tt.run().then(() => {
             t.deepEqual(ret, [
                 n("start", []),
                 n("end", []),
@@ -294,24 +290,24 @@ suite("core (selection)", function () {
         })
     })
 
-    test("only async tests as index", function () {
-        var tt = t.base().use(fail)
-        var ret = []
+    test("only async tests as index", () => {
+        const tt = t.base().use(fail)
+        const ret = []
 
-        tt.reporter(util.push(ret))
+        tt.reporter(push(ret))
         tt.only(["one", "inner"])
 
-        tt.test("0", function (tt) {
-            tt.async("inner", function (_, done) { done() })
-            tt.async("other", function (tt) { tt.fail() })
+        tt.test("0", tt => {
+            tt.async("inner", (_, done) => done())
+            tt.async("other", tt => tt.fail())
         })
 
-        tt.test("1", function (tt) {
-            tt.async("inner", function (tt) { tt.fail() })
-            tt.async("other", function (tt) { tt.fail() })
+        tt.test("1", tt => {
+            tt.async("inner", tt => tt.fail())
+            tt.async("other", tt => tt.fail())
         })
 
-        tt.run().then(function () {
+        return tt.run().then(() => {
             t.deepEqual(ret, [
                 n("start", []),
                 n("end", []),
@@ -320,24 +316,24 @@ suite("core (selection)", function () {
         })
     })
 
-    test("only against regexp", function () {
-        var tt = t.base().use(fail)
-        var ret = []
+    test("only against regexp", () => {
+        const tt = t.base().use(fail)
+        const ret = []
 
-        tt.reporter(util.push(ret))
+        tt.reporter(push(ret))
         tt.only([/^one$/, "inner"])
 
-        tt.test("one", function (tt) {
-            tt.test("inner", function () {})
-            tt.test("other", function (tt) { tt.fail() })
+        tt.test("one", tt => {
+            tt.test("inner", () => {})
+            tt.test("other", tt => tt.fail())
         })
 
-        tt.test("two", function (tt) {
-            tt.test("inner", function (tt) { tt.fail() })
-            tt.test("other", function (tt) { tt.fail() })
+        tt.test("two", tt => {
+            tt.test("inner", tt => tt.fail())
+            tt.test("other", tt => tt.fail())
         })
 
-        tt.run().then(function () {
+        return tt.run().then(() => {
             t.deepEqual(ret, [
                 n("start", []),
                 n("start", [p("one", 0)]),

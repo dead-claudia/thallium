@@ -1,13 +1,11 @@
-"use strict"
+import t from "../src/index.js"
 
-var t = require("../index.js")
-
-suite("class AssertionError", function () {
-    test("exists", function () {
+suite("class AssertionError", () => {
+    test("exists", () => {
         t.function(t.AssertionError)
     })
 
-    test("is an error", function () {
+    test("is an error", () => {
         t.instanceof(new t.AssertionError("message"), Error)
     })
 })

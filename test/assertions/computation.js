@@ -1,72 +1,60 @@
-"use strict"
+import t from "../../src/index.js"
+import {fail, basic} from "../../test-util/assertions.js"
 
-var t = require("../../index.js")
-var util = require("../../test-util/assertions.js")
-var fail = util.fail
-var basic = util.basic
+suite("assertions (computation)", () => {
+    basic("t.throws()", () => {
+        t.throws(() => { throw new Error("fail") })
+        t.throws(() => { throw new TypeError("fail") }, TypeError)
+        t.throws(() => { throw new TypeError("fail") }, Error)
 
-suite("assertions (computation)", function () {
-    basic("t.throws()", function () {
-        t.throws(function () { throw new Error("fail") })
-        t.throws(function () { throw new TypeError("fail") }, TypeError)
-        t.throws(function () { throw new TypeError("fail") }, Error)
-
-        fail("throws", function () { throw new Error("fail") }, TypeError)
-        fail("throws", function () {}, Error)
-        fail("throws", function () {})
+        fail("throws", () => { throw new Error("fail") }, TypeError)
+        fail("throws", () => {}, Error)
+        fail("throws", () => {})
     })
 
-    basic("t.notThrows()", function () {
-        fail("notThrows", function () {
-            throw new Error("fail")
-        })
+    basic("t.notThrows()", () => {
+        fail("notThrows", () => { throw new Error("fail") })
+        fail("notThrows", () => { throw new TypeError("fail") }, TypeError)
+        fail("notThrows", () => { throw new TypeError("fail") }, Error)
 
-        fail("notThrows", function () {
-            throw new TypeError("fail")
-        }, TypeError)
-
-        fail("notThrows", function () {
-            throw new TypeError("fail")
-        }, Error)
-
-        t.notThrows(function () { throw new Error("fail") }, TypeError)
-        t.notThrows(function () {}, Error)
-        t.notThrows(function () {})
+        t.notThrows(() => { throw new Error("fail") }, TypeError)
+        t.notThrows(() => {}, Error)
+        t.notThrows(() => {})
     })
 
-    basic("t.throwsMatch()", function () {
-        var sentinel = new Error("sentinel")
+    basic("t.throwsMatch()", () => {
+        const sentinel = new Error("sentinel")
 
         function test() { throw sentinel }
         function not(x) { return x !== sentinel }
 
-        t.throwsMatch(test, function (e) { return e === sentinel })
+        t.throwsMatch(test, e => e === sentinel)
         t.throwsMatch(test, "sentinel")
         t.throwsMatch(test, /sent/)
 
         fail("throwsMatch", test, not)
-        fail("throwsMatch", function () {}, not)
+        fail("throwsMatch", () => {}, not)
         fail("throwsMatch", test, "nope")
         fail("throwsMatch", test, /hi/)
     })
 
-    basic("t.notThrowsMatch()", function () {
-        var sentinel = new Error("sentinel")
+    basic("t.notThrowsMatch()", () => {
+        const sentinel = new Error("sentinel")
 
         function test() { throw sentinel }
         function not(x) { return x !== sentinel }
 
-        fail("notThrowsMatch", test, function (e) { return e === sentinel })
+        fail("notThrowsMatch", test, e => e === sentinel)
         fail("notThrowsMatch", test, "sentinel")
         fail("notThrowsMatch", test, /sent/)
 
         t.notThrowsMatch(test, not)
-        t.notThrowsMatch(function () {}, not)
+        t.notThrowsMatch(() => {}, not)
         t.notThrowsMatch(test, "nope")
         t.notThrowsMatch(test, /hi/)
     })
 
-    basic("t.length()", function () {
+    basic("t.length()", () => {
         t.length([], 0)
         t.length([1, 2, 3, 4, 5], 5)
         t.length(new Array(5), 5)
@@ -79,11 +67,11 @@ suite("assertions (computation)", function () {
         fail("length", [], NaN)
         fail("length", [], -1)
 
-        t.throws(function () { t.length(null, -1) }, TypeError)
-        t.throws(function () { t.length(undefined, -1) }, TypeError)
+        t.throws(() => t.length(null, -1), TypeError)
+        t.throws(() => t.length(undefined, -1), TypeError)
     })
 
-    basic("t.notLength()", function () {
+    basic("t.notLength()", () => {
         fail("notLength", [], 0)
         fail("notLength", [1, 2, 3, 4, 5], 5)
         fail("notLength", new Array(5), 5)
@@ -97,12 +85,12 @@ suite("assertions (computation)", function () {
         t.notLength([], NaN)
         t.notLength([], -1)
 
-        t.throws(function () { t.notLength(null, -1) }, TypeError)
-        t.throws(function () { t.notLength(undefined, -1) }, TypeError)
+        t.throws(() => t.notLength(null, -1), TypeError)
+        t.throws(() => t.notLength(undefined, -1), TypeError)
     })
 
-    suite("t.lengthAtLeast()", function () {
-        test("works", function () {
+    suite("t.lengthAtLeast()", () => {
+        test("works", () => {
             t.lengthAtLeast([], 0)
             t.lengthAtLeast([1], 0)
             t.lengthAtLeast([1], 1)
@@ -124,7 +112,7 @@ suite("assertions (computation)", function () {
             fail("lengthAtLeast", {length: 3}, 10)
         })
 
-        test("works with Infinities", function () {
+        test("works with Infinities", () => {
             t.lengthAtLeast([], -Infinity)
             t.lengthAtLeast({length: -Infinity}, -Infinity)
             t.lengthAtLeast({length: Infinity}, -Infinity)
@@ -132,7 +120,7 @@ suite("assertions (computation)", function () {
             t.lengthAtLeast({length: Infinity}, Infinity)
         })
 
-        test("fails with NaNs", function () {
+        test("fails with NaNs", () => {
             fail("lengthAtLeast", [], NaN)
             fail("lengthAtLeast", [1], NaN)
             fail("lengthAtLeast", {length: Infinity}, NaN)
@@ -145,8 +133,8 @@ suite("assertions (computation)", function () {
         })
     })
 
-    suite("t.lengthAtMost()", function () {
-        test("works", function () {
+    suite("t.lengthAtMost()", () => {
+        test("works", () => {
             t.lengthAtMost([], 0)
             fail("lengthAtMost", [1], 0)
             t.lengthAtMost([1], 1)
@@ -168,7 +156,7 @@ suite("assertions (computation)", function () {
             t.lengthAtMost({length: 3}, 10)
         })
 
-        test("works with Infinities", function () {
+        test("works with Infinities", () => {
             fail("lengthAtMost", [], -Infinity)
             t.lengthAtMost({length: -Infinity}, -Infinity)
             fail("lengthAtMost", {length: Infinity}, -Infinity)
@@ -176,7 +164,7 @@ suite("assertions (computation)", function () {
             t.lengthAtMost({length: Infinity}, Infinity)
         })
 
-        test("fails with NaNs", function () {
+        test("fails with NaNs", () => {
             fail("lengthAtMost", [], NaN)
             fail("lengthAtMost", [1], NaN)
             fail("lengthAtMost", {length: Infinity}, NaN)
@@ -189,8 +177,8 @@ suite("assertions (computation)", function () {
         })
     })
 
-    suite("t.lengthAbove()", function () {
-        test("works", function () {
+    suite("t.lengthAbove()", () => {
+        test("works", () => {
             fail("lengthAbove", [], 0)
             t.lengthAbove([1], 0)
             fail("lengthAbove", [1], 1)
@@ -212,7 +200,7 @@ suite("assertions (computation)", function () {
             fail("lengthAbove", {length: 3}, 10)
         })
 
-        test("works with Infinities", function () {
+        test("works with Infinities", () => {
             t.lengthAbove([], -Infinity)
             fail("lengthAbove", {length: -Infinity}, -Infinity)
             t.lengthAbove({length: Infinity}, -Infinity)
@@ -220,7 +208,7 @@ suite("assertions (computation)", function () {
             fail("lengthAbove", {length: Infinity}, Infinity)
         })
 
-        test("fails with NaNs", function () {
+        test("fails with NaNs", () => {
             fail("lengthAbove", [], NaN)
             fail("lengthAbove", [1], NaN)
             fail("lengthAbove", {length: Infinity}, NaN)
@@ -233,8 +221,8 @@ suite("assertions (computation)", function () {
         })
     })
 
-    suite("t.lengthBelow()", function () {
-        test("works", function () {
+    suite("t.lengthBelow()", () => {
+        test("works", () => {
             fail("lengthBelow", [], 0)
             fail("lengthBelow", [1], 0)
             fail("lengthBelow", [1], 1)
@@ -256,7 +244,7 @@ suite("assertions (computation)", function () {
             t.lengthBelow({length: 3}, 10)
         })
 
-        test("works with Infinities", function () {
+        test("works with Infinities", () => {
             fail("lengthBelow", [], -Infinity)
             fail("lengthBelow", {length: -Infinity}, -Infinity)
             fail("lengthBelow", {length: Infinity}, -Infinity)
@@ -264,7 +252,7 @@ suite("assertions (computation)", function () {
             fail("lengthBelow", {length: Infinity}, Infinity)
         })
 
-        test("fails with NaNs", function () {
+        test("fails with NaNs", () => {
             fail("lengthBelow", [], NaN)
             fail("lengthBelow", [1], NaN)
             fail("lengthBelow", {length: Infinity}, NaN)
@@ -277,8 +265,8 @@ suite("assertions (computation)", function () {
         })
     })
 
-    suite("t.closeTo()", function () {
-        test("works", function () {
+    suite("t.closeTo()", () => {
+        test("works", () => {
             t.closeTo(0, 0, 0)
             t.closeTo(0, 0, -0)
 
@@ -299,7 +287,7 @@ suite("assertions (computation)", function () {
             fail("closeTo", 1, 0, 0.5)
         })
 
-        test("works with Infinities", function () {
+        test("works with Infinities", () => {
             t.closeTo(0, 0, Infinity)
             t.closeTo(100, 0, Infinity)
             t.closeTo(Infinity, -Infinity, Infinity)
@@ -309,7 +297,7 @@ suite("assertions (computation)", function () {
             t.closeTo(Infinity, -Infinity, -Infinity)
         })
 
-        test("fails with NaNs", function () {
+        test("fails with NaNs", () => {
             fail("closeTo", NaN, 0, 0)
             fail("closeTo", NaN, 0, Infinity)
             fail("closeTo", NaN, Infinity, Infinity)
@@ -336,8 +324,8 @@ suite("assertions (computation)", function () {
         })
     })
 
-    suite("t.notCloseTo()", function () {
-        test("works", function () {
+    suite("t.notCloseTo()", () => {
+        test("works", () => {
             fail("notCloseTo", 0, 0, 0)
             fail("notCloseTo", 0, 0, -0)
 
@@ -358,7 +346,7 @@ suite("assertions (computation)", function () {
             t.notCloseTo(1, 0, 0.5)
         })
 
-        test("works with Infinities", function () {
+        test("works with Infinities", () => {
             fail("notCloseTo", 0, 0, Infinity)
             fail("notCloseTo", 100, 0, Infinity)
             fail("notCloseTo", Infinity, -Infinity, Infinity)
@@ -368,7 +356,7 @@ suite("assertions (computation)", function () {
             fail("notCloseTo", Infinity, -Infinity, -Infinity)
         })
 
-        test("fails with NaNs", function () {
+        test("fails with NaNs", () => {
             fail("notCloseTo", NaN, 0, 0)
             fail("notCloseTo", NaN, 0, Infinity)
             fail("notCloseTo", NaN, Infinity, Infinity)

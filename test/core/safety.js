@@ -1,145 +1,102 @@
-"use strict"
+import t from "../../src/index.js"
+import {p, n, push} from "../../test-util/base.js"
 
-var t = require("../../index.js")
-var util = require("../../test-util/base.js")
-var p = util.p
-var n = util.n
+suite("core (safety)", () => {
+    test("disallows non-nullish non-functions as `test` impls", () => {
+        const tt = t.base()
 
-suite("core (safety)", function () {
-    test("disallows non-nullish non-functions as `test` impls", function () {
-        var tt = t.base()
-
-        t.throws(function () { tt.test("test", 1) }, TypeError)
-        t.throws(function () { tt.test("test", 0) }, TypeError)
-        t.throws(function () { tt.test("test", true) }, TypeError)
-        t.throws(function () { tt.test("test", false) }, TypeError)
-        t.throws(function () { tt.test("test", "hi") }, TypeError)
-        t.throws(function () { tt.test("test", "") }, TypeError)
-        t.throws(function () { tt.test("test", []) }, TypeError)
-        t.throws(function () { tt.test("test", [1, 2, 3, 4, 5]) }, TypeError)
-        t.throws(function () { tt.test("test", {hello: "world"}) }, TypeError)
-        t.throws(function () { tt.test("test", {}) }, TypeError)
-
-        t.throws(function () {
-            tt.test("test", {valueOf: function () { return false }})
-        }, TypeError)
-
-        t.throws(function () {
-            tt.test("test", {valueOf: function () { return undefined }})
-        }, TypeError)
+        t.throws(() => tt.test("test", 1), TypeError)
+        t.throws(() => tt.test("test", 0), TypeError)
+        t.throws(() => tt.test("test", true), TypeError)
+        t.throws(() => tt.test("test", false), TypeError)
+        t.throws(() => tt.test("test", "hi"), TypeError)
+        t.throws(() => tt.test("test", ""), TypeError)
+        t.throws(() => tt.test("test", []), TypeError)
+        t.throws(() => tt.test("test", [1, 2, 3, 4, 5]), TypeError)
+        t.throws(() => tt.test("test", {hello: "world"}), TypeError)
+        t.throws(() => tt.test("test", {}), TypeError)
+        t.throws(() => tt.test("test", {valueOf() { return false }}), TypeError)
+        t.throws(() => tt.test("test", {valueOf() { return undefined }}), TypeError) // eslint-disable-line max-len
 
         tt.test("test")
         tt.test("test", undefined)
         tt.test("test", null)
-        tt.test("test", function () {})
+        tt.test("test", () => {})
 
         /* eslint-disable no-unused-vars */
 
-        tt.test("test", function (t) {})
-
-        // it also ignores too many arguments
-        tt.test("test", function (t, done) {})
+        tt.test("test", t => {})
+        tt.test("test", (t, done) => {}) // too many arguments
 
         /* eslint-enable no-unused-vars */
 
-        tt.test("test", function () {
-            return {next: function () { return {done: true} }}
-        })
+        tt.test("test", () => ({next() { return {done: true} }}))
     })
 
-    test("disallows non-functions as `async` impls", function () {
-        var tt = t.base()
+    test("disallows non-functions as `async` impls", () => {
+        const tt = t.base()
 
-        t.throws(function () { tt.async("test", 1) }, TypeError)
-        t.throws(function () { tt.async("test", 0) }, TypeError)
-        t.throws(function () { tt.async("test", true) }, TypeError)
-        t.throws(function () { tt.async("test", false) }, TypeError)
-        t.throws(function () { tt.async("test", "hi") }, TypeError)
-        t.throws(function () { tt.async("test", "") }, TypeError)
-        t.throws(function () { tt.async("test", []) }, TypeError)
-        t.throws(function () { tt.async("test", [1, 2, 3, 4, 5]) }, TypeError)
-        t.throws(function () { tt.async("test", {hello: "world"}) }, TypeError)
-        t.throws(function () { tt.async("test", {}) }, TypeError)
+        t.throws(() => tt.async("test", 1), TypeError)
+        t.throws(() => tt.async("test", 0), TypeError)
+        t.throws(() => tt.async("test", true), TypeError)
+        t.throws(() => tt.async("test", false), TypeError)
+        t.throws(() => tt.async("test", "hi"), TypeError)
+        t.throws(() => tt.async("test", ""), TypeError)
+        t.throws(() => tt.async("test", []), TypeError)
+        t.throws(() => tt.async("test", [1, 2, 3, 4, 5]), TypeError)
+        t.throws(() => tt.async("test", {hello: "world"}), TypeError)
+        t.throws(() => tt.async("test", {}), TypeError)
+        t.throws(() => tt.async("test", {valueOf() { return false }}), TypeError) // eslint-disable-line max-len
+        t.throws(() => tt.async("test", {valueOf() { return undefined }}), TypeError) // eslint-disable-line max-len
+        t.throws(() => tt.async("test"), TypeError)
+        t.throws(() => tt.async("test", undefined), TypeError)
+        t.throws(() => tt.async("test", null), TypeError)
 
-        t.throws(function () {
-            tt.async("test", {valueOf: function () { return false }})
-        }, TypeError)
-
-        t.throws(function () {
-            tt.async("test", {valueOf: function () { return undefined }})
-        }, TypeError)
-
-        t.throws(function () { tt.async("test") }, TypeError)
-        t.throws(function () { tt.async("test", undefined) }, TypeError)
-        t.throws(function () { tt.async("test", null) }, TypeError)
-
-        tt.async("test", function () {})
+        tt.async("test", () => {})
 
         /* eslint-disable no-unused-vars */
 
-        tt.async("test", function (t) {})
-        tt.async("test", function (t, done) {})
-
-        // it also ignores too many arguments
-        tt.async("test", function (t, done, wtf) {})
+        tt.async("test", t => {})
+        tt.async("test", (t, done) => {})
+        tt.async("test", (t, done, wtf) => {}) // too many arguments
 
         /* eslint-enable no-unused-vars */
 
-        tt.async("test", function () {
-            return {next: function () { return {done: true} }}
-        })
+        tt.async("test", () => ({next() { return {done: true} }}))
     })
 
-    test("catches unsafe access", function () {
-        var tt = t.base()
-        var ret = []
+    test("catches unsafe access", () => {
+        const tt = t.base()
+        const ret = []
 
-        tt.reporter(util.push(ret))
+        tt.reporter(push(ret))
 
-        var error = new ReferenceError(
+        const error = new ReferenceError(
             "It is only safe to call test methods during initialization")
 
         function plugin() {}
 
-        tt.test("one", function () {
-            tt.test("hi")
+        tt.test("one", () => tt.test("hi"))
+        tt.test("two", () => tt.define("hi", () => {}))
+        tt.define("assert", () => ({test: true}))
+        tt.test("three", () => tt.assert())
+        tt.test("four", () => tt.use(plugin))
+
+        tt.test("five", tt => {
+            tt.test("inner", () => tt.use(plugin))
         })
 
-        tt.test("two", function () {
-            tt.define("hi", function () {})
+        tt.test("six", tt => {
+            tt.test("inner", () => tt.use(plugin))
         })
 
-        tt.define("assert", function () { return {test: true} })
+        tt.test("seven", () => tt.add("inner", () => {}))
 
-        tt.test("three", function () {
-            tt.assert()
+        tt.test("eight", () => {
+            tt.wrap("test", func => func())
         })
 
-        tt.test("four", function () {
-            tt.use(plugin)
-        })
-
-        tt.test("five", function (tt) {
-            tt.test("inner", function () {
-                tt.use(plugin)
-            })
-        })
-
-        tt.test("six", function (tt) {
-            tt.test("inner", function () {
-                tt.use(plugin)
-            })
-        })
-
-        tt.test("seven", function () {
-            tt.add("inner", function () {})
-        })
-
-        tt.test("eight", function () {
-            tt.wrap("test", function (func) { return func() })
-        })
-
-        tt.run().then(function () {
+        return tt.run().then(() => {
             t.deepEqual(ret, [
                 n("start", []),
                 n("start", [p("one", 0)]),
@@ -178,19 +135,19 @@ suite("core (safety)", function () {
         })
     })
 
-    test("reports extraneous async done", function () {
-        var tt = t.base()
-        var ret = []
+    test("reports extraneous async done", () => {
+        const tt = t.base()
+        const ret = []
 
-        var sentinel = new Error("true")
+        const sentinel = new Error("true")
 
-        sentinel.marker = function () {}
+        sentinel.marker = () => {}
 
-        tt.reporter(util.push(ret))
+        tt.reporter(push(ret))
 
-        tt.test("test", function (tt) {
-            tt.test("inner", function (tt) {
-                tt.async("fail", function (tt, done) {
+        tt.test("test", tt => {
+            tt.test("inner", tt => {
+                tt.async("fail", (tt, done) => {
                     /* eslint-disable callback-return */
 
                     done()
@@ -202,17 +159,17 @@ suite("core (safety)", function () {
             })
         })
 
-        tt.run().then(function () {
-            t.includesDeepAny([4, 5, 6, 7, 8, 9, 10, 11, 12].map(function (i) {
-                var splice1 = n("extra",
+        return tt.run().then(() => {
+            t.includesDeepAny([4, 5, 6, 7, 8, 9, 10, 11, 12].map(i => {
+                const splice1 = n("extra",
                     [p("test", 0), p("inner", 0), p("fail", 0)],
                     {count: 2, value: undefined})
 
-                var splice2 = n("extra",
+                const splice2 = n("extra",
                     [p("test", 0), p("inner", 0), p("fail", 0)],
                     {count: 3, value: sentinel})
 
-                var nodes = [
+                const nodes = [
                     n("start", []),
                     n("start", [p("test", 0)]),
                     n("start", [p("test", 0), p("inner", 0)]),
@@ -234,40 +191,37 @@ suite("core (safety)", function () {
         })
     })
 
-    test("catches concurrent runs", function () {
-        var tt = t.base()
+    test("catches concurrent runs", () => {
+        const tt = t.base()
 
-        tt.reporter(function (_, done) { done() })
-        var res = tt.run()
+        tt.reporter((_, done) => done())
+        const res = tt.run()
 
-        t.throws(function () { tt.run() }, Error)
+        t.throws(() => tt.run(), Error)
 
         return res
     })
 
-    test("catches concurrent runs when given a callback", function (done) {
-        var tt = t.base()
+    test("catches concurrent runs when given a callback", done => {
+        const tt = t.base()
 
-        tt.reporter(function (_, done) { done() })
+        tt.reporter((_, done) => done())
         tt.run(done)
-        t.throws(function () { tt.run() }, Error)
+        t.throws(() => tt.run(), Error)
     })
 
-    test("allows non-concurrent runs with reporter error", function () {
-        var tt = t.base()
-        var sentinel = new Error("fail")
+    test("allows non-concurrent runs with reporter error", () => {
+        const tt = t.base()
+        const sentinel = new Error("fail")
 
-        tt.reporter(function (_, done) { done(sentinel) })
+        tt.reporter((_, done) => done(sentinel))
 
-        tt.run()
-        .then(
-            function () { t.fail("Expected a rejection") },
-            function (err) { t.equal(err, sentinel) })
-        .then(function () {
-            tt.run()
-            .then(
-                function () { t.fail("Expected a rejection") },
-                function (err) { t.equal(err, sentinel) })
-        })
+        return tt.run().then(
+            () => t.fail("Expected a rejection"),
+            err => t.equal(err, sentinel))
+        .then(() =>
+            tt.run().then(
+                () => t.fail("Expected a rejection"),
+                err => t.equal(err, sentinel)))
     })
 })

@@ -1,25 +1,21 @@
-"use strict"
-
 /* global setTimeout */
 
-var t = require("../../index.js")
-var util = require("../../test-util/base.js")
-var p = util.p
-var n = util.n
+import t from "../../src/index.js"
+import {n, p, push} from "../../test-util/base.js"
 
-suite("core (timeouts)", function () {
-    test("succeeds with own", function () {
-        var tt = t.base()
-        var ret = []
+suite("core (timeouts)", () => {
+    test("succeeds with own", () => {
+        const tt = t.base()
+        const ret = []
 
-        tt.reporter(util.push(ret))
+        tt.reporter(push(ret))
 
-        tt.async("test", function (tt, done) {
+        tt.async("test", (tt, done) => {
             tt.timeout(10)
             done()
         })
 
-        tt.run().then(function () {
+        return tt.run().then(() => {
             t.deepEqual(ret, [
                 n("start", []),
                 n("start", [p("test", 0)]),
@@ -31,20 +27,20 @@ suite("core (timeouts)", function () {
         })
     })
 
-    test("fails with own", function () {
-        var tt = t.base()
-        var ret = []
+    test("fails with own", () => {
+        const tt = t.base()
+        const ret = []
 
-        tt.reporter(util.push(ret))
+        tt.reporter(push(ret))
 
-        tt.async("test", function (tt, done) {
+        tt.async("test", (tt, done) => {
             tt.timeout(50)
             // It's highly unlikely the engine will take this long to
             // finish.
-            setTimeout(function () { done() }, 200)
+            setTimeout(() => done(), 200)
         })
 
-        tt.run().then(function () {
+        return tt.run().then(() => {
             t.deepEqual(ret, [
                 n("start", []),
                 n("start", [p("test", 0)]),
@@ -56,17 +52,17 @@ suite("core (timeouts)", function () {
         })
     })
 
-    test("succeeds with inherited", function () {
-        var tt = t.base()
-        var ret = []
+    test("succeeds with inherited", () => {
+        const tt = t.base()
+        const ret = []
 
-        tt.reporter(util.push(ret))
+        tt.reporter(push(ret))
 
         tt.test("test")
         .timeout(50)
-        .async("inner", function (tt, done) { done() })
+        .async("inner", (tt, done) => done())
 
-        tt.run().then(function () {
+        return tt.run().then(() => {
             t.deepEqual(ret, [
                 n("start", []),
                 n("start", [p("test", 0)]),
@@ -81,21 +77,21 @@ suite("core (timeouts)", function () {
         })
     })
 
-    test("fails with inherited", function () {
-        var tt = t.base()
-        var ret = []
+    test("fails with inherited", () => {
+        const tt = t.base()
+        const ret = []
 
-        tt.reporter(util.push(ret))
+        tt.reporter(push(ret))
 
         tt.test("test")
         .timeout(50)
-        .async("inner", function (tt, done) {
+        .async("inner", (tt, done) => {
             // It's highly unlikely the engine will take this long to
             // finish.
-            setTimeout(function () { done() }, 200)
+            setTimeout(() => done(), 200)
         })
 
-        tt.run().then(function () {
+        return tt.run().then(() => {
             t.deepEqual(ret, [
                 n("start", []),
                 n("start", [p("test", 0)]),
@@ -111,55 +107,45 @@ suite("core (timeouts)", function () {
         })
     })
 
-    test("gets own set timeout", function () {
-        var tt = t.base()
-        var timeout
+    test("gets own set timeout", () => {
+        const tt = t.base()
+        let timeout
 
-        tt.test("test", function (tt) {
+        tt.test("test", tt => {
             tt.timeout(50)
             timeout = tt.timeout()
         })
 
-        tt.run().then(function () {
-            t.equal(timeout, 50)
-        })
+        return tt.run().then(() => t.equal(timeout, 50))
     })
 
-    test("gets own set timeout", function () {
-        var tt = t.base()
-        var timeout
+    test("gets own set timeout", () => {
+        const tt = t.base()
+        let timeout
 
         tt.test("test")
         .timeout(50)
-        .test("inner", function (tt) { timeout = tt.timeout() })
+        .test("inner", tt => { timeout = tt.timeout() })
 
-        tt.run().then(function () {
-            t.equal(timeout, 50)
-        })
+        return tt.run().then(() => t.equal(timeout, 50))
     })
 
-    test("gets own sync inner timeout", function () {
-        var tt = t.base()
+    test("gets own sync inner timeout", () => {
+        const tt = t.base()
 
-        var timeout = tt.test("test")
+        const timeout = tt.test("test")
         .timeout(50)
         .test("inner").timeout()
 
-        tt.run().then(function () {
-            t.equal(timeout, 50)
-        })
+        return tt.run().then(() => t.equal(timeout, 50))
     })
 
-    test("gets default timeout", function () {
-        var tt = t.base()
-        var timeout
+    test("gets default timeout", () => {
+        const tt = t.base()
+        let timeout
 
-        tt.test("test", function (tt) {
-            timeout = tt.timeout()
-        })
+        tt.test("test", tt => { timeout = tt.timeout() })
 
-        tt.run().then(function () {
-            t.equal(timeout, 2000)
-        })
+        return tt.run().then(() => t.equal(timeout, 2000))
     })
 })

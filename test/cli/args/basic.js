@@ -1,35 +1,33 @@
-"use strict"
+import * as path from "path"
 
-var t = require("../../../index.js")
-var parseArgs = require("../../../lib/cli/parse-args.js")
-var path = require("path")
+import t from "../../../src/index.js"
+import parseArgs from "../../../src/cli/parse-args.js"
 
 // Pull it out to safely wrap.
-var test1 = test
+const test1 = test
 
-suite("cli arguments (basic)", function () { // eslint-disable-line max-statements, max-len
-    // Mostly for consistency
-    var cwd = "base"
-    var config = path.join("test", ".techtonic")
-    var testDir = path.join("test", "**")
+suite("cli arguments (basic)", () => { // eslint-disable-line max-statements
+    const defaultCwd = "base"
+    const defaultConfig = path.join("test", ".techtonic")
+    const testDir = path.join("test", "**")
 
     function set(set, value) {
-        return {set: set, value: value}
+        return {set, value}
     }
 
-    function test(description, str, result) {
+    function test(description, str, {
+        config = set(false, defaultConfig),
+        module = set(false, null),
+        cwd = set(false, defaultCwd),
+        register = set(false, []),
+        files = set(false, [testDir]),
+        reporter = set(false, []),
+        help = null,
+    } = {}) {
         str = str.trim()
-        test1(description, function () {
-            t.deepEqual(parseArgs(cwd, str ? str.split(/\s+/g) : []), {
-                config: result.config || set(false, config),
-                module: result.module || set(false, null),
-
-                cwd: result.cwd || set(false, cwd),
-                register: result.register || set(false, []),
-                files: result.files || set(false, [testDir]),
-                reporter: result.reporter || set(false, []),
-
-                help: result.help || null,
+        test1(description, () => {
+            t.deepEqual(parseArgs(defaultCwd, str ? str.split(/\s+/g) : []), {
+                config, module, cwd, register, files, reporter, help,
             })
         })
     }
@@ -86,25 +84,25 @@ suite("cli arguments (basic)", function () { // eslint-disable-line max-statemen
         "-R foo",
         {reporter: set(true, ["foo"])})
 
-    var my = path.join("my-test", "**", "*.js")
-    var other = path.join("other-test", "**", "*.js")
+    const my = path.join("my-test", "**", "*.js")
+    const other = path.join("other-test", "**", "*.js")
 
     test("works with file arguments",
-        my + " " + other,
+        `${my} ${other}`,
         {
             config: set(false, path.join("my-test", ".techtonic")),
             files: set(true, [my, other]),
         })
 
     test("works with rest files with invalid options",
-        my + " -- --weird-file.js",
+        `${my} -- --weird-file.js`,
         {
             config: set(false, path.join("my-test", ".techtonic")),
             files: set(true, [my, "--weird-file.js"]),
         })
 
     test("works with rest files with valid options",
-        my + " -- --module",
+        `${my} -- --module`,
         {
             config: set(false, path.join("my-test", ".techtonic")),
             files: set(true, [my, "--module"]),

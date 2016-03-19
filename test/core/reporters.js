@@ -1,38 +1,28 @@
-"use strict"
+import t from "../../src/index.js"
+import {n, p, push} from "../../test-util/base.js"
+import assertions from "../../src/assertions.js"
+import global from "../../src/global.js"
 
-var t = require("../../index.js")
-var util = require("../../test-util/base.js")
-var assertions = require("../../assertions.js")
-var p = util.p
-var n = util.n
-
-suite("core (reporters)", function () { // eslint-disable-line max-statements
+suite("core (reporters)", () => { // eslint-disable-line max-statements
+    // Use thenables, not actual Promises.
     function resolve(value) {
-        return {
-            then: function (resolve) {
-                resolve(value)
-            },
-        }
+        return {then(resolve) { resolve(value) }}
     }
 
     function reject(value) {
-        return {
-            then: function (resolve, reject) {
-                reject(value)
-            },
-        }
+        return {then(resolve, reject) { reject(value) }}
     }
 
-    test("added individually correctly", function () {
-        var tt = t.base()
+    test("added individually correctly", () => {
+        const tt = t.base()
 
         function plugin() {}
         tt.reporter(plugin)
         t.deepEqual(tt.reporters(), [plugin])
     })
 
-    test("added in batches correctly", function () {
-        var tt = t.base()
+    test("added in batches correctly", () => {
+        const tt = t.base()
 
         function plugin1() {}
         function plugin2() {}
@@ -45,8 +35,8 @@ suite("core (reporters)", function () { // eslint-disable-line max-statements
         ])
     })
 
-    test("added on children correctly", function () {
-        var tt = t.base()
+    test("added on children correctly", () => {
+        const tt = t.base()
 
         function plugin1() {}
         function plugin2() {}
@@ -57,7 +47,7 @@ suite("core (reporters)", function () { // eslint-disable-line max-statements
 
         tt.reporter(plugin6)
 
-        var ttt = tt.test("test")
+        const ttt = tt.test("test")
         .reporter([plugin1, plugin2, [[plugin3], plugin4], [[[plugin5]]]])
 
         t.deepEqual(ttt.reporters(), [
@@ -67,8 +57,8 @@ suite("core (reporters)", function () { // eslint-disable-line max-statements
         t.deepEqual(tt.reporters(), [plugin6])
     })
 
-    test("read on children correctly", function () {
-        var tt = t.base()
+    test("read on children correctly", () => {
+        const tt = t.base()
 
         function plugin1() {}
         function plugin2() {}
@@ -77,15 +67,15 @@ suite("core (reporters)", function () { // eslint-disable-line max-statements
         function plugin5() {}
 
         tt.reporter([plugin1, plugin2, [[plugin3], plugin4], [[[plugin5]]]])
-        var ttt = tt.test("test")
+        const ttt = tt.test("test")
 
         t.deepEqual(ttt.reporters(), [
             plugin1, plugin2, plugin3, plugin4, plugin5,
         ])
     })
 
-    test("only added once", function () {
-        var tt = t.base()
+    test("only added once", () => {
+        const tt = t.base()
 
         function plugin1() {}
         function plugin2() {}
@@ -99,16 +89,16 @@ suite("core (reporters)", function () { // eslint-disable-line max-statements
         ])
     })
 
-    test("called correctly with sync passing", function () {
-        var tt = t.base()
-        var ret = []
+    test("called correctly with sync passing", () => {
+        const tt = t.base()
+        const ret = []
 
-        tt.reporter(util.push(ret))
+        tt.reporter(push(ret))
 
-        tt.test("test", function () {})
-        tt.test("test", function () {})
+        tt.test("test", () => {})
+        tt.test("test", () => {})
 
-        tt.run().then(function () {
+        return tt.run().then(() => {
             t.deepEqual(ret, [
                 n("start", []),
                 n("start", [p("test", 0)]),
@@ -123,19 +113,19 @@ suite("core (reporters)", function () { // eslint-disable-line max-statements
         })
     })
 
-    test("called correctly with sync failing", function () {
-        var tt = t.base()
-        var ret = []
-        var sentinel = new Error("sentinel")
+    test("called correctly with sync failing", () => {
+        const tt = t.base()
+        const ret = []
+        const sentinel = new Error("sentinel")
 
-        sentinel.marker = function () {}
+        sentinel.marker = () => {}
 
-        tt.reporter(util.push(ret))
+        tt.reporter(push(ret))
 
-        tt.test("one", function () { throw sentinel })
-        tt.test("two", function () { throw sentinel })
+        tt.test("one", () => { throw sentinel })
+        tt.test("two", () => { throw sentinel })
 
-        tt.run().then(function () {
+        return tt.run().then(() => {
             t.deepEqual(ret, [
                 n("start", []),
                 n("start", [p("one", 0)]),
@@ -150,19 +140,19 @@ suite("core (reporters)", function () { // eslint-disable-line max-statements
         })
     })
 
-    test("called correctly with sync both", function () {
-        var tt = t.base()
-        var ret = []
-        var sentinel = new Error("sentinel")
+    test("called correctly with sync both", () => {
+        const tt = t.base()
+        const ret = []
+        const sentinel = new Error("sentinel")
 
-        sentinel.marker = function () {}
+        sentinel.marker = () => {}
 
-        tt.reporter(util.push(ret))
+        tt.reporter(push(ret))
 
-        tt.test("one", function () { throw sentinel })
-        tt.test("two", function () {})
+        tt.test("one", () => { throw sentinel })
+        tt.test("two", () => {})
 
-        tt.run().then(function () {
+        return tt.run().then(() => {
             t.deepEqual(ret, [
                 n("start", []),
                 n("start", [p("one", 0)]),
@@ -177,16 +167,16 @@ suite("core (reporters)", function () { // eslint-disable-line max-statements
         })
     })
 
-    test("called correctly with inline passing", function () {
-        var tt = t.base()
-        var ret = []
+    test("called correctly with inline passing", () => {
+        const tt = t.base()
+        const ret = []
 
-        tt.reporter(util.push(ret))
+        tt.reporter(push(ret))
 
         tt.test("test")
         tt.test("test")
 
-        tt.run().then(function () {
+        return tt.run().then(() => {
             t.deepEqual(ret, [
                 n("start", []),
                 n("start", [p("test", 0)]),
@@ -201,18 +191,18 @@ suite("core (reporters)", function () { // eslint-disable-line max-statements
         })
     })
 
-    test("called correctly with inline failing", function () {
-        var tt = t.base()
-        var ret = []
+    test("called correctly with inline failing", () => {
+        const tt = t.base()
+        const ret = []
 
-        tt.reporter(util.push(ret))
+        tt.reporter(push(ret))
 
-        tt.define("fail", function () { return {test: false, message: "fail"} })
+        tt.define("fail", () => ({test: false, message: "fail"}))
 
         tt.test("one").fail()
         tt.test("two").fail()
 
-        tt.run().then(function () {
+        return tt.run().then(() => {
             t.deepEqual(ret, [
                 n("start", []),
                 n("start", [p("one", 0)]),
@@ -227,18 +217,18 @@ suite("core (reporters)", function () { // eslint-disable-line max-statements
         })
     })
 
-    test("called correctly with inline both", function () {
-        var tt = t.base()
-        var ret = []
+    test("called correctly with inline both", () => {
+        const tt = t.base()
+        const ret = []
 
-        tt.reporter(util.push(ret))
+        tt.reporter(push(ret))
 
-        tt.define("fail", function () { return {test: false, message: "fail"} })
+        tt.define("fail", () => ({test: false, message: "fail"}))
 
         tt.test("one").fail()
-        tt.test("two", function () {})
+        tt.test("two", () => {})
 
-        tt.run().then(function () {
+        return tt.run().then(() => {
             t.deepEqual(ret, [
                 n("start", []),
                 n("start", [p("one", 0)]),
@@ -253,16 +243,16 @@ suite("core (reporters)", function () { // eslint-disable-line max-statements
         })
     })
 
-    test("called correctly with async passing", function () {
-        var tt = t.base()
-        var ret = []
+    test("called correctly with async passing", () => {
+        const tt = t.base()
+        const ret = []
 
-        tt.reporter(util.push(ret))
+        tt.reporter(push(ret))
 
-        tt.async("test", function (t, done) { done() })
-        tt.test("test", function () {})
+        tt.async("test", (t, done) => { done() })
+        tt.test("test", () => {})
 
-        tt.run().then(function () {
+        return tt.run().then(() => {
             t.deepEqual(ret, [
                 n("start", []),
                 n("start", [p("test", 0)]),
@@ -277,19 +267,19 @@ suite("core (reporters)", function () { // eslint-disable-line max-statements
         })
     })
 
-    test("called correctly with async failing", function () {
-        var tt = t.base()
-        var ret = []
-        var sentinel = new Error("sentinel")
+    test("called correctly with async failing", () => {
+        const tt = t.base()
+        const ret = []
+        const sentinel = new Error("sentinel")
 
-        sentinel.marker = function () {}
+        sentinel.marker = () => {}
 
-        tt.reporter(util.push(ret))
+        tt.reporter(push(ret))
 
-        tt.async("one", function (t, done) { done(sentinel) })
-        tt.test("two", function () { throw sentinel })
+        tt.async("one", (t, done) => { done(sentinel) })
+        tt.test("two", () => { throw sentinel })
 
-        tt.run().then(function () {
+        return tt.run().then(() => {
             t.deepEqual(ret, [
                 n("start", []),
                 n("start", [p("one", 0)]),
@@ -304,19 +294,19 @@ suite("core (reporters)", function () { // eslint-disable-line max-statements
         })
     })
 
-    test("called correctly with async both", function () {
-        var tt = t.base()
-        var ret = []
-        var sentinel = new Error("sentinel")
+    test("called correctly with async both", () => {
+        const tt = t.base()
+        const ret = []
+        const sentinel = new Error("sentinel")
 
-        sentinel.marker = function () {}
+        sentinel.marker = () => {}
 
-        tt.reporter(util.push(ret))
+        tt.reporter(push(ret))
 
-        tt.async("one", function (t, done) { done(sentinel) })
-        tt.async("two", function (t, done) { done() })
+        tt.async("one", (t, done) => { done(sentinel) })
+        tt.async("two", (t, done) => { done() })
 
-        tt.run().then(function () {
+        return tt.run().then(() => {
             t.deepEqual(ret, [
                 n("start", []),
                 n("start", [p("one", 0)]),
@@ -331,16 +321,16 @@ suite("core (reporters)", function () { // eslint-disable-line max-statements
         })
     })
 
-    test("called correctly with async + promise passing", function () {
-        var tt = t.base()
-        var ret = []
+    test("called correctly with async + promise passing", () => {
+        const tt = t.base()
+        const ret = []
 
-        tt.reporter(util.push(ret))
+        tt.reporter(push(ret))
 
-        tt.async("test", function () { return resolve() })
-        tt.test("test", function () {})
+        tt.async("test", () => resolve())
+        tt.test("test", () => {})
 
-        tt.run().then(function () {
+        return tt.run().then(() => {
             t.deepEqual(ret, [
                 n("start", []),
                 n("start", [p("test", 0)]),
@@ -355,19 +345,19 @@ suite("core (reporters)", function () { // eslint-disable-line max-statements
         })
     })
 
-    test("called correctly with async + promise failing", function () {
-        var tt = t.base()
-        var ret = []
-        var sentinel = new Error("sentinel")
+    test("called correctly with async + promise failing", () => {
+        const tt = t.base()
+        const ret = []
+        const sentinel = new Error("sentinel")
 
-        sentinel.marker = function () {}
+        sentinel.marker = () => {}
 
-        tt.reporter(util.push(ret))
+        tt.reporter(push(ret))
 
-        tt.async("one", function () { return reject(sentinel) })
-        tt.test("two", function () { throw sentinel })
+        tt.async("one", () => reject(sentinel))
+        tt.test("two", () => { throw sentinel })
 
-        tt.run().then(function () {
+        return tt.run().then(() => {
             t.deepEqual(ret, [
                 n("start", []),
                 n("start", [p("one", 0)]),
@@ -382,19 +372,19 @@ suite("core (reporters)", function () { // eslint-disable-line max-statements
         })
     })
 
-    test("called correctly with async + promise both", function () {
-        var tt = t.base()
-        var ret = []
-        var sentinel = new Error("sentinel")
+    test("called correctly with async + promise both", () => {
+        const tt = t.base()
+        const ret = []
+        const sentinel = new Error("sentinel")
 
-        sentinel.marker = function () {}
+        sentinel.marker = () => {}
 
-        tt.reporter(util.push(ret))
+        tt.reporter(push(ret))
 
-        tt.async("one", function () { return reject(sentinel) })
-        tt.async("two", function () { return resolve() })
+        tt.async("one", () => reject(sentinel))
+        tt.async("two", () => resolve())
 
-        tt.run().then(function () {
+        return tt.run().then(() => {
             t.deepEqual(ret, [
                 n("start", []),
                 n("start", [p("one", 0)]),
@@ -409,18 +399,18 @@ suite("core (reporters)", function () { // eslint-disable-line max-statements
         })
     })
 
-    test("called correctly with child passing tests", function () {
-        var tt = t.base()
-        var ret = []
+    test("called correctly with child passing tests", () => {
+        const tt = t.base()
+        const ret = []
 
-        tt.reporter(util.push(ret))
+        tt.reporter(push(ret))
 
-        tt.test("test", function (tt) {
-            tt.test("one", function () {})
-            tt.test("two", function () {})
+        tt.test("test", tt => {
+            tt.test("one", () => {})
+            tt.test("two", () => {})
         })
 
-        tt.run().then(function () {
+        return tt.run().then(() => {
             t.deepEqual(ret, [
                 n("start", []),
                 n("start", [p("test", 0)]),
@@ -438,30 +428,30 @@ suite("core (reporters)", function () { // eslint-disable-line max-statements
         })
     })
 
-    test("called correctly with child failing tests", function () {
-        var tt = t.base()
-        var ret = []
-        var sentinel1 = new Error("sentinel one")
+    test("called correctly with child failing tests", () => {
+        const tt = t.base()
+        const ret = []
+        const sentinel1 = new Error("sentinel one")
 
-        sentinel1.marker = function () {}
+        sentinel1.marker = () => {}
 
-        var sentinel2 = new Error("sentinel two")
+        const sentinel2 = new Error("sentinel two")
 
-        sentinel2.marker = function () {}
+        sentinel2.marker = () => {}
 
-        tt.reporter(util.push(ret))
+        tt.reporter(push(ret))
 
-        tt.test("parent one", function (tt) {
-            tt.test("child one", function () { throw sentinel1 })
-            tt.test("child two", function () { throw sentinel1 })
+        tt.test("parent one", tt => {
+            tt.test("child one", () => { throw sentinel1 })
+            tt.test("child two", () => { throw sentinel1 })
         })
 
-        tt.test("parent two", function (tt) {
-            tt.test("child one", function () { throw sentinel2 })
-            tt.test("child two", function () { throw sentinel2 })
+        tt.test("parent two", tt => {
+            tt.test("child one", () => { throw sentinel2 })
+            tt.test("child two", () => { throw sentinel2 })
         })
 
-        tt.run().then(function () {
+        return tt.run().then(() => {
             t.deepEqual(ret, [
                 n("start", []),
                 n("start", [p("parent one", 0)]),
@@ -488,30 +478,30 @@ suite("core (reporters)", function () { // eslint-disable-line max-statements
         })
     })
 
-    test("called correctly with child both", function () {
-        var tt = t.base()
-        var ret = []
-        var sentinel1 = new Error("sentinel one")
+    test("called correctly with child both", () => {
+        const tt = t.base()
+        const ret = []
+        const sentinel1 = new Error("sentinel one")
 
-        sentinel1.marker = function () {}
+        sentinel1.marker = () => {}
 
-        var sentinel2 = new Error("sentinel two")
+        const sentinel2 = new Error("sentinel two")
 
-        sentinel2.marker = function () {}
+        sentinel2.marker = () => {}
 
-        tt.reporter(util.push(ret))
+        tt.reporter(push(ret))
 
-        tt.test("parent one", function (tt) {
-            tt.test("child one", function () { throw sentinel1 })
-            tt.test("child two", function () {})
+        tt.test("parent one", tt => {
+            tt.test("child one", () => { throw sentinel1 })
+            tt.test("child two", () => {})
         })
 
-        tt.test("parent two", function (tt) {
-            tt.test("child one", function () { throw sentinel2 })
-            tt.test("child two", function () {})
+        tt.test("parent two", tt => {
+            tt.test("child one", () => { throw sentinel2 })
+            tt.test("child two", () => {})
         })
 
-        tt.run().then(function () {
+        return tt.run().then(() => {
             t.deepEqual(ret, [
                 n("start", []),
                 n("start", [p("parent one", 0)]),
@@ -538,17 +528,17 @@ suite("core (reporters)", function () { // eslint-disable-line max-statements
         })
     })
 
-    test("called correctly with subtest run", function () {
-        var tt = t.base()
-        var ret = []
+    test("called correctly with subtest run", () => {
+        const tt = t.base()
+        const ret = []
 
-        tt.reporter(util.push(ret))
+        tt.reporter(push(ret))
 
-        var ttt = tt.test("test")
+        const ttt = tt.test("test")
 
-        ttt.test("foo", function () {})
+        ttt.test("foo", () => {})
 
-        ttt.run().then(function () {
+        return ttt.run().then(() => {
             t.deepEqual(ret, [
                 n("start", [p("test", 0)]),
                 n("start", [p("test", 0), p("foo", 0)]),
@@ -561,57 +551,51 @@ suite("core (reporters)", function () { // eslint-disable-line max-statements
         })
     })
 
-    test("called correctly with complex sequence", function () {
-        var tt = t.base()
-        var ret = []
-        var sentinel = new Error("sentinel")
+    test("called correctly with complex sequence", () => {
+        const tt = t.base()
+        const ret = []
+        const sentinel = new Error("sentinel")
 
-        sentinel.marker = function () {}
+        sentinel.marker = () => {}
 
-        tt.reporter(util.push(ret))
+        tt.reporter(push(ret))
 
         tt.use(assertions)
 
-        tt.test("module-1", function (tt) {
+        tt.test("module-1", tt => {
             tt.test("1 === 1").equal(1, 1)
 
-            tt.test("foo()", function (tt) {
+            tt.test("foo()", tt => {
                 tt.foo = 1
                 tt.notEqual(1, 1)
             })
 
-            tt.async("bar()", function (t, done) {
-                setTimeout(function () {
-                    done(new Error("fail"))
-                }, 0)
+            tt.async("bar()", (t, done) => {
+                global.setTimeout(() => done(new Error("fail")), 0)
             })
 
-            tt.async("baz()", function () {
+            tt.async("baz()", () => {
                 return {
-                    then: function (resolve, reject) {
-                        setTimeout(function () {
-                            reject(sentinel)
-                        }, 0)
+                    then(resolve, reject) {
+                        global.setTimeout(() => reject(sentinel), 0)
                     },
                 }
             })
 
-            tt.test("nested", function (tt) {
-                tt.test("nested 2", function (tt) {
-                    tt.true(true)
-                })
+            tt.test("nested", tt => {
+                tt.test("nested 2", tt => tt.true(true))
             })
         })
 
-        tt.test("module-2", function (tt) {
+        tt.test("module-2", tt => {
             tt.test("1 === 2").equal(1, 2)
             tt.test("expandos don't transfer").notHasKey(tt, "foo")
         })
 
-        var fail1 = new t.AssertionError("Expected 1 to not equal 1", 1, 1)
-        var fail2 = new t.AssertionError("Expected 1 to equal 2", 2, 1)
+        const fail1 = new t.AssertionError("Expected 1 to not equal 1", 1, 1)
+        const fail2 = new t.AssertionError("Expected 1 to equal 2", 2, 1)
 
-        tt.run().then(function () {
+        return tt.run().then(() => {
             t.deepEqual(ret, [
                 n("start", []),
                 n("start", [p("module-1", 0)]),
@@ -650,23 +634,21 @@ suite("core (reporters)", function () { // eslint-disable-line max-statements
         })
     })
 
-    test("can return a resolving thenable", function () {
-        var tt = t.base()
-        var ret = []
+    test("can return a resolving thenable", () => {
+        const tt = t.base()
+        const ret = []
 
-        tt.reporter(function (entry) {
-            return {
-                then: function (resolve) {
-                    ret.push(entry)
-                    resolve()
-                },
-            }
-        })
+        tt.reporter(entry => ({
+            then(resolve) {
+                ret.push(entry)
+                resolve()
+            },
+        }))
 
-        tt.test("test", function () {})
-        tt.test("test", function () {})
+        tt.test("test", () => {})
+        tt.test("test", () => {})
 
-        tt.run().then(function () {
+        return tt.run().then(() => {
             t.deepEqual(ret, [
                 n("start", []),
                 n("start", [p("test", 0)]),
@@ -681,24 +663,22 @@ suite("core (reporters)", function () { // eslint-disable-line max-statements
         })
     })
 
-    test("can return a rejecting thenable", function () {
-        var tt = t.base()
+    test("can return a rejecting thenable", () => {
+        const tt = t.base()
 
-        var sentinel = new Error("sentinel")
+        const sentinel = new Error("sentinel")
 
-        tt.reporter(function () {
-            return {
-                then: function (resolve, reject) {
-                    reject(sentinel)
-                },
-            }
-        })
+        tt.reporter(() => ({
+            then(resolve, reject) {
+                reject(sentinel)
+            },
+        }))
 
-        tt.test("test", function () {})
-        tt.test("test", function () {})
+        tt.test("test", () => {})
+        tt.test("test", () => {})
 
-        tt.run().then(
-            function () { t.fail("Expected a rejection") },
-            function (err) { t.equal(err, sentinel) })
+        return tt.run().then(
+            () => t.fail("Expected a rejection"),
+            err => t.equal(err, sentinel))
     })
 })

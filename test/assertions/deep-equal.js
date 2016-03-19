@@ -1,39 +1,41 @@
-"use strict"
+import t from "../../src/index.js"
+import global from "../../src/global.js"
 
-/* global Symbol */
+const Symbol = typeof global.Symbol === "function" &&
+        typeof global.Symbol() === "symbol"
+    ? global.Symbol
+    : undefined
 
-var t = require("../../index.js")
-
-suite("assertions (deep equal)", function () {
-    test("equal", function () {
+suite("assertions (deep equal)", () => {
+    test("equal", () => {
         t.looseDeepEqual(
             {a: [2, 3], b: [4]},
             {a: [2, 3], b: [4]}
         )
     })
 
-    test("not equal", function () {
+    test("not equal", () => {
         t.notLooseDeepEqual(
             {x: 5, y: [6]},
             {x: 5, y: 6}
         )
     })
 
-    test("nested nulls", function () {
+    test("nested nulls", () => {
         t.looseDeepEqual(
             [null, null, null],
             [null, null, null]
         )
     })
 
-    test("strict equal", function () {
+    test("strict equal", () => {
         t.notDeepEqual(
             [{a: 3}, {b: 4}],
             [{a: "3"}, {b: "4"}]
         )
     })
 
-    test("non-objects", function () {
+    test("non-objects", () => {
         t.looseDeepEqual(3, 3)
         t.looseDeepEqual("beep", "beep")
         t.looseDeepEqual("3", 3)
@@ -41,7 +43,9 @@ suite("assertions (deep equal)", function () {
         t.notLooseDeepEqual("3", [3])
     })
 
-    test("arguments class", function () {
+    /* eslint-disable prefer-rest-params */
+
+    test("arguments class", () => {
         t.looseDeepEqual(
             (function () { return arguments })(1, 2, 3),
             (function () { return arguments })(1, 2, 3)
@@ -53,27 +57,29 @@ suite("assertions (deep equal)", function () {
         )
     })
 
-    test("dates", function () {
-        var d0 = new Date(1387585278000)
-        var d1 = new Date("Fri Dec 20 2013 16:21:18 GMT-0800 (PST)")
+    /* eslint-enable prefer-rest-params */
 
-        t.looseDeepEqual(d0, d1)
+    test("dates", () => {
+        t.looseDeepEqual(
+            new Date(1387585278000),
+            new Date("Fri Dec 20 2013 16:21:18 GMT-0800 (PST)")
+        )
     })
 
-    if (typeof Buffer === "function") {
-        test("buffers", function () {
+    if (typeof global.Buffer === "function") {
+        test("buffers", () => {
             t.looseDeepEqual(
-                new Buffer("xyz"), // eslint-disable-line no-undef
-                new Buffer("xyz") // eslint-disable-line no-undef
+                new global.Buffer("xyz"), // eslint-disable-line no-undef
+                new global.Buffer("xyz") // eslint-disable-line no-undef
             )
         })
     }
 
-    test("booleans and arrays", function () {
+    test("booleans and arrays", () => {
         t.notLooseDeepEqual(true, [])
     })
 
-    test("null == undefined", function () {
+    test("null == undefined", () => {
         t.looseDeepEqual(null, undefined)
         t.looseDeepEqual(undefined, null)
 
@@ -81,7 +87,7 @@ suite("assertions (deep equal)", function () {
         t.notDeepEqual(undefined, null)
     })
 
-    test("prototypes", function () {
+    test("prototypes", () => {
         function A() {}
         function B() {}
 
@@ -92,7 +98,7 @@ suite("assertions (deep equal)", function () {
         t.notDeepEqual(new A(), new B())
     })
 
-    test("one is object", function () {
+    test("one is object", () => {
         t.notLooseDeepEqual("foo", {bar: 1})
         t.notLooseDeepEqual({foo: 1}, "bar")
 
@@ -100,7 +106,7 @@ suite("assertions (deep equal)", function () {
         t.notDeepEqual({foo: 1}, "bar")
     })
 
-    test("both are strings", function () {
+    test("both are strings", () => {
         t.looseDeepEqual("foo", "foo")
         t.notLooseDeepEqual("foo", "bar")
 
@@ -108,13 +114,13 @@ suite("assertions (deep equal)", function () {
         t.notDeepEqual("foo", "bar")
     })
 
-    test("differing keys", function () {
+    test("differing keys", () => {
         t.notDeepEqual({a: 1, b: 2}, {b: 1, c: 2})
         t.notLooseDeepEqual({a: 1, b: 2}, {b: 1, c: 2})
     })
 
     if (typeof Symbol === "function") {
-        test("both are symbols", function () {
+        test("both are symbols", () => {
             t.looseDeepEqual(
                 Symbol("foo"),
                 Symbol("foo")

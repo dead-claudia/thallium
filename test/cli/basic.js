@@ -1,18 +1,16 @@
-"use strict"
+import * as mockery from "mockery"
+import requireUncached from "require-uncached"
 
-var mockery = require("mockery")
-var requireUncached = require("require-uncached")
+import t from "../../src/index.js"
+import assertions from "../../src/assertions.js"
+import * as util from "../../test-util/base.js"
 
-var t = require("../../index.js")
-var assertions = require("../../assertions.js")
-var util = require("../../test-util/base.js")
+const hasOwn = {}.hasOwnProperty
 
-var hasOwn = {}.hasOwnProperty
+suite.skip("cli (basic)", () => {
+    let core, index, cli
 
-suite.skip("cli (basic)", function () {
-    var core, index, cli
-
-    setup(function () {
+    setup(() => {
         mockery.enable({
             useCleanCache: true,
             // That's going to get annoying real quick if these aren't disabled.
@@ -24,9 +22,7 @@ suite.skip("cli (basic)", function () {
 
         function resolve(mod, opts, callback) {
             if (hasOwn.call(util.paths, mod)) {
-                return process.nextTick(function () {
-                    callback(null, util.paths[mod])
-                })
+                return process.nextTick(() => callback(null, util.paths[mod]))
             } else {
                 return util.resolveAsync(mod, opts, callback)
             }
@@ -47,18 +43,18 @@ suite.skip("cli (basic)", function () {
         mockery.registerMock("resolve", resolve)
 
         // This needs to be required *after* the mocks have taken effect.
-        cli = requireUncached("../../lib/cli/cli.js")
+        cli = requireUncached("../../src/cli/cli.js")
     })
 
-    teardown(function () {
+    teardown(() => {
         core = index = cli = null
         mockery.disable()
         mockery.deregisterAll()
         mockery.resetCache()
     })
 
-    test("fails with no config", function (done) {
-        cli(util.fixture("cli/no-config"), [], function (err) {
+    test("fails with no config", done => {
+        cli(util.fixture("cli/no-config"), [], err => {
             try {
                 t.ok(err)
                 t.hasOwn(err, "code", "ENOTESTCONFIG")
