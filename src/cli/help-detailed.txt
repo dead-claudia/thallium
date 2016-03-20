@@ -6,7 +6,7 @@ Options:
     Show a simpler help prompt.
 
 -H, --help-detailed
-    Show this help prompt, suitable for a console pager like `less`.
+    Show this help prompt.
 
 --cwd [directory]
     Set the current working directory for Techtonic to use. By default, it's
