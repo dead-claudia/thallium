@@ -120,5 +120,5 @@ export function merge(args, config) {
     set(args.module, config.module)
     push(args.register, config.register)
     push(args.reporters, reporters)
-    push(args.files, files && !Array.isArray(files) ? [files] : files)
+    set(args.files, files && !Array.isArray(files) ? [files] : files)
 }

@@ -313,7 +313,7 @@ suite("cli json (merging)", () => {
                 cwd: set(false, "foo"),
                 register: set(false, []),
                 reporters: set(false, []),
-                files: set(true, ["custom/**/*.test.js", "other/**"]),
+                files: set(true, ["custom/**/*.test.js"]),
                 help: null,
             },
         })
@@ -344,7 +344,7 @@ suite("cli json (merging)", () => {
                     {module: "./coverage.js", args: []},
                     {module: "techtonic/r/spec", args: [{color: false}]},
                 ]),
-                files: set(true, ["custom/**/*.test.js", "other/**"]),
+                files: set(true, ["custom/**/*.test.js"]),
                 help: null,
             },
         })
