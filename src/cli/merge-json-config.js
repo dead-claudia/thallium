@@ -106,8 +106,7 @@ function push(prop, value) {
 export function merge(args, config) {
     validateConfig(config)
 
-    const files = config.files
-    const reporters = config.reporters
+    const {files, reporters} = config
 
     if (reporters != null) {
         for (let i = 0; i < reporters.length; i++) {

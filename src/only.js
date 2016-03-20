@@ -70,7 +70,7 @@ export default class Only {
                 node.children.push(child)
                 node = child
             } else {
-                node = node.childen[index]
+                node = node.children[index]
             }
         }
     }
