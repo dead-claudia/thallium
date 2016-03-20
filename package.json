@@ -5,10 +5,8 @@
   "main": "index.js",
   "scripts": {
     "lint": "eslint .",
-    "compile:babel": "rimraf lib && babel src --out-dir lib --ignore src/cli",
-    "compile": "npm run lint && npm run babel",
+    "compile": "npm test && rimraf lib && babel src --out-dir lib --ignore src/cli",
     "test": "npm run lint && mocha",
-    "prepublish": "npm test && npm run compile:babel"
   },
   "files": [
     "./assertions.js",
