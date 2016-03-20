@@ -31,10 +31,10 @@ Options:
     Register a particular extension, optionally with a module. This may be
     repeated as many times as desired. This accepts the following syntax:
 
-    ext, .ext
+    ext
         Register `ext`, inferring the module from node-interpret.
 
-    ext:module, .ext:module
+    ext:module
         Register `ext`, requiring from `module`.
 
     Note that if the same extension is passed multiple times, the last takes

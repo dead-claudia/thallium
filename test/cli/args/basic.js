@@ -1,14 +1,13 @@
 import * as path from "path"
 
 import t from "../../../src/index.js"
-import parseArgs from "../../../src/cli/parse-args.js"
+import {parseArgs} from "../../../src/cli/parse-args.js"
 
 // Pull it out to safely wrap.
 const test1 = test
 
 suite("cli arguments (basic)", () => { // eslint-disable-line max-statements
     const defaultCwd = "base"
-    const defaultConfig = path.join("test", ".techtonic")
     const testDir = path.join("test", "**")
 
     function set(set, value) {
@@ -16,18 +15,18 @@ suite("cli arguments (basic)", () => { // eslint-disable-line max-statements
     }
 
     function test(description, str, {
-        config = set(false, defaultConfig),
-        module = set(false, null),
+        config = set(false, null),
+        module = set(false, "techtonic"),
         cwd = set(false, defaultCwd),
         register = set(false, []),
         files = set(false, [testDir]),
-        reporter = set(false, []),
+        reporters = set(false, []),
         help = null,
     } = {}) {
         str = str.trim()
         test1(description, () => {
             t.deepEqual(parseArgs(defaultCwd, str ? str.split(/\s+/g) : []), {
-                config, module, cwd, register, files, reporter, help,
+                config, module, cwd, register, files, reporters, help,
             })
         })
     }
@@ -78,35 +77,26 @@ suite("cli arguments (basic)", () => { // eslint-disable-line max-statements
 
     test("works with --reporter",
         "--reporter foo",
-        {reporter: set(true, ["foo"])})
+        {reporters: set(true, [{module: "foo", args: []}])})
 
     test("works with -R",
         "-R foo",
-        {reporter: set(true, ["foo"])})
+        {reporters: set(true, [{module: "foo", args: []}])})
 
     const my = path.join("my-test", "**", "*.js")
     const other = path.join("other-test", "**", "*.js")
 
     test("works with file arguments",
         `${my} ${other}`,
-        {
-            config: set(false, path.join("my-test", ".techtonic")),
-            files: set(true, [my, other]),
-        })
+        {files: set(true, [my, other])})
 
     test("works with rest files with invalid options",
         `${my} -- --weird-file.js`,
-        {
-            config: set(false, path.join("my-test", ".techtonic")),
-            files: set(true, [my, "--weird-file.js"]),
-        })
+        {files: set(true, [my, "--weird-file.js"])})
 
     test("works with rest files with valid options",
         `${my} -- --module`,
-        {
-            config: set(false, path.join("my-test", ".techtonic")),
-            files: set(true, [my, "--module"]),
-        })
+        {files: set(true, [my, "--module"])})
 
     // Note: this is a slightly flaky test.
     test("ignores invalid options", "--why -AM -i --here", {})

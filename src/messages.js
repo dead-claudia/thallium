@@ -1,5 +1,5 @@
 /**
- * The messages for everything (CLI + tests)
+ * The messages for everything, including the CLI.
  */
 
 const messages = {
@@ -29,6 +29,10 @@ const messages = {
     "type.setters.name": "name must be a string if func exists",
     "type.callback.optional": "Expected callback to be a function or not exist",
     "type.test.name": "Expected name to be a string",
+    "type.cli.json": "Expected JSON config.{0} to be a(n) {1} if it exists, but found a(n) {2}",
+    "type.cli.json.register": "Invalid ext[:module] syntax for JSON config.register[{0}]: {1}",
+    "type.cli.json.reporter": "Expected JSON config.reporter[{0}] to be a string or [string, ...args]",
+    "type.cli.json.files": "Expected JSON config.files[{0}] to be a string",
 
     /* eslint-enable max-len */
 }
@@ -41,5 +45,5 @@ export default function m(name, ...args) {
         throw new RangeError(`message \`${name}\` does not exist!`)
     }
 
-    return message.replace(/\{(\d+)\}/, (_, index) => args[index])
+    return message.replace(/\{(\d+)\}/g, (_, index) => args[index])
 }

@@ -98,6 +98,8 @@ class Serializer {
         const result = subarg(this.argv, i + 1)
 
         this.push("value", result.value)
+        this.acceptsArgs = false
+        this.valueRequired = false
         return result.index
     }
 

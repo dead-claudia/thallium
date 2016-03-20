@@ -6,20 +6,21 @@ import m from "../../messages.js"
  * as raw strings.
  */
 function formatArg(arg) {
+    if (arg === "true") return true
+    if (arg === "false") return false
+    if (arg === "null") return null
+
     const start = /^[+-]/.test(arg) ? arg[0] : ""
-    const factor = start === "-" ? -1 : 1
+    const sign = start === "-" ? -1 : 1
+    const rest = start === "" ? arg : arg.slice(1)
 
-    if (start !== "") {
-        arg = arg.slice(1)
-    }
+    if (/^0b[01]+$/i.test(rest)) return sign * parseInt(rest.slice(2), 2)
+    if (/^0o[0-7]+$/i.test(rest)) return sign * parseInt(rest.slice(2), 8)
+    if (/^0x[\da-f]+$/i.test(rest)) return sign * parseInt(rest.slice(2), 16)
+    if (/^\d+$/.test(rest)) return sign * parseInt(rest, 10)
+    if (/^\d+(\.\d*)?(e[+-]?\d+)?$/i.test(rest)) return sign * parseFloat(rest)
 
-    if (/^0b[01]+$/i.test(arg)) return factor * parseInt(arg.slice(2), 2)
-    if (/^0o[0-7]+$/i.test(arg)) return factor * parseInt(arg.slice(2), 8)
-    if (/^0x[\da-f]+$/i.test(arg)) return factor * parseInt(arg.slice(2), 16)
-    if (/^\d+$/.test(arg)) return factor * parseInt(arg, 10)
-    if (/^\d+(\.\d*)?(e[+-]?\d+)?$/i.test(arg)) return factor * parseFloat(arg)
-
-    return start + arg
+    return arg
 }
 
 /**
@@ -39,42 +40,86 @@ export default function (argv, start) {
         throw new ArgumentError(m("missing.cli.reporter.close"))
     }
 
-    const value = {
-        module: argv[start++],
-        args: {},
+    const module = argv[start]
+    let argsObject = null
+    let lastArg = null
+    const args = []
+
+    function prop(key, value) {
+        if (argsObject == null) {
+            args.push(lastArg = argsObject = {})
+        }
+
+        argsObject[key] = value
     }
 
-    let last
-
-    for (let i = start; i < argv.length; i++) {
-        const arg = argv[i]
-
-        if (arg === "]") {
-            if (last != null) {
-                value.args[last] = true
-            }
-
-            return {index: i, value}
+    function value(value) {
+        if (lastArg == null || lastArg === argsObject) {
+            args.push(lastArg = value)
+            argsObject = null
+        } else if (Array.isArray(lastArg)) {
+            lastArg.push(value)
+        } else {
+            args.pop()
+            args.push(lastArg = [lastArg, value])
         }
+    }
 
-        if (arg === "--") {
-            throw new ArgumentError(m("missing.cli.reporter.close"))
-        }
-
+    function read(last, arg) {
         if (last != null) {
             if (/^--/.test(arg)) {
-                value.args[last] = true
+                prop(last, true)
+                return arg.slice(2)
             } else {
-                value.args[last] = formatArg(arg)
+                prop(last, formatArg(arg))
+                return null
             }
-        }
-
-        if (/^--/.test(arg)) {
-            last = arg.slice(2)
+        } else if (/^--/.test(arg)) {
+            return arg.slice(2)
         } else {
-            last = null
+            value(formatArg(arg))
+            return null
         }
     }
 
-    throw new Error("unreachable")
+    function run() {
+        let end = false
+        let last, i
+
+        for (i = start + 1; i < argv.length; i++) {
+            const arg = argv[i]
+
+            // Laziness hack :)
+            if (arg === "]") {
+                if (last != null) {
+                    prop(last, true)
+                }
+
+                break
+            }
+
+            if (end) {
+                value(formatArg(arg))
+                continue
+            }
+
+            if (arg === "--") {
+                if (last != null) {
+                    prop(last, true)
+                }
+
+                end = true
+                last = null
+            } else {
+                last = read(last, arg)
+            }
+        }
+
+        return {
+            index: i,
+            value: {module, args},
+        }
+    }
+
+    return run()
 }

@@ -1,5 +1,5 @@
 import t from "../../../src/index.js"
-import parseArgs from "../../../src/cli/parse-args.js"
+import {parseArgs} from "../../../src/cli/parse-args.js"
 import ArgumentError from "../../../src/cli/argument-error.js"
 
 suite("cli arguments (subarg)", () => {

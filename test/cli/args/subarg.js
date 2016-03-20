@@ -1,7 +1,7 @@
 import * as path from "path"
 
 import t from "../../../src/index.js"
-import parseArgs from "../../../src/cli/parse-args.js"
+import {parseArgs} from "../../../src/cli/parse-args.js"
 import ArgumentError from "../../../src/cli/argument-error.js"
 
 // Pull it out to safely wrap.
@@ -19,7 +19,7 @@ suite("cli arguments (subarg)", () => { // eslint-disable-line max-statements
         })
     }
 
-    // This lends itself well for DSLs
+    // This is a nice DSL.
     function test(description, str, result) {
         str = /^\s+$/.test(str) ? [] : str.split(/\s+/g)
 
@@ -29,46 +29,53 @@ suite("cli arguments (subarg)", () => { // eslint-disable-line max-statements
 
         test1(description, () => {
             t.deepEqual(parseArgs("base", str), {
-                config: set(false, path.join("test", ".techtonic")),
-                module: set(false, null),
+                config: set(false, null),
+                module: set(false, "techtonic"),
                 cwd: set(false, "base"),
                 register: set(false, []),
                 files: set(false, [path.join("test", "**")]),
-                reporter: set(true, list),
+                reporters: set(true, list),
                 help: null,
             })
         })
     }
 
-    throws("fails with anything other than a reporter", "--cwd [ foo ]")
     throws("fails with unbalanced brackets", "--reporter [ foo")
+    throws("fails with subarg in flag position", "--reporter [ foo ] [ bar ]")
+    throws("fails with subarg in value position", "--cwd [ bar ]")
+    throws("fails with subarg in initial position", "[ bar ]")
+    throws("fails with subarg in flag position after boolean", "--help [ bar ]")
 
-    test("works with an empty object", "--reporter [ foo ]", {foo: {}})
+    test("works with nothing", "--reporter [ foo ]", {foo: []})
 
     test("works with a single object with boolean",
         "--reporter [ foo --bar ]",
-        {foo: {bar: true}})
+        {foo: [{bar: true}]})
 
     test("works with a single object with value",
         "--reporter [ foo --bar value ]",
-        {foo: {bar: "value"}})
+        {foo: [{bar: "value"}]})
 
     test("works with a single object with value + boolean",
         "--reporter [ foo --bar value --bool ]",
-        {foo: {bar: "value", bool: true}})
+        {foo: [{bar: "value", bool: true}]})
 
     test("works with a single object with value + value",
         "--reporter [ foo --bar value --baz other ]",
-        {foo: {bar: "value", baz: "other"}})
+        {foo: [{bar: "value", baz: "other"}]})
 
     test("works with a single object with boolean + value",
         "--reporter [ foo --bar --baz other ]",
-        {foo: {bar: true, baz: "other"}})
+        {foo: [{bar: true, baz: "other"}]})
 
     function numeric(name, string, number) {
         test(`works with a single object with ${name} value`,
             `--reporter [ foo --bar ${string} ]`,
-            {foo: {bar: number}})
+            {foo: [{bar: number}]})
+
+        test(`works with a single string with ${name} value`,
+            `--reporter [ foo ${string} ]`,
+            {foo: [number]})
     }
 
     numeric("bare lowercase binary", "0b1101", 13)
@@ -128,11 +135,54 @@ suite("cli arguments (subarg)", () => { // eslint-disable-line max-statements
 
     test("works with a single object with several things",
         "--reporter [ techtonic/r/console --color --tee output.txt --good * --bad - --hide-pending ]", // eslint-disable-line max-len
-        {"techtonic/r/console": {
+        {"techtonic/r/console": [{
             "color": true,
             "tee": "output.txt",
             "good": "*",
             "bad": "-",
             "hide-pending": true,
-        }})
+        }]})
+
+    test("works with string value",
+        "--reporter [ foo bar ]",
+        {foo: ["bar"]})
+
+    for (const item of [true, false, null]) {
+        test(`works with \`${item}\` value`,
+            `--reporter [ foo ${item} ]`,
+            {foo: [item]})
+
+        test(`works with \`${item}\` object value`,
+            `--reporter [ foo --bar ${item} ]`,
+            {foo: [{bar: item}]})
+    }
+
+    test("works with multiple subargs with no extra args",
+        "--reporter [ foo ] --reporter [ bar ]",
+        {foo: [], bar: []})
+
+    test("does not nest subargs",
+        "--reporter [ foo --bar [ baz ]",
+        {foo: [{bar: "["}, "baz"]})
+
+    test("works with multiple seriously complicated subargs",
+        `--reporter [ foo
+            --bool true
+            file.js
+            --input -
+            --whatever
+            --
+            --not-an-option
+            nope.txt
+            what?!? ]
+        --reporter [ bar --hi --bye -- !**/file.txt ]`,
+        {
+            foo: [
+                {bool: true},
+                "file.js",
+                {input: "-", whatever: true},
+                ["--not-an-option", "nope.txt", "what?!?"],
+            ],
+            bar: [{hi: true, bye: true}, "!**/file.txt"],
+        })
 })
