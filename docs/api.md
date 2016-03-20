@@ -32,7 +32,7 @@ t.test '1 should equal 1', ->
     @equal 1, 1
 ```
 
-This calls the callback on a separate event loop tick, with `this` and the first argument being a new Techtonic instance inheriting everything of this instance, plugins, reporters, assertions, methods, and all. It is perfectly safe to add new properties and modify existing ones on the inner instance, as none of the changes escape to the outer context.
+This calls the callback on a separate event loop tick, with `this` and the first argument being a new Techtonic instance prototypically inheriting everything of this instance, plugins, reporters, assertions, methods, and all. It is perfectly safe to add new properties and modify existing ones on the inner instance, as none of the changes escape to the outer context.
 
 You can skip block tests with `t.testSkip("name", callback)`, which is identical except the test is reported as pending instead.
 
@@ -120,7 +120,7 @@ t.async 'reads files correctly', ->
     @equal data, 'contents\n'
 ```
 
-This calls the callback on a separate event loop tick, with `this` and the first argument being a new Techtonic instance inheriting everything of this instance, plugins, reporters, assertions, methods, and all. It is perfectly safe to add new properties and modify existing ones on the inner instance, as none of the changes escape to the outer context.
+This calls the callback on a separate event loop tick, with `this` and the first argument being a new Techtonic instance prototypically inheriting everything of this instance, plugins, reporters, assertions, methods, and all. It is perfectly safe to add new properties and modify existing ones on the inner instance, as none of the changes escape to the outer context.
 
 Do note that the test is initialized on a separate event loop tick. Also, the `done` argument is always asynchronous. And if you use the `done` callback, you *must* call it to end the test.
 
