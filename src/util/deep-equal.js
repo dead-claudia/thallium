@@ -15,7 +15,7 @@ function symbolEqual(a, b) {
         symbolToString.call(a) === symbolToString.call(b)
 }
 
-export default function deepEqual(actual, expected, strict) {
+export function deepEqual(actual, expected, strict) {
     if (typeof actual !== "object" && typeof expected !== "object") {
         return strict
             ? strictIs(actual, expected)

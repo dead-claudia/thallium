@@ -6,7 +6,7 @@
  * work well because I want to minimize ES6 library features used.
  */
 
-import m from "./messages.js"
+import {m} from "./messages.js"
 
 class Node {
     constructor(value) {
@@ -48,7 +48,7 @@ class Node {
     }
 }
 
-export default class Only {
+export class Only {
     constructor() {
         this.node = new Node(null)
     }

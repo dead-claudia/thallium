@@ -4,7 +4,7 @@
  */
 
 import * as is from "./util/is.js"
-import deepEqualImpl from "./util/deep-equal.js"
+import {deepEqual as deepEqualImpl} from "./util/deep-equal.js"
 
 const toString = Object.prototype.toString
 const hasOwn = Object.prototype.hasOwnProperty
@@ -230,8 +230,7 @@ function getName(func) {
 
 function throws(name, check, message) {
     function run(invert, func, match) {
-        let test = false
-        let error
+        let test, error
 
         try {
             func()
@@ -242,7 +241,7 @@ function throws(name, check, message) {
         if (invert) test = !test
 
         return {
-            test,
+            test: test !== false,
             expected: match,
             func, error,
             message: message(match, invert, test),
@@ -255,10 +254,14 @@ function throws(name, check, message) {
 
 throws("throws",
     (Type, e) => Type == null || e instanceof Type,
-    (Type, invert) => {
+    (Type, invert, test) => {
         let str = `Expected {func} to ${invert ? "not " : ""}throw`
 
-        if (Type != null) str += ` an instance of ${getName(Type)}`
+        if (Type != null) {
+            str += ` an instance of ${getName(Type)}`
+            if (!invert && test !== undefined) str += ", but found {error}"
+        }
+
         return str
     })
 

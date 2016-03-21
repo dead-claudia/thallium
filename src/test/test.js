@@ -1,8 +1,8 @@
-import m from "../messages.js"
+import {m} from "../messages.js"
 import {report, runTests} from "./common.js"
 import {r} from "../util/util.js"
 
-export default class Test {
+export class Test {
     constructor() {
         this.plugins = []
         this.tests = []

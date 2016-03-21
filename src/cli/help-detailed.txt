@@ -41,13 +41,6 @@ Options:
     precedence. Also, note that this module is loaded regardless of if it's
     actually used.
 
--m [module], --module [module]
-    Use this module to represent Techtonic instead of the one installed in the
-    closest node_modules to the config. This is resolved to the current working
-    directory, and it must be a full path to the module.
-
-    If this option is passed multiple times, the last one takes precedence.
-
 --
     Stop parsing options past this point. Treat any further argument as a file.
 

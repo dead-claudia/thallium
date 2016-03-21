@@ -1,6 +1,5 @@
 // I can't just subclass Error here, since Babel doesn't support that.
-export default ArgumentError
-function ArgumentError(message) {
+export function ArgumentError(message) {
     this.message = message
 
     if (Error.captureStackTrace) {

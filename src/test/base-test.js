@@ -1,8 +1,8 @@
-import Test from "./test.js"
+import {Test} from "./test.js"
 import {runTests, report} from "./common.js"
 import {r} from "../util/util.js"
 
-export default class BaseTest extends Test {
+export class BaseTest extends Test {
     constructor(methods) {
         super()
         this.methods = methods

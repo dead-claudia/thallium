@@ -1,18 +1,18 @@
-import m from "./messages.js"
+import {m} from "./messages.js"
 
-import AssertionError from "./assertion-error.js"
-import inspect from "./util/inspect.js"
+import {AssertionError} from "./assertion-error.js"
+import {inspect} from "./util/inspect.js"
 
-import BaseTest from "./test/base-test.js"
-import InlineTest from "./test/inline-test.js"
-import BlockTest from "./test/block-test.js"
+import {BaseTest} from "./test/base-test.js"
+import {InlineTest} from "./test/inline-test.js"
+import {BlockTest} from "./test/block-test.js"
 import * as dummy from "./test/dummy-test.js"
 import * as skip from "./test/skip-test.js"
-import AsyncTest, {getTimeout} from "./test/async-test.js"
+import {AsyncTest, getTimeout} from "./test/async-test.js"
 
 import {activeReporters} from "./test/common.js"
 import {isIterator, bind} from "./util/util.js"
-import Only from "./only.js"
+import {Only} from "./only.js"
 
 function checkInit(ctx) {
     if (!ctx.initializing) {
@@ -69,7 +69,7 @@ function format(obj) {
     if (!obj.message) return "unspecified"
     return obj.message.replace(/(.?)\{(.+?)\}/g, (m, pre, prop) => {
         if (pre === "\\") return m.slice(1)
-        if ({}.hasOwnProperty.call(obj, prop)) {
+        if (Object.prototype.hasOwnProperty.call(obj, prop)) {
             return pre + inspect(obj[prop])
         }
         return m

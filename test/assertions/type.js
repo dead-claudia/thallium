@@ -1,6 +1,6 @@
 import t from "../../src/index.js"
 import {fail, basic} from "../../test-util/assertions.js"
-import global from "../../src/global.js"
+import {global} from "../../src/global.js"
 
 const Symbol = typeof global.Symbol === "function" &&
         typeof global.Symbol() === "symbol"

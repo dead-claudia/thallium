@@ -1,7 +1,7 @@
-import Test from "./test.js"
+import {Test} from "./test.js"
 import {r} from "../util/util.js"
 
-export default class BlockTest extends Test {
+export class BlockTest extends Test {
     constructor(methods, name, index, callback) {
         super()
         this.methods = methods

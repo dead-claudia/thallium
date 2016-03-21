@@ -1,5 +1,5 @@
-import Test from "./test.js"
-import LiveInlineTest from "./inline-test.js"
+import {Test} from "./test.js"
+import {InlineTest as LiveInlineTest} from "./inline-test.js"
 
 /**
  * This has to be an inline test subclass, because the methods still have to be

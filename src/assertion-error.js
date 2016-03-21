@@ -87,4 +87,4 @@ try {
     })
 }
 
-export default AssertionError
+export {AssertionError}

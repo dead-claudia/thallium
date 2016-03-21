@@ -1,7 +1,7 @@
-import Test from "./test.js"
+import {Test} from "./test.js"
 import {r} from "../util/util.js"
 
-export default class InlineTest extends Test {
+export class InlineTest extends Test {
     constructor(methods, name, index) {
         super()
 

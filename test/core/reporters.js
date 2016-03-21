@@ -1,7 +1,7 @@
 import t from "../../src/index.js"
 import {n, p, push} from "../../test-util/base.js"
 import assertions from "../../src/assertions.js"
-import global from "../../src/global.js"
+import {global} from "../../src/global.js"
 
 suite("core (reporters)", () => { // eslint-disable-line max-statements
     // Use thenables, not actual Promises.

@@ -1,6 +1,6 @@
 /* eslint-disable max-params */
 
-import global from "../global.js"
+import {global} from "../global.js"
 
 /**
  * This code is largely derived from util-inspect by Automattic, which itself is
@@ -9,7 +9,7 @@ import global from "../global.js"
  * ES3-compatible, and Node's util.inspect requires ES6 and internal V8 APIs).
  */
 
-const hasOwn = {}.hasOwnProperty
+const hasOwn = Object.prototype.hasOwnProperty
 const toString = {}.toString
 
 // ES6, section 24.2.3.3 - QuoteJSONString(value)
@@ -65,7 +65,7 @@ function quote(value) {
  * @param {Object} opts Optional options object that alters the output.
  */
 
-export default function inspect(obj, opts) {
+export function inspect(obj, opts) {
     // default options
     const ctx = {
         seen: [],

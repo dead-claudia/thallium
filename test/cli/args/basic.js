@@ -10,93 +10,71 @@ suite("cli arguments (basic)", () => { // eslint-disable-line max-statements
     const defaultCwd = "base"
     const testDir = path.join("test", "**")
 
-    function set(set, value) {
-        return {set, value}
+    function arg(passed, value = null) {
+        return {passed, value}
     }
 
     function test(description, str, {
-        config = set(false, null),
-        module = set(false, "techtonic"),
-        cwd = set(false, defaultCwd),
-        register = set(false, []),
-        files = set(false, [testDir]),
-        reporters = set(false, []),
-        help = null,
+        config = arg(false),
+        cwd = arg(false, defaultCwd),
+        register = arg(false, []),
+        files = arg(false, [testDir]),
+        help = arg(false),
     } = {}) {
         str = str.trim()
         test1(description, () => {
-            t.deepEqual(parseArgs(defaultCwd, str ? str.split(/\s+/g) : []), {
-                config, module, cwd, register, files, reporters, help,
-            })
+            t.deepEqual(parseArgs(defaultCwd, str ? str.split(/\s+/g) : []),
+                {config, cwd, register, files, help})
         })
     }
 
     test("works with defaults", "", {})
-    test("works with --help", "--help", {help: "simple"})
-    test("works with -h", "-h", {help: "simple"})
-    test("works with --help-detailed", "--help-detailed", {help: "detailed"})
-    test("works with -H", "-H", {help: "detailed"})
-    test("works with --cwd", "--cwd foo", {cwd: set(true, "foo")})
-    test("works with --config", "--config foo", {config: set(true, "foo")})
-    test("works with -c", "-c foo", {config: set(true, "foo")})
+    test("works with --help", "--help", {help: arg(true, "simple")})
+    test("works with -h", "-h", {help: arg(true, "simple")})
+    test("works with --help-detailed", "--help-detailed", {help: arg(true, "detailed")}) // eslint-disable-line max-len
+    test("works with -H", "-H", {help: arg(true, "detailed")})
+    test("works with --cwd", "--cwd foo", {cwd: arg(true, "foo")})
+    test("works with --config", "--config foo", {config: arg(true, "foo")})
+    test("works with -c", "-c foo", {config: arg(true, "foo")})
 
     test("works with --register (with dot + no module)",
         "--register .ext",
-        {register: set(true, [".ext"])})
+            {register: arg(true, [".ext"])})
 
     test("works with --register (no dot + no module)",
         "--register ext",
-        {register: set(true, ["ext"])})
+            {register: arg(true, ["ext"])})
 
     test("works with --register (with dot + with module)",
         "--register .ext:module",
-        {register: set(true, [".ext:module"])})
+            {register: arg(true, [".ext:module"])})
 
     test("works with --register (no dot + with module)",
         "--register ext:module",
-        {register: set(true, ["ext:module"])})
-
-    test("works with -r (with dot + no module)",
-        "-r .ext",
-        {register: set(true, [".ext"])})
+            {register: arg(true, ["ext:module"])})
 
     test("works with -r (no dot + no module)",
         "-r ext",
-        {register: set(true, ["ext"])})
-
-    test("works with -r (with dot + with module)",
-        "-r .ext:module",
-        {register: set(true, [".ext:module"])})
+            {register: arg(true, ["ext"])})
 
     test("works with -r (no dot + with module)",
         "-r ext:module",
-        {register: set(true, ["ext:module"])})
-
-    test("works with --module", "--module foo", {module: set(true, "foo")})
-    test("works with -m", "-m foo", {module: set(true, "foo")})
-
-    test("works with --reporter",
-        "--reporter foo",
-        {reporters: set(true, [{module: "foo", args: []}])})
-
-    test("works with -R",
-        "-R foo",
-        {reporters: set(true, [{module: "foo", args: []}])})
+            {register: arg(true, ["ext:module"])})
 
     const my = path.join("my-test", "**", "*.js")
     const other = path.join("other-test", "**", "*.js")
 
     test("works with file arguments",
         `${my} ${other}`,
-        {files: set(true, [my, other])})
+            {files: arg(true, [my, other])})
 
     test("works with rest files with invalid options",
         `${my} -- --weird-file.js`,
-        {files: set(true, [my, "--weird-file.js"])})
+            {files: arg(true, [my, "--weird-file.js"])})
 
     test("works with rest files with valid options",
         `${my} -- --module`,
-        {files: set(true, [my, "--module"])})
+            {files: arg(true, [my, "--module"])})
 
     // Note: this is a slightly flaky test.
     test("ignores invalid options", "--why -AM -i --here", {})

@@ -1,9 +1,9 @@
 import Promise from "bluebird"
-import m from "../messages.js"
-import Test from "./test.js"
+import {m} from "../messages.js"
+import {Test} from "./test.js"
 import {report} from "./common.js"
 import {r, isThenable, isIterator} from "../util/util.js"
-import global from "../global.js"
+import {global} from "../global.js"
 
 function checkResult(result, message) {
     if (typeof result !== "object" || result === null) {
@@ -68,7 +68,7 @@ export function getTimeout(ctx) {
     return ctx.timeout || DEFAULT_TIMEOUT
 }
 
-export default class AsyncTest extends Test {
+export class AsyncTest extends Test {
     constructor(methods, name, index, callback) {
         super()
         this.methods = methods

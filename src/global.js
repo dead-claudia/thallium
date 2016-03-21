@@ -5,4 +5,4 @@
  */
 
 /* global global */
-export default global
+export {global}

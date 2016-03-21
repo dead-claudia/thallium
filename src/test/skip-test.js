@@ -1,7 +1,7 @@
 import {report} from "./common.js"
 import {r} from "../util/util.js"
-import Test from "./test.js"
-import LiveInlineTest from "./inline-test.js"
+import {Test} from "./test.js"
+import {InlineTest as LiveInlineTest} from "./inline-test.js"
 
 function runPendingTest(ctx, isMain) {
     ctx.running = true

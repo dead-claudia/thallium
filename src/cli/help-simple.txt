@@ -17,9 +17,6 @@ Options:
 -r [extension], --register [extension]
     Register a particular extension, optionally with a module.
 
--m [module], --module [module]
-    Use this module to represent Techtonic
-
 --
     Stop parsing options.
 

@@ -10,38 +10,29 @@ suite("cli arguments (multiple)", () => { // eslint-disable-line max-statements
     const defaultCwd = "base"
     const testDir = path.join("test", "**")
 
-    function set(set, value) {
-        return {set, value}
+    function arg(passed, value = null) {
+        return {passed, value}
     }
 
     function test(description, str, {
-        config = set(false, null),
-        module = set(false, "techtonic"),
-        cwd = set(false, defaultCwd),
-        register = set(false, []),
-        files = set(false, [testDir]),
-        reporters = set(false, []),
-        help = null,
+        config = arg(false),
+        cwd = arg(false, defaultCwd),
+        register = arg(false, []),
+        files = arg(false, [testDir]),
+        help = arg(false),
     } = {}) {
         str = str.trim()
         test1(description, () => {
-            t.deepEqual(parseArgs(defaultCwd, str ? str.split(/\s+/g) : []), {
-                config, module, cwd, register, files, reporters, help,
-            })
+            t.deepEqual(parseArgs(defaultCwd, str ? str.split(/\s+/g) : []),
+                {config, cwd, register, files, help})
         })
     }
 
-    test("works with multiple reporters via --reporter",
-        "--reporter foo --reporter bar",
-        {reporters: set(true, [
-            {module: "foo", args: []},
-            {module: "bar", args: []},
-        ])})
+    test("works with multiple register hooks via --register",
+        "--register foo:module1 --register bar:module2",
+        {register: arg(true, ["foo:module1", "bar:module2"])})
 
-    test("works with multiple reporters via -R",
-        "-R foo -R bar",
-        {reporters: set(true, [
-            {module: "foo", args: []},
-            {module: "bar", args: []},
-        ])})
+    test("works with multiple register hooks via -r",
+        "-r foo:module1 -r bar:module2",
+        {register: arg(true, ["foo:module1", "bar:module2"])})
 })
