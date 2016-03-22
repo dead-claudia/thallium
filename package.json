@@ -4,9 +4,7 @@
   "description": "A simple, unopinionated, modular test framework",
   "main": "index.js",
   "scripts": {
-    "lint": "eslint .",
-    "compile": "npm test && rimraf lib && babel src --out-dir lib --ignore src/cli",
-    "test": "npm run lint && mocha"
+    "test": "node make test"
   },
   "files": [
     "./assertions.js",
@@ -25,37 +23,13 @@
   "author": "Isiah Meadows <me@isiahmeadows.com>",
   "license": "ISC",
   "devDependencies": {
-    "babel-cli": "^6.6.5",
-    "babel-plugin-check-es2015-constants": "^6.7.2",
-    "babel-plugin-transform-es2015-arrow-functions": "^6.5.2",
-    "babel-plugin-transform-es2015-block-scoped-functions": "^6.6.5",
-    "babel-plugin-transform-es2015-block-scoping": "^6.7.1",
-    "babel-plugin-transform-es2015-classes": "^6.6.5",
-    "babel-plugin-transform-es2015-computed-properties": "^6.6.5",
-    "babel-plugin-transform-es2015-destructuring": "^6.6.5",
-    "babel-plugin-transform-es2015-duplicate-keys": "^6.6.4",
-    "babel-plugin-transform-es2015-for-of": "^6.6.0",
-    "babel-plugin-transform-es2015-function-name": "^6.5.0",
-    "babel-plugin-transform-es2015-literals": "^6.5.0",
-    "babel-plugin-transform-es2015-modules-commonjs": "^6.7.0",
-    "babel-plugin-transform-es2015-object-super": "^6.6.5",
-    "babel-plugin-transform-es2015-parameters": "^6.7.0",
-    "babel-plugin-transform-es2015-shorthand-properties": "^6.5.0",
-    "babel-plugin-transform-es2015-spread": "^6.6.5",
-    "babel-plugin-transform-es2015-sticky-regex": "^6.5.0",
-    "babel-plugin-transform-es2015-template-literals": "^6.6.5",
-    "babel-plugin-transform-es2015-unicode-regex": "^6.5.0",
-    "babel-plugin-transform-regenerator": "^6.6.5",
-    "babel-plugin-transform-runtime": "^6.6.0",
-    "babel-register": "^6.7.2",
-    "eslint": "^2.0.0",
-    "eslint-config-isiahmeadows": "0.1.6",
+    "livescript": "^1.4.0",
     "mocha": "^2.3.4",
     "mock-fs": "^3.8.0",
-    "mockery": "^1.4.0"
+    "mockery": "^1.4.0",
+    "shelljs": "^0.6.0"
   },
   "dependencies": {
-    "babel-runtime": "^6.6.1",
     "bluebird": "^3.3.4",
     "glob-parent": "^2.0.0",
     "glob-stream": "^5.3.1",

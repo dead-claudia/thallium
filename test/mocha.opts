@@ -1,6 +1,5 @@
 --ui tdd
 --reporter dot
---compilers js:babel-register
---require ./test-util/env.js
+--compilers ls:livescript
 --check-leaks
 --recursive

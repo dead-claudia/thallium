@@ -1,8 +1,6 @@
 #!/usr/bin/env node
 "use strict"
 
-process.title = "techtonic"
-
 var cp = require("child_process")
 var path = require("path")
 var help = require("../lib/cli/help.js")
@@ -13,6 +11,12 @@ var args = {
     module: null,
     cwd: null,
 }
+
+process.title = "techtonic " +
+    process.argv
+    .slice(2)
+    .map(function (x) { return "'" + JSON.stringify(x).slice(1, -1) + "'" })
+    .join(" ")
 
 var node = []
 var rest = []
@@ -48,7 +52,15 @@ for (i = 2; i < process.argv.length; i++) {
 // Append the rest.
 while (i < process.argv.length) rest.push(process.argv[i++])
 
-var res = cp.spawnSync("node", [].concat.apply([
+var count = 2
+var code = 0
+
+function exit(status) {
+    code = status != null ? status : code
+    if (--count) process.exit(code)
+}
+
+cp.spawn("node", [].concat.apply([
     node,
     [path.resolve(__dirname, "_techtonic.js")],
     args.config == null ? [] : ["--config", args.config],
@@ -61,5 +73,5 @@ var res = cp.spawnSync("node", [].concat.apply([
     cwd: process.cwd(),
     stdio: "inherit",
 })
-
-process.exit(res.status)
+.on("exit", count)
+.on("close", count)

@@ -113,7 +113,7 @@ If you use `t.define()`, `t.wrap()`, or `t.add()`, this is already done for you.
 
 - Don't rely on Techtonic's assertions when writing your own assertions.
 
-- Avoid adding state directly to the Techtonic instance yourself. Your plugin, and possibly others as well, can easily conflict if you do this. If possible, prefer WeakMaps or Symbols for assigning state, as those can't conflict.
+- Avoid adding state directly to the Techtonic instance yourself. Your plugin, and possibly others as well, can easily conflict if you do this. If possible, prefer WeakMaps or Symbols (possibly with a polyfill) for assigning state, as those can't conflict.
 
     Also note that tests prototypically inherit from their parent test by design.
 

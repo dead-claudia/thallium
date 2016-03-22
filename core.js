@@ -1,3 +1,3 @@
 /* eslint-disable */
 "use strict"
-module.exports = require("./lib/core.js").default
+module.exports = require("./lib/core.js").t
