@@ -18,6 +18,7 @@ deepEqual = (actual, expected) -> deepEqualImpl actual, expected, true
 
 # This holds everything to be added.
 methods = []
+aliases = []
 
 /**
  * The core assertions export, as a plugin.
@@ -26,8 +27,12 @@ export assertions = !->
     for m in methods
         @define m.name, m.callback
 
+    for alias in aliases
+        @[alias.name] = @[alias.original]
+
 # Little helper so that these functions only need to be created once.
 define = (name, callback) -> methods.push {name, callback}
+alias = (name, original) -> aliases.push {name, original}
 
 # Much easier to type
 negate = (name) -> "not#{name.0.toUpperCase! + name.slice 1}"
@@ -402,6 +407,9 @@ makeHasKeys 'notHasDeepAllKeys', hasDeepAllKeys, true, 'Expected {actual} to not
 makeHasKeys 'hasDeepAnyKeys', hasDeepAnyKeys, false, 'Expected {actual} to match any key in {keys}'
 makeHasKeys 'notHasDeepKeys', hasDeepAnyKeys, true, 'Expected {actual} to not match any key in {keys}'
 
+# More sensible structural matching.
+alias 'match', 'hasDeepKeys'
+
 hasLooseDeepAllKeys = hasKeysType true, looseDeepEqual
 hasLooseDeepAnyKeys = hasKeysType false, looseDeepEqual
 
@@ -409,3 +417,6 @@ makeHasKeys 'hasLooseDeepKeys', hasLooseDeepAllKeys, false, 'Expected {actual} t
 makeHasKeys 'notHasLooseDeepAllKeys', hasLooseDeepAllKeys, true, 'Expected {actual} to loosely not match all keys in {keys}'
 makeHasKeys 'hasLooseDeepAnyKeys', hasLooseDeepAnyKeys, false, 'Expected {actual} to loosely match any key in {keys}'
 makeHasKeys 'notHasLooseDeepKeys', hasLooseDeepAnyKeys, true, 'Expected {actual} to loosely not match any key in {keys}'
+
+# More sensible structural matching.
+alias 'matchLoose', 'hasLooseDeepKeys'

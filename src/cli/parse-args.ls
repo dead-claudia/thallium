@@ -66,7 +66,7 @@ serialize = (argv) ->
         push 'value', value
         boolean := true
 
-    for entry, i in argv then switch
+    for entry, i in argv
         if entry == '--'
             rest(i + 1)
             break
@@ -98,11 +98,11 @@ argPush = (arg, value) ->
  * Properties:
  *
  * config: The config file to use. The default is inferred from
- *         `${args.files[0]}/.techtonic.${ext}`, taking the first `ext` from
+ *         `#{args.files.0}/.techtonic.#{ext}`, taking the first `ext` from
  *         `--register` or whatever's inferred from node-interpret.
  *
  * cwd: This changes the default current working directory. It defaults to the
- *      initial `process.cwd()`, although the unit tests do use internal hooks
+ *      initial `process.cwd!`, although the unit tests do use internal hooks
  *      to change that default.
  *
  * register: A list of extensions + possible modules to register. This
@@ -149,6 +149,6 @@ export parseArgs = (cwd, argv) ->
         throw new ArgumentError m 'missing.cli.argument', last.value
 
     if args.files.value.length == 0
-        args.files.value = [path.join('test', '**')]
+        args.files.value = [path.join 'test', '**']
 
     args

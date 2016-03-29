@@ -114,7 +114,7 @@ export class Techtonic
      */
     reporter: iterateCall 'type.reporter', (reporter) !->
         | not @_.reporters? => @_.reporters = [reporter]
-        | @_.reporters.indexOf(reporter) < 0 => @_.reporters.push reporter
+        | (@_.reporters.indexOf reporter) < 0 => @_.reporters.push reporter
 
     # This handles name + func vs object with methods.
     makeSetterCheck = (func, name) ->
@@ -137,7 +137,7 @@ export class Techtonic
         | not obj.message => 'unspecified'
         | otherwise =>
             obj.message.replace /(.?)\{(.+?)\}/g, (m, pre, prop) ->
-                | pre == '\\' => m.slice(1)
+                | pre == '\\' => m.slice 1
                 | Object::hasOwnProperty.call obj, prop =>
                     pre + inspect obj[prop]
                 | otherwise => m
@@ -175,7 +175,7 @@ export class Techtonic
             throw new TypeError m 'missing.wrap.callback', name
 
         @[name] = ->
-            checkInit @._
+            checkInit @_
             ret = func.apply void, [old `bind` @] ++ [.. for &]
             if ret != void then ret else @
 
@@ -186,7 +186,7 @@ export class Techtonic
      */
     add: makeSetter (name, func) !->
         @[name] = ->
-            checkInit @._
+            checkInit @_
             ret = func.apply @, [@] ++ [.. for &]
             if ret != void then ret else @
 
@@ -299,6 +299,7 @@ export class Techtonic
         index = @_.tests.length
 
         @_.tests.push new T @, name, index, callback
+        @
 
     /**
      * Add a skipped async test.
