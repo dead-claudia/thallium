@@ -1,6 +1,5 @@
 # This ignores all the extra dev crud.
-{lib,bin}/**/.*
-{lib,bin}/**/README.md
+bin/README.md
 
 # Not ready for release
 lib/cli

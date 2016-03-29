@@ -7,12 +7,12 @@
     "test": "node make test"
   },
   "files": [
-    "./assertions.js",
-    "./core.js",
-    "./index.js",
-    "./definitions.d.ts",
-    "./lib",
-    "./docs"
+    "assertions.js",
+    "core.js",
+    "index.js",
+    "definitions.d.ts",
+    "lib",
+    "docs"
   ],
   "keywords": [
     "test",
@@ -38,9 +38,9 @@
     "resolve": "^1.1.7"
   },
   "directories": {
-    "lib": "./lib",
-    "doc": "./docs",
-    "example": "./docs/examples"
+    "lib": "lib",
+    "doc": "docs",
+    "example": "docs/examples"
   },
   "engines": {
     "node": ">=0.10"
