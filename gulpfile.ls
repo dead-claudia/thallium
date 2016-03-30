@@ -9,7 +9,7 @@ require! {
     'gulp-rename': rename
 }
 
-ignores = <[!src/cli]>
+ignores = <[!src/cli/**]>
 
 gulp.task 'clean', (callback) ->
     rimraf 'lib', callback
@@ -30,4 +30,4 @@ gulp.task 'test', (callback) ->
     gulp.src 'test/**/*.ls', {-read}
         .pipe mocha ui: 'tdd', reporter: 'dot'
 
-gulp.task 'default', 'compile'
+gulp.task 'default', <[compile]>
