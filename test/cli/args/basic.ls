@@ -70,8 +70,8 @@ suite 'cli arguments (basic)', !->
         files: arg true, [my, '--weird-file']
 
     test 'works with rest files with valid options',
-        "#{my} -- --module",
-        files: arg true, [my, '--module']
+        "#{my} -- --help",
+        files: arg true, [my, '--help']
 
     # Note: this is a slightly flaky test.
     test 'ignores invalid options', '--why -AM -i --here', {}

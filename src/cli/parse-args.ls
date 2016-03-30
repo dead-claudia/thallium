@@ -68,7 +68,7 @@ serialize = (argv) ->
 
     for entry, i in argv
         if entry == '--'
-            rest(i + 1)
+            rest i + 1
             break
         # Allow anything other than `--` or in the value position. If it's a
         # mistake, this'll likely complain later, anyways.
@@ -137,7 +137,7 @@ types =
             | last.boolean => argSet current, true
             | otherwise => argSet current, arg.value
 
-    file: (args, arg) -> argPush args.files, arg.value
+    file: (args, arg) !-> argPush args.files, arg.value
 
 export parseArgs = (cwd, argv) ->
     args = initArgs cwd

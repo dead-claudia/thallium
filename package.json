@@ -4,7 +4,7 @@
   "description": "A simple, unopinionated, modular test framework",
   "main": "index.js",
   "scripts": {
-    "test": "node make test"
+    "test": "gulp test"
   },
   "files": [
     "assertions.js",
@@ -23,11 +23,15 @@
   "author": "Isiah Meadows <me@isiahmeadows.com>",
   "license": "ISC",
   "devDependencies": {
+    "gulp": "^3.9.1",
+    "gulp-livescript": "^3.0.0",
+    "gulp-mocha": "^2.2.0",
+    "gulp-rename": "^1.2.2",
     "livescript": "^1.4.0",
     "mocha": "^2.3.4",
     "mock-fs": "^3.8.0",
     "mockery": "^1.4.0",
-    "shelljs": "^0.6.0"
+    "rimraf": "^2.5.2"
   },
   "dependencies": {
     "bluebird": "^3.3.4",
