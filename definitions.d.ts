@@ -190,6 +190,8 @@ declare module "techtonic/core" {
 declare module "techtonic/assertions" {
     import {Test} from "techtonic/core";
 
+    type Key = string | number | symbol;
+
     type TypeofValue =
         "boolean" |
         "function" |
@@ -202,10 +204,7 @@ declare module "techtonic/assertions" {
     type Matcher = ((error: any) => any) | string | RegExp;
 
     export interface Assertions {
-        // basic assertion
         assert(cond: boolean, message?: string): this;
-
-        // unconditionally fail with an optional message
         fail(message?: string): this;
 
         ok(cond: any): this;
@@ -229,9 +228,6 @@ declare module "techtonic/assertions" {
         symbol(object: any): this;
         notSymbol(object: any): this;
 
-        undefined(object: any): this;
-        notUndefined(object: any): this;
-
         true(object: any): this;
         notTrue(object: any): this;
 
@@ -243,6 +239,9 @@ declare module "techtonic/assertions" {
 
         undefined(object: any): this;
         notUndefined(object: any): this;
+
+        exists(object: any): this;
+        notExists(object: any): this;
 
         array(object: any): this;
         notArray(object: any): this;
@@ -259,64 +258,57 @@ declare module "techtonic/assertions" {
         looseEqual<T>(a: T, b: T): this;
         notLooseEqual<T>(a: T, b: T): this;
 
+        // Strict deep equal, taking into account types
         deepEqual<T>(a: T, b: T): this;
         notDeepEqual<T>(a: T, b: T): this;
 
-        looseDeepEqual<T>(a: T, b: T): this;
-        notLooseDeepEqual<T>(a: T, b: T): this;
+        // Loose deep equal, ignoring types
+        looseDeepEqual(a: Object, b: Object): this;
+        notLooseDeepEqual(a: Object, b: Object): this;
 
-        // TODO: enable the symbol variants once TypeScript supports these
-        hasOwn(object: {[key: string]: any}, key: string, value?: any): this;
-        hasOwn(object: {[key: number]: any}, key: number, value?: any): this;
-        // hasOwn(object: {[key: symbol]: any}, key: symbol, value?: any): this;
+        // deepEqual, but ignoring types
+        match(a: Object, b: Object): this;
+        notMatch(a: Object, b: Object): this;
 
-        notHasOwn(object: {[key: string]: any}, key: string, value?: any): this;
-        notHasOwn(object: {[key: number]: any}, key: number, value?: any): this;
-        // notHasOwn(object: {[key: symbol]: any}, key: symbol, value?: any): this;
+        // alias of looseDeepEqual
+        matchLoose(a: Object, b: Object): this;
+        notMatchLoose(a: Object, b: Object): this;
 
-        looseHasOwn(object: {[key: string]: any}, key: string, value?: any): this;
-        looseHasOwn(object: {[key: number]: any}, key: number, value?: any): this;
-        // looseHasOwn(object: {[key: symbol]: any}, key: symbol, value?: any): this;
+        // has own property, possibly equal to a value
+        hasOwn(object: Object, key: Key, value?: any): this;
+        notHasOwn(object: Object, key: Key, value?: any): this;
+        looseHasOwn(object: Object, key: Key, value?: any): this;
+        notLooseHasOwn(object: Object, key: Key, value?: any): this;
 
-        notLooseHasOwn(object: {[key: string]: any}, key: string, value?: any): this;
-        notLooseHasOwn(object: {[key: number]: any}, key: number, value?: any): this;
-        // notLooseHasOwn(object: {[key: symbol]: any}, key: symbol, value?: any): this;
+        // has own or inherited property, possibly equal to a value
+        hasKey(object: Object, key: Key, value?: any): this;
+        notHasKey(object: Object, key: Key, value?: any): this;
+        looseHasKey(object: Object, key: Key, value?: any): this;
+        notLooseHasKey(object: Object, key: Key, value?: any): this;
 
-        hasKey(object: {[key: string]: any}, key: string, value?: any): this;
-        hasKey(object: {[key: number]: any}, key: number, value?: any): this;
-        // hasKey(object: {[key: symbol]: any}, key: symbol, value?: any): this;
-
-        notHasKey(object: {[key: string]: any}, key: string, value?: any): this;
-        notHasKey(object: {[key: number]: any}, key: number, value?: any): this;
-        // notHasKey(object: {[key: symbol]: any}, key: symbol, value?: any): this;
-
-        looseHasKey(object: {[key: string]: any}, key: string, value?: any): this;
-        looseHasKey(object: {[key: number]: any}, key: number, value?: any): this;
-        // looseHasKey(object: {[key: symbol]: any}, key: symbol, value?: any): this;
-
-        notLooseHasKey(object: {[key: string]: any}, key: string, value?: any): this;
-        notLooseHasKey(object: {[key: number]: any}, key: number, value?: any): this;
-        // notLooseHasKey(object: {[key: symbol]: any}, key: symbol, value?: any): this;
-
+        // throws, possibly of a specified type
         throws(func: () => any, Type?: new (...args: any[]) => any): this;
         notThrows(func: () => any, Type?: new (...args: any[]) => any): this;
 
+        // throws, possibly satisfying a predicate function, having message
+        // equal to a particular string, or having message that matches a
+        // regular expression
         throwsMatch(func: () => any, matcher?: Matcher): this;
         notThrowsMatch(func: () => any, matcher?: Matcher): this;
 
+        // Note: length comparisons always fail with NaNs.
         length(object: {length: number}, length: number): this;
         notLength(object: {length: number}, length: number): this;
-
-        // Note: these always fail with NaNs.
         lengthAtLeast(object: {length: number}, length: number): this;
         lengthAtMost(object: {length: number}, length: number): this;
         lengthAbove(object: {length: number}, length: number): this;
         lengthBelow(object: {length: number}, length: number): this;
 
-        // Note: these two always fail with NaNs.
+        // Note: these two always fail with NaNs, and the delta ignores sign.
         closeTo(actual: number, expected: number, delta: number): this;
         notCloseTo(actual: number, expected: number, delta: number): this;
 
+        // includes list of values
         includes<T>(array: T[], keys: T | T[]): this;
         notIncludesAll<T>(array: T[], keys: T | T[]): this;
         includesAny<T>(array: T[], keys: T | T[]): this;
@@ -327,35 +319,68 @@ declare module "techtonic/assertions" {
         includesLooseAny<T>(array: T[], keys: T | T[]): this;
         notIncludesLoose<T>(array: T[], keys: T | T[]): this;
 
-        includesDeep<T>(array: T[], keys: T): this;
-        notIncludesDeepAll<T>(array: T[], keys: T): this;
-        includesDeepAny<T>(array: T[], keys: T): this;
-        notIncludesDeep<T>(array: T[], keys: T): this;
+        includesDeep<T>(array: T[], keys: T | T[]): this;
+        notIncludesDeepAll<T>(array: T[], keys: T | T[]): this;
+        includesDeepAny<T>(array: T[], keys: T | T[]): this;
+        notIncludesDeep<T>(array: T[], keys: T | T[]): this;
 
-        includesLooseDeep<T>(array: T[], keys: T): this;
-        notIncludesLooseDeepAll<T>(array: T[], keys: T): this;
-        includesLooseDeepAny<T>(array: T[], keys: T): this;
-        notIncludesLooseDeep<T>(array: T[], keys: T): this;
+        includesLooseDeep<T>(array: T[], keys: T | T[]): this;
+        notIncludesLooseDeepAll<T>(array: T[], keys: T | T[]): this;
+        includesLooseDeepAny<T>(array: T[], keys: T | T[]): this;
+        notIncludesLooseDeep<T>(array: T[], keys: T | T[]): this;
 
-        hasKeys(object: any, keys: any): this;
-        notHasAllKeys(object: any, keys: any): this;
-        hasAnyKeys(object: any, keys: any): this;
-        notHasKeys(object: any, keys: any): this;
+        includesMatchLoose<T>(array: T[], keys: T | T[]): this;
+        notIncludesMatchLooseAll<T>(array: T[], keys: T | T[]): this;
+        includesMatchLooseAny<T>(array: T[], keys: T | T[]): this;
+        notIncludesMatchLoose<T>(array: T[], keys: T | T[]): this;
 
-        hasLooseKeys(object: any, keys: any): this;
-        notHasLooseAllKeys(object: any, keys: any): this;
-        hasLooseAnyKeys(object: any, keys: any): this;
-        notHasLooseKeys(object: any, keys: any): this;
+        includesMatch<T>(array: T[], keys: T | T[]): this;
+        notIncludesMatchAll<T>(array: T[], keys: T | T[]): this;
+        includesMatchAny<T>(array: T[], keys: T | T[]): this;
+        notIncludesMatch<T>(array: T[], keys: T | T[]): this;
 
-        hasDeepKeys(object: any, keys: any): this;
-        notHasDeepAllKeys(object: any, keys: any): this;
-        hasDeepAnyKeys(object: any, keys: any): this;
-        notHasDeepKeys(object: any, keys: any): this;
+        // match Object.keys(object) with list of keys
+        hasKeys(object: Object, keys: Array<Key>): this;
+        notHasAllKeys(object: Object, keys: Array<Key>): this;
+        hasAnyKeys(object: Object, keys: Array<Key>): this;
+        notHasKeys(object: Object, keys: Array<Key>): this;
 
-        hasLooseDeepKeys(object: any, keys: any): this;
-        notHasLooseDeepAllKeys(object: any, keys: any): this;
-        hasLooseDeepAnyKeys(object: any, keys: any): this;
-        notHasLooseDeepKeys(object: any, keys: any): this;
+        // match Object.keys(object) with keys
+        // strict equal
+        hasKeys(object: Object, keys: Object): this;
+        notHasAllKeys(object: Object, keys: Object): this;
+        hasAnyKeys(object: Object, keys: Object): this;
+        notHasKeys(object: Object, keys: Object): this;
+
+        // loose equal
+        hasLooseKeys(object: Object, keys: Object): this;
+        notHasLooseAllKeys(object: Object, keys: Object): this;
+        hasLooseAnyKeys(object: Object, keys: Object): this;
+        notHasLooseKeys(object: Object, keys: Object): this;
+
+        // strict deep equal
+        hasDeepKeys(object: Object, keys: Object): this;
+        notHasDeepAllKeys(object: Object, keys: Object): this;
+        hasDeepAnyKeys(object: Object, keys: Object): this;
+        notHasDeepKeys(object: Object, keys: Object): this;
+
+        // loose deep equal
+        hasLooseDeepKeys(object: Object, keys: Object): this;
+        notHasLooseDeepAllKeys(object: Object, keys: Object): this;
+        hasLooseDeepAnyKeys(object: Object, keys: Object): this;
+        notHasLooseDeepKeys(object: Object, keys: Object): this;
+
+        // structural deep equal
+        hasMatchKeys(object: Object, keys: Object): this;
+        notHasMatchAllKeys(object: Object, keys: Object): this;
+        hasMatchAnyKeys(object: Object, keys: Object): this;
+        notHasMatchKeys(object: Object, keys: Object): this;
+
+        // Aliases for hasLooseDeepKeys/etc.
+        hasMatchLooseKeys(object: Object, keys: Object): this;
+        notHasMatchLooseAllKeys(object: Object, keys: Object): this;
+        hasMatchLooseAnyKeys(object: Object, keys: Object): this;
+        notHasMatchLooseKeys(object: Object, keys: Object): this;
     }
 
     /**

@@ -9,4 +9,4 @@ require! {
     './assertions': {assertions}
 }
 
-export t = new Techtonic!use assertions
+export t = Techtonic.base!use assertions

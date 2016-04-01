@@ -12,6 +12,7 @@ suite 'assertions (includes)', !->
             t.includes [1, 2, 3, 4, 5], [1]
 
         test 'is strict', !->
+            fail 'includes', ['1', 2, 3, 4, 5], 1
             fail 'includes', ['1', 2, 3, 4, 5], [1]
 
         test 'checks objects', !->
@@ -46,6 +47,7 @@ suite 'assertions (includes)', !->
             fail 'notIncludesAll', [1, 2, 3, 4, 5], [1]
 
         test 'is strict', !->
+            t.notIncludesAll ['1', 2, 3, 4, 5], 1
             t.notIncludesAll ['1', 2, 3, 4, 5], [1]
 
         test 'checks objects', !->
@@ -80,6 +82,7 @@ suite 'assertions (includes)', !->
             t.includesAny [1, 2, 3, 4, 5], [1]
 
         test 'is strict', !->
+            fail 'includesAny', ['1', 2, 3, 4, 5], 1
             fail 'includesAny', ['1', 2, 3, 4, 5], [1]
 
         test 'checks objects', !->
@@ -114,6 +117,7 @@ suite 'assertions (includes)', !->
             fail 'notIncludes', [1, 2, 3, 4, 5], [1]
 
         test 'is strict', !->
+            t.notIncludes ['1', 2, 3, 4, 5], 1
             t.notIncludes ['1', 2, 3, 4, 5], [1]
 
         test 'checks objects', !->
@@ -285,6 +289,7 @@ suite 'assertions (includes)', !->
             t.includesDeep [1, 2, 3, 4, 5], [1]
 
         test 'is strict', !->
+            fail 'includesDeep', ['1', 2, 3, 4, 5], 1
             fail 'includesDeep', ['1', 2, 3, 4, 5], [1]
 
         test 'checks objects', !->
@@ -317,6 +322,7 @@ suite 'assertions (includes)', !->
             fail 'notIncludesDeepAll', [1, 2, 3, 4, 5], [1]
 
         test 'is strict', !->
+            t.notIncludesDeepAll ['1', 2, 3, 4, 5], 1
             t.notIncludesDeepAll ['1', 2, 3, 4, 5], [1]
 
         test 'checks objects', !->
@@ -341,6 +347,7 @@ suite 'assertions (includes)', !->
             t.includesDeepAny [1, 2, 3, 4, 5], [1]
 
         test 'is strict', !->
+            fail 'includesDeepAny', ['1', 2, 3, 4, 5], 1
             fail 'includesDeepAny', ['1', 2, 3, 4, 5], [1]
 
         test 'checks objects', !->
@@ -365,13 +372,12 @@ suite 'assertions (includes)', !->
             fail 'notIncludesDeep', [1, 2, 3, 4, 5], [1]
 
         test 'is strict', !->
+            t.notIncludesDeep ['1', 2, 3, 4, 5], 1
             t.notIncludesDeep ['1', 2, 3, 4, 5], [1]
 
         test 'checks objects', !->
             fail 'notIncludesDeep', [{foo: 1}, 3, 'foo'], ['foo', 1]
-
             fail 'notIncludesDeep', [{foo: 1}, {bar: 2}], [{foo: 1}, {bar: 1}]
-
             fail 'notIncludesDeep', [{foo: 1}, {bar: 2}], [{foo: 1}, {bar: 2}]
 
         test 'checks nothing', !->
@@ -491,3 +497,119 @@ suite 'assertions (includes)', !->
         test 'checks missing objects', !->
             t.notIncludesLooseDeep [{foo: 1}, {bar: 2}, {}], [[]]
             fail 'notIncludesLooseDeep', [{foo: 1}, {bar: 2}, {}], [[], {foo: 1}]
+
+    /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+    suite 't.includesMatch()', !->
+        test 'checks numbers', !->
+            t.includesMatch [1, 2, 3, 4, 5], 1
+            t.includesMatch [1, 2, 3, 4, 5], [1]
+
+        test 'is strict', !->
+            fail 'includesMatch', ['1', 2, 3, 4, 5], 1
+            fail 'includesMatch', ['1', 2, 3, 4, 5], [1]
+
+        test 'checks objects', !->
+            obj1 = {}
+            obj2 = {}
+            obj3 = {}
+
+            t.includesMatch [obj1, 3, obj3, 'foo'], [obj1, obj3]
+            t.includesMatch [obj1, obj2, obj3], [obj1, obj2, obj3]
+            t.includesMatch [obj1, 3, obj3, 'foo'], [obj1, obj2, obj3]
+
+            t.includesMatch [{foo: 1}, {bar: 2}, 3, 'foo', {}], [{foo: 1}]
+            t.includesMatch [{foo: 1}, {bar: 2}, {}], [{bar: 2}, {}]
+            t.includesMatch [{foo: 1}, {bar: 2}, []], [[]]
+
+        test 'checks nothing', !->
+            t.includesMatch [{}, {}], []
+
+        test 'checks missing numbers', !->
+            fail 'includesMatch', [1, 2, 3, 4, 5], 10
+            fail 'includesMatch', [1, 2, 3, 4, 5], [10]
+
+        test 'checks missing objects', !->
+            fail 'includesMatch', [{foo: 1}, {bar: 2}, {}], [[]]
+            fail 'includesMatch', [{foo: 1}, {bar: 2}, {}], [[], {foo: 1}]
+
+    suite 't.notIncludesMatchAll()', !->
+        test 'checks numbers', !->
+            fail 'notIncludesMatchAll', [1, 2, 3, 4, 5], 1
+            fail 'notIncludesMatchAll', [1, 2, 3, 4, 5], [1]
+
+        test 'is strict', !->
+            t.notIncludesMatchAll ['1', 2, 3, 4, 5], 1
+            t.notIncludesMatchAll ['1', 2, 3, 4, 5], [1]
+
+        test 'checks objects', !->
+            t.notIncludesMatchAll [{foo: 1}, 3, 'foo'], ['foo', 1]
+            t.notIncludesMatchAll [{foo: 1}, {bar: 2}], [{foo: 1}, {bar: 1}]
+            fail 'notIncludesMatchAll', [{foo: 1}, {bar: 2}], [{foo: 1}, {bar: 2}]
+
+        test 'checks nothing', !->
+            t.notIncludesMatchAll [{}, {}], []
+
+        test 'checks missing numbers', !->
+            t.notIncludesMatchAll [1, 2, 3, 4, 5], 10
+            t.notIncludesMatchAll [1, 2, 3, 4, 5], [10]
+
+        test 'checks missing objects', !->
+            t.notIncludesMatchAll [{foo: 1}, {bar: 2}, {}], [[]]
+            t.notIncludesMatchAll [{foo: 1}, {bar: 2}, {}], [[], {foo: 1}]
+
+    suite 't.includesMatchAny()', !->
+        test 'checks numbers', !->
+            t.includesMatchAny [1, 2, 3, 4, 5], 1
+            t.includesMatchAny [1, 2, 3, 4, 5], [1]
+
+        test 'is strict', !->
+            fail 'includesMatchAny', ['1', 2, 3, 4, 5], 1
+            fail 'includesMatchAny', ['1', 2, 3, 4, 5], [1]
+
+        test 'checks objects', !->
+            t.includesMatchAny [{foo: 1}, 3, 'foo'], ['foo', 1]
+            t.includesMatchAny [{foo: 1}, {bar: 2}], [{foo: 1}, {bar: 1}]
+            t.includesMatchAny [{foo: 1}, {bar: 2}], [{foo: 1}, {bar: 2}]
+
+        test 'checks nothing', !->
+            t.includesMatchAny [{}, {}], []
+
+        test 'checks missing numbers', !->
+            fail 'includesMatchAny', [1, 2, 3, 4, 5], 10
+            fail 'includesMatchAny', [1, 2, 3, 4, 5], [10]
+
+        test 'checks missing objects', !->
+            fail 'includesMatchAny', [{foo: 1}, {bar: 2}, {}], [[]]
+            t.includesMatchAny [{foo: 1}, {bar: 2}, {}], [[], {foo: 1}]
+
+    suite 't.notIncludesMatch()', !->
+        test 'checks numbers', !->
+            fail 'notIncludesMatch', [1, 2, 3, 4, 5], 1
+            fail 'notIncludesMatch', [1, 2, 3, 4, 5], [1]
+
+        test 'is strict', !->
+            t.notIncludesMatch ['1', 2, 3, 4, 5], 1
+            t.notIncludesMatch ['1', 2, 3, 4, 5], [1]
+
+        test 'checks objects', !->
+            fail 'notIncludesMatch', [{foo: 1}, 3, 'foo'], ['foo', 1]
+            fail 'notIncludesMatch', [{foo: 1}, {bar: 2}], [{foo: 1}, {bar: 1}]
+            fail 'notIncludesMatch', [{foo: 1}, {bar: 2}], [{foo: 1}, {bar: 2}]
+
+        test 'checks nothing', !->
+            t.notIncludesMatch [{}, {}], []
+
+        test 'checks missing numbers', !->
+            t.notIncludesMatch [1, 2, 3, 4, 5], 10
+            t.notIncludesMatch [1, 2, 3, 4, 5], [10]
+
+        test 'checks missing objects', !->
+            t.notIncludesMatch [{foo: 1}, {bar: 2}, {}], [[]]
+            fail 'notIncludesMatch', [{foo: 1}, {bar: 2}, {}], [[], {foo: 1}]
+
+    test 'correct aliases', !->
+        t.equal t.includesMatchLoose, t.includesLooseDeep
+        t.equal t.notIncludesMatchLooseAll, t.notIncludesLooseDeepAll
+        t.equal t.includesMatchLooseAny, t.includesLooseDeepAny
+        t.equal t.notIncludesMatchLoose, t.notIncludesLooseDeep

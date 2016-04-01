@@ -13,8 +13,9 @@ require! {
 toString = Object::toString
 hasOwn = Object::hasOwnProperty
 
-looseDeepEqual = (actual, expected) -> deepEqualImpl actual, expected, false
-deepEqual = (actual, expected) -> deepEqualImpl actual, expected, true
+looseDeepEqual = (a, b) -> deepEqualImpl a, b, 'loose'
+deepEqual = (a, b) -> deepEqualImpl a, b, 'strict'
+deepEqualMatch = (a, b) -> deepEqualImpl a, b, 'match'
 
 # This holds everything to be added.
 methods = []
@@ -77,14 +78,19 @@ unary 'ok', (-> it),
     'Expected {actual} to not be ok'
 
 for let type in <[boolean function number object string symbol]>
+    name = (if type[0] == 'o' then 'an ' else 'a ') + type
     unary type, (-> typeof it == type),
-        "Expected typeof {actual} to be #{type}"
-        "Expected typeof {actual} to not be #{type}"
+        "Expected {actual} to be #{name}"
+        "Expected {actual} to not be #{name}"
 
 for let value in [true, false, null, undefined]
     unary "#{value}", (== value),
         "Expected {actual} to be #{value}"
         "Expected {actual} to not be #{value}"
+
+unary 'exists', (-> it?),
+    'Expected {actual} to exist'
+    'Expected {actual} to not exist'
 
 unary 'array', Array.isArray,
     'Expected {actual} to be an array'
@@ -129,8 +135,15 @@ binary 'deepEqual', deepEqual,
     'Expected {actual} to not deeply equal {expected}'
 
 binary 'looseDeepEqual', looseDeepEqual,
-    'Expected {actual} to loosely equal {expected}'
-    'Expected {actual} to not loosely equal {expected}'
+    'Expected {actual} to loosely match {expected}'
+    'Expected {actual} to not loosely match {expected}'
+
+binary 'match', deepEqualMatch,
+    'Expected {actual} to match {keys}'
+    'Expected {actual} to not match {keys}'
+
+alias 'matchLoose', 'looseDeepEqual'
+alias 'notMatchLoose', 'notLooseDeepEqual'
 
 has = (name, equals, check, messages) ->
     define name, (object, key, value) ->
@@ -274,8 +287,8 @@ define 'notCloseTo', (actual, expected, delta) ->
 
 /**
  * There's 4 sets of 4 permutations here instead of N sets of 2 (which would
- * fit the `foo`/`notFoo` idiom better), so it's easier to just make a
- * functional DSL and use that to define everything.
+ * fit the `foo`/`notFoo` idiom better), so it's easier to just make a DSL and
+ * use that to define everything.
  *
  * Here's the top level:
  *
@@ -292,131 +305,161 @@ define 'notCloseTo', (actual, expected, delta) ->
  * - not including some/missing all
  *
  * A near-identical DSL is used to define the hasKeys set as well, although
- * the internals use it to also overload all of them to consume either an
- * array (in which it simply searches keys) or an object (where it does a
- * full comparison). Do note that most of the hasKeys set are effectively
+ * those are also overloaded to consume either an array (in which it simply
+ * compares the object's keys to a list of keys) or an object (where it does a
+ * full deep comparison). Do note that most of the hasKeys set are effectively
  * aliases for half of the methods if called with an array, since no actual
  * property access occurs.
  */
 
-makeIncludes = (all, func, array, keys) -->
+makeIncludes = (all, func) -> (array, keys) ->
     | all => keys.every (key) -> array.some (i) -> func key, i
     | otherwise => keys.some (key) -> array.some (i) -> func key, i
 
 defineIncludes = (name, func, invert, message) ->
-    base = (array, keys, func) ->
+    base = (array, values, func) ->
         # Cheap cases first
         | not Array.isArray array => false
-        | array == keys => true
-        | array.length < keys.length => false
-        | otherwise => func array, keys
+        | array == values => true
+        | array.length < values.length => false
+        | otherwise => func array, values
 
-    define name, (array, keys) ->
-        keys = [keys] unless Array.isArray keys
+    define name, (array, values) ->
+        values = [values] unless Array.isArray values
         # exclusive or to invert the result if `invert` is true
-        test: not keys.length or invert xor base array, keys, func
+        test: not values.length or invert xor base array, values, func
         actual: array
-        keys: keys
+        values: values
         message: message
 
 includesAll = makeIncludes true, strictIs
 includesAny = makeIncludes false, strictIs
 
-defineIncludes 'includes', includesAll, false, 'Expected {actual} to have all values in {keys}'
-defineIncludes 'notIncludesAll', includesAll, true, 'Expected {actual} to not have all values in {keys}'
-defineIncludes 'includesAny', includesAny, false, 'Expected {actual} to have any value in {keys}'
-defineIncludes 'notIncludes', includesAny, true, 'Expected {actual} to not have any value in {keys}'
+defineIncludes 'includes', includesAll, false, 'Expected {actual} to have all values in {value}'
+defineIncludes 'notIncludesAll', includesAll, true, 'Expected {actual} to not have all values in {value}'
+defineIncludes 'includesAny', includesAny, false, 'Expected {actual} to have any value in {value}'
+defineIncludes 'notIncludes', includesAny, true, 'Expected {actual} to not have any value in {value}'
 
 includesLooseAll = makeIncludes true, looseIs
 includesLooseAny = makeIncludes false, looseIs
 
-defineIncludes 'includesLoose', includesLooseAll, false, 'Expected {actual} to loosely have all values in {keys}'
-defineIncludes 'notIncludesLooseAll', includesLooseAll, true, 'Expected {actual} to loosely not have all values in {keys}'
-defineIncludes 'includesLooseAny', includesLooseAny, false, 'Expected {actual} to loosely have any value in {keys}'
-defineIncludes 'notIncludesLoose', includesLooseAny, true, 'Expected {actual} to loosely not have any value in {keys}'
+defineIncludes 'includesLoose', includesLooseAll, false, 'Expected {actual} to loosely have all values in {value}'
+defineIncludes 'notIncludesLooseAll', includesLooseAll, true, 'Expected {actual} to not loosely have all values in {value}'
+defineIncludes 'includesLooseAny', includesLooseAny, false, 'Expected {actual} to loosely have any value in {value}'
+defineIncludes 'notIncludesLoose', includesLooseAny, true, 'Expected {actual} to not loosely have any value in {value}'
 
 includesDeepAll = makeIncludes true, deepEqual
 includesDeepAny = makeIncludes false, deepEqual
 
-defineIncludes 'includesDeep', includesDeepAll, false, 'Expected {actual} to match all values in {keys}'
-defineIncludes 'notIncludesDeepAll', includesDeepAll, true, 'Expected {actual} to not match all values in {keys}'
-defineIncludes 'includesDeepAny', includesDeepAny, false, 'Expected {actual} to match any value in {keys}'
-defineIncludes 'notIncludesDeep', includesDeepAny, true, 'Expected {actual} to not match any value in {keys}'
+defineIncludes 'includesDeep', includesDeepAll, false, 'Expected {actual} to match all values in {value}'
+defineIncludes 'notIncludesDeepAll', includesDeepAll, true, 'Expected {actual} to not match all values in {value}'
+defineIncludes 'includesDeepAny', includesDeepAny, false, 'Expected {actual} to match any value in {value}'
+defineIncludes 'notIncludesDeep', includesDeepAny, true, 'Expected {actual} to not match any value in {value}'
 
 includesLooseDeepAll = makeIncludes true, looseDeepEqual
 includesLooseDeepAny = makeIncludes false, looseDeepEqual
 
-defineIncludes 'includesLooseDeep', includesLooseDeepAll, false, 'Expected {actual} to loosely match all values in {keys}'
-defineIncludes 'notIncludesLooseDeepAll', includesLooseDeepAll, true, 'Expected {actual} to loosely not match all values in {keys}'
-defineIncludes 'includesLooseDeepAny', includesLooseDeepAny, false, 'Expected {actual} to loosely match any value in {keys}'
-defineIncludes 'notIncludesLooseDeep', includesLooseDeepAny, true, 'Expected {actual} to loosely not match any value in {keys}'
+defineIncludes 'includesLooseDeep', includesLooseDeepAll, false, 'Expected {actual} to loosely match all values in {value}'
+defineIncludes 'notIncludesLooseDeepAll', includesLooseDeepAll, true, 'Expected {actual} to not loosely match all values in {value}'
+defineIncludes 'includesLooseDeepAny', includesLooseDeepAny, false, 'Expected {actual} to loosely match any value in {value}'
+defineIncludes 'notIncludesLooseDeep', includesLooseDeepAny, true, 'Expected {actual} to not loosely match any value in {value}'
+
+includesMatchDeepAll = makeIncludes true, deepEqualMatch
+includesMatchDeepAny = makeIncludes false, deepEqualMatch
+
+defineIncludes 'includesMatch', includesMatchDeepAll, false, 'Expected {actual} to match all values in {value}'
+defineIncludes 'notIncludesMatchAll', includesMatchDeepAll, true, 'Expected {actual} to not match all values in {value}'
+defineIncludes 'includesMatchAny', includesMatchDeepAny, false, 'Expected {actual} to match any value in {value}'
+defineIncludes 'notIncludesMatch', includesMatchDeepAny, true, 'Expected {actual} to not match any value in {value}'
+
+alias 'includesMatchLoose', 'includesLooseDeep'
+alias 'notIncludesMatchLooseAll', 'notIncludesLooseDeepAll'
+alias 'includesMatchLooseAny', 'includesLooseDeepAny'
+alias 'notIncludesMatchLoose', 'notIncludesLooseDeep'
 
 isEmpty = (object) ->
     | Array.isArray object => object.length == 0
     | typeof object != 'object' or not object? => true
     | otherwise => Object.keys object .length == 0
 
-makeHasKeys = (name, methods, invert, message) ->
-    base = (object, keys, methods) ->
+makeHasOverload = (name, methods, invert, message) ->
+    base = (object, keys) ->
         # Cheap case first
         | object == keys => true
         | Array.isArray keys => methods.array object, keys
         | otherwise => methods.object object, keys
 
     define name, (object, keys) ->
-        keys = [keys] unless typeof keys == 'object' and keys
         # exclusive or to invert the result if `invert` is true
         test: isEmpty keys or invert xor base object, keys, methods
         actual: object
         keys: keys
         message: message
 
-hasKeysType = (all, func) ->
-    object: (object, keys) ->
-        f = (k) -> hasOwn.call object, k and func keys[k], object[k]
-        typeof keys != 'object' or not keys? or if all
-            Object.keys keys .every f
-        else
-            Object.keys keys .some f
+makeHasKeys = (name, func, invert, message) ->
+    base = (object, keys) -> object == keys or func object, keys
 
+    define name, (object, keys) ->
+        # exclusive or to invert the result if `invert` is true
+        test: isEmpty keys or invert xor base object, keys
+        actual: object
+        keys: keys
+        message: message
+
+hasKeysType = (all, func) -> (object, keys) ->
+    f = (k) -> hasOwn.call object, k and func keys[k], object[k]
+    typeof keys != 'object' or not keys? or if all
+        Object.keys keys .every f
+    else
+        Object.keys keys .some f
+
+hasOverloadType = (all, func) ->
+    object: hasKeysType all, func
     array: (object, keys) ->
         | all => keys.every (k) -> hasOwn.call object, k
         | otherwise => keys.some (k) -> hasOwn.call object, k
 
-hasAllKeys = hasKeysType true, strictIs
-hasAnyKeys = hasKeysType false, strictIs
+hasAllKeys = hasOverloadType true, strictIs
+hasAnyKeys = hasOverloadType false, strictIs
 
-makeHasKeys 'hasKeys', hasAllKeys, false, 'Expected {actual} to have all keys in {keys}'
-makeHasKeys 'notHasAllKeys', hasAllKeys, true, 'Expected {actual} to not have all keys in {keys}'
-makeHasKeys 'hasAnyKeys', hasAnyKeys, false, 'Expected {actual} to have any key in {keys}'
-makeHasKeys 'notHasKeys', hasAnyKeys, true, 'Expected {actual} to not have any key in {keys}'
+makeHasOverload 'hasKeys', hasAllKeys, false, 'Expected {actual} to have all keys in {keys}'
+makeHasOverload 'notHasAllKeys', hasAllKeys, true, 'Expected {actual} to not have all keys in {keys}'
+makeHasOverload 'hasAnyKeys', hasAnyKeys, false, 'Expected {actual} to have any key in {keys}'
+makeHasOverload 'notHasKeys', hasAnyKeys, true, 'Expected {actual} to not have any key in {keys}'
 
 hasLooseAllKeys = hasKeysType true, looseIs
 hasLooseAnyKeys = hasKeysType false, looseIs
 
 makeHasKeys 'hasLooseKeys', hasLooseAllKeys, false, 'Expected {actual} to loosely have all keys in {keys}'
-makeHasKeys 'notHasLooseAllKeys', hasLooseAllKeys, true, 'Expected {actual} to loosely not have all keys in {keys}'
+makeHasKeys 'notHasLooseAllKeys', hasLooseAllKeys, true, 'Expected {actual} to not loosely have all keys in {keys}'
 makeHasKeys 'hasLooseAnyKeys', hasLooseAnyKeys, false, 'Expected {actual} to loosely have any key in {keys}'
-makeHasKeys 'notHasLooseKeys', hasLooseAnyKeys, true, 'Expected {actual} to loosely not have any key in {keys}'
+makeHasKeys 'notHasLooseKeys', hasLooseAnyKeys, true, 'Expected {actual} to not loosely have any key in {keys}'
 
 hasDeepAllKeys = hasKeysType true, deepEqual
 hasDeepAnyKeys = hasKeysType false, deepEqual
 
-makeHasKeys 'hasDeepKeys', hasDeepAllKeys, false, 'Expected {actual} to match all keys in {keys}'
-makeHasKeys 'notHasDeepAllKeys', hasDeepAllKeys, true, 'Expected {actual} to not match all keys in {keys}'
-makeHasKeys 'hasDeepAnyKeys', hasDeepAnyKeys, false, 'Expected {actual} to match any key in {keys}'
-makeHasKeys 'notHasDeepKeys', hasDeepAnyKeys, true, 'Expected {actual} to not match any key in {keys}'
-
-# More sensible structural matching.
-alias 'match', 'hasDeepKeys'
+makeHasKeys 'hasDeepKeys', hasDeepAllKeys, false, 'Expected {actual} to have all keys in {keys}'
+makeHasKeys 'notHasDeepAllKeys', hasDeepAllKeys, true, 'Expected {actual} to not have all keys in {keys}'
+makeHasKeys 'hasDeepAnyKeys', hasDeepAnyKeys, false, 'Expected {actual} to have any key in {keys}'
+makeHasKeys 'notHasDeepKeys', hasDeepAnyKeys, true, 'Expected {actual} to not have any key in {keys}'
 
 hasLooseDeepAllKeys = hasKeysType true, looseDeepEqual
 hasLooseDeepAnyKeys = hasKeysType false, looseDeepEqual
 
 makeHasKeys 'hasLooseDeepKeys', hasLooseDeepAllKeys, false, 'Expected {actual} to loosely match all keys in {keys}'
-makeHasKeys 'notHasLooseDeepAllKeys', hasLooseDeepAllKeys, true, 'Expected {actual} to loosely not match all keys in {keys}'
+makeHasKeys 'notHasLooseDeepAllKeys', hasLooseDeepAllKeys, true, 'Expected {actual} to not loosely match all keys in {keys}'
 makeHasKeys 'hasLooseDeepAnyKeys', hasLooseDeepAnyKeys, false, 'Expected {actual} to loosely match any key in {keys}'
-makeHasKeys 'notHasLooseDeepKeys', hasLooseDeepAnyKeys, true, 'Expected {actual} to loosely not match any key in {keys}'
+makeHasKeys 'notHasLooseDeepKeys', hasLooseDeepAnyKeys, true, 'Expected {actual} to not loosely match any key in {keys}'
 
-# More sensible structural matching.
-alias 'matchLoose', 'hasLooseDeepKeys'
+hasMatchAllKeys = hasKeysType true, deepEqualMatch
+hasMatchAnyKeys = hasKeysType false, deepEqualMatch
+
+makeHasKeys 'hasMatchKeys', hasMatchAllKeys, false, 'Expected {actual} to match all keys in {keys}'
+makeHasKeys 'notHasMatchAllKeys', hasMatchAllKeys, true, 'Expected {actual} to not match all keys in {keys}'
+makeHasKeys 'hasMatchAnyKeys', hasMatchAnyKeys, false, 'Expected {actual} to match any key in {keys}'
+makeHasKeys 'notHasMatchKeys', hasMatchAnyKeys, true, 'Expected {actual} to not match any key in {keys}'
+
+alias 'hasMatchLooseKeys', 'hasLooseDeepKeys'
+alias 'notHasMatchLooseAllKeys', 'notHasLooseDeepAllKeys'
+alias 'hasMatchLooseAnyKeys', 'hasLooseDeepAnyKeys'
+alias 'notHasMatchLooseKeys', 'notHasLooseDeepKeys'

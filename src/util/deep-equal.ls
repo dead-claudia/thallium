@@ -11,37 +11,14 @@
 
 require! './is': {strictIs, looseIs}
 
-symbolToString = if typeof Symbol == 'function' and typeof Symbol() == 'symbol'
+symbolToString = if typeof Symbol == 'function' and typeof Symbol! == 'symbol'
     Symbol::toString
 else
     void
 
-symbolEqual = (a, b) ->
+symbolIs = (a, b) ->
     typeof a == 'symbol' and typeof b == 'symbol' and
         (symbolToString.call a) == (symbolToString.call b)
-
-export deepEqual = (actual, expected, strict) ->
-    if typeof actual != 'object' and typeof expected != 'object'
-        return if strict
-            strictIs actual, expected
-        else
-            looseIs actual, expected or symbolEqual actual, expected
-
-    if strict
-        return expected == null if actual == null
-        return false if expected == null
-        return expected == void if actual == void
-        return false if expected == void
-    else
-        return not expected? if not actual?
-        return false if not expected?
-
-    if typeof actual != 'object' or typeof expected != 'object'
-        false
-    else if actual instanceof Date and expected instanceof Date
-        actual.getTime! == expected.getTime!
-    else
-        objEquiv actual, expected, strict
 
 isBuffer = (x) ->
     | not x or typeof x != 'object' or typeof x.length != 'number' => false
@@ -49,7 +26,7 @@ isBuffer = (x) ->
     | otherwise => x.length <= 0 or typeof x.0 == 'number'
 
 # Way faster than deepEqual, as everything here is always a number
-checkBuffer = (a, b) ->
+bufferMatch = (a, b) ->
     return false if a.length != b.length
 
     for i til a.length | a[i] != b[i]
@@ -57,80 +34,93 @@ checkBuffer = (a, b) ->
 
     true
 
-keyPair = (object, keys) -> {object, keys}
+getProto = Object.getPrototypeOf
+keys = Object.keys
 
-checkKeys = (a, b, strict) ->
-    # the same set of keys (although not necessarily the same order),
-    a.keys.sort!
-    b.keys.sort!
+isPrim = (a) -> typeof a != 'object' and typeof a != 'undefined'
+isArguments = (a) -> (toString.call a) == '[object Arguments]'
 
-    # cheap key test
-    for i til a.keys.length | a.keys[i] != b.keys[i]
+any = (xs, f) ->
+    for i til xs.length | f xs[i], i
+        return true
+    false
+
+all = (xs, f) ->
+    for i til xs.length | not f xs[i], i
         return false
-
-    # equivalent values for every corresponding key, and possibly
-    # expensive deep test
-    for key in a.keys
-        unless deepEqual a.object[key], b.object[key], strict
-            return false
-
     true
 
-checkArrayLike = (a, b, strict) ->
-    return false if a.length != b.length
+# Most of the time, there aren't any non-index members to check. Let's do that
+# before sorting, as this is easy to test.
+keyCount = (keys) ->
+    return 0 if keys.length == 0
+    count = 0
+    for x in keys | x == 'length' or /^\d+$/.test x
+        count++
+    count
 
-    for i til a.length
-        unless deepEqual a[i], b[i], strict
-            return false
+export deepEqual = (actual, expected, type) ->
+    deepEqual = (a, b) ->
+        | isPrim a and isPrim b => primMatch a, b
+        | type == 'loose' => looseMatch a, b
+        | otherwise => strictMatch a, b
 
-    akeys = Object.keys a
-    bkeys = Object.keys b
+    primMatch = (a, b) ->
+        | type == 'strict' => strictIs a, b
+        | type == 'match' => strictIs a, b or symbolIs a, b
+        | type == 'loose' => looseIs a, b or symbolIs a, b
+        | otherwise => throw new Error 'unreachable'
 
-    # Same number of own properties
-    return false if akeys.length != bkeys.length
+    looseMatch = (a, b) ->
+        | not a? => not b?
+        | not b? => false
+        | otherwise => objMatch a, b
 
-    # Most of the time, there aren't any non-index to check. Let's do
-    # that before sorting, as this is easy to test.
-    acount = 0
-    bcount = 0
+    strictMatch = (a, b) ->
+        | a == null => b == null
+        | b == null => false
+        | a == void => b == void
+        | b == void => false
+        | otherwise => objMatch a, b
 
-    for i til akeys.length
-        akey = akeys[i]
-        bkey = bkeys[i]
+    keysMatch = (a, akeys, b, bkeys) ->
+        # the same set of keys (although not necessarily the same order),
+        akeys.sort!
+        bkeys.sort!
 
-        acount++ if akey == 'length' or /^\d+$/.test akey
-        bcount++ if bkey == 'length' or /^\d+$/.test bkey
+        # cheap key test
+        all akeys, ((key, i) -> key == bkeys[i]) and
 
-    acount == 0 and bcount == 0 or
-        checkKeys (keyPair a, akeys), (keyPair b, bkeys), strict
+        # equivalent values for every corresponding key, and possibly
+        # expensive deep test
+        all akeys, ((key) -> deepEqual a[key], b[key])
 
-objEquiv = (a, b, strict) ->
-    return false unless a? and b?
+    arrayMatch = (a, b) ->
+        | a.length != b.length => false
+        | not all a, ((x, i) -> deepEqual x, b[i]) => false
+        # Same number of own properties
+        | (akeys = keys a).length != (bkeys = keys b).length => false
+        | otherwise =>
+            # Most of the time, there aren't any non-index to check. Let's do
+            # that before sorting, as this is easy to test.
+            acount = keyCount akeys
+            bcount = keyCount bkeys
+            acount == 0 and bcount == 0 or
+            acount == bcount and keysMatch a, akeys, b, bkeys
 
-    # an identical 'prototype' property.
-    if strict and (Object.getPrototypeOf a) != (Object.getPrototypeOf b)
-        return false
+    objMatch = (a, b) ->
+        | typeof a != 'object' or typeof b != 'object' => false
+        | a instanceof Date and b instanceof Date => a.getTime! == b.getTime!
+        # an identical 'prototype' property.
+        | type == 'strict' and (getProto a) != (getProto b) => false
+        # Arguments object doesn't seem to like Object.keys. Checking it as
+        # an array fixes this.
+        | isArguments a => isArguments b and arrayMatch a, b
+        | isBuffer a => isBuffer b and bufferMatch a, b
+        # If it's an array, no point checking keys.
+        | Array.isArray a => Array.isArray b and arrayMatch a, b
+        # Same number of own properties
+        | (akeys = keys a).length != (bkeys = keys b).length => false
+        | otherwise => keysMatch a, akeys, b, bkeys
 
-    # Arguments object doesn't seem to like Object.keys. Checking it as
-    # an array fixes this.
-    if (toString.call a) == '[object Arguments]'
-        return (toString.call b) == '[object Arguments]' and
-            checkArrayLike a, b, strict
-
-    if isBuffer a
-        return isBuffer b and checkBuffer a, b
-
-    # If it's an array, no point checking keys.
-    if Array.isArray a
-        return Array.isArray b and checkArrayLike a, b, strict
-
-    try
-        akeys = Object.keys(a)
-        bkeys = Object.keys(b)
-    catch
-        # Happens when one is a string literal and the other isn't
-        return false
-
-    # Same number of own properties
-    akeys.length == bkeys.length and
-        checkKeys (keyPair a, akeys), (keyPair b, bkeys), strict
+    deepEqual actual, expected

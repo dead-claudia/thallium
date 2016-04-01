@@ -251,6 +251,23 @@ suite 'assertions (type)', !->
         bad!
         bad Symbol! if typeof Symbol == 'function'
 
+    testType 'exists', (good, bad) !->
+        good true
+        good false
+        good 0
+        good 1
+        good NaN
+        good Infinity
+        good 'foo'
+        good ''
+        bad null
+        good {}
+        good []
+        good !->
+        bad void
+        bad!
+        good Symbol! if typeof Symbol == 'function'
+
     testType 'array', (good, bad) !->
         bad true
         bad false

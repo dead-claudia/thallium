@@ -5,16 +5,17 @@ require! {
     '../util/util': {r}
 }
 
-export class InlineTest extends Test
-    (methods, @name, @index) ->
-        super!
+createSyncTest = ({init, construct}) -> (methods, name, index, callback) ->
+    ret = Test! <<< {name, index, callback, init, parent: methods._}
+    construct.call ret, methods
+    ret
 
+export InlineTest = createSyncTest do
+    construct: (methods) !->
         # Initialize the test now, because the methods are immediately
         # returned, instead of being revealed through the callback.
-
         @inline = []
         @initializing = true
-        @parent = methods._
         @methods = Object.create methods
         @methods._ = @
 
@@ -27,3 +28,16 @@ export class InlineTest extends Test
                 return r 'fail', e
 
         r 'pass'
+
+export BlockTest = createSyncTest do
+    construct: (@methods) !->
+
+    init: ->
+        methods = Object.create @methods
+        methods._ = @
+
+        try
+            @callback.call methods, methods
+            r 'pass'
+        catch e
+            r 'fail', e

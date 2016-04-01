@@ -6,4 +6,4 @@
  */
 require! './techtonic': {Techtonic}
 
-export t = new Techtonic
+export t = Techtonic.base!

@@ -13,14 +13,15 @@ suite 'assertions (has keys)', !->
             | otherwise => fail name, ...args
 
         suite "t.#{name}()", !->
+            test 'exists', !->
+                t.function t[name]
+
             test 'checks numbers', !->
-                run not opts.invert, {1: true, 2: true, 3: false}, 1
-                run not opts.invert, {1: true, 2: true, 3: false}, [1]
-                run not opts.invert, {1: true, 2: true, 3: false}, {1: true}
+                run (opts.keys and not opts.invert), {1: true, 2: true, 3: false}, [1]
+                run (opts.keys and not opts.invert), {1: true, 2: true, 3: false}, {1: true}
 
             test 'checks strings', !->
-                run not opts.invert, {foo: true, bar: false, baz: 1}, 'foo'
-                run not opts.invert, {foo: true, bar: false, baz: 1}, ['foo']
+                run (opts.keys and not opts.invert), {foo: true, bar: false, baz: 1}, ['foo']
                 run not opts.invert, {foo: true, bar: false, baz: 1}, {foo: true}
 
             test 'is strict', !->
@@ -44,8 +45,7 @@ suite 'assertions (has keys)', !->
                 run true, {foo: {}, bar: {}}, {}
 
             test 'checks missing keys', !->
-                run opts.invert, {foo: 1, bar: 2, baz: 3}, 10
-                run opts.invert, {foo: 1, bar: 2, baz: 3}, [10]
+                run (opts.keys and opts.invert), {foo: 1, bar: 2, baz: 3}, [10]
                 run opts.invert, {foo: 1, bar: 2, baz: 3}, {a: 10}
                 run opts.invert, {foo: 1, bar: 2, baz: 3}, {foo: 10}
 
@@ -59,10 +59,10 @@ suite 'assertions (has keys)', !->
                 run opts.invert, {obj1, obj2, obj3}, {a: []}
                 run (opts.invert xor not opts.all), {obj1, obj2, obj3}, {a: [], obj1}
 
-    shallow 'hasKeys', {+all}
-    shallow 'notHasAllKeys', {+all, +invert}
-    shallow 'hasAnyKeys', {}
-    shallow 'notHasKeys', {+invert}
+    shallow 'hasKeys', {+keys, +all}
+    shallow 'notHasAllKeys', {+keys, +all, +invert}
+    shallow 'hasAnyKeys', {+keys}
+    shallow 'notHasKeys', {+keys, +invert}
     shallow 'hasLooseKeys', {+loose, +all}
     shallow 'notHasLooseAllKeys', {+loose, +all, +invert}
     shallow 'hasLooseAnyKeys', {+loose}
@@ -77,13 +77,9 @@ suite 'assertions (has keys)', !->
 
         suite "t.#{name}()", !->
             test 'checks numbers', !->
-                run not opts.invert, {1: true, 2: false, 3: 0}, 1
-                run not opts.invert, {1: true, 2: false, 3: 0}, [1]
                 run not opts.invert, {1: true, 2: false, 3: 0}, {1: true}
 
             test 'checks strings', !->
-                run not opts.invert, {foo: 1, bar: 2, baz: 3}, 'foo'
-                run not opts.invert, {foo: 1, bar: 2, baz: 3}, ['foo']
                 run not opts.invert, {foo: 1, bar: 2, baz: 3}, {foo: 1}
 
             test 'is strict', !->
@@ -152,3 +148,9 @@ suite 'assertions (has keys)', !->
     deep 'notHasLooseDeepAllKeys', {+loose, +invert, +all}
     deep 'hasLooseDeepAnyKeys', {+loose}
     deep 'notHasLooseDeepKeys', {+loose, +invert}
+
+    test 'correct aliases', !->
+        t.equal t.hasMatchLooseKeys, t.hasLooseDeepKeys
+        t.equal t.notHasMatchLooseAllKeys, t.notHasLooseDeepAllKeys
+        t.equal t.hasMatchLooseAnyKeys, t.hasLooseDeepAnyKeys
+        t.equal t.notHasMatchLooseKeys, t.notHasLooseDeepKeys

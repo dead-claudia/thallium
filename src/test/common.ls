@@ -25,9 +25,7 @@ getPath = (ctx) ->
 maybePromisify = (func, value) ->
     new Promise (resolve, reject) ->
         res = func value, (err) ->
-            | err? => reject err
-            | otherwise => resolve!
-
+            if err? then reject err else resolve!
         resolve res if isThenable res
 
 export report = (ctx, args) ->
@@ -54,6 +52,8 @@ export report = (ctx, args) ->
 
 export runTests = (ctx, res) ->
     # If the init failed, then this has already failed.
-    | res.type != 'pass' => Promise.resolve res
-    # Tests are called in sequence for obvious reasons.
-    | otherwise => Promise.each ctx.tests, (.run false) .return res
+    if res.type != 'pass'
+        Promise.resolve res
+    else
+        # Tests are called in sequence for obvious reasons.
+        Promise.each ctx.tests, (-> it.run false) .return res

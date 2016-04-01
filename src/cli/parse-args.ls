@@ -87,12 +87,10 @@ arg = (value = null) ->
 argSet = (arg, value) ->
     arg.passed = true
     arg.value = value
-    arg
 
 argPush = (arg, value) ->
     arg.passed = true
     arg.value.push value
-    arg
 
 /**
  * Properties:
@@ -123,21 +121,23 @@ initArgs = (cwd) ->
 
 types =
     flag: (args, arg) !->
-        | arg.value == 'help' => argSet args.help, 'simple'
-        | arg.value == 'help-detailed' => argSet args.help, 'detailed'
+        | arg.value == 'help' => args.help `argSet` 'simple'
+        | arg.value == 'help-detailed' => args.help `argSet` 'detailed'
         | otherwise => return arg
 
     value: (args, arg, last) !->
         | last == void =>
-            argPush args.files, arg.value
+            args.files `argPush` arg.value
             # Silently ignore invalid arguments
         | hasOwn.call args, last.value =>
-            let current = args[last.value] then switch
-            | Array.isArray current.value => argPush current, arg.value
-            | last.boolean => argSet current, true
-            | otherwise => argSet current, arg.value
+            current = args[last.value]
 
-    file: (args, arg) !-> argPush args.files, arg.value
+            if Array.isArray current.value
+                current `argPush` arg.value
+            else
+                current `argSet` (last.boolean or arg.value)
+
+    file: (args, arg) !-> args.files `argPush` arg.value
 
 export parseArgs = (cwd, argv) ->
     args = initArgs cwd

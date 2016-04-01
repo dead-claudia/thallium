@@ -55,65 +55,64 @@ export getTimeout = (ctx) ->
 
     ctx.timeout or DEFAULT_TIMEOUT
 
-export class AsyncTest extends Test
-    (@methods, @name, @index, @callback) ->
-        super!
-        @parent = @methods._
+init = ->
+    ctx = @
+    methods = Object.create ctx.methods
+    methods._ = ctx
 
-    init: ->
-        methods = Object.create @methods
-        methods._ = @
+    # There's no real way to avoid using the Promise constructor, since
+    # it's difficult to handle the cancellation and failing test semantics
+    # properly as well.
+    new Promise (resolve) !->
+        count = 0
+        interesting = false
+        timer = void
 
-        # There's no real way to avoid using the Promise constructor, since
-        # it's difficult to handle the cancellation and failing test semantics
-        # properly as well.
-        new Promise (resolve) !~>
-            count = 0
-            interesting = false
-            timer = void
+        end = (value) ->
+            if timer
+                clearTimeout timer
+                timer = void
 
-            end = (value) ->
-                if timer
-                    clearTimeout timer
-                    timer = void
+            resolve value
 
-                resolve value
+        pass = -> end r 'pass'
+        fail = (err) -> end r 'fail', err
 
-            pass = -> end r 'pass'
-            fail = (err) -> end r 'fail', err
+        try
+            res = ctx.callback.call methods, methods, (err) !->
+                # Ignore calls to this if something interesting was
+                # already returned.
+                | interesting =>
+                # Errors are ignored here, since there is no reliable
+                # way to handle them after the test ends.
+                | count++ => report ctx, r 'extra', count: count, value: err
+                | err? => fail err
+                | otherwise => pass!
 
-            try
-                res = @callback.call methods, methods, (err) !~>
-                    # Ignore calls to this if something interesting was
-                    # already returned.
-                    | interesting =>
-                    # Errors are ignored here, since there is no reliable
-                    # way to handle them after the test ends.
-                    | count++ => report @, r 'extra', count: count, value: err
-                    | err? => fail err
-                    | otherwise => pass!
+            # It can't be interesting if the result's nullish.
+            interesting = res?
 
-                # It can't be interesting if the result's nullish.
-                interesting = res?
+            switch
+            | isThenable res => Promise.resolve res .then pass, fail
+            # No, Bluebird's coroutines don't work.
+            | isIterator res => iterate res .then pass, fail
+            # Not interesting enough. Mark it as such.
+            | otherwise => interesting = false
+        catch e
+            # Synchronous failures when initializing an async test are test
+            # failures, not fatal errors.
+            return fail e
 
-                switch
-                | isThenable res => Promise.resolve res .then pass, fail
-                # No, Bluebird's coroutines don't work.
-                | isIterator res => iterate res .then pass, fail
-                # Not interesting enough. Mark it as such.
-                | otherwise => interesting = false
-            catch e
-                # Synchronous failures when initializing an async test are test
-                # failures, not fatal errors.
-                return fail e
+        # Start the polling after the initialization. The timeout *must* be
+        # synchronously set, but the timer won't be affected by a slow
+        # initialization.
+        timeout = getTimeout ctx
 
-            # Start the polling after the initialization. The timeout *must* be
-            # synchronously set, but the timer won't be affected by a slow
-            # initialization.
-            timeout = getTimeout @
+        # Don't waste time setting a timeout if it was `Infinity`.
+        if timeout != Infinity
+            timer = setTimeout do
+                -> fail new Error m 'async.timeout', timeout
+                timeout
 
-            # Don't waste time setting a timeout if it was `Infinity`.
-            if timeout != Infinity
-                timer = setTimeout do
-                    -> fail new Error m 'async.timeout', timeout
-                    timeout
+export AsyncTest = (methods, name, index, callback) ->
+    Test! <<< {methods, name, index, callback, init, parent: methods._}
