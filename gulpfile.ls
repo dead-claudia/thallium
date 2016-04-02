@@ -1,7 +1,6 @@
 'use strict'
 
 require! {
-    child_process: cp
     gulp
     rimraf
     'gulp-livescript': livescript
@@ -26,7 +25,7 @@ gulp.task 'compile:ls', <[clean test]>, ->
 
 gulp.task 'compile', <[compile:copy compile:ls]>
 
-gulp.task 'test', (callback) ->
+gulp.task 'test', ->
     gulp.src 'test/**/*.ls', {-read}
         .pipe mocha ui: 'tdd', reporter: 'dot'
 
