@@ -1,5 +1,4 @@
---ui tdd
+--ui bdd
 --reporter dot
---compilers ls:livescript
 --check-leaks
 --recursive

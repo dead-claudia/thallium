@@ -73,5 +73,5 @@ cp.spawn("node", [].concat.apply([
     cwd: process.cwd(),
     stdio: "inherit",
 })
-.on("exit", count)
-.on("close", count)
+.on("exit", exit)
+.on("close", exit)
