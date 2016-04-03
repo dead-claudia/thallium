@@ -49,11 +49,11 @@ See the [documentation](./docs/README.md).
 
 1. Finish + test the CLI. It's still a work in progress.
 2. Finish documenting this project. This mainly includes the core assertions and CLI.
-3. Fix + test `src/util/inspect.js`. It was copied initially from util-inspect, but that was literally untested.
+3. Implement Node's `util.inspect` for the browser, while actually testing it.
+    - [`util-inspect`, the most common version](https://www.npmjs.com/package/util-inspect), is completely untested.
     - Probably best to bring Node's implementation + tests over, and adapt that accordingly.
 3. Self-host this module's tests like what Mocha does.
 4. Port this to the browser with Browserify/Webpack.
-    - Note that global variable detection should be disabled for this library itself. That's handled already by this as well as every single one of its runtime dependencies outside the CLI.
 5. Write a few plugins for `describe`/`it`, `before{,Each}`/`after{,Each}` hooks, etc.
 6. Write lots of blog posts. :smile:
 
@@ -61,57 +61,56 @@ See the [documentation](./docs/README.md).
 
 General information:
 
-- Everything is in [LiveScript](http://livescript.net), an expressive, compile-to-JavaScript language.
-    - If you're familiar with that language and its ecosystem, note that I'm not using [prelude-ls](http://www.preludels.com). The code is done a little more imperatively.
 - [Bluebird](http://bluebirdjs.com) is used extensively as the Promise implementation.
-- The source code is in `src/**`.
-- The executables are in `bin/**`, but they won't work. Most of the CLI code is in `src/cli/**`.
+- The source code is in `lib/**`.
+- The executables are in `bin/**`, but they won't work. Most of the CLI code is in `lib/cli/**`.
 - The documentation and examples are in `docs/**`.
 - The tests are in `test/**`.
     - Mocha is used to run the tests, and the assertions are self-hosted.
     - Fixtures for those tests are in `test-fixtures/**`.
     - Utilities are in `test-util/**`.
-- The compiled output is in `lib/**`. Do note that this isn't checked into Git.
 - This uses [eslint-config-isiahmeadows](https://npmjs.com/package/eslint-config-isiahmeadows) for its presets. In case you're curious what those settings are, you can start with [the index file](https://github.com/isiahmeadows/eslint-config-isiahmeadows/blob/master/index.js), which the rest are only minor variations of.
 
 Tips and idioms:
 
-- There's a little helper in `test-util/base.ls` named `a`, defined as `a = -> [.. for &]`. It creates an array equivalent to an array literal, but using a function call. It's helpful for reducing parentheses and brackets in the tests. Oh, and there's a few other nice utilities as well (not comprehensive):
+- There are a few useful helpers in `test-util/base.js`, that you may appreciate when you write your tests:
 
-    - `fixture :: name -> directory` - Get a fixture's path from `test-fixtures/**`.
-    - `push :: array -> plugin` - A plugin that accepts an array destination argument, and stores its reports in it.
-    - `n :: type, path, value -> reporterNode` - Create a reporter node of a given type, path, and value.
-    - `p :: name, index -> pathNode` - Create a path node with a given name and index
+    - `fixture(name) -> directory` - Get a fixture's path from `test-fixtures/**`.
+    - `push(array) -> plugin` - A plugin that accepts an array destination argument, and stores its reports in it.
+    - `n(type, path, value) -> reporterNode` - Create a reporter node of a given type, path, and value.
+    - `p(name, index) -> pathNode` - Create a path node with a given name and index
 
     These are most frequently used for testing reporter output for whatever reason.
 
 - For the tests, feel free to use the framework's own plugin and reporter system to your advantage to simplify your testing. For example, I used a combination of `t.reporter` and `t.deepEqual` to test the reporter output throughout the tests. Here's an example from one of the tests:
 
-    ```ls
-    tt = t.base!
-    ret = []
+    ```js
+    var tt = t.base()
+    var ret = []
 
-    tt.reporter push ret
+    tt.reporter(util.push(ret))
 
-    tt.test 'test', !->
-    tt.test 'test', !->
+    tt.test("test", function () {})
+    tt.test("test", function () {})
 
-    tt.run!then !->
-        t.deepEqual ret, a do
-            n 'start', []
-            n 'start', a p 'test', 0
-            n 'end', a p 'test', 0
-            n 'pass', a p 'test', 0
-            n 'start', a p 'test', 1
-            n 'end', a p 'test', 1
-            n 'pass', a p 'test', 1
-            n 'end', []
-            n 'exit', []
+    return tt.run().then(function () {
+        t.deepEqual(ret, [
+            n("start", [])
+            n("start", [p("test", 0)])
+            n("end", [p("test", 0)])
+            n("pass", [p("test", 0)])
+            n("start", [p("test", 1)])
+            n("end", [p("test", 1)])
+            n("pass", [p("test", 1)])
+            n("end", [])
+            n("exit", [])
+        ])
+    })
     ```
 
-- Classes are used throughout, but only to describe large ADTs and non-trivial state. For simpler cases, I prefer plain objects, sometimes created by a factory if the same structure is used multiple times, and I usually prefer functions where state is minimal. There are no mixins, though.
+- Plain object factories are preferred for ADTs, and external functions are used for the logic. If you need dynamic dispatch, make it a direct member of that object (this was done for `init` and `run` for the test types). It's somewhat C-like/functional (take your pick) in that regard.
 
-- Prefer external functions over private state. If you need to reuse that private function elsewhere, export that function as well. Functions don't keep much state, and are easier to test. They also don't have `this` issues.
+- Note that outside of handling the API methods and Error subclasses, almost no inheritance at all is used.
 
 ## License
 
