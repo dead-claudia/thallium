@@ -1,10 +1,10 @@
 "use strict"
 
 var t = require("../../lib/index.js").t
-var util = require("../../test-util/base.js")
+var Util = require("../../test-util/base.js")
 
-var n = util.n
-var p = util.p
+var n = Util.n
+var p = Util.p
 
 describe("core (asynchronous behavior)", function () {
     it("with normal tests", function () {
@@ -95,7 +95,7 @@ describe("core (asynchronous behavior)", function () {
 
         sentinel.marker = function () {}
 
-        tt.reporter(util.push(ret))
+        tt.reporter(Util.push(ret))
 
         tt.async("test", function () {
             called = true
@@ -131,7 +131,7 @@ describe("core (asynchronous behavior)", function () {
 
         sentinel.marker = function () {}
 
-        tt.reporter(util.push(ret))
+        tt.reporter(Util.push(ret))
 
         tt.async("test", function () {
             called = true
@@ -168,7 +168,7 @@ describe("core (asynchronous behavior)", function () {
 
         sentinel.marker = function () {}
 
-        tt.reporter(util.push(ret))
+        tt.reporter(Util.push(ret))
 
         tt.async("test", function () {
             called = true

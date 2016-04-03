@@ -1,9 +1,9 @@
 "use strict"
 
 var t = require("../../lib/index.js").t
-var util = require("../../test-util/assertions.js")
-var fail = util.fail
-var basic = util.basic
+var Util = require("../../test-util/assertions.js")
+var fail = Util.fail
+var basic = Util.basic
 
 describe("assertions (computation)", function () {
     basic("t.throws()", function () {

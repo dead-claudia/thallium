@@ -1,8 +1,8 @@
 "use strict"
 
 var t = require("../../../lib/index").t
-var parseArgs = require("../../../lib/cli/parse-args").parseArgs
-var ArgumentError = require("../../../lib/cli/argument-error").ArgumentError
+var parseArgs = require("../../../lib/cli/parse-args")
+var ArgumentError = require("../../../lib/cli/argument-error")
 
 describe("cli arguments (basic fail)", function () {
     function throws(str) {

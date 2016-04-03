@@ -1,9 +1,9 @@
 "use strict"
 
 var t = require("../../lib/index.js").t
-var util = require("../../test-util/base.js")
-var p = util.p
-var n = util.n
+var Util = require("../../test-util/base.js")
+var p = Util.p
+var n = Util.n
 
 describe("core (safety)", function () {
     function valueOf(value) {
@@ -87,7 +87,7 @@ describe("core (safety)", function () {
         var tt = t.base()
         var ret = []
 
-        tt.reporter(util.push(ret))
+        tt.reporter(Util.push(ret))
 
         var error = new ReferenceError(
             "It is only safe to call test methods during initialization")
@@ -160,7 +160,7 @@ describe("core (safety)", function () {
 
         sentinel.marker = function () {}
 
-        tt.reporter(util.push(ret))
+        tt.reporter(Util.push(ret))
 
         tt.test("test", function (tt) {
             tt.test("inner", function (tt) {

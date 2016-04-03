@@ -3,9 +3,9 @@
 /* eslint max-nested-callbacks: [2, 5] */
 
 var t = require("../../lib/index").t
-var util = require("../../test-util/base.js")
-var p = util.p
-var n = util.n
+var Util = require("../../test-util/base.js")
+var p = Util.p
+var n = Util.n
 
 describe("core (selection)", function () {
     function fail(t) {
@@ -19,7 +19,7 @@ describe("core (selection)", function () {
             var tt = t.base().use(fail)
             var ret = []
 
-            tt.reporter(util.push(ret))
+            tt.reporter(Util.push(ret))
 
             tt.test("one", function (t) {
                 t.testSkip("inner", function (tt) { tt.fail() })
@@ -60,7 +60,7 @@ describe("core (selection)", function () {
             var tt = t.base().use(fail)
             var ret = []
 
-            tt.reporter(util.push(ret))
+            tt.reporter(Util.push(ret))
 
             tt.test("one", function (t) {
                 t.testSkip("inner").fail()
@@ -101,7 +101,7 @@ describe("core (selection)", function () {
             var tt = t.base().use(fail)
             var ret = []
 
-            tt.reporter(util.push(ret))
+            tt.reporter(Util.push(ret))
 
             tt.test("one", function (tt) {
                 tt.asyncSkip("inner", function (tt) { tt.fail() })
@@ -140,7 +140,7 @@ describe("core (selection)", function () {
 
         it("inline tests run directly", function () {
             var ret = []
-            var tt = t.base().reporter(util.push(ret))
+            var tt = t.base().reporter(Util.push(ret))
             var ttt = tt.testSkip("test")
 
             return ttt.run().then(function () {
@@ -157,7 +157,7 @@ describe("core (selection)", function () {
             var tt = t.base().use(fail)
             var ret = []
 
-            tt.reporter(util.push(ret))
+            tt.reporter(Util.push(ret))
             tt.only(["one", "inner"])
 
             tt.test("one", function (tt) {
@@ -189,7 +189,7 @@ describe("core (selection)", function () {
             var tt = t.base().use(fail)
             var ret = []
 
-            tt.reporter(util.push(ret))
+            tt.reporter(Util.push(ret))
             tt.only(["one", "inner"])
 
             tt.test("one", function (tt) {
@@ -221,7 +221,7 @@ describe("core (selection)", function () {
             var tt = t.base().use(fail)
             var ret = []
 
-            tt.reporter(util.push(ret))
+            tt.reporter(Util.push(ret))
             tt.only(["one", "inner"])
 
             tt.test("one", function (tt) {
@@ -253,7 +253,7 @@ describe("core (selection)", function () {
             var tt = t.base().use(fail)
             var ret = []
 
-            tt.reporter(util.push(ret))
+            tt.reporter(Util.push(ret))
             tt.only(["one", "inner"])
 
             tt.test("0", function (tt) {
@@ -279,7 +279,7 @@ describe("core (selection)", function () {
             var tt = t.base().use(fail)
             var ret = []
 
-            tt.reporter(util.push(ret))
+            tt.reporter(Util.push(ret))
             tt.only(["one", "inner"])
 
             tt.test("0", function (tt) {
@@ -305,7 +305,7 @@ describe("core (selection)", function () {
             var tt = t.base().use(fail)
             var ret = []
 
-            tt.reporter(util.push(ret))
+            tt.reporter(Util.push(ret))
             tt.only(["one", "inner"])
 
             tt.test("0", function (tt) {
@@ -331,7 +331,7 @@ describe("core (selection)", function () {
             var tt = t.base().use(fail)
             var ret = []
 
-            tt.reporter(util.push(ret))
+            tt.reporter(Util.push(ret))
             tt.only([/^one$/, "inner"])
 
             tt.test("one", function (tt) {

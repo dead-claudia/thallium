@@ -1,11 +1,11 @@
 "use strict"
 
 var t = require("../../lib/index.js").t
-var util = require("../../test-util/base.js")
-var assertions = require("../../lib/assertions.js").assertions
+var Util = require("../../test-util/base.js")
+var assertions = require("../../lib/assertions.js")
 
-var n = util.n
-var p = util.p
+var n = Util.n
+var p = Util.p
 
 describe("core (reporters)", function () { // eslint-disable-line max-statements
     // Use thenables, not actual Promises.
@@ -96,7 +96,7 @@ describe("core (reporters)", function () { // eslint-disable-line max-statements
         var tt = t.base()
         var ret = []
 
-        tt.reporter(util.push(ret))
+        tt.reporter(Util.push(ret))
 
         tt.test("test", function () {})
         tt.test("test", function () {})
@@ -123,7 +123,7 @@ describe("core (reporters)", function () { // eslint-disable-line max-statements
 
         sentinel.marker = function () {}
 
-        tt.reporter(util.push(ret))
+        tt.reporter(Util.push(ret))
 
         tt.test("one", function () { throw sentinel })
         tt.test("two", function () { throw sentinel })
@@ -150,7 +150,7 @@ describe("core (reporters)", function () { // eslint-disable-line max-statements
 
         sentinel.marker = function () {}
 
-        tt.reporter(util.push(ret))
+        tt.reporter(Util.push(ret))
 
         tt.test("one", function () { throw sentinel })
         tt.test("two", function () {})
@@ -174,7 +174,7 @@ describe("core (reporters)", function () { // eslint-disable-line max-statements
         var tt = t.base()
         var ret = []
 
-        tt.reporter(util.push(ret))
+        tt.reporter(Util.push(ret))
 
         tt.test("test")
         tt.test("test")
@@ -198,7 +198,7 @@ describe("core (reporters)", function () { // eslint-disable-line max-statements
         var tt = t.base()
         var ret = []
 
-        tt.reporter(util.push(ret))
+        tt.reporter(Util.push(ret))
 
         tt.define("fail", function () {
             return {test: false, message: "fail"}
@@ -226,7 +226,7 @@ describe("core (reporters)", function () { // eslint-disable-line max-statements
         var tt = t.base()
         var ret = []
 
-        tt.reporter(util.push(ret))
+        tt.reporter(Util.push(ret))
 
         tt.define("fail", function () {
             return {test: false, message: "fail"}
@@ -254,7 +254,7 @@ describe("core (reporters)", function () { // eslint-disable-line max-statements
         var tt = t.base()
         var ret = []
 
-        tt.reporter(util.push(ret))
+        tt.reporter(Util.push(ret))
 
         tt.async("test", function (t, done) { done() })
         tt.test("test", function () {})
@@ -281,7 +281,7 @@ describe("core (reporters)", function () { // eslint-disable-line max-statements
 
         sentinel.marker = function () {}
 
-        tt.reporter(util.push(ret))
+        tt.reporter(Util.push(ret))
 
         tt.async("one", function (t, done) { done(sentinel) })
         tt.test("two", function () { throw sentinel })
@@ -308,7 +308,7 @@ describe("core (reporters)", function () { // eslint-disable-line max-statements
 
         sentinel.marker = function () {}
 
-        tt.reporter(util.push(ret))
+        tt.reporter(Util.push(ret))
 
         tt.async("one", function (t, done) { done(sentinel) })
         tt.async("two", function (t, done) { done() })
@@ -332,7 +332,7 @@ describe("core (reporters)", function () { // eslint-disable-line max-statements
         var tt = t.base()
         var ret = []
 
-        tt.reporter(util.push(ret))
+        tt.reporter(Util.push(ret))
 
         tt.async("test", function () { return resolve() })
         tt.test("test", function () {})
@@ -359,7 +359,7 @@ describe("core (reporters)", function () { // eslint-disable-line max-statements
 
         sentinel.marker = function () {}
 
-        tt.reporter(util.push(ret))
+        tt.reporter(Util.push(ret))
 
         tt.async("one", function () { return reject(sentinel) })
         tt.test("two", function () { throw sentinel })
@@ -386,7 +386,7 @@ describe("core (reporters)", function () { // eslint-disable-line max-statements
 
         sentinel.marker = function () {}
 
-        tt.reporter(util.push(ret))
+        tt.reporter(Util.push(ret))
 
         tt.async("one", function () { return reject(sentinel) })
         tt.async("two", function () { return resolve() })
@@ -410,7 +410,7 @@ describe("core (reporters)", function () { // eslint-disable-line max-statements
         var tt = t.base()
         var ret = []
 
-        tt.reporter(util.push(ret))
+        tt.reporter(Util.push(ret))
 
         tt.test("test", function (tt) {
             tt.test("one", function () {})
@@ -444,7 +444,7 @@ describe("core (reporters)", function () { // eslint-disable-line max-statements
         sentinel1.marker = function () {}
         sentinel2.marker = function () {}
 
-        tt.reporter(util.push(ret))
+        tt.reporter(Util.push(ret))
 
         tt.test("parent one", function (tt) {
             tt.test("child one", function () { throw sentinel1 })
@@ -492,7 +492,7 @@ describe("core (reporters)", function () { // eslint-disable-line max-statements
         sentinel1.marker = function () {}
         sentinel2.marker = function () {}
 
-        tt.reporter(util.push(ret))
+        tt.reporter(Util.push(ret))
 
         tt.test("parent one", function (tt) {
             tt.test("child one", function () { throw sentinel1 })
@@ -535,7 +535,7 @@ describe("core (reporters)", function () { // eslint-disable-line max-statements
         var tt = t.base()
         var ret = []
 
-        tt.reporter(util.push(ret))
+        tt.reporter(Util.push(ret))
 
         return tt.test("test")
         .test("foo", function () {})
@@ -559,7 +559,7 @@ describe("core (reporters)", function () { // eslint-disable-line max-statements
 
         sentinel.marker = function () {}
 
-        tt.reporter(util.push(ret))
+        tt.reporter(Util.push(ret))
         tt.use(assertions)
 
         tt.test("mod-one", function (tt) {

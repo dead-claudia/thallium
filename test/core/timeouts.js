@@ -1,16 +1,16 @@
 "use strict"
 
 var t = require("../../lib/index").t
-var util = require("../../test-util/base.js")
-var n = util.n
-var p = util.p
+var Util = require("../../test-util/base.js")
+var n = Util.n
+var p = Util.p
 
 describe("core (timeouts)", function () {
     it("succeeds with own", function () {
         var tt = t.base()
         var ret = []
 
-        tt.reporter(util.push(ret))
+        tt.reporter(Util.push(ret))
 
         tt.async("test", function (tt, done) {
             // It's highly unlikely the engine will take this long to finish.
@@ -34,7 +34,7 @@ describe("core (timeouts)", function () {
         var tt = t.base()
         var ret = []
 
-        tt.reporter(util.push(ret))
+        tt.reporter(Util.push(ret))
 
         tt.async("test", function (tt, done) {
             tt.timeout(50)
@@ -58,7 +58,7 @@ describe("core (timeouts)", function () {
         var tt = t.base()
         var ret = []
 
-        tt.reporter(util.push(ret))
+        tt.reporter(Util.push(ret))
 
         tt.test("test")
         .timeout(50)
@@ -83,7 +83,7 @@ describe("core (timeouts)", function () {
         var tt = t.base()
         var ret = []
 
-        tt.reporter(util.push(ret))
+        tt.reporter(Util.push(ret))
 
         tt.test("test")
         .timeout(50)

@@ -1,10 +1,10 @@
 "use strict"
 
 var t = require("../../lib/index.js").t
-var util = require("../../test-util/base.js")
+var Util = require("../../test-util/base.js")
 
-var n = util.n
-var p = util.p
+var n = Util.n
+var p = Util.p
 
 describe("core (iterators)", function () {
     describe("raw", function () {
@@ -29,7 +29,7 @@ describe("core (iterators)", function () {
             var tt = t.base()
             var ret = []
 
-            tt.reporter(util.push(ret))
+            tt.reporter(Util.push(ret))
             tt.async("test", function () { return iter })
 
             return tt.run().then(function () {
@@ -63,7 +63,7 @@ describe("core (iterators)", function () {
             var tt = t.base()
             var ret = []
 
-            tt.reporter(util.push(ret))
+            tt.reporter(Util.push(ret))
             tt.async("test", function () { return iter })
 
             return tt.run().then(function () {
@@ -97,7 +97,7 @@ describe("core (iterators)", function () {
             var tt = t.base()
             var ret = []
 
-            tt.reporter(util.push(ret))
+            tt.reporter(Util.push(ret))
             tt.async("test", function () { return iter })
 
             return tt.run().then(function () {
@@ -136,7 +136,7 @@ describe("core (iterators)", function () {
             var tt = t.base()
             var ret = []
 
-            tt.reporter(util.push(ret))
+            tt.reporter(Util.push(ret))
             tt.async("test", function () { return iter })
 
             return tt.run().then(function () {
@@ -174,7 +174,7 @@ describe("core (iterators)", function () {
             var tt = t.base()
             var ret = []
 
-            tt.reporter(util.push(ret))
+            tt.reporter(Util.push(ret))
             tt.async("test", function () { return iter })
 
             return tt.run().then(function () {
@@ -219,7 +219,7 @@ describe("core (iterators)", function () {
             var tt = t.base()
             var ret = []
 
-            tt.reporter(util.push(ret))
+            tt.reporter(Util.push(ret))
             tt.async("test", function () { return iter })
 
             return tt.run().then(function () {
@@ -253,7 +253,7 @@ describe("core (iterators)", function () {
             var tt = t.base()
             var ret = []
 
-            tt.reporter(util.push(ret))
+            tt.reporter(Util.push(ret))
             tt.async("test", function () { return iter })
 
             return tt.run().then(function () {
@@ -292,7 +292,7 @@ describe("core (iterators)", function () {
             var tt = t.base()
             var ret = []
 
-            tt.reporter(util.push(ret))
+            tt.reporter(Util.push(ret))
             tt.async("test", function () { return iter })
 
             return tt.run().then(function () {
@@ -326,7 +326,7 @@ describe("core (iterators)", function () {
             var tt = t.base()
             var ret = []
 
-            tt.reporter(util.push(ret))
+            tt.reporter(Util.push(ret))
             tt.async("test", function () { return iter })
 
             return tt.run().then(function () {
@@ -368,7 +368,7 @@ describe("core (iterators)", function () {
             var tt = t.base()
             var ret = []
 
-            tt.reporter(util.push(ret))
+            tt.reporter(Util.push(ret))
             tt.async("test", function () { return iter })
 
             return tt.run().then(function () {
@@ -406,7 +406,7 @@ describe("core (iterators)", function () {
             var tt = t.base()
             var ret = []
 
-            tt.reporter(util.push(ret))
+            tt.reporter(Util.push(ret))
             tt.async("test", function () { return iter })
 
             return tt.run().then(function () {
@@ -452,7 +452,7 @@ describe("core (iterators)", function () {
             var tt = t.base()
             var ret = []
 
-            tt.reporter(util.push(ret))
+            tt.reporter(Util.push(ret))
             tt.async("test", function () { return iter })
 
             return tt.run().then(function () {
@@ -486,7 +486,7 @@ describe("core (iterators)", function () {
             var tt = t.base()
             var ret = []
 
-            tt.reporter(util.push(ret))
+            tt.reporter(Util.push(ret))
             tt.async("test", function () { return iter })
 
             return tt.run().then(function () {
@@ -524,7 +524,7 @@ describe("core (iterators)", function () {
             var tt = t.base()
             var ret = []
 
-            tt.reporter(util.push(ret))
+            tt.reporter(Util.push(ret))
             tt.async("test", function () { return iter })
 
             return tt.run().then(function () {
@@ -558,7 +558,7 @@ describe("core (iterators)", function () {
             var tt = t.base()
             var ret = []
 
-            tt.reporter(util.push(ret))
+            tt.reporter(Util.push(ret))
             tt.async("test", function () { return iter })
 
             return tt.run().then(function () {
@@ -600,7 +600,7 @@ describe("core (iterators)", function () {
             var tt = t.base()
             var ret = []
 
-            tt.reporter(util.push(ret))
+            tt.reporter(Util.push(ret))
             tt.async("test", function () { return iter })
 
             return tt.run().then(function () {
@@ -655,7 +655,7 @@ describe("core (iterators)", function () {
             var tt = t.base()
             var ret = []
 
-            tt.reporter(util.push(ret))
+            tt.reporter(Util.push(ret))
             tt.async("test", function () { return iter })
 
             return tt.run().then(function () {
@@ -696,7 +696,7 @@ describe("core (iterators)", function () {
             var tt = t.base()
             var ret = []
 
-            tt.reporter(util.push(ret))
+            tt.reporter(Util.push(ret))
             tt.async("test", function () { return iter })
 
             return tt.run().then(function () {

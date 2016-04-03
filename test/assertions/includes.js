@@ -1,7 +1,7 @@
 "use strict"
 
 var t = require("../../lib/index").t
-var fail = require("../../test-util/assertions").fail
+var fail = require("../../test-util/assertions.js").fail
 
 describe("assertions (includes)", function () {
     it("correct aliases", function () {

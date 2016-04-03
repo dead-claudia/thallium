@@ -4,8 +4,8 @@ var mockery = require("mockery")
 var requireUncached = require("require-uncached")
 
 var t = require("../../lib/index.js").t
-var assertions = require("../../lib/assertions").assertions
-var util = require("../../test-util/base")
+var assertions = require("../../lib/assertions.js")
+var Util = require("../../test-util/base.js")
 
 var hasOwn = Object.prototype.hasOwnProperty
 
@@ -23,20 +23,20 @@ describe.skip("cli (basic)", function () {
         index = t.base().use(assertions)
 
         function resolve(mod, opts, callback) {
-            if (hasOwn.call(util.paths, mod)) {
+            if (hasOwn.call(Util.paths, mod)) {
                 process.nextTick(function () {
-                    callback(null, util.paths[mod])
+                    callback(null, Util.paths[mod])
                 })
             } else {
-                util.resolveAsync(mod, opts, callback)
+                Util.resolveAsync(mod, opts, callback)
             }
         }
 
         resolve.sync = function (mod, opts) {
-            if (hasOwn.call(util.paths, mod)) {
-                return util.paths[mod]
+            if (hasOwn.call(Util.paths, mod)) {
+                return Util.paths[mod]
             } else {
-                return util.resolve(mod, opts)
+                return Util.resolve(mod, opts)
             }
         }
 
@@ -58,7 +58,7 @@ describe.skip("cli (basic)", function () {
     })
 
     it("fails with no config", function () {
-        return cli(util.fixture("cli/no-config"), [])
+        return cli(Util.fixture("cli/no-config"), [])
         .then(
             function () { t.fail("Expected an error to be thrown") },
             function (err) { t.hasOwn(err, "code", "ENOTESTCONFIG") })

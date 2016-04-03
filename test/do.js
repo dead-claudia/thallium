@@ -1,9 +1,9 @@
 "use strict"
 
 var t = require("../lib/index.js").t
-var util = require("../test-util/base.js")
-var n = util.n
-var p = util.p
+var Util = require("../test-util/base.js")
+var n = Util.n
+var p = Util.p
 
 run("do")
 run("block")
@@ -22,7 +22,7 @@ function run(name) {
             var ret = []
             var len, self // eslint-disable-line consistent-this
 
-            tt.reporter(util.push(ret))
+            tt.reporter(Util.push(ret))
 
             tt.test("test", function (tt) {
                 tt[name](/** @this */ function () {
@@ -52,7 +52,7 @@ function run(name) {
 
             sentinel.marker = function () {}
 
-            tt.reporter(util.push(ret))
+            tt.reporter(Util.push(ret))
 
             tt.test("test", function (tt) {
                 tt[name](function () { throw sentinel })
@@ -75,7 +75,7 @@ function run(name) {
             var ret = []
             var len, self // eslint-disable-line consistent-this
 
-            tt.reporter(util.push(ret))
+            tt.reporter(Util.push(ret))
 
             tt.async("test", function (tt, done) {
                 tt[name](/** @this */ function () {
@@ -107,7 +107,7 @@ function run(name) {
 
             sentinel.marker = function () {}
 
-            tt.reporter(util.push(ret))
+            tt.reporter(Util.push(ret))
 
             tt.async("test", function (tt, done) {
                 tt[name](/** @this */ function () { throw sentinel })
@@ -131,7 +131,7 @@ function run(name) {
             var ret = []
             var len, self // eslint-disable-line consistent-this
 
-            tt.reporter(util.push(ret))
+            tt.reporter(Util.push(ret))
 
             tt.test("test")[name](/** @this */ function () {
                 len = arguments.length
@@ -159,7 +159,7 @@ function run(name) {
 
             sentinel.marker = function () {}
 
-            tt.reporter(util.push(ret))
+            tt.reporter(Util.push(ret))
 
             tt.test("test")[name](function () { throw sentinel })
 

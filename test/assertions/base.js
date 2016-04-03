@@ -3,9 +3,9 @@
 /* global Symbol */
 
 var t = require("../../lib/index.js").t
-var util = require("../../test-util/assertions.js")
-var fail = util.fail
-var basic = util.basic
+var Util = require("../../test-util/assertions.js")
+var fail = Util.fail
+var basic = Util.basic
 
 describe("assertions (base)", function () {
     var hasSymbol = typeof Symbol === "function" && typeof Symbol() === "symbol"
