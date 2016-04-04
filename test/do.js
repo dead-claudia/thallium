@@ -1,6 +1,6 @@
 "use strict"
 
-var t = require("../lib/index.js").t
+var t = require("../index.js")
 var Util = require("../test-util/base.js")
 var n = Util.n
 var p = Util.p

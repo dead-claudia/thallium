@@ -2,7 +2,7 @@
 
 /* global Symbol */
 
-var t = require("../../lib/index.js").t
+var t = require("../../index.js")
 
 describe("assertions (deep equal)", function () { // eslint-disable-line max-statements, max-len
     function check(name, a, b, opts) {

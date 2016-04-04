@@ -3,8 +3,8 @@
 var mockery = require("mockery")
 var requireUncached = require("require-uncached")
 
-var t = require("../../lib/index.js").t
-var assertions = require("../../lib/assertions.js")
+var t = require("../../index.js")
+var assertions = require("../../assertions.js")
 var Util = require("../../test-util/base.js")
 
 var hasOwn = Object.prototype.hasOwnProperty

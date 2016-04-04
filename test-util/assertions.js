@@ -2,7 +2,7 @@
 
 /* eslint-env mocha */
 
-var t = require("../lib/index.js").t
+var t = require("../index.js")
 
 exports.fail = function (name) {
     var args = []

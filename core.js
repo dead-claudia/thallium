@@ -1,3 +1,7 @@
-/* eslint-disable */
 "use strict"
-module.exports = require("./lib/core.js").t
+
+/**
+ * Main entry point, for those wanting to use this framework without the core
+ * assertions.
+ */
+module.exports = require("./lib/techtonic.js").base()

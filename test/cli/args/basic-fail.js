@@ -1,6 +1,6 @@
 "use strict"
 
-var t = require("../../../lib/index").t
+var t = require("../../../index.js")
 var parseArgs = require("../../../lib/cli/parse-args")
 var ArgumentError = require("../../../lib/cli/argument-error")
 

@@ -1,7 +1,7 @@
 "use strict"
 
 var Promise = require("bluebird")
-var t = require("../../lib/index.js").t
+var t = require("../../index.js")
 
 describe("core (basic)", function () {
     it("has `base()`", function () {

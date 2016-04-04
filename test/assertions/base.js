@@ -2,7 +2,7 @@
 
 /* global Symbol */
 
-var t = require("../../lib/index.js").t
+var t = require("../../index.js")
 var Util = require("../../test-util/assertions.js")
 var fail = Util.fail
 var basic = Util.basic

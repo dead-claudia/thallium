@@ -2,7 +2,7 @@
 
 var path = require("path")
 
-var t = require("../../../lib/index").t
+var t = require("../../../index.js")
 var parseArgs = require("../../../lib/cli/parse-args")
 
 describe("cli arguments (basic)", function () {

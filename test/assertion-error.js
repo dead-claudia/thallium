@@ -1,6 +1,6 @@
 "use strict"
 
-var t = require("../lib/index.js").t
+var t = require("../index.js")
 
 describe("class AssertionError", function () {
     it("exists", function () {

@@ -1,6 +1,6 @@
 "use strict"
 
-var t = require("../../../lib/index").t
+var t = require("../../../index.js")
 var validate = require("../../../lib/cli/merge-config").validate
 
 describe("cli merging (validation)", function () {

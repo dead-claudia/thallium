@@ -1,6 +1,6 @@
 "use strict"
 
-var t = require("../lib/index.js").t
+var t = require("../index.js")
 
 describe("define()", function () {
     it("exists", function () {
