@@ -1,6 +1,6 @@
 # Assertions
 
-This is a work in progress with literally almost 100 distinct methods to
+This is a work in progress with literally about 100 distinct methods to
 individually document. For now, please consult the `techtonic/assertions` module
 in the [TypeScript definition file](../definitions.d.ts) for an overview of the
 various assertions. The methods are generally self-explanatory.

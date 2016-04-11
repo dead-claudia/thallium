@@ -1,25 +1,23 @@
 "use strict"
 
-var t = require("../index.js")
+const t = require("../index.js")
 
-describe("define()", function () {
-    it("exists", function () {
-        var tt = t.base()
+describe("define()", () => {
+    it("exists", () => {
+        const tt = t.base()
 
         t.hasKey(tt, "define")
         t.function(tt.define)
     })
 
-    it("works with string + function", function () {
-        var tt = t.base()
-        var self // eslint-disable-line consistent-this
+    it("works with string + function", () => {
+        const tt = t.base()
+        let self // eslint-disable-line consistent-this
 
         tt.define("assert", /** @this */ function (test, expected, actual) {
             self = this
             return {
-                test: test,
-                expected: expected,
-                actual: actual,
+                test, expected, actual,
                 message: "{expected} :: {actual}",
             }
         })
@@ -27,36 +25,30 @@ describe("define()", function () {
         tt.assert(true, {}, {})
         t.undefined(self)
 
-        var expected = {}
-        var actual = {}
+        const expected = {}
+        const actual = {}
 
         try {
             tt.assert(false, expected, actual)
         } catch (e) {
             t.undefined(self)
             t.instanceof(e, t.AssertionError)
-            t.hasKeys(e, {
-                expected: expected,
-                actual: actual,
-                message: "{} :: {}",
-            })
+            t.hasKeys(e, {expected, actual, message: "{} :: {}"})
             return
         }
 
         throw new t.AssertionError("Expected tt.assert to throw an error")
     })
 
-    it("works with object", function () {
-        var tt = t.base()
-        var self // eslint-disable-line consistent-this
+    it("works with object", () => {
+        const tt = t.base()
+        let self // eslint-disable-line consistent-this
 
         tt.define({
-            assert: function (test, expected, actual) {
+            assert(test, expected, actual) {
                 self = this
                 return {
-                    test: test,
-                    expected: expected,
-                    actual: actual,
+                    test, expected, actual,
                     message: "{expected} :: {actual}",
                 }
             },
@@ -65,30 +57,26 @@ describe("define()", function () {
         tt.assert(true, {}, {})
         t.undefined(self)
 
-        var expected = {}
-        var actual = {}
+        const expected = {}
+        const actual = {}
 
         try {
             tt.assert(false, expected, actual)
         } catch (e) {
             t.undefined(self)
             t.instanceof(e, t.AssertionError)
-            t.hasKeys(e, {
-                expected: expected,
-                actual: actual,
-                message: "{} :: {}",
-            })
+            t.hasKeys(e, {expected, actual, message: "{} :: {}"})
             return
         }
 
         throw new t.AssertionError("Expected tt.assert to throw an error")
     })
 
-    it("allows arbitrary properties to be used in the message", function () {
-        var tt = t.base()
+    it("allows arbitrary properties to be used in the message", () => {
+        const tt = t.base()
 
-        tt.define("assert", function (test, extra) {
-            return {test: test, extra: extra, message: "{extra}"}
+        tt.define("assert", (test, extra) => {
+            return {test, extra, message: "{extra}"}
         })
 
         try {

@@ -14,32 +14,24 @@ Options:
 
 -c [file], --config [file]
     Use a custom config file. By default, this is inferred from the first file
-    glob, for example `test/.techtonic.js` from a glob of `test/**`. If the
-    extension does not match anything, this will first try to infer it from the
-    glob before giving up.
-
-    Any extension understood by node-interpret will be automagically recognized
-    and registered, including Babel, CoffeeScript, and many others. Do note that
-    if multiple config files can match this option, this will only try to load
-    the first one it can find without loading, and it's unspecified which it
-    will load other than that it prefers a `.js` file if this option is not
-    passed.
+    glob, for example `test/.techtonic.coffee` from a glob of
+    `test/**/*.coffee`. If the extension does not match anything, this will
+    first try to infer it from the glob before giving up.
 
     If this option is passed multiple times, the last one takes precedence.
 
--r [extension], --register [extension]
-    Register a particular extension, optionally with a module. This may be
-    repeated as many times as desired. This accepts the following syntax:
+-r [module], --require [module]
+    Require a module before loading the config.
 
-    ext
-        Register `ext`, inferring the module from node-interpret.
+-r [ext:module], --require [ext:module]
+    Register an extension with that module (so Techtonic knows it's a register
+    hook). Usually you don't even need to register the extension yourself, but
+    if either the module or the language itself not listed in node-interpret,
+    you'll need to specify an extension. If you're using Babel, you can use
+    `.techtonic.babel.js` to the same effect.
 
-    ext:module
-        Register `ext`, requiring from `module`.
-
-    Note that if the same extension is passed multiple times, the last takes
-    precedence. Also, note that this module is loaded regardless of if it's
-    actually used.
+    Note: the preceding dot in `ext` is optional. Both `ext` and `.ext` mean the
+    same thing.
 
 --
     Stop parsing options past this point. Treat any further argument as a file.
@@ -49,6 +41,5 @@ If no file globs are given, `test/**/*.{extname of config found}` is used as the
 default glob, with `test/.config.{extname}` being the default config, where the
 `extname` is inferred.
 
-This tries to be sane by attempting to infer the general intent as much as
-possible over some magical, over-specified algorithm, so it's much easier to set
-up and run.
+This tries to be sane by attempting to infer the general intent and preferring
+code over config in the CLI, so it's much easier to set up and run.

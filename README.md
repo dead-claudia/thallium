@@ -48,14 +48,13 @@ See the [documentation](./docs/README.md).
 ## Remaining work
 
 1. Finish + test the CLI. It's still a work in progress.
-2. Finish documenting this project. This mainly includes the core assertions and CLI.
-3. Implement Node's `util.inspect` for the browser, while actually testing it.
-    - [`util-inspect`, the most common version](https://www.npmjs.com/package/util-inspect), is completely untested.
-    - Probably best to bring Node's implementation + tests over, and adapt that accordingly.
-3. Self-host this module's tests like what Mocha does.
-4. Port this to the browser with Browserify/Webpack.
-5. Write a few plugins for `describe`/`it`, `before{,Each}`/`after{,Each}` hooks, etc.
-6. Write lots of blog posts. :smile:
+2. Create basic reporters for TAP, spec, dot, etc.
+3. Finish documenting this project. This mainly includes the core assertions and CLI.
+4. Self-host this module's tests like what Mocha does.
+5. Bring this back to pure ES5. It's easier to prototype in ES6, but it's easier to maintain compatibility in ES5.
+6. Port this to the browser with Browserify/Webpack. This will include implementing Node's `util.inspect` for the browser, while actually testing it, unlike [`util-inspect`, the most common replacement](https://www.npmjs.com/package/util-inspect), which is completely untested.
+7. Write a few plugins for `describe`/`it`, `before{,Each}`/`after{,Each}` hooks, etc.
+8. Write lots of blog posts. :smile:
 
 ## Contributing
 
@@ -66,35 +65,35 @@ General information:
 - The executables are in `bin/**`, but they won't work. Most of the CLI code is in `lib/cli/**`.
 - The documentation and examples are in `docs/**`.
 - The tests are in `test/**`.
-    - Mocha is used to run the tests, and the assertions are self-hosted.
+    - Mocha is currently used as the runner.
+    - The assertions are fully self-hosted. Using Techtonic to test Techtonic is awesome!
     - Fixtures for those tests are in `test-fixtures/**`.
     - Utilities are in `test-util/**`.
-- This uses [eslint-config-isiahmeadows](https://npmjs.com/package/eslint-config-isiahmeadows) for its presets. In case you're curious what those settings are, you can start with [the index file](https://github.com/isiahmeadows/eslint-config-isiahmeadows/blob/master/index.js), which the rest are only minor variations of.
+- This uses [eslint-config-isiahmeadows](https://npmjs.com/package/eslint-config-isiahmeadows) for its presets (specifically `isiahmeadows/node-4`). In case you're curious what those settings are, you can start with [the index file](https://github.com/isiahmeadows/eslint-config-isiahmeadows/blob/master/index.js), which the rest are only minor variations of.
 
 Tips and idioms:
 
 - There are a few useful helpers in `test-util/base.js`, that you may appreciate when you write your tests:
 
-    - `fixture(name) -> directory` - Get a fixture's path from `test-fixtures/**`.
     - `push(array) -> plugin` - A plugin that accepts an array destination argument, and stores its reports in it.
     - `n(type, path, value) -> reporterNode` - Create a reporter node of a given type, path, and value.
     - `p(name, index) -> pathNode` - Create a path node with a given name and index
 
     These are most frequently used for testing reporter output for whatever reason.
 
-- For the tests, feel free to use the framework's own plugin and reporter system to your advantage to simplify your testing. For example, I used a combination of `t.reporter` and `t.deepEqual` to test the reporter output throughout the tests. Here's an example from one of the tests:
+- For the tests, feel free to use the framework's own plugin and reporter system to your advantage to simplify your testing. They are very well tested. For example, I used a combination of `t.reporter` and `t.deepEqual` to test the reporter output throughout the tests. Here's an example from one of the tests:
 
     ```js
-    var tt = t.base()
-    var ret = []
+    const tt = t.base()
+    const ret = []
 
-    tt.reporter(util.push(ret))
+    tt.reporter(Util.push(ret))
 
-    tt.test("test", function () {})
-    tt.test("test", function () {})
+    tt.test("test", () => {})
+    tt.test("test", () => {})
 
-    return tt.run().then(function () {
-        t.deepEqual(ret, [
+    return tt.run().then(() => {
+        t.match(ret, [
             n("start", [])
             n("start", [p("test", 0)])
             n("end", [p("test", 0)])
@@ -108,9 +107,9 @@ Tips and idioms:
     })
     ```
 
-- Plain object factories are preferred for ADTs, and external functions are used for the logic. If you need dynamic dispatch, make it a direct member of that object (this was done for `init` and `run` for the test types). It's somewhat C-like/functional (take your pick) in that regard.
+- Classes are used, but inheritance is avoided. Generally, the question I ask myself is "Is this like a getter or setter, or is it mostly logic?", and usually, I go method in the first case, and function for the latter. Most of the exceptions are in the test types themselves, where I extracted many common methods into their own module to keep the base class simple.
 
-- Note that outside of handling the API methods and Error subclasses, almost no inheritance at all is used.
+- Note that outside of the tests, the `Techtonic` class, and Error subclasses, inheritance is minimal.
 
 ## License
 

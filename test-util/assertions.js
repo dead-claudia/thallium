@@ -2,18 +2,16 @@
 
 /* eslint-env mocha */
 
-var t = require("../index.js")
+const t = require("../index.js")
 
 exports.fail = function (name) {
-    var args = []
+    const args = []
 
-    for (var i = 1; i < arguments.length; i++) {
+    for (let i = 1; i < arguments.length; i++) {
         args.push(arguments[i])
     }
 
-    t.throws(function () { t[name].apply(t, args) }, t.AssertionError)
+    t.throws(() => { t[name].apply(t, args) }, t.AssertionError)
 }
 
-exports.basic = function (desc, callback) {
-    describe(desc, function () { return it("works", callback) })
-}
+exports.basic = (desc, callback) => describe(desc, () => it("works", callback))

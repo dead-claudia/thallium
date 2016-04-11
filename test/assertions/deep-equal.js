@@ -1,23 +1,21 @@
 "use strict"
 
-/* global Symbol */
+const t = require("../../index.js")
 
-var t = require("../../index.js")
-
-describe("assertions (deep equal)", function () { // eslint-disable-line max-statements, max-len
+describe("assertions (deep equal)", () => { // eslint-disable-line max-statements, max-len
     function check(name, a, b, opts) {
         function m(key) {
-            return opts[key] ? key : "not" + key[0].toUpperCase() + key.slice(1)
+            return opts[key] ? key : `not${key[0].toUpperCase()}${key.slice(1)}`
         }
 
-        it(name, function () {
+        it(name, () => {
             t[m("deepEqual")](a, b)
             t[m("looseDeepEqual")](a, b)
             t[m("match")](a, b)
         })
     }
 
-    it("exists", function () {
+    it("exists", () => {
         t.function(t.deepEqual)
         t.function(t.notDeepEqual)
         t.function(t.looseDeepEqual)
@@ -28,7 +26,7 @@ describe("assertions (deep equal)", function () { // eslint-disable-line max-sta
         t.function(t.notMatchLoose)
     })
 
-    it("correct aliases", function () {
+    it("correct aliases", () => {
         t.equal(t.matchLoose, t.looseDeepEqual)
         t.equal(t.notMatchLoose, t.notLooseDeepEqual)
     })
@@ -234,25 +232,360 @@ describe("assertions (deep equal)", function () { // eslint-disable-line max-sta
         match: false,
     })
 
-    if (typeof Symbol === "function" && typeof Symbol() === "symbol") {
-        var foo = Symbol("foo")
+    const symbol = Symbol("foo")
 
-        check("same symbols", foo, foo, {
-            deepEqual: true,
-            looseDeepEqual: true,
-            match: true,
-        })
+    check("same symbols", symbol, symbol, {
+        deepEqual: true,
+        looseDeepEqual: true,
+        match: true,
+    })
 
-        check("similar symbols", Symbol("foo"), Symbol("foo"), {
-            deepEqual: false,
-            looseDeepEqual: true,
-            match: true,
-        })
+    check("similar symbols", Symbol("foo"), Symbol("foo"), {
+        deepEqual: false,
+        looseDeepEqual: true,
+        match: true,
+    })
 
-        check("different symbols", Symbol("foo"), Symbol("bar"), {
-            deepEqual: false,
-            looseDeepEqual: false,
-            match: false,
-        })
-    }
+    check("different symbols", Symbol("foo"), Symbol("bar"), {
+        deepEqual: false,
+        looseDeepEqual: false,
+        match: false,
+    })
+
+    check("empty maps", new Map(), new Map(), {
+        deepEqual: true,
+        looseDeepEqual: true,
+        match: true,
+    })
+
+    check("maps with same primitive keys",
+        new Map([["foo", "bar"]]),
+        new Map([["foo", "bar"]]),
+        {deepEqual: true, looseDeepEqual: true, match: true})
+
+    check("maps with different primitive keys",
+        new Map([["foo", "bar"]]),
+        new Map([["bar", "bar"]]),
+        {deepEqual: false, looseDeepEqual: false, match: false})
+
+    check("maps with different primitive values",
+        new Map([["foo", "bar"]]),
+        new Map([["foo", "foo"]]),
+        {deepEqual: false, looseDeepEqual: false, match: false})
+
+    check("maps with different primitive both",
+        new Map([["foo", "bar"]]),
+        new Map([["bar", "foo"]]),
+        {deepEqual: false, looseDeepEqual: false, match: false})
+
+    check("maps with loosely same primitive key",
+        new Map([[1, "foo"]]),
+        new Map([["1", "foo"]]),
+        {deepEqual: false, looseDeepEqual: true, match: false})
+
+    check("maps with loosely same primitive value",
+        new Map([["foo", 1]]),
+        new Map([["foo", "1"]]),
+        {deepEqual: false, looseDeepEqual: true, match: false})
+
+    check("maps with loosely same primitive both",
+        new Map([["1", 1]]),
+        new Map([[1, "1"]]),
+        {deepEqual: false, looseDeepEqual: true, match: false})
+
+    check("maps with many same primitive keys",
+        new Map([["foo", "bar"], ["bar", 1], [1, 2], [true, 3]]),
+        new Map([["foo", "bar"], ["bar", 1], [1, 2], [true, 3]]),
+        {deepEqual: true, looseDeepEqual: true, match: true})
+
+    check("maps with many different primitive keys",
+        new Map([["foo", "bar"], ["bar", 1], [1, 2], [true, 3]]),
+        new Map([["foo", "bar"], ["bar", 2], ["15", 2], [false, 4]]),
+        {deepEqual: false, looseDeepEqual: false, match: false})
+
+    const mapObj = {foo: "bar"}
+
+    check("maps with identical keys",
+        new Map([[mapObj, "bar"]]),
+        new Map([[mapObj, "bar"]]),
+        {deepEqual: true, looseDeepEqual: true, match: true})
+
+    check("maps with structurally similar keys",
+        new Map([[{foo: "bar"}, "bar"]]),
+        new Map([[{foo: "bar"}, "bar"]]),
+        {deepEqual: true, looseDeepEqual: true, match: true})
+
+    check("maps with structurally different keys",
+        new Map([[{foo: "bar"}, "bar"]]),
+        new Map([[{bar: "foo"}, "bar"]]),
+        {deepEqual: false, looseDeepEqual: false, match: false})
+
+    check("maps with structurally similar values",
+        new Map([["bar", {foo: "bar"}]]),
+        new Map([["bar", {foo: "bar"}]]),
+        {deepEqual: true, looseDeepEqual: true, match: true})
+
+    check("maps with structurally different values",
+        new Map([["bar", {foo: "bar"}]]),
+        new Map([["bar", {bar: "foo"}]]),
+        {deepEqual: false, looseDeepEqual: false, match: false})
+
+    check("maps with structurally similar both",
+        new Map([[{foo: "bar"}, {foo: "bar"}]]),
+        new Map([[{foo: "bar"}, {foo: "bar"}]]),
+        {deepEqual: true, looseDeepEqual: true, match: true})
+
+    check("maps with structurally different both",
+        new Map([[{foo: "bar"}, {foo: "bar"}]]),
+        new Map([[{bar: "foo"}, {bar: "foo"}]]),
+        {deepEqual: false, looseDeepEqual: false, match: false})
+
+    const bar = () => {}
+
+    check("maps with inner functions",
+        new Map([[{foo: "bar", bar}, {foo: "bar", bar}]]),
+        new Map([[{foo: "bar", bar}, {foo: "bar", bar}]]),
+        {deepEqual: true, looseDeepEqual: true, match: true})
+
+    // Derived from a failing LoaderData test
+    ;(() => {
+        const load = () => {}
+
+        function register(ext, value, load, use) {
+            return {ext, value, require, use, loaded: false, original: false}
+        }
+
+        function simple(module, load) {
+            return {module, load, loaded: false}
+        }
+
+        class Register {
+            constructor(ext, value, load, use) {
+                this.ext = ext
+                this.value = value
+                this.require = load
+                this.loaded = false
+                this.use = use
+                this.original = false
+            }
+        }
+
+        class Simple {
+            constructor(module, load) {
+                this.module = module
+                this.require = load
+                this.loaded = false
+            }
+        }
+
+        class Ext {
+            constructor(ext) { this.ext = ext }
+        }
+
+        class Id {
+            constructor(id) { this.id = id }
+        }
+
+        /* eslint-disable max-len */
+
+        check("really complex maps with objects",
+            new Map([
+                [".my-shell", register(".my-shell", "@company/my-shell/register", load, true)],
+                [".js", register(".js", "./babel-register-wrapper", load, true)],
+                [0, simple("./util/env.my-shell", load)],
+                [".ls", register(".ls", ["livescript", "LiveScript"], load, false)],
+                [".coffee", register(".coffee", ["coffee-script/register", "coffee-script"], load, false)],
+            ]),
+            new Map([
+                [".my-shell", register(".my-shell", "@company/my-shell/register", load, true)],
+                [".js", register(".js", "./babel-register-wrapper", load, true)],
+                [".ls", register(".ls", ["livescript", "LiveScript"], load, false)],
+                [".coffee", register(".coffee", ["coffee-script/register", "coffee-script"], load, false)],
+                [0, simple("./util/env.my-shell", load)],
+            ]),
+            {deepEqual: true, looseDeepEqual: true, match: true})
+
+        check("really complex maps with classes",
+            new Map([
+                [".my-shell", new Register(".my-shell", "@company/my-shell/register", load, true)],
+                [".js", new Register(".js", "./babel-register-wrapper", load, true)],
+                [0, new Simple("./util/env.my-shell", load)],
+                [".ls", new Register(".ls", ["livescript", "LiveScript"], load, false)],
+                [".coffee", new Register(".coffee", ["coffee-script/register", "coffee-script"], load, false)],
+            ]),
+            new Map([
+                [".my-shell", new Register(".my-shell", "@company/my-shell/register", load, true)],
+                [".js", new Register(".js", "./babel-register-wrapper", load, true)],
+                [".ls", new Register(".ls", ["livescript", "LiveScript"], load, false)],
+                [".coffee", new Register(".coffee", ["coffee-script/register", "coffee-script"], load, false)],
+                [0, new Simple("./util/env.my-shell", load)],
+            ]),
+            {deepEqual: true, looseDeepEqual: true, match: true})
+
+        check("complex sets with differently ordered primitive + object",
+            new Set([
+                [".my-shell", register(".my-shell", "@company/my-shell/register", load, true)],
+                [".js", register(".js", "./babel-register-wrapper", load, true)],
+                [0, simple("./util/env.my-shell", load)],
+                [".ls", register(".ls", ["livescript", "LiveScript"], load, false)],
+                [".coffee", register(".coffee", ["coffee-script/register", "coffee-script"], load, false)],
+            ]),
+            new Set([
+                [".my-shell", register(".my-shell", "@company/my-shell/register", load, true)],
+                [".js", register(".js", "./babel-register-wrapper", load, true)],
+                [".ls", register(".ls", ["livescript", "LiveScript"], load, false)],
+                [".coffee", register(".coffee", ["coffee-script/register", "coffee-script"], load, false)],
+                [0, simple("./util/env.my-shell", load)],
+            ]),
+            {deepEqual: true, looseDeepEqual: true, match: true})
+
+        check("complex sets with differently ordered primitive + class",
+            new Set([
+                [".my-shell", new Register(".my-shell", "@company/my-shell/register", load, true)],
+                [".js", new Register(".js", "./babel-register-wrapper", load, true)],
+                [0, new Simple("./util/env.my-shell", load)],
+                [".ls", new Register(".ls", ["livescript", "LiveScript"], load, false)],
+                [".coffee", new Register(".coffee", ["coffee-script/register", "coffee-script"], load, false)],
+            ]),
+            new Set([
+                [".my-shell", new Register(".my-shell", "@company/my-shell/register", load, true)],
+                [".js", new Register(".js", "./babel-register-wrapper", load, true)],
+                [".ls", new Register(".ls", ["livescript", "LiveScript"], load, false)],
+                [".coffee", new Register(".coffee", ["coffee-script/register", "coffee-script"], load, false)],
+                [0, new Simple("./util/env.my-shell", load)],
+            ]),
+            {deepEqual: true, looseDeepEqual: true, match: true})
+
+        check("complex sets with differently ordered object + object",
+            new Set([
+                [{ext: ".my-shell"}, register(".my-shell", "@company/my-shell/register", load, true)],
+                [{ext: ".js"}, register(".js", "./babel-register-wrapper", load, true)],
+                [{id: 0}, simple("./util/env.my-shell", load)],
+                [{ext: ".ls"}, register(".ls", ["livescript", "LiveScript"], load, false)],
+                [{ext: ".coffee"}, register(".coffee", ["coffee-script/register", "coffee-script"], load, false)],
+            ]),
+            new Set([
+                [{ext: ".my-shell"}, register(".my-shell", "@company/my-shell/register", load, true)],
+                [{ext: ".js"}, register(".js", "./babel-register-wrapper", load, true)],
+                [{ext: ".ls"}, register(".ls", ["livescript", "LiveScript"], load, false)],
+                [{ext: ".coffee"}, register(".coffee", ["coffee-script/register", "coffee-script"], load, false)],
+                [{id: 0}, simple("./util/env.my-shell", load)],
+            ]),
+            {deepEqual: true, looseDeepEqual: true, match: true})
+
+        check("complex sets with differently ordered object + class",
+            new Set([
+                [{ext: ".my-shell"}, new Register(".my-shell", "@company/my-shell/register", load, true)],
+                [{ext: ".js"}, new Register(".js", "./babel-register-wrapper", load, true)],
+                [{id: 0}, new Simple("./util/env.my-shell", load)],
+                [{ext: ".ls"}, new Register(".ls", ["livescript", "LiveScript"], load, false)],
+                [{ext: ".coffee"}, new Register(".coffee", ["coffee-script/register", "coffee-script"], load, false)],
+            ]),
+            new Set([
+                [{ext: ".my-shell"}, new Register(".my-shell", "@company/my-shell/register", load, true)],
+                [{ext: ".js"}, new Register(".js", "./babel-register-wrapper", load, true)],
+                [{ext: ".ls"}, new Register(".ls", ["livescript", "LiveScript"], load, false)],
+                [{ext: ".coffee"}, new Register(".coffee", ["coffee-script/register", "coffee-script"], load, false)],
+                [{id: 0}, new Simple("./util/env.my-shell", load)],
+            ]),
+            {deepEqual: true, looseDeepEqual: true, match: true})
+
+        check("complex sets with differently ordered class + object",
+            new Set([
+                [new Ext(".my-shell"), register(".my-shell", "@company/my-shell/register", load, true)],
+                [new Ext(".js"), register(".js", "./babel-register-wrapper", load, true)],
+                [new Id(0), simple("./util/env.my-shell", load)],
+                [new Ext(".ls"), register(".ls", ["livescript", "LiveScript"], load, false)],
+                [new Ext(".coffee"), register(".coffee", ["coffee-script/register", "coffee-script"], load, false)],
+            ]),
+            new Set([
+                [new Ext(".my-shell"), register(".my-shell", "@company/my-shell/register", load, true)],
+                [new Ext(".js"), register(".js", "./babel-register-wrapper", load, true)],
+                [new Ext(".ls"), register(".ls", ["livescript", "LiveScript"], load, false)],
+                [new Ext(".coffee"), register(".coffee", ["coffee-script/register", "coffee-script"], load, false)],
+                [new Id(0), simple("./util/env.my-shell", load)],
+            ]),
+            {deepEqual: true, looseDeepEqual: true, match: true})
+
+        check("complex sets with differently ordered class + class",
+            new Set([
+                [new Ext(".my-shell"), new Register(".my-shell", "@company/my-shell/register", load, true)],
+                [new Ext(".js"), new Register(".js", "./babel-register-wrapper", load, true)],
+                [new Id(0), new Simple("./util/env.my-shell", load)],
+                [new Ext(".ls"), new Register(".ls", ["livescript", "LiveScript"], load, false)],
+                [new Ext(".coffee"), new Register(".coffee", ["coffee-script/register", "coffee-script"], load, false)],
+            ]),
+            new Set([
+                [new Ext(".my-shell"), new Register(".my-shell", "@company/my-shell/register", load, true)],
+                [new Ext(".js"), new Register(".js", "./babel-register-wrapper", load, true)],
+                [new Ext(".ls"), new Register(".ls", ["livescript", "LiveScript"], load, false)],
+                [new Ext(".coffee"), new Register(".coffee", ["coffee-script/register", "coffee-script"], load, false)],
+                [new Id(0), new Simple("./util/env.my-shell", load)],
+            ]),
+            {deepEqual: true, looseDeepEqual: true, match: true})
+
+        /* eslint-enable max-len */
+    })()
+
+    check("empty sets", new Set(), new Set(), {
+        deepEqual: true,
+        looseDeepEqual: true,
+        match: true,
+    })
+
+    check("sets with same primitive values",
+        new Set(["foo", "bar"]),
+        new Set(["foo", "bar"]),
+        {deepEqual: true, looseDeepEqual: true, match: true})
+
+    check("sets with different primitive values",
+        new Set(["foo", "bar"]),
+        new Set(["bar", "bar"]),
+        {deepEqual: false, looseDeepEqual: false, match: false})
+
+    check("sets with loosely same primitive value",
+        new Set([1, "foo"]),
+        new Set(["1", "foo"]),
+        {deepEqual: false, looseDeepEqual: true, match: false})
+
+    check("sets with many same primitive values",
+        new Set(["foo", "bar", "bar", 1, 1, 2, true, 3]),
+        new Set(["foo", "bar", "bar", 1, 1, 2, true, 3]),
+        {deepEqual: true, looseDeepEqual: true, match: true})
+
+    check("sets with many different primitive values",
+        new Set(["foo", "bar", "bar", 1, 1, 2, true, 3]),
+        new Set(["foo", "bar", "bar", 2, "15", 2, false, 4]),
+        {deepEqual: false, looseDeepEqual: false, match: false})
+
+    const setObj = {foo: "bar"}
+
+    check("sets with identical values",
+        new Set([setObj, "bar"]),
+        new Set([setObj, "bar"]),
+        {deepEqual: true, looseDeepEqual: true, match: true})
+
+    check("sets with structurally similar values",
+        new Set([{foo: "bar"}, "bar"]),
+        new Set([{foo: "bar"}, "bar"]),
+        {deepEqual: true, looseDeepEqual: true, match: true})
+
+    check("sets with structurally different values",
+        new Set([{foo: "bar"}, "bar"]),
+        new Set([{bar: "foo"}, "bar"]),
+        {deepEqual: false, looseDeepEqual: false, match: false})
+
+    const f = () => {}
+
+    check("same functions", f, f, {
+        deepEqual: true,
+        looseDeepEqual: true,
+        match: true,
+    })
+
+    check("different functions", () => {}, () => {}, {
+        deepEqual: false,
+        looseDeepEqual: false,
+        match: false,
+    })
 })

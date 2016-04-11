@@ -1,13 +1,13 @@
 "use strict"
 
-var t = require("../index.js")
+const t = require("../index.js")
 
-describe("class AssertionError", function () {
-    it("exists", function () {
+describe("class AssertionError", () => {
+    it("exists", () => {
         t.function(t.AssertionError)
     })
 
-    it("is an error", function () {
+    it("is an error", () => {
         t.instanceof(new t.AssertionError("message"), Error)
     })
 })

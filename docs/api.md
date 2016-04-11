@@ -128,9 +128,9 @@ You can skip async tests with `t.asyncSkip("name", callback)`, which is identica
 
 This returns the current Techtonic instance, for chaining.
 
-### t.do(func), t.block(func)
+### t.do(func)
 
-These run a function when the assertions are being run, and is guaranteed to report errors thrown as within that test. This is probably mostly useful for plugin authors dealing with inline tests, for simple setup and/or cleanup within those. `t.block()` is an ES3-compatible alias for `t.do()`.
+These run a function when the assertions are being run, and is guaranteed to report errors thrown as within that test. This is probably mostly useful for plugin authors dealing with inline tests, for simple setup and/or cleanup within those. Note that it isn't safe to call API methods within this, though.
 
 ```js
 t.test("test")
@@ -279,7 +279,7 @@ t.myAssert 1, 1 # ReferenceError: method not defined here
 
 Ad-hoc assertions are most definitely permitted, and the API is made for this to be easy.
 
-This returns the current Techtonic instance, for chaining.
+This returns the current Techtonic instance, for chaining. Note that it isn't safe to call API methods within the callback.
 
 ### t.wrap("method", callback), t.wrap(methods)
 

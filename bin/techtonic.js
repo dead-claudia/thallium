@@ -1,29 +1,27 @@
 #!/usr/bin/env node
 "use strict"
 
-var cp = require("child_process")
-var path = require("path")
-var help = require("../lib/cli/help.js")
+if (require.main !== module) {
+    throw new Error("This is not a module!")
+}
 
-var args = {
+const cp = require("child_process")
+const path = require("path")
+const help = require("../lib/cli/help.js")
+
+const args = {
     config: null,
     register: [],
     module: null,
     cwd: null,
 }
 
-process.title = "techtonic " +
-    process.argv
-    .slice(2)
-    .map(function (x) { return "'" + JSON.stringify(x).slice(1, -1) + "'" })
-    .join(" ")
-
-var node = []
-var rest = []
-var last, i
+const node = []
+const rest = []
+let last, i
 
 for (i = 2; i < process.argv.length; i++) {
-    var arg = process.argv[i]
+    const arg = process.argv[i]
 
     if (last != null) {
         if (Array.isArray(args[last])) args[last].push(arg)
@@ -31,8 +29,10 @@ for (i = 2; i < process.argv.length; i++) {
         last = null
     } else if (/^(-h|--help)$/.test(arg)) {
         help()
+        process.exit()
     } else if (/^(-hh|--help-detailed)$/.test(arg)) {
         help(true)
+        process.exit()
     } else if (/^(-c|--config)$/.test(arg)) {
         last = "config"
     } else if (/^(-r|--register)$/.test(arg)) {
@@ -52,8 +52,8 @@ for (i = 2; i < process.argv.length; i++) {
 // Append the rest.
 while (i < process.argv.length) rest.push(process.argv[i++])
 
-var count = 2
-var code = 0
+let count = 2
+let code = 0
 
 function exit(status) {
     code = status != null ? status : code
@@ -66,7 +66,7 @@ cp.spawn("node", [].concat.apply([
     args.config == null ? [] : ["--config", args.config],
     args.module == null ? [] : ["--module", args.module],
     args.cwd == null ? [] : ["--cwd", args.cwd],
-    args.register.map(function (arg) { return ["--register", arg] }),
+    args.register.map(arg => ["--register", arg]),
     ["--"],
     rest,
 ]), {

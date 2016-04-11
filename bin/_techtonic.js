@@ -4,17 +4,10 @@ if (require.main !== module) {
     throw new Error("This is not a module!")
 }
 
-var cwd = process.cwd()
-var argv = process.argv.slice(2)
-
-process.title = "techtonic " +
-    argv
-    .map(function (x) { return "'" + JSON.stringify(x).slice(1, -1) + "'" })
-    .join(" ")
-
-require("../lib/cli/cli.js")(cwd, argv).then(function () {
-    process.exit()
-}, function (err) {
-    console.error(err)
-    process.exit(1)
+// One of the few legitimate use cases for Bluebird's Promise#done().
+require("../lib/cli/cli.js").run({
+    cwd: process.cwd(),
+    argv: process.argv.slice(2),
+    util: require("../lib/cli/util.js"), // eslint-disable-line global-require
 })
+.done(process.exit)

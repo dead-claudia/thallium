@@ -14,8 +14,12 @@ Options:
 -c [file], --config [file]
     Use a custom config file.
 
--r [extension], --register [extension]
-    Register a particular extension, optionally with a module.
+-r [module], --require [module]
+    `require` a given module before loading the config.
+
+-r [ext:module], --require [ext:module]
+    Register an extension with that module (so Techtonic knows it's a register
+    hook). Usually, you won't need to use this.
 
 --
     Stop parsing options.

@@ -1,17 +1,13 @@
 "use strict"
 
-/* global Symbol */
+const t = require("../../index.js")
+const Util = require("../../test-util/assertions.js")
+const fail = Util.fail
+const basic = Util.basic
 
-var t = require("../../index.js")
-var Util = require("../../test-util/assertions.js")
-var fail = Util.fail
-var basic = Util.basic
-
-describe("assertions (base)", function () {
-    var hasSymbol = typeof Symbol === "function" && typeof Symbol() === "symbol"
-
-    describe("t.assert()", function () {
-        it("works", function () {
+describe("assertions (base)", () => {
+    describe("t.assert()", () => {
+        it("works", () => {
             function fail(arg, message) {
                 try {
                     t.assert(arg, message)
@@ -28,7 +24,7 @@ describe("assertions (base)", function () {
             t.assert({})
             t.assert([])
             t.assert(new Date())
-            if (hasSymbol) t.assert(Symbol())
+            t.assert(Symbol())
 
             fail(undefined, "message")
             fail(null, "message")
@@ -38,7 +34,7 @@ describe("assertions (base)", function () {
             fail(NaN, "message")
         })
 
-        it("escapes the message", function () {
+        it("escapes the message", () => {
             fail("assert", undefined, "{test}")
             fail("assert", null, "{test}")
             fail("assert", false, "{test}")
@@ -48,7 +44,7 @@ describe("assertions (base)", function () {
         })
     })
 
-    basic("t.ok()", function () {
+    basic("t.ok()", () => {
         t.ok(true)
         t.ok(1)
         t.ok(Infinity)
@@ -56,7 +52,7 @@ describe("assertions (base)", function () {
         t.ok({})
         t.ok([])
         t.ok(new Date())
-        if (hasSymbol) t.ok(Symbol())
+        t.ok(Symbol())
 
         fail("ok")
         fail("ok", undefined)
@@ -67,7 +63,7 @@ describe("assertions (base)", function () {
         fail("ok", NaN)
     })
 
-    basic("t.notOk()", function () {
+    basic("t.notOk()", () => {
         fail("notOk", true)
         fail("notOk", 1)
         fail("notOk", Infinity)
@@ -75,7 +71,7 @@ describe("assertions (base)", function () {
         fail("notOk", {})
         fail("notOk", [])
         fail("notOk", new Date())
-        if (hasSymbol) fail("notOk", Symbol())
+        fail("notOk", Symbol())
 
         t.notOk()
         t.notOk(undefined)
@@ -86,7 +82,7 @@ describe("assertions (base)", function () {
         t.notOk(NaN)
     })
 
-    basic("t.equal()", function () {
+    basic("t.equal()", () => {
         t.equal(0, 0)
         t.equal(1, 1)
         t.equal(null, null)
@@ -96,7 +92,7 @@ describe("assertions (base)", function () {
         t.equal("", "")
         t.equal("foo", "foo")
 
-        var obj = {}
+        const obj = {}
 
         t.equal(obj, obj)
 
@@ -106,7 +102,7 @@ describe("assertions (base)", function () {
         fail("equal", 1, "1")
     })
 
-    basic("t.notEqual()", function () {
+    basic("t.notEqual()", () => {
         fail("notEqual", 0, 0)
         fail("notEqual", 1, 1)
         fail("notEqual", null, null)
@@ -116,7 +112,7 @@ describe("assertions (base)", function () {
         fail("notEqual", "", "")
         fail("notEqual", "foo", "foo")
 
-        var obj = {}
+        const obj = {}
 
         fail("notEqual", obj, obj)
 
@@ -126,7 +122,7 @@ describe("assertions (base)", function () {
         t.notEqual(1, "1")
     })
 
-    basic("t.looseEqual()", function () {
+    basic("t.looseEqual()", () => {
         t.looseEqual(0, 0)
         t.looseEqual(1, 1)
         t.looseEqual(null, null)
@@ -138,7 +134,7 @@ describe("assertions (base)", function () {
         t.looseEqual(null, undefined)
         t.looseEqual(1, "1")
 
-        var obj = {}
+        const obj = {}
 
         t.looseEqual(obj, obj)
 
@@ -146,7 +142,7 @@ describe("assertions (base)", function () {
         fail("looseEqual", 0, 1)
     })
 
-    basic("t.notLooseEqual()", function () {
+    basic("t.notLooseEqual()", () => {
         fail("notLooseEqual", 0, 0)
         fail("notLooseEqual", 1, 1)
         fail("notLooseEqual", null, null)
@@ -158,7 +154,7 @@ describe("assertions (base)", function () {
         fail("notLooseEqual", null, undefined)
         fail("notLooseEqual", 1, "1")
 
-        var obj = {}
+        const obj = {}
 
         fail("notLooseEqual", obj, obj)
 
@@ -166,7 +162,7 @@ describe("assertions (base)", function () {
         t.notLooseEqual(0, 1)
     })
 
-    basic("t.deepEqual()", function () {
+    basic("t.deepEqual()", () => {
         t.deepEqual(0, 0)
         t.deepEqual(1, 1)
         t.deepEqual(null, null)
@@ -176,7 +172,7 @@ describe("assertions (base)", function () {
         t.deepEqual("", "")
         t.deepEqual("foo", "foo")
 
-        var obj = {}
+        const obj = {}
 
         t.deepEqual(obj, obj)
 
@@ -190,7 +186,7 @@ describe("assertions (base)", function () {
             {a: [2, 3], b: [4]})
     })
 
-    basic("t.notDeepEqual()", function () {
+    basic("t.notDeepEqual()", () => {
         fail("notDeepEqual", 0, 0)
         fail("notDeepEqual", 1, 1)
         fail("notDeepEqual", null, null)
@@ -200,7 +196,7 @@ describe("assertions (base)", function () {
         fail("notDeepEqual", "", "")
         fail("notDeepEqual", "foo", "foo")
 
-        var obj = {}
+        const obj = {}
 
         fail("notDeepEqual", obj, obj)
 
@@ -214,7 +210,7 @@ describe("assertions (base)", function () {
             {a: [2, 3], b: [4]})
     })
 
-    basic("t.looseDeepEqual()", function () {
+    basic("t.looseDeepEqual()", () => {
         t.looseDeepEqual(0, 0)
         t.looseDeepEqual(1, 1)
         t.looseDeepEqual(null, null)
@@ -224,7 +220,7 @@ describe("assertions (base)", function () {
         t.looseDeepEqual("", "")
         t.looseDeepEqual("foo", "foo")
 
-        var obj = {}
+        const obj = {}
 
         t.looseDeepEqual(obj, obj)
 
@@ -238,7 +234,7 @@ describe("assertions (base)", function () {
             {a: [2, 3], b: [4]})
     })
 
-    basic("t.notLooseDeepEqual()", function () {
+    basic("t.notLooseDeepEqual()", () => {
         fail("notLooseDeepEqual", 0, 0)
         fail("notLooseDeepEqual", 1, 1)
         fail("notLooseDeepEqual", null, null)
@@ -248,7 +244,7 @@ describe("assertions (base)", function () {
         fail("notLooseDeepEqual", "", "")
         fail("notLooseDeepEqual", "foo", "foo")
 
-        var obj = {}
+        const obj = {}
 
         fail("notLooseDeepEqual", obj, obj)
 
@@ -262,10 +258,12 @@ describe("assertions (base)", function () {
             {a: [2, 3], b: [4]})
     })
 
-    function F() { this.value = 1 }
-    F.prototype.prop = 1
+    class F {
+        constructor() { this.value = 1 }
+        get prop() { return 1 }
+    }
 
-    basic("t.hasOwn()", function () {
+    basic("t.hasOwn()", () => {
         t.hasOwn({prop: 1}, "prop")
         t.hasOwn({prop: 1}, "prop", 1)
         t.hasOwn(new F(), "value", 1)
@@ -279,7 +277,7 @@ describe("assertions (base)", function () {
         fail("hasOwn", new F(), "value", 2)
     })
 
-    basic("t.notHasOwn()", function () {
+    basic("t.notHasOwn()", () => {
         fail("notHasOwn", {prop: 1}, "prop")
         fail("notHasOwn", {prop: 1}, "prop", 1)
         fail("notHasOwn", new F(), "value", 1)
@@ -293,7 +291,7 @@ describe("assertions (base)", function () {
         t.notHasOwn(new F(), "value", 2)
     })
 
-    basic("t.looseHasOwn()", function () {
+    basic("t.looseHasOwn()", () => {
         t.looseHasOwn({prop: 1}, "prop")
         t.looseHasOwn({prop: 1}, "prop", 1)
         t.looseHasOwn(new F(), "value", 1)
@@ -307,7 +305,7 @@ describe("assertions (base)", function () {
         fail("looseHasOwn", new F(), "value", 2)
     })
 
-    basic("t.notLooseHasOwn()", function () {
+    basic("t.notLooseHasOwn()", () => {
         fail("notLooseHasOwn", {prop: 1}, "prop")
         fail("notLooseHasOwn", {prop: 1}, "prop", 1)
         fail("notLooseHasOwn", new F(), "value", 1)
@@ -321,7 +319,7 @@ describe("assertions (base)", function () {
         t.notLooseHasOwn(new F(), "value", 2)
     })
 
-    basic("t.hasKey()", function () {
+    basic("t.hasKey()", () => {
         t.hasKey({prop: 1}, "prop")
         t.hasKey({prop: 1}, "prop", 1)
         t.hasKey(new F(), "value", 1)
@@ -335,7 +333,7 @@ describe("assertions (base)", function () {
         fail("hasKey", new F(), "value", 2)
     })
 
-    basic("t.notHasKey()", function () {
+    basic("t.notHasKey()", () => {
         fail("notHasKey", {prop: 1}, "prop")
         fail("notHasKey", {prop: 1}, "prop", 1)
         fail("notHasKey", new F(), "value", 1)
@@ -349,7 +347,7 @@ describe("assertions (base)", function () {
         t.notHasKey(new F(), "value", 2)
     })
 
-    basic("t.looseHasKey()", function () {
+    basic("t.looseHasKey()", () => {
         t.looseHasKey({prop: 1}, "prop")
         t.looseHasKey({prop: 1}, "prop", 1)
         t.looseHasKey(new F(), "value", 1)
@@ -363,7 +361,7 @@ describe("assertions (base)", function () {
         fail("looseHasKey", new F(), "value", 2)
     })
 
-    basic("t.notLooseHasKey()", function () {
+    basic("t.notLooseHasKey()", () => {
         fail("notLooseHasKey", {prop: 1}, "prop")
         fail("notLooseHasKey", {prop: 1}, "prop", 1)
         fail("notLooseHasKey", new F(), "value", 1)

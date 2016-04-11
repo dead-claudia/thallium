@@ -8,10 +8,12 @@
     "test": "npm run lint && mocha"
   },
   "files": [
+    "assertions.d.ts",
     "assertions.js",
+    "core.d.ts",
     "core.js",
+    "index.d.ts",
     "index.js",
-    "definitions.d.ts",
     "lib",
     "docs"
   ],
@@ -26,17 +28,13 @@
   "devDependencies": {
     "eslint": "^2.6.0",
     "eslint-config-isiahmeadows": "^0.1.6",
+    "minimatch": "^3.0.0",
     "mocha": "^2.3.4",
-    "mock-fs": "^3.8.0",
-    "mockery": "^1.4.0"
   },
   "dependencies": {
     "bluebird": "^3.3.4",
-    "glob-parent": "^2.0.0",
     "glob-stream": "^5.3.1",
-    "interpret": "^1.0.0",
-    "require-uncached": "^1.0.2",
-    "resolve": "^1.1.7"
+    "interpret": "^1.0.0"
   },
   "directories": {
     "lib": "lib",
@@ -44,7 +42,7 @@
     "example": "docs/examples"
   },
   "engines": {
-    "node": ">=0.10"
+    "node": ">=4"
   },
   "repository": "isiahmeadows/techtonic",
   "bugs": "https://github.com/isiahmeadows/techtonic/issues",

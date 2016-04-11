@@ -1,7 +1,0 @@
-{
-    "name": "techtonic",
-    "main": "./definitions.d.ts",
-    "browser": "./definitions.d.ts",
-    "author": "Isiah Meadows <me@isiahmeadows.com>",
-    "description": "A simple, unopinionated, modular test framework"
-}

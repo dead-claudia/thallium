@@ -1,716 +1,154 @@
 "use strict"
 
-var t = require("../../index.js")
-var Util = require("../../test-util/base.js")
+const t = require("../../index.js")
+const Util = require("../../test-util/base.js")
 
-var n = Util.n
-var p = Util.p
+const n = Util.n
+const p = Util.p
 
-describe("core (iterators)", function () {
-    describe("raw", function () {
-        it("normal", function () {
-            var iter = {
-                list: [],
-                index: 0,
-                next: function (value) {
-                    this.list.push(value)
+describe("core (iterators)", () => {
+    function createSentinel(name) {
+        return Object.assign(new Error(name), {marker() {}})
+    }
 
-                    if (this.index >= 5) {
-                        return {done: true, value: 5}
-                    } else {
-                        return {done: false, value: this.index++}
-                    }
-                },
-                throw: function () {
-                    t.fail("should never happen")
-                },
+    function test(last) {
+        return (name, len, create) => it(name, () => {
+            const sentinel = createSentinel("sentinel")
+            const iter = create(sentinel)
+            const tt = t.base()
+            const ret = []
+
+            const list = []
+            let index = 0
+
+            const wrapper = {}
+
+            wrapper.next = value => {
+                list.push(value)
+                const ret = iter.next(index)
+
+                if (!ret.done) index++
+                return ret
             }
 
-            var tt = t.base()
-            var ret = []
+            if (iter.throw) wrapper.throw = value => iter.throw(value)
 
             tt.reporter(Util.push(ret))
-            tt.async("test", function () { return iter })
+            tt.async("test", () => wrapper)
 
-            return tt.run().then(function () {
-                t.deepEqual(ret, [
+            return tt.run().then(() => {
+                t.match(ret, [
                     n("start", []),
                     n("start", [p("test", 0)]),
                     n("end", [p("test", 0)]),
-                    n("pass", [p("test", 0)]),
+                    last(sentinel),
                     n("end", []),
                     n("exit", []),
                 ])
-
-                t.deepEqual(iter.list, [undefined, 0, 1, 2, 3, 4])
+                t.match(list, [undefined, 0, 1, 2, 3, 4].slice(0, len + 1))
+                if (iter.check) iter.check()
             })
         })
+    }
 
-        it("normal + no `throw`", function () {
-            var iter = {
-                list: [],
-                index: 0,
-                next: function (value) {
-                    this.list.push(value)
-                    if (this.index >= 5) {
-                        return {done: true, value: 5}
-                    } else {
-                        return {done: false, value: this.index++}
-                    }
-                },
+    const pass = test(() => n("pass", [p("test", 0)]))
+    const fail = test(sentinel => n("fail", [p("test", 0)], sentinel))
+    const resolve = value => ({then(resolve) { resolve(value) }})
+    const reject = value => ({then(_, reject) { reject(value) }})
+    const next = value => ({done: false, value})
+    const done = value => ({done: true, value})
+    const unreachable = () => t.fail("should never happen")
+    const recover = (sentinel, f) => value => {
+        t.equal(value, sentinel)
+        return done(f())
+    }
+
+    function check(name, throws, m) {
+        context(name, () => {
+            const doFive = index =>
+                index >= 5 ? done(m.return(5)) : next(m.return(index))
+
+            pass("normal", 5, () => ({next: doFive, throw: unreachable}))
+            pass("normal + no `throw`", 5, () => ({next: doFive}))
+
+            m.nothrow(`${throws} initially`, 0, sentinel => ({
+                next: () => next(m.throw(sentinel)),
+                throw: recover(sentinel, m.return),
+            }))
+
+            fail(`${throws} initially + no \`throw\``, 0, sentinel => ({
+                next: () => next(m.throw(sentinel)),
+            }))
+
+            const throwNext = sentinel => index => {
+                if (index !== 0) return next(m.throw(sentinel))
+                return next(m.return(index))
             }
 
-            var tt = t.base()
-            var ret = []
+            m.nothrow(`${throws} in middle`, 1, sentinel => ({
+                next: throwNext(sentinel),
+                throw: m.recover(sentinel, m.return),
+            }))
 
-            tt.reporter(Util.push(ret))
-            tt.async("test", function () { return iter })
-
-            return tt.run().then(function () {
-                t.deepEqual(ret, [
-                    n("start", []),
-                    n("start", [p("test", 0)]),
-                    n("end", [p("test", 0)]),
-                    n("pass", [p("test", 0)]),
-                    n("end", []),
-                    n("exit", []),
-                ])
-
-                t.deepEqual(iter.list, [undefined, 0, 1, 2, 3, 4])
-            })
+            fail(`${throws} in middle + no \`throw\``, 1, sentinel => ({
+                next: throwNext(sentinel),
+            }))
         })
+    }
 
-        it("throws initially + no `throw`", function () {
-            var sentinel = new Error("sentinel")
-
-            sentinel.marker = function () {}
-
-            var iter = {
-                list: [],
-                index: 0,
-                next: function (value) {
-                    this.list.push(value)
-                    throw sentinel
-                },
-            }
-
-            var tt = t.base()
-            var ret = []
-
-            tt.reporter(Util.push(ret))
-            tt.async("test", function () { return iter })
-
-            return tt.run().then(function () {
-                t.deepEqual(ret, [
-                    n("start", []),
-                    n("start", [p("test", 0)]),
-                    n("end", [p("test", 0)]),
-                    n("fail", [p("test", 0)], sentinel),
-                    n("end", []),
-                    n("exit", []),
-                ])
-
-                t.deepEqual(iter.list, [undefined])
-            })
-        })
-
-        it("throws in middle", function () {
-            var sentinel = new Error("sentinel")
-
-            sentinel.marker = function () {}
-
-            var iter = {
-                list: [],
-                index: 0,
-                next: function (value) {
-                    this.list.push(value)
-                    if (this.index === 0) {
-                        return {done: false, value: this.index++}
-                    } else {
-                        throw sentinel
-                    }
-                },
-                throw: function () { t.fail("should never happen") },
-            }
-
-            var tt = t.base()
-            var ret = []
-
-            tt.reporter(Util.push(ret))
-            tt.async("test", function () { return iter })
-
-            return tt.run().then(function () {
-                t.deepEqual(ret, [
-                    n("start", []),
-                    n("start", [p("test", 0)]),
-                    n("end", [p("test", 0)]),
-                    n("fail", [p("test", 0)], sentinel),
-                    n("end", []),
-                    n("exit", []),
-                ])
-
-                t.deepEqual(iter.list, [undefined, 0])
-            })
-        })
-
-        it("throws in middle + no `throw`", function () {
-            var sentinel = new Error("sentinel")
-
-            sentinel.marker = function () {}
-
-            var iter = {
-                list: [],
-                index: 0,
-                next: function (value) {
-                    this.list.push(value)
-                    if (this.index === 0) {
-                        return {done: false, value: this.index++}
-                    } else {
-                        throw sentinel
-                    }
-                },
-            }
-
-            var tt = t.base()
-            var ret = []
-
-            tt.reporter(Util.push(ret))
-            tt.async("test", function () { return iter })
-
-            return tt.run().then(function () {
-                t.deepEqual(ret, [
-                    n("start", []),
-                    n("start", [p("test", 0)]),
-                    n("end", [p("test", 0)]),
-                    n("fail", [p("test", 0)], sentinel),
-                    n("end", []),
-                    n("exit", []),
-                ])
-
-                t.deepEqual(iter.list, [undefined, 0])
-            })
-        })
+    check("raw", "throws", {
+        nothrow: fail,
+        recover: () => unreachable,
+        return: value => value,
+        throw: value => { throw value },
     })
 
-    describe("promise", function () {
-        function resolve(value) {
-            return {then: function (resolve) { resolve(value) }}
-        }
-
-        function reject(value) {
-            return {then: function (_, reject) { reject(value) }}
-        }
-
-        it("normal", function () {
-            var iter = {
-                list: [],
-                index: 0,
-                next: function (value) {
-                    this.list.push(value)
-                    if (this.index >= 5) {
-                        return {done: true, value: resolve(5)}
-                    } else {
-                        return {done: false, value: resolve(this.index++)}
-                    }
-                },
-                throw: function () { t.fail("should never happen") },
-            }
-
-            var tt = t.base()
-            var ret = []
-
-            tt.reporter(Util.push(ret))
-            tt.async("test", function () { return iter })
-
-            return tt.run().then(function () {
-                t.deepEqual(ret, [
-                    n("start", []),
-                    n("start", [p("test", 0)]),
-                    n("end", [p("test", 0)]),
-                    n("pass", [p("test", 0)]),
-                    n("end", []),
-                    n("exit", []),
-                ])
-
-                t.deepEqual(iter.list, [undefined, 0, 1, 2, 3, 4])
-            })
-        })
-
-        it("normal + no `throw`", function () {
-            var iter = {
-                list: [],
-                index: 0,
-                next: function (value) {
-                    this.list.push(value)
-                    if (this.index >= 5) {
-                        return {done: true, value: resolve(5)}
-                    } else {
-                        return {done: false, value: resolve(this.index++)}
-                    }
-                },
-            }
-
-            var tt = t.base()
-            var ret = []
-
-            tt.reporter(Util.push(ret))
-            tt.async("test", function () { return iter })
-
-            return tt.run().then(function () {
-                t.deepEqual(ret, [
-                    n("start", []),
-                    n("start", [p("test", 0)]),
-                    n("end", [p("test", 0)]),
-                    n("pass", [p("test", 0)]),
-                    n("end", []),
-                    n("exit", []),
-                ])
-
-                t.deepEqual(iter.list, [undefined, 0, 1, 2, 3, 4])
-            })
-        })
-
-        it("rejects initially", function () {
-            var sentinel = new Error("sentinel")
-
-            sentinel.marker = function () {}
-
-            var iter = {
-                list: [],
-                index: 0,
-                next: function (value) {
-                    this.list.push(value)
-                    return {done: false, value: reject(sentinel)}
-                },
-
-                throw: function (value) {
-                    t.equal(value, sentinel)
-                    return {done: true}
-                },
-            }
-
-            var tt = t.base()
-            var ret = []
-
-            tt.reporter(Util.push(ret))
-            tt.async("test", function () { return iter })
-
-            return tt.run().then(function () {
-                t.deepEqual(ret, [
-                    n("start", []),
-                    n("start", [p("test", 0)]),
-                    n("end", [p("test", 0)]),
-                    n("pass", [p("test", 0)]),
-                    n("end", []),
-                    n("exit", []),
-                ])
-
-                t.deepEqual(iter.list, [undefined])
-            })
-        })
-
-        it("rejects initially + no `throw`", function () {
-            var sentinel = new Error("sentinel")
-
-            sentinel.marker = function () {}
-
-            var iter = {
-                list: [],
-                index: 0,
-                next: function (value) {
-                    this.list.push(value)
-                    return {done: false, value: reject(sentinel)}
-                },
-            }
-
-            var tt = t.base()
-            var ret = []
-
-            tt.reporter(Util.push(ret))
-            tt.async("test", function () { return iter })
-
-            return tt.run().then(function () {
-                t.deepEqual(ret, [
-                    n("start", []),
-                    n("start", [p("test", 0)]),
-                    n("end", [p("test", 0)]),
-                    n("fail", [p("test", 0)], sentinel),
-                    n("end", []),
-                    n("exit", []),
-                ])
-
-                t.deepEqual(iter.list, [undefined])
-            })
-        })
-
-        it("rejects in middle", function () {
-            var sentinel = new Error("sentinel")
-
-            sentinel.marker = function () {}
-
-            var iter = {
-                list: [],
-                index: 0,
-                next: function (value) {
-                    this.list.push(value)
-                    if (this.index === 0) {
-                        return {done: false, value: this.index++}
-                    } else {
-                        return {done: false, value: reject(sentinel)}
-                    }
-                },
-                throw: function (value) {
-                    t.equal(value, sentinel)
-                    return {done: true}
-                },
-            }
-
-            var tt = t.base()
-            var ret = []
-
-            tt.reporter(Util.push(ret))
-            tt.async("test", function () { return iter })
-
-            return tt.run().then(function () {
-                t.deepEqual(ret, [
-                    n("start", []),
-                    n("start", [p("test", 0)]),
-                    n("end", [p("test", 0)]),
-                    n("pass", [p("test", 0)]),
-                    n("end", []),
-                    n("exit", []),
-                ])
-
-                t.deepEqual(iter.list, [undefined, 0])
-            })
-        })
-
-        it("rejects in middle + no `throw`", function () {
-            var sentinel = new Error("sentinel")
-
-            sentinel.marker = function () {}
-
-            var iter = {
-                list: [],
-                index: 0,
-                next: function (value) {
-                    this.list.push(value)
-                    if (this.index === 0) {
-                        return {done: false, value: this.index++}
-                    } else {
-                        return {done: false, value: reject(sentinel)}
-                    }
-                },
-            }
-
-            var tt = t.base()
-            var ret = []
-
-            tt.reporter(Util.push(ret))
-            tt.async("test", function () { return iter })
-
-            return tt.run().then(function () {
-                t.deepEqual(ret, [
-                    n("start", []),
-                    n("start", [p("test", 0)]),
-                    n("end", [p("test", 0)]),
-                    n("fail", [p("test", 0)], sentinel),
-                    n("end", []),
-                    n("exit", []),
-                ])
-
-                t.deepEqual(iter.list, [undefined, 0])
-            })
-        })
+    check("promise", "rejects", {
+        nothrow: pass,
+        recover,
+        return: resolve,
+        throw: reject,
     })
 
     // This contains most of the more edge cases.
-    describe("mixed", function () {
-        function resolve(value) {
-            return {then: function (resolve) { resolve(value) }}
-        }
+    check("mixed, return raw + reject promise", "rejects", {
+        nothrow: pass,
+        recover,
+        return: value => value,
+        throw: reject,
+    })
 
-        function reject(value) {
-            return {then: function (_, reject) { reject(value) }}
-        }
+    check("mixed, return raw + reject promise", "throws", {
+        nothrow: fail,
+        recover,
+        return: resolve,
+        throw: value => { throw value },
+    })
 
-        it("normal", function () {
-            var iter = {
-                list: [],
-                index: 0,
-                next: function (value) {
-                    this.list.push(value)
-                    if (this.index >= 5) {
-                        return {done: true, value: 5}
-                    } else {
-                        return {done: false, value: resolve(this.index++)}
-                    }
-                },
-                throw: function () { t.fail("should never happen") },
-            }
+    fail("mixed, rejects in middle + rejects in recovery", 1, sentinel => {
+        const initial = createSentinel("initial")
+        let returned = 0
+        let called = 0
 
-            var tt = t.base()
-            var ret = []
-
-            tt.reporter(Util.push(ret))
-            tt.async("test", function () { return iter })
-
-            return tt.run().then(function () {
-                t.deepEqual(ret, [
-                    n("start", []),
-                    n("start", [p("test", 0)]),
-                    n("end", [p("test", 0)]),
-                    n("pass", [p("test", 0)]),
-                    n("end", []),
-                    n("exit", []),
-                ])
-
-                t.deepEqual(iter.list, [undefined, 0, 1, 2, 3, 4])
-            })
-        })
-
-        it("normal + no `throw`", function () {
-            var iter = {
-                list: [],
-                index: 0,
-                next: function (value) {
-                    this.list.push(value)
-                    if (this.index >= 5) {
-                        return {done: true, value: 5}
-                    } else {
-                        return {done: false, value: resolve(this.index++)}
-                    }
-                },
-            }
-
-            var tt = t.base()
-            var ret = []
-
-            tt.reporter(Util.push(ret))
-            tt.async("test", function () { return iter })
-
-            return tt.run().then(function () {
-                t.deepEqual(ret, [
-                    n("start", []),
-                    n("start", [p("test", 0)]),
-                    n("end", [p("test", 0)]),
-                    n("pass", [p("test", 0)]),
-                    n("end", []),
-                    n("exit", []),
-                ])
-
-                t.deepEqual(iter.list, [undefined, 0, 1, 2, 3, 4])
-            })
-        })
-
-        it("rejects initially, but returns promise", function () {
-            var sentinel = new Error("sentinel")
-
-            sentinel.marker = function () {}
-
-            var iter = {
-                list: [],
-                index: 0,
-                next: function (value) {
-                    this.list.push(value)
-                    return {done: false, value: reject(sentinel)}
-                },
-                throw: function (value) {
-                    t.equal(value, sentinel)
-                    return {done: true, value: resolve()}
-                },
-            }
-
-            var tt = t.base()
-            var ret = []
-
-            tt.reporter(Util.push(ret))
-            tt.async("test", function () { return iter })
-
-            return tt.run().then(function () {
-                t.deepEqual(ret, [
-                    n("start", []),
-                    n("start", [p("test", 0)]),
-                    n("end", [p("test", 0)]),
-                    n("pass", [p("test", 0)]),
-                    n("end", []),
-                    n("exit", []),
-                ])
-
-                t.deepEqual(iter.list, [undefined])
-            })
-        })
-
-        it("rejects initially + no `throw`", function () {
-            var sentinel = new Error("sentinel")
-
-            sentinel.marker = function () {}
-
-            var iter = {
-                list: [],
-                index: 0,
-                next: function (value) {
-                    this.list.push(value)
-                    return {done: false, value: reject(sentinel)}
-                },
-            }
-
-            var tt = t.base()
-            var ret = []
-
-            tt.reporter(Util.push(ret))
-            tt.async("test", function () { return iter })
-
-            return tt.run().then(function () {
-                t.deepEqual(ret, [
-                    n("start", []),
-                    n("start", [p("test", 0)]),
-                    n("end", [p("test", 0)]),
-                    n("fail", [p("test", 0)], sentinel),
-                    n("end", []),
-                    n("exit", []),
-                ])
-
-                t.deepEqual(iter.list, [undefined])
-            })
-        })
-
-        it("rejects in middle", function () {
-            var sentinel = new Error("sentinel")
-
-            sentinel.marker = function () {}
-
-            var iter = {
-                list: [],
-                index: 0,
-                next: function (value) {
-                    this.list.push(value)
-                    if (this.index === 0) {
-                        return {done: false, value: this.index++}
-                    } else {
-                        return {done: false, value: reject(sentinel)}
-                    }
-                },
-                throw: function (value) {
-                    t.equal(value, sentinel)
-                    return {done: true}
-                },
-            }
-
-            var tt = t.base()
-            var ret = []
-
-            tt.reporter(Util.push(ret))
-            tt.async("test", function () { return iter })
-
-            return tt.run().then(function () {
-                t.deepEqual(ret, [
-                    n("start", []),
-                    n("start", [p("test", 0)]),
-                    n("end", [p("test", 0)]),
-                    n("pass", [p("test", 0)]),
-                    n("end", []),
-                    n("exit", []),
-                ])
-
-                t.deepEqual(iter.list, [undefined, 0])
-            })
-        })
-
-        it("rejects in middle, recovers rejected thenable", function () {
-            var returned = 0
-            var called = 0
-            var sentinel1 = new Error("sentinel1")
-            var sentinel2 = new Error("sentinel2")
-
-            sentinel1.marker = function () {}
-            sentinel2.marker = function () {}
-
-            var iter = {
-                list: [],
-                index: 0,
-                next: function (value) {
-                    this.list.push(value)
-                    if (this.index === 0) {
-                        return {done: false, value: this.index++}
-                    } else {
-                        return {done: false, value: reject(sentinel1)}
-                    }
-                },
-                throw: function (value) {
-                    returned++
-                    t.equal(value, sentinel1)
-                    return {
-                        done: true,
-                        value: {
-                            then: function (_, reject) {
-                                called++
-                                reject(sentinel2)
-                            },
-                        },
-                    }
-                },
-            }
-
-            var tt = t.base()
-            var ret = []
-
-            tt.reporter(Util.push(ret))
-            tt.async("test", function () { return iter })
-
-            return tt.run().then(function () {
-                t.deepEqual(ret, [
-                    n("start", []),
-                    n("start", [p("test", 0)]),
-                    n("end", [p("test", 0)]),
-                    n("fail", [p("test", 0)], sentinel2),
-                    n("end", []),
-                    n("exit", []),
-                ])
-
-                t.deepEqual(iter.list, [undefined, 0])
-
+        return {
+            next: index => {
+                if (index !== 0) return next(reject(initial))
+                return next(index)
+            },
+            throw(value) {
+                returned++
+                t.equal(value, initial)
+                return done({
+                    then: (_, reject) => {
+                        called++
+                        reject(sentinel)
+                    },
+                })
+            },
+            check() {
                 t.equal(returned, 1)
                 t.equal(called, 1)
-            })
-        })
-
-        it("rejects in middle + no `throw`", function () {
-            var sentinel = new Error("sentinel")
-
-            sentinel.marker = function () {}
-
-            var iter = {
-                list: [],
-                index: 0,
-                next: function (value) {
-                    this.list.push(value)
-                    if (this.index === 0) {
-                        return {done: false, value: this.index++}
-                    } else {
-                        return {done: false, value: reject(sentinel)}
-                    }
-                },
-            }
-
-            var tt = t.base()
-            var ret = []
-
-            tt.reporter(Util.push(ret))
-            tt.async("test", function () { return iter })
-
-            return tt.run().then(function () {
-                t.deepEqual(ret, [
-                    n("start", []),
-                    n("start", [p("test", 0)]),
-                    n("end", [p("test", 0)]),
-                    n("fail", [p("test", 0)], sentinel),
-                    n("end", []),
-                    n("exit", []),
-                ])
-
-                t.deepEqual(iter.list, [undefined, 0])
-            })
-        })
+            },
+        }
     })
 })

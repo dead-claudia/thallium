@@ -1,10 +1,10 @@
 "use strict"
 
-var t = require("../index.js")
+const t = require("../index.js")
 
-describe("wrap()", function () {
-    it("exists", function () {
-        var tt = t.base()
+describe("wrap()", () => {
+    it("exists", () => {
+        const tt = t.base()
 
         t.hasKey(tt, "wrap")
         t.function(tt.wrap)
@@ -20,19 +20,19 @@ describe("wrap()", function () {
         return g
     }
 
-    it("works with string + function", function () {
-        var tt = t.base()
-        var sentinel = {}
+    it("works with string + function", () => {
+        const tt = t.base()
+        const sentinel = {}
 
-        var f1 = tt.f1 = spy(function () {})
-        var f2 = tt.f2 = spy(function (x) { t.equal(x, sentinel) })
-        var f3 = tt.f3 = spy(/** @this */ function () { t.equal(this, tt) })
-        var f4 = tt.f4 = spy(function () {})
+        const f1 = tt.f1 = spy(() => {})
+        const f2 = tt.f2 = spy(x => { t.equal(x, sentinel) })
+        const f3 = tt.f3 = spy(/** @this */ function () { t.equal(this, tt) })
+        const f4 = tt.f4 = spy(() => {})
 
         tt.wrap("f1", /** @this */ function () { t.undefined(this) })
-        tt.wrap("f2", function (f) { return f(sentinel) })
-        tt.wrap("f3", function (f) { return f() })
-        tt.wrap("f4", function (f, x) { return x })
+        tt.wrap("f2", f => f(sentinel))
+        tt.wrap("f3", f => f())
+        tt.wrap("f4", (f, x) => x)
 
         tt.f1()
         t.false(f1.called)
@@ -47,20 +47,20 @@ describe("wrap()", function () {
         t.false(f4.called)
     })
 
-    it("works with object", function () {
-        var tt = t.base()
-        var sentinel = {}
+    it("works with object", () => {
+        const tt = t.base()
+        const sentinel = {}
 
-        var f1 = tt.f1 = spy(function () {})
-        var f2 = tt.f2 = spy(function (x) { t.equal(x, sentinel) })
-        var f3 = tt.f3 = spy(/** @this */ function () { t.equal(this, tt) })
-        var f4 = tt.f4 = spy(function () {})
+        const f1 = tt.f1 = spy(() => {})
+        const f2 = tt.f2 = spy(x => { t.equal(x, sentinel) })
+        const f3 = tt.f3 = spy(/** @this */ function () { t.equal(this, tt) })
+        const f4 = tt.f4 = spy(() => {})
 
         tt.wrap({
-            f1: function () { t.undefined(this) },
-            f2: function (f) { return f(sentinel) },
-            f3: function (f) { return f() },
-            f4: function (f, x) { return x },
+            f1() { t.undefined(this) },
+            f2(f) { return f(sentinel) },
+            f3(f) { return f() },
+            f4(f, x) { return x },
         })
 
         tt.f1()

@@ -1,2 +1,2 @@
 root: true
-extends: isiahmeadows/node
+extends: isiahmeadows/node-4

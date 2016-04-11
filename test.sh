@@ -12,7 +12,7 @@
 
 # eslint $(dirname $0) || exit $?
 
-for i in 0.10 0.12 1 2 3 4 5; do
+for i in 4 5; do
     nvm which $i > /dev/null 2>&1 || nvm install $i || exit $?
     nvm exec $i mocha $@ || exit $?
 done
