@@ -14,21 +14,78 @@ function notFound(file) {
     return e
 }
 
-function initTree(files, listing, file, entry) {
-    if (typeof entry === "string") {
-        // Node tries to execute unknown extensions as JS, but this is better.
-        entry = file => { throw new Error(`${file} is not executable!`) }
-    }
+// Fake a Node `fs` errpr
+function fsError(opts) {
+    let message = `${opts.code}: ${opts.message}`
 
+    if (opts.syscall != null) message += `, ${opts.syscall}`
+    if (opts.path != null) message += ` '${opts.path}'`
+
+    const e = new Error(message)
+
+    if (opts.errno != null) e.errno = opts.errno
+    if (opts.code != null) e.code = opts.code
+    if (opts.syscall != null) e.syscall = opts.syscall
+    if (opts.path != null) e.path = opts.path
+    return e
+}
+
+function initTree(files, listing, file, entry) {
     if (entry == null) {
         throw new TypeError(`value for entry ${file} must exist`)
+    } else if (typeof entry === "string") {
+        // Node tries to execute unknown extensions as JS, but this is better.
+        files.set(file, type => {
+            if (type === "read") return entry
+            throw new Error(`${file} is not executable!`)
+        })
+        listing.push(file)
     } else if (typeof entry === "function") {
-        files.set(file, entry)
+        // Cache the load, like Node.
+        let value
+
+        files.set(file, type => {
+            if (type === "load") {
+                if (entry == null) return value
+                return value = entry()
+            }
+            throw new Error(`${file} shouldn't be read!`)
+        })
         listing.push(file)
     } else {
         files.set(file, {type: "directory"})
         for (const child of Object.keys(entry)) {
             initTree(files, listing, path.resolve(file, child), entry[child])
+        }
+    }
+}
+
+// Mock the node-interpret modules that are associated with a `register` method.
+const interpretMocks = {
+    "babel-register": () => {},
+    "babel-core/register": () => {},
+    "babel/register": () => {},
+    "node-jsx": () => ({install() {}}),
+}
+
+const interpretModules = {}
+
+for (const key of Object.keys(interpret.jsVariants)) {
+    const mod = interpret.jsVariants[key]
+
+    if (mod == null) {
+        // do nothing - it's a native extension.
+    } else if (typeof mod === "string") {
+        interpretModules[mod] = true
+    } else if (!Array.isArray(mod)) {
+        interpretModules[mod.module] = true
+    } else {
+        for (const part of mod) {
+            if (typeof part === "string") {
+                interpretModules[part] = true
+            } else {
+                interpretModules[part.module] = true
+            }
         }
     }
 }
@@ -40,47 +97,132 @@ exports.mock = tree => {
 
     initTree(files, listing, cwd, tree)
 
-    const resolve = file => path.resolve(cwd, file)
-    const resolveGlob = glob =>
-        glob[0] === "!" ? `!${resolve(glob.slice(1))}` : resolve(glob)
+    function resolve(file) {
+        return path.resolve(cwd, file)
+    }
 
-    const fixGlob = glob =>
-        Array.isArray(glob) ? glob.map(resolveGlob) : resolveGlob(glob)
+    function resolveGlobs(globs) {
+        if (!Array.isArray(globs)) globs = [globs]
+
+        if (globs.length === 1) {
+            let cooked
+
+            if (globs[0][0] === "!") {
+                cooked = `!${resolve(globs[0].slice(1))}`
+            } else {
+                cooked = resolve(globs[0])
+            }
+
+            const mm = new minimatch.Minimatch(cooked, {
+                nocase: process.platform === "win32",
+                nocomment: true,
+            })
+
+            return file => mm.match(file)
+        }
+
+        const ignores = []
+        const keeps = []
+
+        for (const raw of globs) {
+            let cooked, list
+
+            if (raw[0] === "!") {
+                cooked = resolve(raw.slice(1))
+                list = ignores
+            } else {
+                cooked = resolve(raw)
+                list = keeps
+            }
+
+            list.push(new minimatch.Minimatch(cooked, {
+                nocase: process.platform === "win32",
+                nocomment: true,
+            }))
+        }
+
+        return file => {
+            for (const mm of ignores) {
+                if (mm.match(file)) return false
+            }
+
+            for (const mm of keeps) {
+                if (mm.match(file)) return true
+            }
+
+            return false
+        }
+    }
 
     function load(file) {
-        let target = resolve(file)
+        // Total hack, but it's easier than implementing Node's resolution
+        // algorithm.
+        if (file === "techtonic") {
+            return load("node_modules/techtonic")
+        }
+
+        if (interpretMocks[file] != null) return interpretMocks[file]
+        if (interpretModules[file]) return undefined
+
+        const target = resolve(file)
 
         // Directories are initialized as objects.
         if (!files.has(target)) throw notFound(file)
 
         let func = files.get(target)
 
+        if (typeof func !== "function") func = files.get(`${target}.js`)
+
         if (typeof func !== "function") {
-            func = files.get(target = path.join(target, "index.js"))
+            func = files.get(path.join(target, "index.js"))
         }
 
         if (typeof func !== "function") throw notFound(file)
 
-        return func(target)
+        return func("load")
     }
 
     return {
-        readGlob(glob) {
-            const mm = new minimatch.Minimatch(fixGlob(glob), {
-                nocase: process.platform === "win32",
-                nocomment: true,
-            })
+        readGlob(globs) {
+            const matcher = resolveGlobs(globs)
 
             for (const item of listing) {
-                if (mm.match(item)) load(item)
+                if (matcher(item)) load(item)
             }
+        },
+
+        read(file) {
+            const target = resolve(file)
+
+            // Directories are initialized as objects.
+            if (!files.has(target)) {
+                throw fsError({
+                    path: file,
+                    message: "no such file or directory",
+                    code: "ENOENT",
+                    errno: -2,
+                    syscall: "open",
+                })
+            }
+
+            const func = files.get(target)
+
+            if (typeof func === "object") {
+                throw fsError({
+                    message: "illegal operation on a directory",
+                    code: "EISDIR",
+                    errno: -21,
+                    syscall: "read",
+                })
+            }
+
+            return func("read")
         },
 
         load, resolve,
         cwd: () => cwd,
         chdir(dir) { cwd = resolve(dir) },
-        exists: file => files.has(resolve(file)),
-        existsSync: file => files.has(resolve(file)),
+        exists: file => typeof files.get(resolve(file)) === "function",
     }
 }
 
@@ -100,23 +242,23 @@ exports.Loader = class Loader {
     // Partially copied from the module itself. Checks and cleans the
     // map of default keys.
     clean(map) {
-        Object.keys(interpret.jsVariants).forEach(ext => {
-            const mod = interpret.jsVariants[ext]
-
-            if (!mod || !map.has(ext)) return
-
-            const value = map.get(ext)
-
+        for (const pair of Array.from(map)) {
             // Skip any custom or out-of-order modules.
-            if (!value.original) return
+            if (!pair[1].original) continue
 
-            t.deepEqual(value, Object.assign(
-                new LoaderData.Register(ext, mod, this.load),
-                {original: true}
-            ))
+            if (pair[0] === ".js") {
+                t.deepEqual(pair[1], LoaderData.jsLoader)
+            } else {
+                const mod = interpret.jsVariants[pair[0]]
 
-            map.delete(ext)
-        })
+                t.deepEqual(pair[1], Object.assign(
+                    new LoaderData.Register(pair[0], mod, this.load),
+                    {original: true}
+                ))
+            }
+
+            map.delete(pair[0])
+        }
 
         return map
     }

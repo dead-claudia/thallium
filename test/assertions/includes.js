@@ -5,10 +5,10 @@ const fail = require("../../test-util/assertions.js").fail
 
 describe("assertions (includes)", () => {
     it("correct aliases", () => {
-        t.equal(t.includesMatchLoose, t.includesLooseDeep)
-        t.equal(t.notIncludesMatchLooseAll, t.notIncludesLooseDeepAll)
-        t.equal(t.includesMatchLooseAny, t.includesLooseDeepAny)
-        t.equal(t.notIncludesMatchLoose, t.notIncludesLooseDeep)
+        t.equal(t.includesMatchLoose, t.includesDeepLoose)
+        t.equal(t.notIncludesMatchLooseAll, t.notIncludesDeepLooseAll)
+        t.equal(t.includesMatchLooseAny, t.includesDeepLooseAny)
+        t.equal(t.notIncludesMatchLoose, t.notIncludesDeepLoose)
     })
 
     describe("t.includes()", () => {
@@ -483,15 +483,15 @@ describe("assertions (includes)", () => {
 
     /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-    describe("t.includesLooseDeep()", () => {
+    describe("t.includesDeepLoose()", () => {
         it("checks numbers", () => {
-            t.includesLooseDeep([1, 2, 3, 4, 5], 1)
-            t.includesLooseDeep([1, 2, 3, 4, 5], [1])
+            t.includesDeepLoose([1, 2, 3, 4, 5], 1)
+            t.includesDeepLoose([1, 2, 3, 4, 5], [1])
         })
 
         it("is loose", () => {
-            t.includesLooseDeep(["1", 2, 3, 4, 5], 1)
-            t.includesLooseDeep(["1", 2, 3, 4, 5], [1])
+            t.includesDeepLoose(["1", 2, 3, 4, 5], 1)
+            t.includesDeepLoose(["1", 2, 3, 4, 5], [1])
         })
 
         it("checks objects", () => {
@@ -499,136 +499,136 @@ describe("assertions (includes)", () => {
             const obj2 = {}
             const obj3 = {}
 
-            t.includesLooseDeep([obj1, 3, obj3, "foo"], [obj1, obj3])
-            t.includesLooseDeep([obj1, obj2, obj3], [obj1, obj2, obj3])
-            t.includesLooseDeep([obj1, 3, obj3, "foo"], [obj1, obj2, obj3])
+            t.includesDeepLoose([obj1, 3, obj3, "foo"], [obj1, obj3])
+            t.includesDeepLoose([obj1, obj2, obj3], [obj1, obj2, obj3])
+            t.includesDeepLoose([obj1, 3, obj3, "foo"], [obj1, obj2, obj3])
 
-            t.includesLooseDeep([{foo: 1}, {bar: 2}, 3, "foo", {}], [{foo: 1}])
-            t.includesLooseDeep([{foo: 1}, {bar: 2}, {}], [{bar: 2}, {}])
-            t.includesLooseDeep([{foo: 1}, {bar: 2}, []], [[]])
+            t.includesDeepLoose([{foo: 1}, {bar: 2}, 3, "foo", {}], [{foo: 1}])
+            t.includesDeepLoose([{foo: 1}, {bar: 2}, {}], [{bar: 2}, {}])
+            t.includesDeepLoose([{foo: 1}, {bar: 2}, []], [[]])
         })
 
         it("checks nothing", () => {
-            t.includesLooseDeep([{}, {}], [])
+            t.includesDeepLoose([{}, {}], [])
         })
 
         it("checks missing numbers", () => {
-            fail("includesLooseDeep", [1, 2, 3, 4, 5], 10)
-            fail("includesLooseDeep", [1, 2, 3, 4, 5], [10])
+            fail("includesDeepLoose", [1, 2, 3, 4, 5], 10)
+            fail("includesDeepLoose", [1, 2, 3, 4, 5], [10])
         })
 
         it("checks missing objects", () => {
-            fail("includesLooseDeep", [{foo: 1}, {bar: 2}, {}], [[]])
-            fail("includesLooseDeep", [{foo: 1}, {bar: 2}, {}], [[], {foo: 1}])
+            fail("includesDeepLoose", [{foo: 1}, {bar: 2}, {}], [[]])
+            fail("includesDeepLoose", [{foo: 1}, {bar: 2}, {}], [[], {foo: 1}])
         })
     })
 
-    describe("t.notIncludesLooseDeepAll()", () => {
+    describe("t.notIncludesDeepLooseAll()", () => {
         it("checks numbers", () => {
-            fail("notIncludesLooseDeepAll", [1, 2, 3, 4, 5], 1)
-            fail("notIncludesLooseDeepAll", [1, 2, 3, 4, 5], [1])
+            fail("notIncludesDeepLooseAll", [1, 2, 3, 4, 5], 1)
+            fail("notIncludesDeepLooseAll", [1, 2, 3, 4, 5], [1])
         })
 
         it("is loose", () => {
-            fail("notIncludesLooseDeepAll", ["1", 2, 3, 4, 5], 1)
-            fail("notIncludesLooseDeepAll", ["1", 2, 3, 4, 5], [1])
+            fail("notIncludesDeepLooseAll", ["1", 2, 3, 4, 5], 1)
+            fail("notIncludesDeepLooseAll", ["1", 2, 3, 4, 5], [1])
         })
 
         it("checks objects", () => {
-            t.notIncludesLooseDeepAll([{foo: 1}, 3, "foo"], ["foo", 1])
+            t.notIncludesDeepLooseAll([{foo: 1}, 3, "foo"], ["foo", 1])
 
-            t.notIncludesLooseDeepAll(
+            t.notIncludesDeepLooseAll(
                 [{foo: 1}, {bar: 2}],
                 [{foo: 1}, {bar: 1}])
 
-            fail("notIncludesLooseDeepAll",
+            fail("notIncludesDeepLooseAll",
                 [{foo: 1}, {bar: 2}],
                 [{foo: 1}, {bar: 2}])
         })
 
         it("checks nothing", () => {
-            t.notIncludesLooseDeepAll([{}, {}], [])
+            t.notIncludesDeepLooseAll([{}, {}], [])
         })
 
         it("checks missing numbers", () => {
-            t.notIncludesLooseDeepAll([1, 2, 3, 4, 5], 10)
-            t.notIncludesLooseDeepAll([1, 2, 3, 4, 5], [10])
+            t.notIncludesDeepLooseAll([1, 2, 3, 4, 5], 10)
+            t.notIncludesDeepLooseAll([1, 2, 3, 4, 5], [10])
         })
 
         it("checks missing objects", () => {
-            t.notIncludesLooseDeepAll([{foo: 1}, {bar: 2}, {}], [[]])
-            t.notIncludesLooseDeepAll([{foo: 1}, {bar: 2}, {}], [[], {foo: 1}])
+            t.notIncludesDeepLooseAll([{foo: 1}, {bar: 2}, {}], [[]])
+            t.notIncludesDeepLooseAll([{foo: 1}, {bar: 2}, {}], [[], {foo: 1}])
         })
     })
 
-    describe("t.includesLooseDeepAny()", () => {
+    describe("t.includesDeepLooseAny()", () => {
         it("checks numbers", () => {
-            t.includesLooseDeepAny([1, 2, 3, 4, 5], 1)
-            t.includesLooseDeepAny([1, 2, 3, 4, 5], [1])
+            t.includesDeepLooseAny([1, 2, 3, 4, 5], 1)
+            t.includesDeepLooseAny([1, 2, 3, 4, 5], [1])
         })
 
         it("is loose", () => {
-            t.includesLooseDeepAny(["1", 2, 3, 4, 5], 1)
-            t.includesLooseDeepAny(["1", 2, 3, 4, 5], [1])
+            t.includesDeepLooseAny(["1", 2, 3, 4, 5], 1)
+            t.includesDeepLooseAny(["1", 2, 3, 4, 5], [1])
         })
 
         it("checks objects", () => {
-            t.includesLooseDeepAny([{foo: 1}, 3, "foo"], ["foo", 1])
-            t.includesLooseDeepAny([{foo: 1}, {bar: 2}], [{foo: 1}, {bar: 1}])
-            t.includesLooseDeepAny([{foo: 1}, {bar: 2}], [{foo: 1}, {bar: 2}])
+            t.includesDeepLooseAny([{foo: 1}, 3, "foo"], ["foo", 1])
+            t.includesDeepLooseAny([{foo: 1}, {bar: 2}], [{foo: 1}, {bar: 1}])
+            t.includesDeepLooseAny([{foo: 1}, {bar: 2}], [{foo: 1}, {bar: 2}])
         })
 
         it("checks nothing", () => {
-            t.includesLooseDeepAny([{}, {}], [])
+            t.includesDeepLooseAny([{}, {}], [])
         })
 
         it("checks missing numbers", () => {
-            fail("includesLooseDeepAny", [1, 2, 3, 4, 5], 10)
-            fail("includesLooseDeepAny", [1, 2, 3, 4, 5], [10])
+            fail("includesDeepLooseAny", [1, 2, 3, 4, 5], 10)
+            fail("includesDeepLooseAny", [1, 2, 3, 4, 5], [10])
         })
 
         it("checks missing objects", () => {
-            fail("includesLooseDeepAny", [{foo: 1}, {bar: 2}, {}], [[]])
-            t.includesLooseDeepAny([{foo: 1}, {bar: 2}, {}], [[], {foo: 1}])
+            fail("includesDeepLooseAny", [{foo: 1}, {bar: 2}, {}], [[]])
+            t.includesDeepLooseAny([{foo: 1}, {bar: 2}, {}], [[], {foo: 1}])
         })
     })
 
-    describe("t.notIncludesLooseDeep()", () => {
+    describe("t.notIncludesDeepLoose()", () => {
         it("checks numbers", () => {
-            fail("notIncludesLooseDeep", [1, 2, 3, 4, 5], 1)
-            fail("notIncludesLooseDeep", [1, 2, 3, 4, 5], [1])
+            fail("notIncludesDeepLoose", [1, 2, 3, 4, 5], 1)
+            fail("notIncludesDeepLoose", [1, 2, 3, 4, 5], [1])
         })
 
         it("is loose", () => {
-            fail("notIncludesLooseDeep", ["1", 2, 3, 4, 5], 1)
-            fail("notIncludesLooseDeep", ["1", 2, 3, 4, 5], [1])
+            fail("notIncludesDeepLoose", ["1", 2, 3, 4, 5], 1)
+            fail("notIncludesDeepLoose", ["1", 2, 3, 4, 5], [1])
         })
 
         it("checks objects", () => {
-            fail("notIncludesLooseDeep", [{foo: 1}, 3, "foo"], ["foo", 1])
+            fail("notIncludesDeepLoose", [{foo: 1}, 3, "foo"], ["foo", 1])
 
-            fail("notIncludesLooseDeep",
+            fail("notIncludesDeepLoose",
                 [{foo: 1}, {bar: 2}],
                 [{foo: 1}, {bar: 1}])
 
-            fail("notIncludesLooseDeep",
+            fail("notIncludesDeepLoose",
                 [{foo: 1}, {bar: 2}],
                 [{foo: 1}, {bar: 2}])
         })
 
         it("checks nothing", () => {
-            t.notIncludesLooseDeep([{}, {}], [])
+            t.notIncludesDeepLoose([{}, {}], [])
         })
 
         it("checks missing numbers", () => {
-            t.notIncludesLooseDeep([1, 2, 3, 4, 5], 10)
-            t.notIncludesLooseDeep([1, 2, 3, 4, 5], [10])
+            t.notIncludesDeepLoose([1, 2, 3, 4, 5], 10)
+            t.notIncludesDeepLoose([1, 2, 3, 4, 5], [10])
         })
 
         it("checks missing objects", () => {
-            t.notIncludesLooseDeep([{foo: 1}, {bar: 2}, {}], [[]])
+            t.notIncludesDeepLoose([{foo: 1}, {bar: 2}, {}], [[]])
 
-            fail("notIncludesLooseDeep",
+            fail("notIncludesDeepLoose",
                 [{foo: 1}, {bar: 2}, {}],
                 [[], {foo: 1}])
         })

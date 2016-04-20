@@ -149,17 +149,31 @@ binary("equal", Util.strictIs, [
     "Expected {actual} to not equal {expected}",
 ])
 
-binary("looseEqual", Util.looseIs, [
+binary("equalLoose", Util.looseIs, [
     "Expected {actual} to loosely equal {expected}",
     "Expected {actual} to not loosely equal {expected}",
 ])
+
+function comp(name, compare, message) {
+    define(name, (a, b) => ({
+        test: compare(a, b),
+        actual: a,
+        expected: b,
+        message,
+    }))
+}
+
+comp("atLeast", (a, b) => a >= b, "Expected {actual} to be at least {expected}")
+comp("atMost", (a, b) => a <= b, "Expected {actual} to be at most {expected}")
+comp("above", (a, b) => a > b, "Expected {actual} to be above {expected}")
+comp("below", (a, b) => a < b, "Expected {actual} to be below {expected}")
 
 binary("deepEqual", deepEqual, [
     "Expected {actual} to deeply equal {expected}",
     "Expected {actual} to not deeply equal {expected}",
 ])
 
-binary("looseDeepEqual", looseDeepEqual, [
+binary("deepEqualLoose", looseDeepEqual, [
     "Expected {actual} to loosely match {expected}",
     "Expected {actual} to not loosely match {expected}",
 ])
@@ -169,80 +183,114 @@ binary("match", deepEqualMatch, [
     "Expected {actual} to not match {expected}",
 ])
 
-alias("matchLoose", "looseDeepEqual")
-alias("notMatchLoose", "notLooseDeepEqual")
+alias("matchLoose", "deepEqualLoose")
+alias("notMatchLoose", "notDeepEqualLoose")
 
-function has(name, equals, check, messages) {
-    define(name, function (object, key, value) {
-        const test = check(object, key)
+function has(name, equals, check, get, messages) { // eslint-disable-line max-len, max-params
+    if (equals === Util.looseIs) {
+        define(name, (object, key, value) => ({
+            test: check(object, key) && equals(get(object, key), value),
+            expected: value,
+            actual: object[key],
+            key, object,
+            message: messages[0],
+        }))
 
-        if (arguments.length >= 3) {
-            return {
-                test: test && equals(object[key], value),
-                expected: value,
-                actual: object[key],
-                key, object,
-                message: messages[0],
-            }
-        } else {
-            return {
-                test,
-                expected: key,
-                actual: object,
-                message: messages[1],
-            }
-        }
-    })
+        define(negate(name), (object, key, value) => ({
+            test: !check(object, key) || !equals(get(object, key), value),
+            actual: value,
+            key, object,
+            message: messages[2],
+        }))
+    } else {
+        define(name, function (object, key, value) {
+            const test = check(object, key)
 
-    define(negate(name), function (object, key, value) {
-        const test = !check(object, key)
+            if (arguments.length >= 3) {
+                return {
+                    test: test && equals(get(object, key), value),
+                    expected: value,
+                    actual: object[key],
+                    key, object,
+                    message: messages[0],
+                }
+            } else {
+                return {
+                    test,
+                    expected: key,
+                    actual: object,
+                    message: messages[1],
+                }
+            }
+        })
 
-        if (arguments.length >= 3) {
-            return {
-                test: test || !equals(object[key], value),
-                actual: value,
-                key, object,
-                message: messages[2],
+        define(negate(name), function (object, key, value) {
+            const test = !check(object, key)
+
+            if (arguments.length >= 3) {
+                return {
+                    test: test || !equals(get(object, key), value),
+                    actual: value,
+                    key, object,
+                    message: messages[2],
+                }
+            } else {
+                return {
+                    test,
+                    expected: key,
+                    actual: object,
+                    message: messages[3],
+                }
             }
-        } else {
-            return {
-                test,
-                expected: key,
-                actual: object,
-                message: messages[3],
-            }
-        }
-    })
+        })
+    }
 }
 
 const hasOwnKey = (object, key) => hasOwn.call(object, key)
 const hasInKey = (object, key) => key in object
+const hasObjectGet = (object, key) => object[key]
+const hasInColl = (object, key) => object.has(key)
+const hasCollGet = (object, key) => object.get(key)
 
-has("hasOwn", Util.strictIs, hasOwnKey, [
+has("hasOwn", Util.strictIs, hasOwnKey, hasObjectGet, [
     "Expected {object} to have own key {key} equal to {expected}, but found {actual}", // eslint-disable-line max-len
     "Expected {actual} to have own key {expected}",
     "Expected {object} to not have own key {key} equal to {actual}",
     "Expected {actual} to not have own key {expected}",
 ])
 
-has("looseHasOwn", Util.looseIs, hasOwnKey, [
+has("hasOwnLoose", Util.looseIs, hasOwnKey, hasObjectGet, [
     "Expected {object} to have own key {key} loosely equal to {expected}, but found {actual}", // eslint-disable-line max-len
     "Expected {actual} to have own key {expected}",
     "Expected {object} to not have own key {key} loosely equal to {actual}",
     "Expected {actual} to not have own key {expected}",
 ])
 
-has("hasKey", Util.strictIs, hasInKey, [
+has("hasKey", Util.strictIs, hasInKey, hasObjectGet, [
     "Expected {object} to have key {key} equal to {expected}, but found {actual}", // eslint-disable-line max-len
     "Expected {actual} to have key {expected}",
     "Expected {object} to not have key {key} equal to {actual}",
     "Expected {actual} to not have key {expected}",
 ])
 
-has("looseHasKey", Util.looseIs, hasInKey, [
+has("hasKeyLoose", Util.looseIs, hasInKey, hasObjectGet, [
     "Expected {object} to have key {key} loosely equal to {expected}, but found {actual}", // eslint-disable-line max-len
     "Expected {actual} to have key {expected}",
     "Expected {object} to not have key {key} loosely equal to {actual}",
+    "Expected {actual} to not have key {expected}",
+])
+
+has("has", Util.strictIs, hasInColl, hasCollGet, [
+    "Expected {object} to have key {key} equal to {expected}, but found {actual}", // eslint-disable-line max-len
+    "Expected {actual} to have key {expected}",
+    "Expected {object} to not have key {key} equal to {actual}",
+    "Expected {actual} to not have key {expected}",
+])
+
+has("hasLoose", Util.looseIs, hasInColl, hasCollGet, [
+    "Expected {object} to have key {key} equal to {expected}, but found {actual}", // eslint-disable-line max-len
+    "Expected {actual} to have key {expected}",
+    "Expected {object} to not have key {key} equal to {actual}",
     "Expected {actual} to not have key {expected}",
 ])
 
@@ -253,27 +301,33 @@ function getName(func) {
 }
 
 function throws(name, methods) {
-    function run(invert, func, matcher) {
-        let test, error
+    function run(invert) {
+        return (func, matcher) => {
+            let test = false
+            let error
 
-        try {
-            func()
-        } catch (e) {
-            test = methods.check(matcher, error = e)
-        }
+            try {
+                func()
+            } catch (e) {
+                test = methods.check(matcher, error = e)
 
-        if (invert) test = !test
+                // Rethrow unknown errors that don't match when a matcher was
+                // passed - it's easier to debug unexpected errors when you have
+                // a stack trace.
+                if (methods.rethrow(matcher, invert, test)) throw e
+            }
 
-        return {
-            test: test !== false,
-            expected: matcher,
-            func, error,
-            message: methods.message(matcher, invert, test),
+            return {
+                test: test ^ invert,
+                expected: matcher,
+                error,
+                message: methods.message(matcher, invert, test),
+            }
         }
     }
 
-    define(name, (func, test) => run(false, func, test))
-    define(negate(name), (func, test) => run(true, func, test))
+    define(name, run(false))
+    define(negate(name), run(true))
 }
 
 throws("throws", {
@@ -281,15 +335,19 @@ throws("throws", {
         return Type == null || e instanceof Type
     },
 
+    rethrow(matcher, invert, test) {
+        return matcher != null && !invert && !test
+    },
+
     message(Type, invert, test) {
-        let str = "Expected {func} to "
+        let str = "Expected callback to "
 
         if (invert) str += "not "
         str += "throw"
 
         if (Type != null) {
             str += ` an instance of ${getName(Type)}`
-            if (!invert && test !== undefined) str += ", but found {error}"
+            if (!invert && test === false) str += ", but found {error}"
         }
 
         return str
@@ -309,13 +367,15 @@ throws("throwsMatch", {
         return !!matcher(e)
     },
 
+    rethrow() { return false },
+
     message(_, invert, test) {
         if (invert) {
-            return "Expected {func} to not throw an error that matches {expected}" // eslint-disable-line max-len
+            return "Expected callback to not throw an error that matches {expected}" // eslint-disable-line max-len
         } else if (test === undefined) {
-            return "Expected {func} to throw an error that matches {expected}, but found no error" // eslint-disable-line max-len
+            return "Expected callback to throw an error that matches {expected}, but found no error" // eslint-disable-line max-len
         } else {
-            return "Expected {func} to throw an error that matches {expected}, but found {error}" // eslint-disable-line max-len
+            return "Expected callback to throw an error that matches {expected}, but found {error}" // eslint-disable-line max-len
         }
     },
 })
@@ -354,10 +414,12 @@ define("notCloseTo", (actual, expected, delta) => ({
     message: "Expected {actual} to not be within {delta} of {expected}",
 }))
 
+/* eslint-disable max-len */
+
 /**
- * There's 4 sets of 4 permutations here instead of N sets of 2 (which would
- * fit the `foo`/`notFoo` idiom better), so it's easier to just make a DSL and
- * use that to define everything.
+ * There's 4 sets of 4 permutations here for `includes` and `hasKeys`, instead
+ * of N sets of 2 (which would fit the `foo`/`notFoo` idiom better), so it's
+ * easier to just make a couple separate DSLs and use that to define everything.
  *
  * Here's the top level:
  *
@@ -366,20 +428,29 @@ define("notCloseTo", (actual, expected, delta) => ({
  * - strict deep includes
  * - loose deep includes
  *
- * And the second level (below uses 'any' instead of 'some' in its idioms):
+ * And the second level:
  *
  * - includes all/not missing some
- * - including some/not missing all
+ * - includes some/not missing all
  * - not including all/missing some
  * - not including some/missing all
  *
- * A near-identical DSL is used to define the hasKeys set as well, although
- * those are also overloaded to consume either an array (in which it simply
- * compares the object's keys to a list of keys) or an object (where it does a
- * full deep comparison). Do note that most of the hasKeys set are effectively
- * aliases for half of the methods if called with an array, since no actual
- * property access occurs.
+ * Here's an example using the naming scheme for `hasKeys`, etc.
+ *
+ *               | strict shallow  |    loose shallow     |     strict deep     |       loose deep
+ * --------------|-----------------|----------------------|---------------------|-------------------------
+ * includes all  | `hasKeys`       | `hasLooseKeys`       | `hasDeepKeys`       | `hasDeepLooseKeys`
+ * includes some | `hasAnyKeys`    | `hasLooseAnyKeys`    | `hasDeepAnyKeys`    | `hasDeepLooseKeys`
+ * missing some  | `notHasAllKeys` | `notHasLooseAllKeys` | `notHasDeepAllKeys` | `notHasLooseDeepAllKeys`
+ * missing all   | `notHasKeys`    | `notHasLooseKeys`    | `notHasDeepKeys`    | `notHasLooseDeepKeys`
+ *
+ * Note that the `hasKeys` shallow comparison variants are also overloaded to
+ * consume either an array (in which it simply checks against a list of keys) or
+ * an object (where it does a full deep comparison).
  */
+
+/* eslint-enable max-len */
+
 function makeIncludes(all, func) {
     return function (array, keys) {
         if (all) {
@@ -437,13 +508,13 @@ defineIncludes("notIncludesDeepAll", includesDeepAll, true, "Expected {actual} t
 defineIncludes("includesDeepAny", includesDeepAny, false, "Expected {actual} to match any value in {value}")
 defineIncludes("notIncludesDeep", includesDeepAny, true, "Expected {actual} to not match any value in {value}")
 
-const includesLooseDeepAll = makeIncludes(true, looseDeepEqual)
-const includesLooseDeepAny = makeIncludes(false, looseDeepEqual)
+const includesDeepLooseAll = makeIncludes(true, looseDeepEqual)
+const includesDeepLooseAny = makeIncludes(false, looseDeepEqual)
 
-defineIncludes("includesLooseDeep", includesLooseDeepAll, false, "Expected {actual} to loosely match all values in {value}")
-defineIncludes("notIncludesLooseDeepAll", includesLooseDeepAll, true, "Expected {actual} to not loosely match all values in {value}")
-defineIncludes("includesLooseDeepAny", includesLooseDeepAny, false, "Expected {actual} to loosely match any value in {value}")
-defineIncludes("notIncludesLooseDeep", includesLooseDeepAny, true, "Expected {actual} to not loosely match any value in {value}")
+defineIncludes("includesDeepLoose", includesDeepLooseAll, false, "Expected {actual} to loosely match all values in {value}")
+defineIncludes("notIncludesDeepLooseAll", includesDeepLooseAll, true, "Expected {actual} to not loosely match all values in {value}")
+defineIncludes("includesDeepLooseAny", includesDeepLooseAny, false, "Expected {actual} to loosely match any value in {value}")
+defineIncludes("notIncludesDeepLoose", includesDeepLooseAny, true, "Expected {actual} to not loosely match any value in {value}")
 
 const includesMatchDeepAll = makeIncludes(true, deepEqualMatch)
 const includesMatchDeepAny = makeIncludes(false, deepEqualMatch)
@@ -453,10 +524,10 @@ defineIncludes("notIncludesMatchAll", includesMatchDeepAll, true, "Expected {act
 defineIncludes("includesMatchAny", includesMatchDeepAny, false, "Expected {actual} to match any value in {value}")
 defineIncludes("notIncludesMatch", includesMatchDeepAny, true, "Expected {actual} to not match any value in {value}")
 
-alias("includesMatchLoose", "includesLooseDeep")
-alias("notIncludesMatchLooseAll", "notIncludesLooseDeepAll")
-alias("includesMatchLooseAny", "includesLooseDeepAny")
-alias("notIncludesMatchLoose", "notIncludesLooseDeep")
+alias("includesMatchLoose", "includesDeepLoose")
+alias("notIncludesMatchLooseAll", "notIncludesDeepLooseAll")
+alias("includesMatchLooseAny", "includesDeepLooseAny")
+alias("notIncludesMatchLoose", "notIncludesDeepLoose")
 
 /* eslint-enable max-len */
 
@@ -533,13 +604,13 @@ makeHasOverload("notHasAllKeys", hasAllKeys, true, "Expected {actual} to not hav
 makeHasOverload("hasAnyKeys", hasAnyKeys, false, "Expected {actual} to have any key in {keys}")
 makeHasOverload("notHasKeys", hasAnyKeys, true, "Expected {actual} to not have any key in {keys}")
 
-const hasLooseAllKeys = hasKeysType(true, Util.looseIs)
-const hasLooseAnyKeys = hasKeysType(false, Util.looseIs)
+const hasLooseAllKeys = hasOverloadType(true, Util.looseIs)
+const hasLooseAnyKeys = hasOverloadType(false, Util.looseIs)
 
-makeHasKeys("hasLooseKeys", hasLooseAllKeys, false, "Expected {actual} to loosely have all keys in {keys}")
-makeHasKeys("notHasLooseAllKeys", hasLooseAllKeys, true, "Expected {actual} to not loosely have all keys in {keys}")
-makeHasKeys("hasLooseAnyKeys", hasLooseAnyKeys, false, "Expected {actual} to loosely have any key in {keys}")
-makeHasKeys("notHasLooseKeys", hasLooseAnyKeys, true, "Expected {actual} to not loosely have any key in {keys}")
+makeHasOverload("hasLooseKeys", hasLooseAllKeys, false, "Expected {actual} to loosely have all keys in {keys}")
+makeHasOverload("notHasLooseAllKeys", hasLooseAllKeys, true, "Expected {actual} to not loosely have all keys in {keys}")
+makeHasOverload("hasLooseAnyKeys", hasLooseAnyKeys, false, "Expected {actual} to loosely have any key in {keys}")
+makeHasOverload("notHasLooseKeys", hasLooseAnyKeys, true, "Expected {actual} to not loosely have any key in {keys}")
 
 const hasDeepAllKeys = hasKeysType(true, deepEqual)
 const hasDeepAnyKeys = hasKeysType(false, deepEqual)
@@ -549,13 +620,13 @@ makeHasKeys("notHasDeepAllKeys", hasDeepAllKeys, true, "Expected {actual} to not
 makeHasKeys("hasDeepAnyKeys", hasDeepAnyKeys, false, "Expected {actual} to have any key in {keys}")
 makeHasKeys("notHasDeepKeys", hasDeepAnyKeys, true, "Expected {actual} to not have any key in {keys}")
 
-const hasLooseDeepAllKeys = hasKeysType(true, looseDeepEqual)
-const hasLooseDeepAnyKeys = hasKeysType(false, looseDeepEqual)
+const hasDeepLooseAllKeys = hasKeysType(true, looseDeepEqual)
+const hasDeepLooseAnyKeys = hasKeysType(false, looseDeepEqual)
 
-makeHasKeys("hasLooseDeepKeys", hasLooseDeepAllKeys, false, "Expected {actual} to loosely match all keys in {keys}")
-makeHasKeys("notHasLooseDeepAllKeys", hasLooseDeepAllKeys, true, "Expected {actual} to not loosely match all keys in {keys}")
-makeHasKeys("hasLooseDeepAnyKeys", hasLooseDeepAnyKeys, false, "Expected {actual} to loosely match any key in {keys}")
-makeHasKeys("notHasLooseDeepKeys", hasLooseDeepAnyKeys, true, "Expected {actual} to not loosely match any key in {keys}")
+makeHasKeys("hasDeepLooseKeys", hasDeepLooseAllKeys, false, "Expected {actual} to loosely match all keys in {keys}")
+makeHasKeys("notHasDeepLooseAllKeys", hasDeepLooseAllKeys, true, "Expected {actual} to not loosely match all keys in {keys}")
+makeHasKeys("hasDeepLooseAnyKeys", hasDeepLooseAnyKeys, false, "Expected {actual} to loosely match any key in {keys}")
+makeHasKeys("notHasDeepLooseKeys", hasDeepLooseAnyKeys, true, "Expected {actual} to not loosely match any key in {keys}")
 
 const hasMatchAllKeys = hasKeysType(true, deepEqualMatch)
 const hasMatchAnyKeys = hasKeysType(false, deepEqualMatch)
@@ -565,7 +636,7 @@ makeHasKeys("notHasMatchAllKeys", hasMatchAllKeys, true, "Expected {actual} to n
 makeHasKeys("hasMatchAnyKeys", hasMatchAnyKeys, false, "Expected {actual} to match any key in {keys}")
 makeHasKeys("notHasMatchKeys", hasMatchAnyKeys, true, "Expected {actual} to not match any key in {keys}")
 
-alias("hasMatchLooseKeys", "hasLooseDeepKeys")
-alias("notHasMatchLooseAllKeys", "notHasLooseDeepAllKeys")
-alias("hasMatchLooseAnyKeys", "hasLooseDeepAnyKeys")
-alias("notHasMatchLooseKeys", "notHasLooseDeepKeys")
+alias("hasMatchLooseKeys", "hasDeepLooseKeys")
+alias("notHasMatchLooseAllKeys", "notHasDeepLooseAllKeys")
+alias("hasMatchLooseAnyKeys", "hasDeepLooseAnyKeys")
+alias("notHasMatchLooseKeys", "notHasDeepLooseKeys")

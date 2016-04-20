@@ -11,7 +11,16 @@ describe("assertions (computation)", () => {
         t.throws(() => { throw new TypeError("fail") }, TypeError)
         t.throws(() => { throw new TypeError("fail") }, Error)
 
-        fail("throws", () => { throw new Error("fail") }, TypeError)
+        let thrown = false
+
+        try {
+            t.throws(() => { throw new Error("fail") }, TypeError)
+        } catch (e) {
+            t.equal(Object.getPrototypeOf(e), Error.prototype)
+            thrown = true
+        }
+
+        t.assert(thrown, "Expected an error to be thrown")
         fail("throws", () => {}, Error)
         fail("throws", () => {})
     })
@@ -19,8 +28,8 @@ describe("assertions (computation)", () => {
     basic("t.notThrows()", () => {
         fail("notThrows", () => { throw new Error("fail") })
         fail("notThrows", () => { throw new TypeError("fail") }, TypeError)
-        fail("notThrows", () => { throw new TypeError("fail") }, Error)
 
+        fail("notThrows", () => { throw new TypeError("fail") }, Error)
         t.notThrows(() => { throw new Error("fail") }, TypeError)
         t.notThrows(() => {}, Error)
         t.notThrows(() => {})
@@ -268,6 +277,108 @@ describe("assertions (computation)", () => {
             fail("lengthBelow", {length: NaN}, 1)
             fail("lengthBelow", {length: NaN}, -Infinity)
             fail("lengthBelow", {length: NaN}, Infinity)
+        })
+    })
+
+    describe("t.atLeast()", () => {
+        it("works", () => {
+            t.atLeast(0, 0)
+            t.atLeast(1, 1)
+            t.atLeast(1, -1)
+            t.atLeast(12398.4639, 1245.472398)
+
+            fail("atLeast", 0, 1000)
+            fail("atLeast", -1, 1)
+            fail("atLeast", -1, 0)
+        })
+
+        it("works with Infinities", () => {
+            t.atLeast(0, -Infinity)
+            t.atLeast(-Infinity, -Infinity)
+            t.atLeast(Infinity, -Infinity)
+            t.atLeast(Infinity, 0)
+            t.atLeast(Infinity, Infinity)
+
+            fail("atLeast", -Infinity, Infinity)
+            fail("atLeast", -Infinity, 0)
+        })
+
+        it("fails with NaNs", () => {
+            fail("atLeast", NaN, 0)
+            fail("atLeast", 0, NaN)
+            fail("atLeast", NaN, NaN)
+            fail("atLeast", NaN, Infinity)
+            fail("atLeast", Infinity, NaN)
+            fail("atLeast", NaN, -Infinity)
+            fail("atLeast", -Infinity, NaN)
+        })
+    })
+
+    describe("t.atMost()", () => {
+        it("works", () => {
+            t.atMost(0, 0)
+            t.atMost(1, 1)
+            fail("atMost", 1, -1)
+            fail("atMost", 12398.4639, 1245.472398)
+
+            t.atMost(0, 1000)
+            t.atMost(-1, 1)
+            t.atMost(-1, 0)
+        })
+
+        it("works with Infinities", () => {
+            fail("atMost", 0, -Infinity)
+            t.atMost(-Infinity, -Infinity)
+            fail("atMost", Infinity, -Infinity)
+            fail("atMost", Infinity, 0)
+            t.atMost(Infinity, Infinity)
+
+            t.atMost(-Infinity, Infinity)
+            t.atMost(-Infinity, 0)
+        })
+
+        it("fails with NaNs", () => {
+            fail("atMost", NaN, 0)
+            fail("atMost", 0, NaN)
+            fail("atMost", NaN, NaN)
+            fail("atMost", NaN, Infinity)
+            fail("atMost", Infinity, NaN)
+            fail("atMost", NaN, -Infinity)
+            fail("atMost", -Infinity, NaN)
+        })
+    })
+
+    describe("t.below()", () => {
+        it("works", () => {
+            fail("below", 0, 0)
+            fail("below", 1, 1)
+            fail("below", 1, -1)
+            fail("below", 12398.4639, 1245.472398)
+
+            t.below(0, 1000)
+            t.below(-1, 1)
+            t.below(-1, 0)
+        })
+
+        it("works with Infinities", () => {
+            fail("below", 0, -Infinity)
+            fail("below", -Infinity, -Infinity)
+            fail("below", Infinity, -Infinity)
+            fail("below", Infinity, 0)
+            fail("below", Infinity, Infinity)
+
+            t.below(-Infinity, Infinity)
+            t.below(-Infinity, 0)
+        })
+
+        it("fails with NaNs", () => {
+            fail("below", NaN, 0)
+            fail("below", 0, NaN)
+            fail("below", NaN, NaN)
+            fail("below", NaN, Infinity)
+            fail("below", Infinity, NaN)
+            fail("below", NaN, -Infinity)
+            fail("below", -Infinity, NaN)
         })
     })
 

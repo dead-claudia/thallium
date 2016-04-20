@@ -45,21 +45,27 @@ Couple specific notes:
 
 See the [documentation](./docs/README.md).
 
-## Remaining work
+## Roadmap
 
-1. Finish + test the CLI. It's still a work in progress.
+1. Finish writing the CLI tests. All that's left are acceptance tests.
 2. Create basic reporters for TAP, spec, dot, etc.
 3. Finish documenting this project. This mainly includes the core assertions and CLI.
-4. Self-host this module's tests like what Mocha does.
-5. Bring this back to pure ES5. It's easier to prototype in ES6, but it's easier to maintain compatibility in ES5.
-6. Port this to the browser with Browserify/Webpack. This will include implementing Node's `util.inspect` for the browser, while actually testing it, unlike [`util-inspect`, the most common replacement](https://www.npmjs.com/package/util-inspect), which is completely untested.
-7. Write a few plugins for `describe`/`it`, `before{,Each}`/`after{,Each}` hooks, etc.
-8. Write lots of blog posts. :smile:
+4. Bring this back to pure ES5 to test in older versions of Node. It's easier to prototype in ES6, but it's easier to maintain compatibility in ES5.
+5. Port this to the browser via Browserify/Webpack.
+    - I'll also rewrite [`util-inspect`](https://www.npmjs.com/package/util-inspect) based on Node's [`util.inspect`](https://nodejs.org/api/util.html#util_util_inspect_object_options) after finishing the port, since that module is completely untested, and has no understanding of ES6. :worried:
+6. Write a few plugins for `describe`/`it`, `before{,Each}`/`after{,Each}` hooks, REPL friendliness\*, etc.
+7. Write lots of blog posts.\*\* :smile:
+
+\* *That's something from Lisp-land I really wish was here...*
+\*\* *And port this to Python, when I can find time.*
 
 ## Contributing
 
 General information:
 
+- This is written partially in ES6, up to what Node 4 supports.
+    - Arrow functions, `let`/`const` declarations, and classes exist.
+    - Destructuring and rest parameters don't.
 - [Bluebird](http://bluebirdjs.com) is used extensively as the Promise implementation.
 - The source code is in `lib/**`.
 - The executables are in `bin/**`, but they won't work. Most of the CLI code is in `lib/cli/**`.
@@ -72,6 +78,10 @@ General information:
 - This uses [eslint-config-isiahmeadows](https://npmjs.com/package/eslint-config-isiahmeadows) for its presets (specifically `isiahmeadows/node-4`). In case you're curious what those settings are, you can start with [the index file](https://github.com/isiahmeadows/eslint-config-isiahmeadows/blob/master/index.js), which the rest are only minor variations of.
 
 Tips and idioms:
+
+- Classes are used, but inheritance is avoided. I also prefer functions over instance methods unless they're something that should be overridable, are more like properties, or are exposed in the API.
+
+    As an exception, classes are usually preferred over closures.
 
 - There are a few useful helpers in `test-util/base.js`, that you may appreciate when you write your tests:
 
@@ -106,10 +116,6 @@ Tips and idioms:
         ])
     })
     ```
-
-- Classes are used, but inheritance is avoided. Generally, the question I ask myself is "Is this like a getter or setter, or is it mostly logic?", and usually, I go method in the first case, and function for the latter. Most of the exceptions are in the test types themselves, where I extracted many common methods into their own module to keep the base class simple.
-
-- Note that outside of the tests, the `Techtonic` class, and Error subclasses, inheritance is minimal.
 
 ## License
 

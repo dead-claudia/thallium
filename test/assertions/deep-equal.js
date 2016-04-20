@@ -10,7 +10,7 @@ describe("assertions (deep equal)", () => { // eslint-disable-line max-statement
 
         it(name, () => {
             t[m("deepEqual")](a, b)
-            t[m("looseDeepEqual")](a, b)
+            t[m("deepEqualLoose")](a, b)
             t[m("match")](a, b)
         })
     }
@@ -18,8 +18,8 @@ describe("assertions (deep equal)", () => { // eslint-disable-line max-statement
     it("exists", () => {
         t.function(t.deepEqual)
         t.function(t.notDeepEqual)
-        t.function(t.looseDeepEqual)
-        t.function(t.notLooseDeepEqual)
+        t.function(t.deepEqualLoose)
+        t.function(t.notDeepEqualLoose)
         t.function(t.match)
         t.function(t.notMatch)
         t.function(t.matchLoose)
@@ -27,87 +27,87 @@ describe("assertions (deep equal)", () => { // eslint-disable-line max-statement
     })
 
     it("correct aliases", () => {
-        t.equal(t.matchLoose, t.looseDeepEqual)
-        t.equal(t.notMatchLoose, t.notLooseDeepEqual)
+        t.equal(t.matchLoose, t.deepEqualLoose)
+        t.equal(t.notMatchLoose, t.notDeepEqualLoose)
     })
 
     check("equal",
         {a: [2, 3], b: [4]},
         {a: [2, 3], b: [4]},
-        {deepEqual: true, looseDeepEqual: true, match: true})
+        {deepEqual: true, deepEqualLoose: true, match: true})
 
     check("not equal",
         {x: 5, y: [6]},
         {x: 5, y: 6},
-        {deepEqual: false, looseDeepEqual: false, match: false})
+        {deepEqual: false, deepEqualLoose: false, match: false})
 
     check("nested nulls",
         [null, null, null],
         [null, null, null],
-        {deepEqual: true, looseDeepEqual: true, match: true})
+        {deepEqual: true, deepEqualLoose: true, match: true})
 
     check("strict equal",
         [{a: 3}, {b: 4}],
         [{a: "3"}, {b: "4"}],
-        {deepEqual: false, looseDeepEqual: true, match: false})
+        {deepEqual: false, deepEqualLoose: true, match: false})
 
     check("same numbers", 3, 3, {
         deepEqual: true,
-        looseDeepEqual: true,
+        deepEqualLoose: true,
         match: true,
     })
 
     check("different numbers", 1, 3, {
         deepEqual: false,
-        looseDeepEqual: false,
+        deepEqualLoose: false,
         match: false,
     })
 
     check("same strings", "beep", "beep", {
         deepEqual: true,
-        looseDeepEqual: true,
+        deepEqualLoose: true,
         match: true,
     })
 
     check("different strings", "beep", "beep", {
         deepEqual: true,
-        looseDeepEqual: true,
+        deepEqualLoose: true,
         match: true,
     })
 
     check("string + number", "3", 3, {
         deepEqual: false,
-        looseDeepEqual: true,
+        deepEqualLoose: true,
         match: false,
     })
 
     check("number + string", 3, "3", {
         deepEqual: false,
-        looseDeepEqual: true,
+        deepEqualLoose: true,
         match: false,
     })
 
     check("different string + number", "3", 5, {
         deepEqual: false,
-        looseDeepEqual: false,
+        deepEqualLoose: false,
         match: false,
     })
 
     check("different number + string", 3, "5", {
         deepEqual: false,
-        looseDeepEqual: false,
+        deepEqualLoose: false,
         match: false,
     })
 
     check("string + [number]", "3", [3], {
         deepEqual: false,
-        looseDeepEqual: false,
+        deepEqualLoose: false,
         match: false,
     })
 
     check("number + [string]", 3, ["3"], {
         deepEqual: false,
-        looseDeepEqual: false,
+        deepEqualLoose: false,
         match: false,
     })
 
@@ -116,74 +116,74 @@ describe("assertions (deep equal)", () => { // eslint-disable-line max-statement
     check("same arguments",
         toArgs(1, 2, 3),
         toArgs(1, 2, 3),
-        {deepEqual: true, looseDeepEqual: true, match: true})
+        {deepEqual: true, deepEqualLoose: true, match: true})
 
     check("different arguments",
         toArgs(1, 2, 3),
         toArgs(3, 2, 1),
-        {deepEqual: false, looseDeepEqual: false, match: false})
+        {deepEqual: false, deepEqualLoose: false, match: false})
 
     check("similar arguments + array",
         toArgs(1, 2, 3),
         [1, 2, 3],
-        {deepEqual: false, looseDeepEqual: false, match: false})
+        {deepEqual: false, deepEqualLoose: false, match: false})
 
     check("similar array + arguments",
         [1, 2, 3],
         toArgs(1, 2, 3),
-        {deepEqual: false, looseDeepEqual: false, match: false})
+        {deepEqual: false, deepEqualLoose: false, match: false})
 
     check("same date",
         new Date("Fri Dec 20 2013 16:21:18 GMT-0800 (PST)"),
         new Date("Fri Dec 20 2013 16:21:18 GMT-0800 (PST)"),
-        {deepEqual: true, looseDeepEqual: true, match: true})
+        {deepEqual: true, deepEqualLoose: true, match: true})
 
     check("different date",
         new Date("Thu, 01 Jan 1970 00:00:00 GMT"),
         new Date("Fri Dec 20 2013 16:21:18 GMT-0800 (PST)"),
-        {deepEqual: false, looseDeepEqual: false, match: false})
+        {deepEqual: false, deepEqualLoose: false, match: false})
 
     if (typeof Buffer === "function") {
         check("same buffers", new Buffer("xyz"), new Buffer("xyz"), {
             deepEqual: true,
-            looseDeepEqual: true,
+            deepEqualLoose: true,
             match: true,
         })
 
         check("different buffers", new Buffer("abc"), new Buffer("xyz"), {
             deepEqual: false,
-            looseDeepEqual: false,
+            deepEqualLoose: false,
             match: false,
         })
     }
 
     check("boolean + array", true, [], {
         deepEqual: false,
-        looseDeepEqual: false,
+        deepEqualLoose: false,
         match: false,
     })
 
     check("both null", null, null, {
         deepEqual: true,
-        looseDeepEqual: true,
+        deepEqualLoose: true,
         match: true,
     })
 
     check("both undefined", undefined, undefined, {
         deepEqual: true,
-        looseDeepEqual: true,
+        deepEqualLoose: true,
         match: true,
     })
 
     check("null + undefined", null, undefined, {
         deepEqual: false,
-        looseDeepEqual: true,
+        deepEqualLoose: true,
         match: false,
     })
 
     check("undefined + null", undefined, null, {
         deepEqual: false,
-        looseDeepEqual: true,
+        deepEqualLoose: true,
         match: false,
     })
 
@@ -192,43 +192,43 @@ describe("assertions (deep equal)", () => { // eslint-disable-line max-statement
 
     check("same prototypes", new A(), new A(), {
         deepEqual: true,
-        looseDeepEqual: true,
+        deepEqualLoose: true,
         match: true,
     })
 
     check("different prototypes", new A(), new B(), {
         deepEqual: false,
-        looseDeepEqual: true,
+        deepEqualLoose: true,
         match: true,
     })
 
     check("object + string", "foo", {bar: 1}, {
         deepEqual: false,
-        looseDeepEqual: false,
+        deepEqualLoose: false,
         match: false,
     })
 
     check("string + object", {foo: 1}, "bar", {
         deepEqual: false,
-        looseDeepEqual: false,
+        deepEqualLoose: false,
         match: false,
     })
 
     check("same strings", "foo", "foo", {
         deepEqual: true,
-        looseDeepEqual: true,
+        deepEqualLoose: true,
         match: true,
     })
 
     check("different strings", "foo", "bar", {
         deepEqual: false,
-        looseDeepEqual: false,
+        deepEqualLoose: false,
         match: false,
     })
 
     check("differing keys", {a: 1, b: 2}, {b: 1, c: 2}, {
         deepEqual: false,
-        looseDeepEqual: false,
+        deepEqualLoose: false,
         match: false,
     })
 
@@ -236,116 +236,116 @@ describe("assertions (deep equal)", () => { // eslint-disable-line max-statement
 
     check("same symbols", symbol, symbol, {
         deepEqual: true,
-        looseDeepEqual: true,
+        deepEqualLoose: true,
         match: true,
     })
 
     check("similar symbols", Symbol("foo"), Symbol("foo"), {
         deepEqual: false,
-        looseDeepEqual: true,
+        deepEqualLoose: true,
         match: true,
     })
 
     check("different symbols", Symbol("foo"), Symbol("bar"), {
         deepEqual: false,
-        looseDeepEqual: false,
+        deepEqualLoose: false,
         match: false,
     })
 
     check("empty maps", new Map(), new Map(), {
         deepEqual: true,
-        looseDeepEqual: true,
+        deepEqualLoose: true,
         match: true,
     })
 
     check("maps with same primitive keys",
         new Map([["foo", "bar"]]),
         new Map([["foo", "bar"]]),
-        {deepEqual: true, looseDeepEqual: true, match: true})
+        {deepEqual: true, deepEqualLoose: true, match: true})
 
     check("maps with different primitive keys",
         new Map([["foo", "bar"]]),
         new Map([["bar", "bar"]]),
-        {deepEqual: false, looseDeepEqual: false, match: false})
+        {deepEqual: false, deepEqualLoose: false, match: false})
 
     check("maps with different primitive values",
         new Map([["foo", "bar"]]),
         new Map([["foo", "foo"]]),
-        {deepEqual: false, looseDeepEqual: false, match: false})
+        {deepEqual: false, deepEqualLoose: false, match: false})
 
     check("maps with different primitive both",
         new Map([["foo", "bar"]]),
         new Map([["bar", "foo"]]),
-        {deepEqual: false, looseDeepEqual: false, match: false})
+        {deepEqual: false, deepEqualLoose: false, match: false})
 
     check("maps with loosely same primitive key",
         new Map([[1, "foo"]]),
         new Map([["1", "foo"]]),
-        {deepEqual: false, looseDeepEqual: true, match: false})
+        {deepEqual: false, deepEqualLoose: true, match: false})
 
     check("maps with loosely same primitive value",
         new Map([["foo", 1]]),
         new Map([["foo", "1"]]),
-        {deepEqual: false, looseDeepEqual: true, match: false})
+        {deepEqual: false, deepEqualLoose: true, match: false})
 
     check("maps with loosely same primitive both",
         new Map([["1", 1]]),
         new Map([[1, "1"]]),
-        {deepEqual: false, looseDeepEqual: true, match: false})
+        {deepEqual: false, deepEqualLoose: true, match: false})
 
     check("maps with many same primitive keys",
         new Map([["foo", "bar"], ["bar", 1], [1, 2], [true, 3]]),
         new Map([["foo", "bar"], ["bar", 1], [1, 2], [true, 3]]),
-        {deepEqual: true, looseDeepEqual: true, match: true})
+        {deepEqual: true, deepEqualLoose: true, match: true})
 
     check("maps with many different primitive keys",
         new Map([["foo", "bar"], ["bar", 1], [1, 2], [true, 3]]),
         new Map([["foo", "bar"], ["bar", 2], ["15", 2], [false, 4]]),
-        {deepEqual: false, looseDeepEqual: false, match: false})
+        {deepEqual: false, deepEqualLoose: false, match: false})
 
     const mapObj = {foo: "bar"}
 
     check("maps with identical keys",
         new Map([[mapObj, "bar"]]),
         new Map([[mapObj, "bar"]]),
-        {deepEqual: true, looseDeepEqual: true, match: true})
+        {deepEqual: true, deepEqualLoose: true, match: true})
 
     check("maps with structurally similar keys",
         new Map([[{foo: "bar"}, "bar"]]),
         new Map([[{foo: "bar"}, "bar"]]),
-        {deepEqual: true, looseDeepEqual: true, match: true})
+        {deepEqual: true, deepEqualLoose: true, match: true})
 
     check("maps with structurally different keys",
         new Map([[{foo: "bar"}, "bar"]]),
         new Map([[{bar: "foo"}, "bar"]]),
-        {deepEqual: false, looseDeepEqual: false, match: false})
+        {deepEqual: false, deepEqualLoose: false, match: false})
 
     check("maps with structurally similar values",
         new Map([["bar", {foo: "bar"}]]),
         new Map([["bar", {foo: "bar"}]]),
-        {deepEqual: true, looseDeepEqual: true, match: true})
+        {deepEqual: true, deepEqualLoose: true, match: true})
 
     check("maps with structurally different values",
         new Map([["bar", {foo: "bar"}]]),
         new Map([["bar", {bar: "foo"}]]),
-        {deepEqual: false, looseDeepEqual: false, match: false})
+        {deepEqual: false, deepEqualLoose: false, match: false})
 
     check("maps with structurally similar both",
         new Map([[{foo: "bar"}, {foo: "bar"}]]),
         new Map([[{foo: "bar"}, {foo: "bar"}]]),
-        {deepEqual: true, looseDeepEqual: true, match: true})
+        {deepEqual: true, deepEqualLoose: true, match: true})
 
     check("maps with structurally different both",
         new Map([[{foo: "bar"}, {foo: "bar"}]]),
         new Map([[{bar: "foo"}, {bar: "foo"}]]),
-        {deepEqual: false, looseDeepEqual: false, match: false})
+        {deepEqual: false, deepEqualLoose: false, match: false})
 
     const bar = () => {}
 
     check("maps with inner functions",
         new Map([[{foo: "bar", bar}, {foo: "bar", bar}]]),
         new Map([[{foo: "bar", bar}, {foo: "bar", bar}]]),
-        {deepEqual: true, looseDeepEqual: true, match: true})
+        {deepEqual: true, deepEqualLoose: true, match: true})
 
     // Derived from a failing LoaderData test
     ;(() => {
@@ -403,7 +403,7 @@ describe("assertions (deep equal)", () => { // eslint-disable-line max-statement
                 [".coffee", register(".coffee", ["coffee-script/register", "coffee-script"], load, false)],
                 [0, simple("./util/env.my-shell", load)],
             ]),
-            {deepEqual: true, looseDeepEqual: true, match: true})
+            {deepEqual: true, deepEqualLoose: true, match: true})
 
         check("really complex maps with classes",
             new Map([
@@ -420,7 +420,7 @@ describe("assertions (deep equal)", () => { // eslint-disable-line max-statement
                 [".coffee", new Register(".coffee", ["coffee-script/register", "coffee-script"], load, false)],
                 [0, new Simple("./util/env.my-shell", load)],
             ]),
-            {deepEqual: true, looseDeepEqual: true, match: true})
+            {deepEqual: true, deepEqualLoose: true, match: true})
 
         check("complex sets with differently ordered primitive + object",
             new Set([
@@ -437,7 +437,7 @@ describe("assertions (deep equal)", () => { // eslint-disable-line max-statement
                 [".coffee", register(".coffee", ["coffee-script/register", "coffee-script"], load, false)],
                 [0, simple("./util/env.my-shell", load)],
             ]),
-            {deepEqual: true, looseDeepEqual: true, match: true})
+            {deepEqual: true, deepEqualLoose: true, match: true})
 
         check("complex sets with differently ordered primitive + class",
             new Set([
@@ -454,7 +454,7 @@ describe("assertions (deep equal)", () => { // eslint-disable-line max-statement
                 [".coffee", new Register(".coffee", ["coffee-script/register", "coffee-script"], load, false)],
                 [0, new Simple("./util/env.my-shell", load)],
             ]),
-            {deepEqual: true, looseDeepEqual: true, match: true})
+            {deepEqual: true, deepEqualLoose: true, match: true})
 
         check("complex sets with differently ordered object + object",
             new Set([
@@ -471,7 +471,7 @@ describe("assertions (deep equal)", () => { // eslint-disable-line max-statement
                 [{ext: ".coffee"}, register(".coffee", ["coffee-script/register", "coffee-script"], load, false)],
                 [{id: 0}, simple("./util/env.my-shell", load)],
             ]),
-            {deepEqual: true, looseDeepEqual: true, match: true})
+            {deepEqual: true, deepEqualLoose: true, match: true})
 
         check("complex sets with differently ordered object + class",
             new Set([
@@ -488,7 +488,7 @@ describe("assertions (deep equal)", () => { // eslint-disable-line max-statement
                 [{ext: ".coffee"}, new Register(".coffee", ["coffee-script/register", "coffee-script"], load, false)],
                 [{id: 0}, new Simple("./util/env.my-shell", load)],
             ]),
-            {deepEqual: true, looseDeepEqual: true, match: true})
+            {deepEqual: true, deepEqualLoose: true, match: true})
 
         check("complex sets with differently ordered class + object",
             new Set([
@@ -505,7 +505,7 @@ describe("assertions (deep equal)", () => { // eslint-disable-line max-statement
                 [new Ext(".coffee"), register(".coffee", ["coffee-script/register", "coffee-script"], load, false)],
                 [new Id(0), simple("./util/env.my-shell", load)],
             ]),
-            {deepEqual: true, looseDeepEqual: true, match: true})
+            {deepEqual: true, deepEqualLoose: true, match: true})
 
         check("complex sets with differently ordered class + class",
             new Set([
@@ -522,70 +522,70 @@ describe("assertions (deep equal)", () => { // eslint-disable-line max-statement
                 [new Ext(".coffee"), new Register(".coffee", ["coffee-script/register", "coffee-script"], load, false)],
                 [new Id(0), new Simple("./util/env.my-shell", load)],
             ]),
-            {deepEqual: true, looseDeepEqual: true, match: true})
+            {deepEqual: true, deepEqualLoose: true, match: true})
 
         /* eslint-enable max-len */
     })()
 
     check("empty sets", new Set(), new Set(), {
         deepEqual: true,
-        looseDeepEqual: true,
+        deepEqualLoose: true,
         match: true,
     })
 
     check("sets with same primitive values",
         new Set(["foo", "bar"]),
         new Set(["foo", "bar"]),
-        {deepEqual: true, looseDeepEqual: true, match: true})
+        {deepEqual: true, deepEqualLoose: true, match: true})
 
     check("sets with different primitive values",
         new Set(["foo", "bar"]),
         new Set(["bar", "bar"]),
-        {deepEqual: false, looseDeepEqual: false, match: false})
+        {deepEqual: false, deepEqualLoose: false, match: false})
 
     check("sets with loosely same primitive value",
         new Set([1, "foo"]),
         new Set(["1", "foo"]),
-        {deepEqual: false, looseDeepEqual: true, match: false})
+        {deepEqual: false, deepEqualLoose: true, match: false})
 
     check("sets with many same primitive values",
         new Set(["foo", "bar", "bar", 1, 1, 2, true, 3]),
         new Set(["foo", "bar", "bar", 1, 1, 2, true, 3]),
-        {deepEqual: true, looseDeepEqual: true, match: true})
+        {deepEqual: true, deepEqualLoose: true, match: true})
 
     check("sets with many different primitive values",
         new Set(["foo", "bar", "bar", 1, 1, 2, true, 3]),
         new Set(["foo", "bar", "bar", 2, "15", 2, false, 4]),
-        {deepEqual: false, looseDeepEqual: false, match: false})
+        {deepEqual: false, deepEqualLoose: false, match: false})
 
     const setObj = {foo: "bar"}
 
     check("sets with identical values",
         new Set([setObj, "bar"]),
         new Set([setObj, "bar"]),
-        {deepEqual: true, looseDeepEqual: true, match: true})
+        {deepEqual: true, deepEqualLoose: true, match: true})
 
     check("sets with structurally similar values",
         new Set([{foo: "bar"}, "bar"]),
         new Set([{foo: "bar"}, "bar"]),
-        {deepEqual: true, looseDeepEqual: true, match: true})
+        {deepEqual: true, deepEqualLoose: true, match: true})
 
     check("sets with structurally different values",
         new Set([{foo: "bar"}, "bar"]),
         new Set([{bar: "foo"}, "bar"]),
-        {deepEqual: false, looseDeepEqual: false, match: false})
+        {deepEqual: false, deepEqualLoose: false, match: false})
 
     const f = () => {}
 
     check("same functions", f, f, {
         deepEqual: true,
-        looseDeepEqual: true,
+        deepEqualLoose: true,
         match: true,
     })
 
     check("different functions", () => {}, () => {}, {
         deepEqual: false,
-        looseDeepEqual: false,
+        deepEqualLoose: false,
         match: false,
     })
 })

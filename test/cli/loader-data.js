@@ -9,12 +9,7 @@ const Util = require("../../test-util/cli.js")
 
 const hasOwn = Object.prototype.hasOwnProperty
 
-describe("cli config LoaderData", () => {
-    // TODO: fill this in.
-    // Note the function prototype:
-    //
-    // LoaderData.getMap(state: State): Map<string | number, Loader>
-
+describe("cli config loader data", () => {
     function forEachVariantExt(f) {
         Object.keys(interpret.jsVariants).forEach(f)
     }

@@ -5,10 +5,10 @@ const fail = require("../../test-util/assertions.js").fail
 
 describe("assertions (has keys)", () => {
     it("correct aliases", () => {
-        t.equal(t.hasMatchLooseKeys, t.hasLooseDeepKeys)
-        t.equal(t.notHasMatchLooseAllKeys, t.notHasLooseDeepAllKeys)
-        t.equal(t.hasMatchLooseAnyKeys, t.hasLooseDeepAnyKeys)
-        t.equal(t.notHasMatchLooseKeys, t.notHasLooseDeepKeys)
+        t.equal(t.hasMatchLooseKeys, t.hasDeepLooseKeys)
+        t.equal(t.notHasMatchLooseAllKeys, t.notHasDeepLooseAllKeys)
+        t.equal(t.hasMatchLooseAnyKeys, t.hasDeepLooseAnyKeys)
+        t.equal(t.notHasMatchLooseKeys, t.notHasDeepLooseKeys)
     })
 
     // It"s much easier to find problems when the tests are generated.
@@ -32,21 +32,27 @@ describe("assertions (has keys)", () => {
                 t.function(t[name])
             })
 
-            it("checks numbers", () => {
-                run(opts.keys && !opts.invert,
-                    {1: true, 2: true, 3: false},
-                    [1])
+            if (opts.keys) {
+                it("checks number keys", () => {
+                    run(!opts.invert,
+                        {1: true, 2: true, 3: false},
+                        [1])
+                })
 
-                run(opts.keys && !opts.invert,
+                it("checks string keys", () => {
+                    run(!opts.invert,
+                        {foo: true, bar: false, baz: 1},
+                        ["foo"])
+                })
+            }
+
+            it("checks numbers", () => {
+                run(!opts.invert,
                     {1: true, 2: true, 3: false},
                     {1: true})
             })
 
             it("checks strings", () => {
-                run(opts.keys && !opts.invert,
-                    {foo: true, bar: false, baz: 1},
-                    ["foo"])
-
                 run(!opts.invert, {foo: true, bar: false, baz: 1}, {foo: true})
             })
 
@@ -79,7 +85,7 @@ describe("assertions (has keys)", () => {
             })
 
             it("checks missing keys", () => {
-                run(opts.keys && opts.invert, {foo: 1, bar: 2, baz: 3}, [10])
+                if (opts.keys) run(opts.invert, {foo: 1, bar: 2, baz: 3}, [10])
                 run(opts.invert, {foo: 1, bar: 2, baz: 3}, {a: 10})
                 run(opts.invert, {foo: 1, bar: 2, baz: 3}, {foo: 10})
             })
@@ -196,8 +202,8 @@ describe("assertions (has keys)", () => {
     deep("notHasDeepAllKeys", {invert: true, all: true})
     deep("hasDeepAnyKeys", {})
     deep("notHasDeepKeys", {invert: true})
-    deep("hasLooseDeepKeys", {loose: true, all: true})
-    deep("notHasLooseDeepAllKeys", {loose: true, invert: true, all: true})
-    deep("hasLooseDeepAnyKeys", {loose: true})
-    deep("notHasLooseDeepKeys", {loose: true, invert: true})
+    deep("hasDeepLooseKeys", {loose: true, all: true})
+    deep("notHasDeepLooseAllKeys", {loose: true, invert: true, all: true})
+    deep("hasDeepLooseAnyKeys", {loose: true})
+    deep("notHasDeepLooseKeys", {loose: true, invert: true})
 })

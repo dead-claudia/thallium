@@ -13,7 +13,7 @@ Each event is specified by the `type` property:
 - `"pass"` - This marks a passing test block. The `value` property is `undefined`.
 - `"fail"` - This marks a failing test block. The `value` property is the error that was thrown, unmodified.
 - `"pending"` - This marks a pending test block, from `t.testSkip()` or `t.asyncSkip()`. The `value` property is `undefined`.
-- `"exit"` - This marks the end of all running tests. The `value` property is `undefined`. If you need to buffer any events, this marks the end of the stream, so you can start your final processing.
+- `"exit"` - This marks the end of all running tests. The `value` property is `undefined`. If you need to buffer any events, this marks the end of the stream (except for possible `"extra"` events), so you can start your final processing.
 - `"extra"` - This marks an extra call to `done` in an asynchronous test. The `value` property is an object where `count` denotes how many times `done` was called overall, and `value` denotes the last value the callback was called with.
 
 Each event has the following properties:
@@ -36,8 +36,26 @@ If you need to take various options, just wrap your reporter in a factory like t
 module.exports = opts => {
     // process your opts here
 
-    return ev => {
+    return (ev, done) => {
         // do reporter magic here
+    }
+}
+```
+
+## `"extra"` events after `"exit"`
+
+If you can't handle them after the exit, you can drop a lock like this, so you can avoid processing to keep out of an invalid state. Note that after the `"exit"` event, only two possible events can occur: `"extra"`, since Techtonic has already moved on by then, and `"start"`, which means the tests are being run again, within the same Node process.
+
+```js
+module.exports = () => {
+    let ignore = false
+
+    return (ev, done) => {
+        if (ev.type === "extra" && ignore) return done()
+        if (ev.type === "start") ignore = false
+        if (ev.type === "end") ignore = true
+
+        // do whatever you would normally
     }
 }
 ```

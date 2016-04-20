@@ -122,44 +122,44 @@ describe("assertions (base)", () => {
         t.notEqual(1, "1")
     })
 
-    basic("t.looseEqual()", () => {
-        t.looseEqual(0, 0)
-        t.looseEqual(1, 1)
-        t.looseEqual(null, null)
-        t.looseEqual(undefined, undefined)
-        t.looseEqual(Infinity, Infinity)
-        t.looseEqual(NaN, NaN)
-        t.looseEqual("", "")
-        t.looseEqual("foo", "foo")
-        t.looseEqual(null, undefined)
-        t.looseEqual(1, "1")
+    basic("t.equalLoose()", () => {
+        t.equalLoose(0, 0)
+        t.equalLoose(1, 1)
+        t.equalLoose(null, null)
+        t.equalLoose(undefined, undefined)
+        t.equalLoose(Infinity, Infinity)
+        t.equalLoose(NaN, NaN)
+        t.equalLoose("", "")
+        t.equalLoose("foo", "foo")
+        t.equalLoose(null, undefined)
+        t.equalLoose(1, "1")
 
         const obj = {}
 
-        t.looseEqual(obj, obj)
+        t.equalLoose(obj, obj)
 
-        fail("looseEqual", {}, {})
-        fail("looseEqual", 0, 1)
+        fail("equalLoose", {}, {})
+        fail("equalLoose", 0, 1)
     })
 
-    basic("t.notLooseEqual()", () => {
-        fail("notLooseEqual", 0, 0)
-        fail("notLooseEqual", 1, 1)
-        fail("notLooseEqual", null, null)
-        fail("notLooseEqual", undefined, undefined)
-        fail("notLooseEqual", Infinity, Infinity)
-        fail("notLooseEqual", NaN, NaN)
-        fail("notLooseEqual", "", "")
-        fail("notLooseEqual", "foo", "foo")
-        fail("notLooseEqual", null, undefined)
-        fail("notLooseEqual", 1, "1")
+    basic("t.notEqualLoose()", () => {
+        fail("notEqualLoose", 0, 0)
+        fail("notEqualLoose", 1, 1)
+        fail("notEqualLoose", null, null)
+        fail("notEqualLoose", undefined, undefined)
+        fail("notEqualLoose", Infinity, Infinity)
+        fail("notEqualLoose", NaN, NaN)
+        fail("notEqualLoose", "", "")
+        fail("notEqualLoose", "foo", "foo")
+        fail("notEqualLoose", null, undefined)
+        fail("notEqualLoose", 1, "1")
 
         const obj = {}
 
-        fail("notLooseEqual", obj, obj)
+        fail("notEqualLoose", obj, obj)
 
-        t.notLooseEqual({}, {})
-        t.notLooseEqual(0, 1)
+        t.notEqualLoose({}, {})
+        t.notEqualLoose(0, 1)
     })
 
     basic("t.deepEqual()", () => {
@@ -210,50 +210,50 @@ describe("assertions (base)", () => {
             {a: [2, 3], b: [4]})
     })
 
-    basic("t.looseDeepEqual()", () => {
-        t.looseDeepEqual(0, 0)
-        t.looseDeepEqual(1, 1)
-        t.looseDeepEqual(null, null)
-        t.looseDeepEqual(undefined, undefined)
-        t.looseDeepEqual(Infinity, Infinity)
-        t.looseDeepEqual(NaN, NaN)
-        t.looseDeepEqual("", "")
-        t.looseDeepEqual("foo", "foo")
+    basic("t.deepEqualLoose()", () => {
+        t.deepEqualLoose(0, 0)
+        t.deepEqualLoose(1, 1)
+        t.deepEqualLoose(null, null)
+        t.deepEqualLoose(undefined, undefined)
+        t.deepEqualLoose(Infinity, Infinity)
+        t.deepEqualLoose(NaN, NaN)
+        t.deepEqualLoose("", "")
+        t.deepEqualLoose("foo", "foo")
 
         const obj = {}
 
-        t.looseDeepEqual(obj, obj)
+        t.deepEqualLoose(obj, obj)
 
-        t.looseDeepEqual({}, {})
-        t.looseDeepEqual(null, undefined)
-        fail("looseDeepEqual", 0, 1)
-        t.looseDeepEqual(1, "1")
+        t.deepEqualLoose({}, {})
+        t.deepEqualLoose(null, undefined)
+        fail("deepEqualLoose", 0, 1)
+        t.deepEqualLoose(1, "1")
 
-        t.looseDeepEqual(
+        t.deepEqualLoose(
             {a: [2, 3], b: [4]},
             {a: [2, 3], b: [4]})
     })
 
-    basic("t.notLooseDeepEqual()", () => {
-        fail("notLooseDeepEqual", 0, 0)
-        fail("notLooseDeepEqual", 1, 1)
-        fail("notLooseDeepEqual", null, null)
-        fail("notLooseDeepEqual", undefined, undefined)
-        fail("notLooseDeepEqual", Infinity, Infinity)
-        fail("notLooseDeepEqual", NaN, NaN)
-        fail("notLooseDeepEqual", "", "")
-        fail("notLooseDeepEqual", "foo", "foo")
+    basic("t.notDeepEqualLoose()", () => {
+        fail("notDeepEqualLoose", 0, 0)
+        fail("notDeepEqualLoose", 1, 1)
+        fail("notDeepEqualLoose", null, null)
+        fail("notDeepEqualLoose", undefined, undefined)
+        fail("notDeepEqualLoose", Infinity, Infinity)
+        fail("notDeepEqualLoose", NaN, NaN)
+        fail("notDeepEqualLoose", "", "")
+        fail("notDeepEqualLoose", "foo", "foo")
 
         const obj = {}
 
-        fail("notLooseDeepEqual", obj, obj)
+        fail("notDeepEqualLoose", obj, obj)
 
-        fail("notLooseDeepEqual", {}, {})
-        fail("notLooseDeepEqual", null, undefined)
-        t.notLooseDeepEqual(0, 1)
-        fail("notLooseDeepEqual", 1, "1")
+        fail("notDeepEqualLoose", {}, {})
+        fail("notDeepEqualLoose", null, undefined)
+        t.notDeepEqualLoose(0, 1)
+        fail("notDeepEqualLoose", 1, "1")
 
-        fail("notLooseDeepEqual",
+        fail("notDeepEqualLoose",
             {a: [2, 3], b: [4]},
             {a: [2, 3], b: [4]})
     })
@@ -291,32 +291,24 @@ describe("assertions (base)", () => {
         t.notHasOwn(new F(), "value", 2)
     })
 
-    basic("t.looseHasOwn()", () => {
-        t.looseHasOwn({prop: 1}, "prop")
-        t.looseHasOwn({prop: 1}, "prop", 1)
-        t.looseHasOwn(new F(), "value", 1)
-        t.looseHasOwn({prop: 1}, "prop", "1")
+    basic("t.hasOwnLoose()", () => {
+        t.hasOwnLoose({prop: 1}, "prop", 1)
+        t.hasOwnLoose(new F(), "value", 1)
+        t.hasOwnLoose({prop: 1}, "prop", "1")
 
-        fail("looseHasOwn", {prop: 1}, "toString")
-        fail("looseHasOwn", {prop: 1}, "value")
-        fail("looseHasOwn", {prop: 1}, "prop", 2)
-        fail("looseHasOwn", new F(), "prop")
-        fail("looseHasOwn", new F(), "prop", 1)
-        fail("looseHasOwn", new F(), "value", 2)
+        fail("hasOwnLoose", {prop: 1}, "prop", 2)
+        fail("hasOwnLoose", new F(), "prop", 1)
+        fail("hasOwnLoose", new F(), "value", 2)
     })
 
-    basic("t.notLooseHasOwn()", () => {
-        fail("notLooseHasOwn", {prop: 1}, "prop")
-        fail("notLooseHasOwn", {prop: 1}, "prop", 1)
-        fail("notLooseHasOwn", new F(), "value", 1)
-        fail("notLooseHasOwn", {prop: 1}, "prop", "1")
+    basic("t.notHasOwnLoose()", () => {
+        fail("notHasOwnLoose", {prop: 1}, "prop", 1)
+        fail("notHasOwnLoose", new F(), "value", 1)
+        fail("notHasOwnLoose", {prop: 1}, "prop", "1")
 
-        t.notLooseHasOwn({prop: 1}, "toString")
-        t.notLooseHasOwn({prop: 1}, "value")
-        t.notLooseHasOwn({prop: 1}, "prop", 2)
-        t.notLooseHasOwn(new F(), "prop")
-        t.notLooseHasOwn(new F(), "prop", 1)
-        t.notLooseHasOwn(new F(), "value", 2)
+        t.notHasOwnLoose({prop: 1}, "prop", 2)
+        t.notHasOwnLoose(new F(), "prop", 1)
+        t.notHasOwnLoose(new F(), "value", 2)
     })
 
     basic("t.hasKey()", () => {
@@ -347,31 +339,55 @@ describe("assertions (base)", () => {
         t.notHasKey(new F(), "value", 2)
     })
 
-    basic("t.looseHasKey()", () => {
-        t.looseHasKey({prop: 1}, "prop")
-        t.looseHasKey({prop: 1}, "prop", 1)
-        t.looseHasKey(new F(), "value", 1)
-        t.looseHasKey({prop: 1}, "toString")
-        t.looseHasKey(new F(), "prop")
-        t.looseHasKey(new F(), "prop", 1)
-        t.looseHasKey({prop: 1}, "prop", "1")
+    basic("t.hasKeyLoose()", () => {
+        t.hasKeyLoose({prop: 1}, "prop", 1)
+        t.hasKeyLoose(new F(), "value", 1)
+        t.hasKeyLoose(new F(), "prop", 1)
+        t.hasKeyLoose({prop: 1}, "prop", "1")
 
-        fail("looseHasKey", {prop: 1}, "value")
-        fail("looseHasKey", {prop: 1}, "prop", 2)
-        fail("looseHasKey", new F(), "value", 2)
+        fail("hasKeyLoose", {prop: 1}, "prop", 2)
+        fail("hasKeyLoose", new F(), "value", 2)
     })
 
-    basic("t.notLooseHasKey()", () => {
-        fail("notLooseHasKey", {prop: 1}, "prop")
-        fail("notLooseHasKey", {prop: 1}, "prop", 1)
-        fail("notLooseHasKey", new F(), "value", 1)
-        fail("notLooseHasKey", {prop: 1}, "toString")
-        fail("notLooseHasKey", new F(), "prop")
-        fail("notLooseHasKey", new F(), "prop", 1)
-        fail("notLooseHasKey", {prop: 1}, "prop", "1")
+    basic("t.notHasKeyLoose()", () => {
+        fail("notHasKeyLoose", {prop: 1}, "prop", 1)
+        fail("notHasKeyLoose", new F(), "value", 1)
+        fail("notHasKeyLoose", new F(), "prop", 1)
+        fail("notHasKeyLoose", {prop: 1}, "prop", "1")
 
-        t.notLooseHasKey({prop: 1}, "value")
-        t.notLooseHasKey({prop: 1}, "prop", 2)
-        t.notLooseHasKey(new F(), "value", 2)
+        t.notHasKeyLoose({prop: 1}, "prop", 2)
+        t.notHasKeyLoose(new F(), "value", 2)
+    })
+
+    basic("t.has()", () => {
+        t.has(new Map([["prop", 1]]), "prop")
+        t.has(new Map([["prop", 1]]), "prop", 1)
+
+        fail("has", new Map([["prop", 1]]), "value")
+        fail("has", new Map([["prop", 1]]), "prop", 2)
+        fail("has", new Map([["prop", 1]]), "prop", "1")
+    })
+
+    basic("t.notHas()", () => {
+        fail("notHas", new Map([["prop", 1]]), "prop")
+        fail("notHas", new Map([["prop", 1]]), "prop", 1)
+
+        t.notHas(new Map([["prop", 1]]), "value")
+        t.notHas(new Map([["prop", 1]]), "prop", 2)
+        t.notHas(new Map([["prop", 1]]), "prop", "1")
+    })
+
+    basic("t.hasLoose()", () => {
+        t.hasLoose(new Map([["prop", 1]]), "prop", 1)
+        t.hasLoose(new Map([["prop", 1]]), "prop", "1")
+
+        fail("hasLoose", new Map([["prop", 1]]), "prop", 2)
+    })
+
+    basic("t.notHasLoose()", () => {
+        fail("notHasLoose", new Map([["prop", 1]]), "prop", 1)
+        fail("notHasLoose", new Map([["prop", 1]]), "prop", "1")
+
+        t.notHasLoose(new Map([["prop", 1]]), "prop", 2)
     })
 })

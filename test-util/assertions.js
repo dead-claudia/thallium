@@ -11,7 +11,17 @@ exports.fail = function (name) {
         args.push(arguments[i])
     }
 
-    t.throws(() => { t[name].apply(t, args) }, t.AssertionError)
+    // Silently swallowing exceptions is bad.
+    try {
+        t[name].apply(t, args)
+    } catch (e) {
+        if (e instanceof t.AssertionError) return
+        throw e
+    }
+
+    throw new t.AssertionError(
+        `Expected t.${name} to throw an AssertionError`,
+        t.AssertionError)
 }
 
 exports.basic = (desc, callback) => describe(desc, () => it("works", callback))

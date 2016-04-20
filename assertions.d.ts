@@ -15,6 +15,11 @@ export type TypeofValue =
 
 export type Matcher = ((error: Error) => any) | string | RegExp;
 
+export interface MapLike<T, U> {
+    has(value: T): boolean;
+    get(value: T): U;
+}
+
 export interface Assertions {
     assert(cond: boolean, message?: string): this;
     fail(message?: string): this;
@@ -67,16 +72,21 @@ export interface Assertions {
     equal<T>(a: T, b: T): this;
     notEqual<T>(a: T, b: T): this;
 
-    looseEqual(a: any, b: any): this;
-    notLooseEqual(a: any, b: any): this;
+    atLeast(n: number, limit: number): this;
+    atMost(n: number, limit: number): this;
+    above(n: number, limit: number): this;
+    below(n: number, limit: number): this;
+
+    equalLoose(a: any, b: any): this;
+    notEqualLoose(a: any, b: any): this;
 
     // Strict deep equal, taking into account types
     deepEqual<T>(a: T, b: T): this;
     notDeepEqual<T>(a: T, b: T): this;
 
     // Loose deep equal, ignoring types
-    looseDeepEqual(a: Object, b: Object): this;
-    notLooseDeepEqual(a: Object, b: Object): this;
+    deepEqualLoose(a: Object, b: Object): this;
+    notDeepEqualLoose(a: Object, b: Object): this;
 
     // deepEqual, but ignoring types
     match<T>(a: T, b: T): this;
@@ -89,14 +99,20 @@ export interface Assertions {
     // has own property, possibly equal to a value
     hasOwn(object: Object, key: Key, value?: any): this;
     notHasOwn(object: Object, key: Key, value?: any): this;
-    looseHasOwn(object: Object, key: Key, value?: any): this;
-    notLooseHasOwn(object: Object, key: Key, value?: any): this;
+    hasOwnLoose(object: Object, key: Key, value: any): this;
+    notHasOwnLoose(object: Object, key: Key, value: any): this;
 
     // has own or inherited property, possibly equal to a value
     hasKey(object: Object, key: Key, value?: any): this;
     notHasKey(object: Object, key: Key, value?: any): this;
-    looseHasKey(object: Object, key: Key, value?: any): this;
-    notLooseHasKey(object: Object, key: Key, value?: any): this;
+    hasKeyLoose(object: Object, key: Key, value: any): this;
+    notHasKeyLoose(object: Object, key: Key, value: any): this;
+
+    // has in collection (e.g. Map)
+    has<T, U>(object: MapLike<T, U>, key: T, value?: U): this;
+    notHas<T, U>(object: MapLike<T, U>, key: T, value?: U): this;
+    hasLoose<T, U>(object: MapLike<T, U>, key: T, value: U): this;
+    notHasLoose<T, U>(object: MapLike<T, U>, key: T, value: U): this;
 
     // throws, possibly of a specified type
     throws(func: () => any, Type?: new (...args: any[]) => any): this;
@@ -140,10 +156,10 @@ export interface Assertions {
     notIncludesDeep<T>(array: T[], keys: T | T[]): this;
 
     // loose deep equal
-    includesLooseDeep<T>(array: T[], keys: T | T[]): this;
-    notIncludesLooseDeepAll<T>(array: T[], keys: T | T[]): this;
-    includesLooseDeepAny<T>(array: T[], keys: T | T[]): this;
-    notIncludesLooseDeep<T>(array: T[], keys: T | T[]): this;
+    includesDeepLoose<T>(array: T[], keys: T | T[]): this;
+    notIncludesDeepLooseAll<T>(array: T[], keys: T | T[]): this;
+    includesDeepLooseAny<T>(array: T[], keys: T | T[]): this;
+    notIncludesDeepLoose<T>(array: T[], keys: T | T[]): this;
 
     // structural deep equal
     includesMatch<T>(array: T[], keys: T | T[]): this;
@@ -151,17 +167,24 @@ export interface Assertions {
     includesMatchAny<T>(array: T[], keys: T | T[]): this;
     notIncludesMatch<T>(array: T[], keys: T | T[]): this;
 
-    // Alias for includesLooseDeep/etc.
+    // Alias for includesDeepLoose/etc.
     includesMatchLoose<T>(array: T[], keys: T | T[]): this;
     notIncludesMatchLooseAll<T>(array: T[], keys: T | T[]): this;
     includesMatchLooseAny<T>(array: T[], keys: T | T[]): this;
     notIncludesMatchLoose<T>(array: T[], keys: T | T[]): this;
 
     // match Object.keys(object) with list of keys
-    hasKeys(object: Object, keys: Array<Key>): this;
-    notHasAllKeys(object: Object, keys: Array<Key>): this;
-    hasAnyKeys(object: Object, keys: Array<Key>): this;
-    notHasKeys(object: Object, keys: Array<Key>): this;
+    // strict equal
+    hasKeys(object: Object, keys: Key[]): this;
+    notHasAllKeys(object: Object, keys: Key[]): this;
+    hasAnyKeys(object: Object, keys: Key[]): this;
+    notHasKeys(object: Object, keys: Key[]): this;
+
+    // loose equal
+    hasLooseKeys(object: Object, keys: Key[]): this;
+    notHasLooseAllKeys(object: Object, keys: Key[]): this;
+    hasLooseAnyKeys(object: Object, keys: Key[]): this;
+    notHasLooseKeys(object: Object, keys: Key[]): this;
 
     // match Object.keys(object) with keys
     // strict equal
@@ -183,10 +206,10 @@ export interface Assertions {
     notHasDeepKeys(object: Object, keys: Object): this;
 
     // loose deep equal
-    hasLooseDeepKeys(object: Object, keys: Object): this;
-    notHasLooseDeepAllKeys(object: Object, keys: Object): this;
-    hasLooseDeepAnyKeys(object: Object, keys: Object): this;
-    notHasLooseDeepKeys(object: Object, keys: Object): this;
+    hasDeepLooseKeys(object: Object, keys: Object): this;
+    notHasDeepLooseAllKeys(object: Object, keys: Object): this;
+    hasDeepLooseAnyKeys(object: Object, keys: Object): this;
+    notHasDeepLooseKeys(object: Object, keys: Object): this;
 
     // structural deep equal
     hasMatchKeys(object: Object, keys: Object): this;
@@ -194,7 +217,7 @@ export interface Assertions {
     hasMatchAnyKeys(object: Object, keys: Object): this;
     notHasMatchKeys(object: Object, keys: Object): this;
 
-    // Aliases for hasLooseDeepKeys/etc.
+    // Aliases for hasDeepLooseKeys/etc.
     hasMatchLooseKeys(object: Object, keys: Object): this;
     notHasMatchLooseAllKeys(object: Object, keys: Object): this;
     hasMatchLooseAnyKeys(object: Object, keys: Object): this;
