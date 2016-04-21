@@ -1,5 +1,7 @@
 "use strict"
 
+/* eslint-disable no-unused-vars */
+
 const path = require("path")
 const t = require("../../index.js")
 const cp = require("child_process")

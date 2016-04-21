@@ -10,7 +10,7 @@
 # nodist/nvm-windows/nvmw/etc., or if you want to add support for FreeBSD, which
 # won't likely gain support anytime soon.
 
-# eslint $(dirname $0) || exit $?
+eslint $(dirname $0) --cache || exit $?
 
 for i in 4 5; do
     nvm which $i > /dev/null 2>&1 || nvm install $i || exit $?
