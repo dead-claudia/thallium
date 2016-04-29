@@ -5,9 +5,13 @@ if (require.main !== module) {
 }
 
 // One of the few legitimate use cases for Bluebird's Promise#done().
-require("../lib/cli/cli.js").run({
+require("../lib/cli/run.js").run({
     cwd: process.cwd(),
     argv: process.argv.slice(2),
     util: require("../lib/cli/util.js"), // eslint-disable-line global-require
 })
-.done(process.exit)
+.then(process.exit)
+.catch(e => {
+    console.error(e.stack)
+    process.exit(1)
+})

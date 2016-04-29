@@ -3,6 +3,7 @@
 const path = require("path")
 const t = require("../../index.js")
 const Util = require("../../lib/cli/util.js")
+const fixture = require("../../test-util/cli.js").fixture
 
 // Mostly sanity tests.
 describe("cli fs utils", () => {
@@ -21,33 +22,33 @@ describe("cli fs utils", () => {
     describe("load()", () => {
         it("works", () => {
             process.chdir(__dirname)
-            t.equal(Util.load("../../test-fixtures/util/test-module.js"), "hi!")
+            t.equal(Util.load(fixture("util/test-module.js")), "hi!")
         })
     })
 
     describe("exists()", () => {
         it("checks files", () => {
             process.chdir(__dirname)
-            t.true(Util.exists("../../test-fixtures/util/test-module.js"))
+            t.true(Util.exists(fixture("util/test-module.js")))
         })
 
         it("checks directories", () => {
             process.chdir(__dirname)
-            t.false(Util.exists("../../test-fixtures/util"))
+            t.false(Util.exists(fixture("util")))
         })
 
         it("checks things that don't exist", () => {
             process.chdir(__dirname)
-            t.false(Util.exists("../../test-fixtures/util/nope.js"))
+            t.false(Util.exists(fixture("util/nope.js")))
         })
     })
 
     describe("readGlobs()", () => {
         it("works", () => {
             process.chdir(__dirname)
-            return Util.readGlobs("../../test-fixtures/util/test-glob/*.js")
+            return Util.readGlobs(fixture("util/test-glob/*.js"))
             .then(() => {
-                process.chdir("../../test-fixtures/util/test-glob")
+                process.chdir(fixture("util/test-glob"))
                 t.equal(require.cache[path.resolve("foo.js")].exports, "foo")
                 t.equal(require.cache[path.resolve("bar.js")].exports, "bar")
                 t.equal(require.cache[path.resolve("baz.js")].exports, "baz")

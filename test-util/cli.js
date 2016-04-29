@@ -7,6 +7,8 @@ const t = require("../index.js")
 const State = require("../lib/cli/run.js").State
 const LoaderData = require("../lib/cli/loader-data.js")
 
+exports.fixture = dir => path.resolve(__dirname, "../test-fixtures", dir)
+
 function notFound(file) {
     const e = new Error(`Cannot find module '${file}'`)
 

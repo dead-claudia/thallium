@@ -52,15 +52,7 @@ for (i = 2; i < process.argv.length; i++) {
 // Append the rest.
 while (i < process.argv.length) rest.push(process.argv[i++])
 
-let count = 2
-let code = 0
-
-function exit(status) {
-    code = status != null ? status : code
-    if (--count) process.exit(code)
-}
-
-cp.spawn("node", [].concat.apply([
+process.exit(cp.spawnSync(process.argv[0], [].concat(...[
     node,
     [path.resolve(__dirname, "_techtonic.js")],
     args.config == null ? [] : ["--config", args.config],
@@ -72,6 +64,4 @@ cp.spawn("node", [].concat.apply([
 ]), {
     cwd: process.cwd(),
     stdio: "inherit",
-})
-.on("exit", exit)
-.on("close", exit)
+}).code)

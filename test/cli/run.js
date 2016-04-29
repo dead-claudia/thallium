@@ -5,6 +5,9 @@ const assertions = require("../../assertions.js")
 const run1 = require("../../lib/cli/run.js").run
 const Cli = require("../../test-util/cli.js")
 const Base = require("../../test-util/base.js")
+const n = Base.n
+const p = Base.p
+const push = Base.push
 
 describe("cli config runner", function () {
     this.slow(150) // eslint-disable-line no-invalid-this
@@ -12,10 +15,6 @@ describe("cli config runner", function () {
     /**
      * Most of these are integration tests.
      */
-
-    const n = Base.n
-    const p = Base.p
-    const push = Base.push
 
     function run(opts) {
         const tt = t.base().use(assertions)
