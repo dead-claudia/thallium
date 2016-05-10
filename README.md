@@ -14,9 +14,7 @@ npm install --save-dev techtonic
 
 ## Usage
 
-This is waiting on the completion of the CLI, but for now, you can look at the
-[documentation](./docs/README.md) and [tests](./test/), which use Techtonic's
-assertions themselves.
+This is waiting on the completion of the CLI, but for now, you can look at the [documentation](./docs/README.md) and [tests](./test/), which use Techtonic's assertions themselves.
 
 Couple specific notes:
 
