@@ -5,6 +5,7 @@ lot left to do in this framework.
 
 - [API](./api.md)
 - [Core assertions](./assertions.md)
+- [CLI](./cli.md)
 - [Plugins](./plugins.md)
 - [Extra safety](./safety.md)
 - [Examples](./examples/README.md)
