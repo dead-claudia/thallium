@@ -1,0 +1,8 @@
+{
+    "indentation": {
+        "value": 4
+    },
+    "no_unnecessary_double_quotes": {
+        "level": "warn"
+    }
+}

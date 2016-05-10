@@ -101,7 +101,7 @@ describe("core (safety)", () => {
         })
 
         return tt.run().then(() => {
-            t.deepEqual(ret, [
+            t.match(ret, [
                 n("start", []),
                 n("start", [p("one", 0)]),
                 n("end", [p("one", 0)]),

@@ -1,5 +1,23 @@
 "use strict"
 
+// Much easier to use a concise DSL than for serialization to compare in
+// assertions. Short description:
+//
+// Global scope:
+//
+//  Type     Value
+//   |         |
+//  \|/       \|/
+// start = undefined
+//
+// Inside a test:
+//
+//    Test index     Subtest index             Value
+//  Type  |  Test name     |   Subtest name      |
+//   |    |      |         |        |            |
+//  \|/  \|/    \|/       \|/      \|/          \|/
+// start [0: test name] > [1: subtest name] = "value"
+
 function fix(value) {
     if (typeof value === "string") return JSON.stringify(value)
     if (typeof value === "number") return value

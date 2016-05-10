@@ -16,9 +16,9 @@ describe("cli config finder", () => {
         it(name, () => {
             const mock = Util.mock(opts.tree)
             const loader = new Util.Loader(opts.args, mock)
+            const found = opts.found != null ? mock.resolve(opts.found) : null
             const map = LoaderData.extractIntoMap(loader.state)
             const file = findConfig(loader.state, map)
-            const found = opts.found != null ? mock.resolve(opts.found) : null
 
             t.equal(file, found)
 

@@ -65,10 +65,14 @@ describe("cli config merging", () => {
             }
         }
 
+        function merge(files, config, load) {
+            return m.merge(files, config, load, ".")
+        }
+
         it("merges an empty object", () => {
             const techtonic = {techtonic: true}
             const files = ["test/**"]
-            const config = m.merge(files, {}, load({techtonic}))
+            const config = merge(files, {}, load({techtonic}))
 
             t.match(config, {techtonic, files})
             t.equal(config.techtonic, techtonic)
@@ -78,7 +82,7 @@ describe("cli config merging", () => {
             const techtonic = {techtonic: true}
             const module = "./some-techtonic-wrapper"
             const files = ["test/**"]
-            const config = m.merge(files, {module}, load({module, techtonic}))
+            const config = merge(files, {module}, load({module, techtonic}))
 
             t.match(config, {techtonic, files})
             t.equal(config.techtonic, techtonic)
@@ -87,7 +91,7 @@ describe("cli config merging", () => {
         it("merges `techtonic`", () => {
             const techtonic = {techtonic: true}
             const files = ["test/**"]
-            const config = m.merge(files, {techtonic}, load({}))
+            const config = merge(files, {techtonic}, load({}))
 
             t.match(config, {techtonic, files})
             t.equal(config.techtonic, techtonic)
@@ -97,7 +101,7 @@ describe("cli config merging", () => {
             const techtonic = {techtonic: true}
             const files = ["test/**"]
             const extra = ["other/**"]
-            const config = m.merge(files, {files: extra}, load({techtonic}))
+            const config = merge(files, {files: extra}, load({techtonic}))
 
             t.match(config, {techtonic, files: files.concat(extra)})
             t.equal(config.techtonic, techtonic)
@@ -108,7 +112,7 @@ describe("cli config merging", () => {
             const module = "./some-techtonic-wrapper"
             const files = ["test/**"]
             const extra = ["other/**"]
-            const config = m.merge(files, {module, techtonic, files: extra},
+            const config = merge(files, {module, techtonic, files: extra},
                 load({module}))
 
             t.match(config, {techtonic, files: files.concat(extra)})

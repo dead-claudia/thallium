@@ -30,7 +30,7 @@ describe("do()", () => {
         return tt.run().then(() => {
             t.undefined(self)
             t.equal(len, 0)
-            t.deepEqual(ret, [
+            t.match(ret, [
                 n("start", []),
                 n("start", [p("test", 0)]),
                 n("end", [p("test", 0)]),
@@ -55,7 +55,7 @@ describe("do()", () => {
         })
 
         return tt.run().then(() => {
-            t.deepEqual(ret, [
+            t.match(ret, [
                 n("start", []),
                 n("start", [p("test", 0)]),
                 n("end", [p("test", 0)]),
@@ -85,7 +85,7 @@ describe("do()", () => {
         return tt.run().then(() => {
             t.undefined(self)
             t.equal(len, 0)
-            t.deepEqual(ret, [
+            t.match(ret, [
                 n("start", []),
                 n("start", [p("test", 0)]),
                 n("end", [p("test", 0)]),
@@ -111,7 +111,7 @@ describe("do()", () => {
         })
 
         return tt.run().then(() => {
-            t.deepEqual(ret, [
+            t.match(ret, [
                 n("start", []),
                 n("start", [p("test", 0)]),
                 n("end", [p("test", 0)]),
@@ -137,7 +137,7 @@ describe("do()", () => {
         return tt.run().then(() => {
             t.undefined(self)
             t.equal(len, 0)
-            t.deepEqual(ret, [
+            t.match(ret, [
                 n("start", []),
                 n("start", [p("test", 0)]),
                 n("end", [p("test", 0)]),
@@ -160,7 +160,7 @@ describe("do()", () => {
         tt.test("test").do(() => { throw sentinel })
 
         return tt.run().then(() => {
-            t.deepEqual(ret, [
+            t.match(ret, [
                 n("start", []),
                 n("start", [p("test", 0)]),
                 n("end", [p("test", 0)]),

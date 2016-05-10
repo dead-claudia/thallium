@@ -74,8 +74,6 @@ describe("cli arguments", () => {
         throws("-c")
         throws("--config")
         throws("--cwd")
-        throws("-r")
-        throws("--register")
 
         throws("-c --")
         throws("--config --")

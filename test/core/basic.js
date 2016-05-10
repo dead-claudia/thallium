@@ -1,5 +1,9 @@
 "use strict"
 
+// Note: updates to this should also be reflected in
+// test-fixtures/acceptance/large-coffee/basic.coffee, as it's trying to
+// represent more real-world usage.
+
 const Promise = require("bluebird")
 const t = require("../../index.js")
 

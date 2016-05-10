@@ -47,10 +47,10 @@ See the [documentation](./docs/README.md).
 
 ## Roadmap
 
-1. Finish writing the CLI tests. All that's left are acceptance tests.
+1. Set up [AppVeyor](https://www.appveyor.com/) to run tests on Windows. Currently, it's only actively tested on Linux.
 2. Create basic reporters for TAP, spec, dot, etc.
 3. Finish documenting this project. This mainly includes the core assertions and CLI.
-4. Bring this back to pure ES5 to test in older versions of Node. It's easier to prototype in ES6, but it's easier to maintain compatibility in ES5.
+4. Bring this back to pure ES5 to test in older versions of Node. It's easier to prototype in ES6, but many browsers and runtimes don't support that.
 5. Port this to the browser via Browserify/Webpack.
     - I'll also rewrite [`util-inspect`](https://www.npmjs.com/package/util-inspect) based on Node's [`util.inspect`](https://nodejs.org/api/util.html#util_util_inspect_object_options) after finishing the port, since that module is completely untested, and has no understanding of ES6. :worried:
 6. Write a few plugins for `describe`/`it`, `before{,Each}`/`after{,Each}` hooks, REPL friendliness\*, etc.
@@ -75,13 +75,17 @@ General information:
     - The assertions are fully self-hosted. Using Techtonic to test Techtonic is awesome!
     - Fixtures for those tests are in `test-fixtures/**`.
     - Utilities are in `test-util/**`.
+    - Some of the test files are mirrored in [CoffeeScript](http://coffeescript.org/) and JavaScript for the acceptance tests. These are very explicitly labeled, so it should be fairly obvious.
 - This uses [eslint-config-isiahmeadows](https://npmjs.com/package/eslint-config-isiahmeadows) for its presets (specifically `isiahmeadows/node-4`). In case you're curious what those settings are, you can start with [the index file](https://github.com/isiahmeadows/eslint-config-isiahmeadows/blob/master/index.js), which the rest are only minor variations of.
+- For the few CoffeeScript files littered around, this uses [CoffeeLint](http://www.coffeelint.org/) to lint them. They exist for testing and examples.
 
 Tips and idioms:
 
-- Classes are used, but inheritance is avoided. I also prefer functions over instance methods unless they're something that should be overridable, are more like properties, or are exposed in the API.
+- If you're on Linux, and have [`nvm`](https://github.com/creationix/nvm) installed, there's a little `test.sh` script you can run, which will test everything Travis sees on your local machine, installing them if necessary. Note that it doesn't actually update them for your, though. It's not quite *that* magical.
 
-    As an exception, classes are usually preferred over closures.
+- Classes are used, but inheritance is limited. I also prefer functions over instance methods unless they're something that should be overridable, are more like properties, or are exposed in the API.
+
+    As an exception, classes are usually preferred over closures, to limit nesting.
 
 - There are a few useful helpers in `test-util/base.js`, that you may appreciate when you write your tests:
 

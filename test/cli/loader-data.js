@@ -1,7 +1,5 @@
 "use strict"
 
-// const path = require("path")
-
 const interpret = require("interpret")
 const t = require("../../index.js")
 const LoaderData = require("../../lib/cli/loader-data.js")
@@ -99,7 +97,9 @@ describe("cli config loader data", () => {
 
                 t.match(loader.clean(map), new Map(list.map(l => {
                     if (Array.isArray(l)) return l
-                    if (typeof l === "string") return [l, loader.register(l)]
+                    if (typeof l === "string") {
+                        return [l, loader.register(l)]
+                    }
                     return [l.ext, loader.require(l.ext, l.mod, true)]
                 })))
             })

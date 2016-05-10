@@ -13,7 +13,7 @@ t.test("mod-one", t => {
         setTimeout(() => done(new Error("fail")), 0)
     })
 
-    t.async("baz()", () => Promise.reject(new Error("foo")))
+    t.async("baz()", () => Promise.reject(new Error("sentinel")))
 
     t.test("nested", t => {
         t.test("nested 2", tt => tt.true(true))

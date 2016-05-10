@@ -1,5 +1,9 @@
 "use strict"
 
+// Note: updates to this should also be reflected in
+// test-fixtures/acceptance/large-coffee/timeouts.coffee, as it's trying to
+// represent more real-world usage.
+
 const t = require("../../index.js")
 const Util = require("../../test-util/base.js")
 const n = Util.n
@@ -22,7 +26,7 @@ describe("core (timeouts)", () => {
         })
 
         return tt.run().then(() => {
-            t.deepEqual(ret, [
+            t.match(ret, [
                 n("start", []),
                 n("start", [p("test", 0)]),
                 n("end", [p("test", 0)]),
@@ -46,7 +50,7 @@ describe("core (timeouts)", () => {
         })
 
         return tt.run().then(() => {
-            t.deepEqual(ret, [
+            t.match(ret, [
                 n("start", []),
                 n("start", [p("test", 0)]),
                 n("end", [p("test", 0)]),
@@ -68,7 +72,7 @@ describe("core (timeouts)", () => {
         .async("inner", (tt, done) => { done() })
 
         return tt.run().then(() => {
-            t.deepEqual(ret, [
+            t.match(ret, [
                 n("start", []),
                 n("start", [p("test", 0)]),
                 n("start", [p("test", 0), p("inner", 0)]),
@@ -96,7 +100,7 @@ describe("core (timeouts)", () => {
         })
 
         return tt.run().then(() => {
-            t.deepEqual(ret, [
+            t.match(ret, [
                 n("start", []),
                 n("start", [p("test", 0)]),
                 n("start", [p("test", 0), p("inner", 0)]),

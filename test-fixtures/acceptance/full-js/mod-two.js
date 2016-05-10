@@ -9,5 +9,11 @@ t.test("mod-two", t => {
         t.notHasKey(t, "foo")
     })
 
+    t.define("isNope", str => ({
+        test: str === "nope",
+        actual: str,
+        message: "Expected {actual} to be a nope",
+    }))
+
     t.test("what a fail...").isNope("yep")
 })

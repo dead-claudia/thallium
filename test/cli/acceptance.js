@@ -1,16 +1,26 @@
 "use strict"
 
+// Note: these tests can be a bit flaky in the time it takes, thus the timeout
+// is higher for some.
+
 const Promise = require("bluebird")
 const path = require("path")
 const t = require("../../index.js")
 const cp = require("child_process")
 const fixture = require("../../test-util/cli.js").fixture
 
-describe.skip("cli acceptance", () => {
+function formatList(msgs) {
+    return msgs.replace(/[^\r\n\S]*(\r\n?|\n)[^\r\n\S]*/g, "\n").trim()
+}
+
+describe("cli acceptance", () => {
     const binary = path.resolve(__dirname, "../../bin/_techtonic.js")
 
     function test(name, opts) {
-        (opts.skip ? it.skip : it)(name, () => {
+        (opts.skip ? it.skip : it)(name, /** @this */ function () {
+            this.slow(1500)
+            if (opts.timeout != null) this.timeout(opts.timeout)
+
             let args = opts.args
 
             if (typeof args === "string") {
@@ -19,14 +29,6 @@ describe.skip("cli acceptance", () => {
             }
 
             args.unshift(binary)
-
-            const expected = opts.messages.trim()
-                .split(/\r\n?|\n/g)
-                .map(x => x.trim())
-                .join("\n")
-
-            console.log(process.argv[0])
-            console.log(args)
 
             const child = cp.spawn(process.argv[0], args, {
                 stdio: ["inherit", "pipe", "inherit"],
@@ -62,13 +64,12 @@ describe.skip("cli acceptance", () => {
                 const code = list[1] != null ? list[1] : list[2]
 
                 t.equal(code, opts.code)
-                t.equal(output, expected)
+                t.equal(formatList(output), formatList(opts.messages))
             })
         })
     }
 
     test("runs simple valid tests", {
-        // skip: true,
         args: `--cwd ${fixture("acceptance/simple")}`,
         code: 0,
         messages: `
@@ -85,9 +86,11 @@ describe.skip("cli acceptance", () => {
     })
 
     test("runs moderately sized test suites", {
-        skip: true,
         args: `--cwd ${fixture("acceptance")} full-js/**`,
         code: 1,
+        timeout: 2500,
+
+        /* eslint-disable max-len */
         messages: `
 start = undefined
 start [0: mod-one] = undefined
@@ -120,11 +123,181 @@ end [1: mod-two] > [1: expandos don't transfer] = undefined
 pass [1: mod-two] > [1: expandos don't transfer] = undefined
 start [1: mod-two] > [2: what a fail...] = undefined
 end [1: mod-two] > [2: what a fail...] = undefined
-fail [1: mod-two] > [2: what a fail...] = "Expected 'yep' to be a nope"
+fail [1: mod-two] > [2: what a fail...] = "AssertionError: Expected 'yep' to be a nope"
 end [1: mod-two] = undefined
 pass [1: mod-two] = undefined
 end = undefined
 exit = undefined
         `,
+        /* eslint-enable max-len */
+    })
+
+    /* eslint-disable max-len */
+
+    const largeCoffeeMessages = `
+start = undefined
+start [0: core (basic)] = undefined
+start [0: core (basic)] > [0: has \`base()\`] = undefined
+end [0: core (basic)] > [0: has \`base()\`] = undefined
+pass [0: core (basic)] > [0: has \`base()\`] = undefined
+start [0: core (basic)] > [1: has \`test()\`] = undefined
+end [0: core (basic)] > [1: has \`test()\`] = undefined
+pass [0: core (basic)] > [1: has \`test()\`] = undefined
+start [0: core (basic)] > [2: has \`parent()\`] = undefined
+end [0: core (basic)] > [2: has \`parent()\`] = undefined
+pass [0: core (basic)] > [2: has \`parent()\`] = undefined
+start [0: core (basic)] > [3: can accept a string + function] = undefined
+end [0: core (basic)] > [3: can accept a string + function] = undefined
+pass [0: core (basic)] > [3: can accept a string + function] = undefined
+start [0: core (basic)] > [4: can accept a string] = undefined
+end [0: core (basic)] > [4: can accept a string] = undefined
+pass [0: core (basic)] > [4: can accept a string] = undefined
+start [0: core (basic)] > [5: returns the current instance when given a callback] = undefined
+end [0: core (basic)] > [5: returns the current instance when given a callback] = undefined
+pass [0: core (basic)] > [5: returns the current instance when given a callback] = undefined
+start [0: core (basic)] > [6: returns a prototypal clone when not given a callback] = undefined
+end [0: core (basic)] > [6: returns a prototypal clone when not given a callback] = undefined
+pass [0: core (basic)] > [6: returns a prototypal clone when not given a callback] = undefined
+start [0: core (basic)] > [7: runs block tests within tests] = undefined
+end [0: core (basic)] > [7: runs block tests within tests] = undefined
+pass [0: core (basic)] > [7: runs block tests within tests] = undefined
+start [0: core (basic)] > [8: runs successful inline tests within tests] = undefined
+end [0: core (basic)] > [8: runs successful inline tests within tests] = undefined
+pass [0: core (basic)] > [8: runs successful inline tests within tests] = undefined
+start [0: core (basic)] > [9: accepts a callback with \`t.run()\`] = undefined
+end [0: core (basic)] > [9: accepts a callback with \`t.run()\`] = undefined
+pass [0: core (basic)] > [9: accepts a callback with \`t.run()\`] = undefined
+end [0: core (basic)] = undefined
+pass [0: core (basic)] = undefined
+start [1: cli normalize glob] = undefined
+start [1: cli normalize glob] > [0: current directory] = undefined
+start [1: cli normalize glob] > [0: current directory] > [0: normalizes a file] = undefined
+end [1: cli normalize glob] > [0: current directory] > [0: normalizes a file] = undefined
+pass [1: cli normalize glob] > [0: current directory] > [0: normalizes a file] = undefined
+start [1: cli normalize glob] > [0: current directory] > [1: normalizes a glob] = undefined
+end [1: cli normalize glob] > [0: current directory] > [1: normalizes a glob] = undefined
+pass [1: cli normalize glob] > [0: current directory] > [1: normalizes a glob] = undefined
+start [1: cli normalize glob] > [0: current directory] > [2: retains trailing slashes] = undefined
+end [1: cli normalize glob] > [0: current directory] > [2: retains trailing slashes] = undefined
+pass [1: cli normalize glob] > [0: current directory] > [2: retains trailing slashes] = undefined
+start [1: cli normalize glob] > [0: current directory] > [3: retains negative] = undefined
+end [1: cli normalize glob] > [0: current directory] > [3: retains negative] = undefined
+pass [1: cli normalize glob] > [0: current directory] > [3: retains negative] = undefined
+start [1: cli normalize glob] > [0: current directory] > [4: retains negative + trailing slashes] = undefined
+end [1: cli normalize glob] > [0: current directory] > [4: retains negative + trailing slashes] = undefined
+pass [1: cli normalize glob] > [0: current directory] > [4: retains negative + trailing slashes] = undefined
+end [1: cli normalize glob] > [0: current directory] = undefined
+pass [1: cli normalize glob] > [0: current directory] = undefined
+start [1: cli normalize glob] > [1: absolute directory] = undefined
+start [1: cli normalize glob] > [1: absolute directory] > [0: normalizes a file] = undefined
+end [1: cli normalize glob] > [1: absolute directory] > [0: normalizes a file] = undefined
+pass [1: cli normalize glob] > [1: absolute directory] > [0: normalizes a file] = undefined
+start [1: cli normalize glob] > [1: absolute directory] > [1: normalizes a glob] = undefined
+end [1: cli normalize glob] > [1: absolute directory] > [1: normalizes a glob] = undefined
+pass [1: cli normalize glob] > [1: absolute directory] > [1: normalizes a glob] = undefined
+start [1: cli normalize glob] > [1: absolute directory] > [2: retains trailing slashes] = undefined
+end [1: cli normalize glob] > [1: absolute directory] > [2: retains trailing slashes] = undefined
+pass [1: cli normalize glob] > [1: absolute directory] > [2: retains trailing slashes] = undefined
+start [1: cli normalize glob] > [1: absolute directory] > [3: retains negative] = undefined
+end [1: cli normalize glob] > [1: absolute directory] > [3: retains negative] = undefined
+pass [1: cli normalize glob] > [1: absolute directory] > [3: retains negative] = undefined
+start [1: cli normalize glob] > [1: absolute directory] > [4: retains negative + trailing slashes] = undefined
+end [1: cli normalize glob] > [1: absolute directory] > [4: retains negative + trailing slashes] = undefined
+pass [1: cli normalize glob] > [1: absolute directory] > [4: retains negative + trailing slashes] = undefined
+end [1: cli normalize glob] > [1: absolute directory] = undefined
+pass [1: cli normalize glob] > [1: absolute directory] = undefined
+start [1: cli normalize glob] > [2: relative directory] = undefined
+start [1: cli normalize glob] > [2: relative directory] > [0: normalizes a file] = undefined
+end [1: cli normalize glob] > [2: relative directory] > [0: normalizes a file] = undefined
+pass [1: cli normalize glob] > [2: relative directory] > [0: normalizes a file] = undefined
+start [1: cli normalize glob] > [2: relative directory] > [1: normalizes a glob] = undefined
+end [1: cli normalize glob] > [2: relative directory] > [1: normalizes a glob] = undefined
+pass [1: cli normalize glob] > [2: relative directory] > [1: normalizes a glob] = undefined
+start [1: cli normalize glob] > [2: relative directory] > [2: retains trailing slashes] = undefined
+end [1: cli normalize glob] > [2: relative directory] > [2: retains trailing slashes] = undefined
+pass [1: cli normalize glob] > [2: relative directory] > [2: retains trailing slashes] = undefined
+start [1: cli normalize glob] > [2: relative directory] > [3: retains negative] = undefined
+end [1: cli normalize glob] > [2: relative directory] > [3: retains negative] = undefined
+pass [1: cli normalize glob] > [2: relative directory] > [3: retains negative] = undefined
+start [1: cli normalize glob] > [2: relative directory] > [4: retains negative + trailing slashes] = undefined
+end [1: cli normalize glob] > [2: relative directory] > [4: retains negative + trailing slashes] = undefined
+pass [1: cli normalize glob] > [2: relative directory] > [4: retains negative + trailing slashes] = undefined
+end [1: cli normalize glob] > [2: relative directory] = undefined
+pass [1: cli normalize glob] > [2: relative directory] = undefined
+start [1: cli normalize glob] > [3: edge cases] = undefined
+start [1: cli normalize glob] > [3: edge cases] > [0: normalizes \`.\` with a cwd of \`.\`] = undefined
+end [1: cli normalize glob] > [3: edge cases] > [0: normalizes \`.\` with a cwd of \`.\`] = undefined
+pass [1: cli normalize glob] > [3: edge cases] > [0: normalizes \`.\` with a cwd of \`.\`] = undefined
+start [1: cli normalize glob] > [3: edge cases] > [1: normalizes \`..\` with a cwd of \`.\`] = undefined
+end [1: cli normalize glob] > [3: edge cases] > [1: normalizes \`..\` with a cwd of \`.\`] = undefined
+pass [1: cli normalize glob] > [3: edge cases] > [1: normalizes \`..\` with a cwd of \`.\`] = undefined
+start [1: cli normalize glob] > [3: edge cases] > [2: normalizes \`.\` with a cwd of \`..\`] = undefined
+end [1: cli normalize glob] > [3: edge cases] > [2: normalizes \`.\` with a cwd of \`..\`] = undefined
+pass [1: cli normalize glob] > [3: edge cases] > [2: normalizes \`.\` with a cwd of \`..\`] = undefined
+start [1: cli normalize glob] > [3: edge cases] > [3: normalizes directories with a cwd of \`..\`] = undefined
+end [1: cli normalize glob] > [3: edge cases] > [3: normalizes directories with a cwd of \`..\`] = undefined
+pass [1: cli normalize glob] > [3: edge cases] > [3: normalizes directories with a cwd of \`..\`] = undefined
+start [1: cli normalize glob] > [3: edge cases] > [4: removes excess \`.\`] = undefined
+end [1: cli normalize glob] > [3: edge cases] > [4: removes excess \`.\`] = undefined
+pass [1: cli normalize glob] > [3: edge cases] > [4: removes excess \`.\`] = undefined
+start [1: cli normalize glob] > [3: edge cases] > [5: removes excess \`..\`] = undefined
+end [1: cli normalize glob] > [3: edge cases] > [5: removes excess \`..\`] = undefined
+pass [1: cli normalize glob] > [3: edge cases] > [5: removes excess \`..\`] = undefined
+start [1: cli normalize glob] > [3: edge cases] > [6: removes excess combined junk] = undefined
+end [1: cli normalize glob] > [3: edge cases] > [6: removes excess combined junk] = undefined
+pass [1: cli normalize glob] > [3: edge cases] > [6: removes excess combined junk] = undefined
+end [1: cli normalize glob] > [3: edge cases] = undefined
+pass [1: cli normalize glob] > [3: edge cases] = undefined
+end [1: cli normalize glob] = undefined
+pass [1: cli normalize glob] = undefined
+start [2: core (timeouts)] = undefined
+start [2: core (timeouts)] > [0: succeeds with own] = undefined
+end [2: core (timeouts)] > [0: succeeds with own] = undefined
+pass [2: core (timeouts)] > [0: succeeds with own] = undefined
+start [2: core (timeouts)] > [1: fails with own] = undefined
+end [2: core (timeouts)] > [1: fails with own] = undefined
+pass [2: core (timeouts)] > [1: fails with own] = undefined
+start [2: core (timeouts)] > [2: succeeds with inherited] = undefined
+end [2: core (timeouts)] > [2: succeeds with inherited] = undefined
+pass [2: core (timeouts)] > [2: succeeds with inherited] = undefined
+start [2: core (timeouts)] > [3: fails with inherited] = undefined
+end [2: core (timeouts)] > [3: fails with inherited] = undefined
+pass [2: core (timeouts)] > [3: fails with inherited] = undefined
+start [2: core (timeouts)] > [4: gets own set timeout] = undefined
+end [2: core (timeouts)] > [4: gets own set timeout] = undefined
+pass [2: core (timeouts)] > [4: gets own set timeout] = undefined
+start [2: core (timeouts)] > [5: gets own inline set timeout] = undefined
+end [2: core (timeouts)] > [5: gets own inline set timeout] = undefined
+pass [2: core (timeouts)] > [5: gets own inline set timeout] = undefined
+start [2: core (timeouts)] > [6: gets own sync inner timeout] = undefined
+end [2: core (timeouts)] > [6: gets own sync inner timeout] = undefined
+pass [2: core (timeouts)] > [6: gets own sync inner timeout] = undefined
+start [2: core (timeouts)] > [7: gets default timeout] = undefined
+end [2: core (timeouts)] > [7: gets default timeout] = undefined
+pass [2: core (timeouts)] > [7: gets default timeout] = undefined
+end [2: core (timeouts)] = undefined
+pass [2: core (timeouts)] = undefined
+end = undefined
+exit = undefined
+    `
+
+    /* eslint-enable max-len */
+
+    test("runs larger test suite with registered extension", {
+        args: `
+            --cwd ${fixture("acceptance")}
+            --require coffee:coffee-script/register
+            large-coffee/**/*.coffee
+        `,
+        code: 0,
+        timeout: 3000,
+        messages: largeCoffeeMessages,
+    })
+
+    test("runs larger test suites with an inferred non-JS config", {
+        args: `--cwd ${fixture("acceptance")} large-coffee/**`,
+        code: 0,
+        timeout: 3000,
+        messages: largeCoffeeMessages,
     })
 })

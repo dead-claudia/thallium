@@ -10,3 +10,7 @@ each of them.
 - Convert `t.reporter()` to
     [return an Observable when called without arguments](./observable-reporter.js) +
     [CoffeeScript version](./observable-reporter.coffee)
+
+Also, the acceptance tests in [this directory](../../test-fixtures/acceptance/large-coffee)
+provide a good example of how you could write some of your tests. They mirror
+some of the existing tests to demonstrate a real-world scenario.

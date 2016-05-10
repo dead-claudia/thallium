@@ -43,10 +43,10 @@ describe("cli fs utils", () => {
         })
     })
 
-    describe("readGlobs()", () => {
+    describe("readGlob()", () => {
         it("works", () => {
             process.chdir(__dirname)
-            return Util.readGlobs(fixture("util/test-glob/*.js"))
+            return Util.readGlob(fixture("util/test-glob/*.js"))
             .then(() => {
                 process.chdir(fixture("util/test-glob"))
                 t.equal(require.cache[path.resolve("foo.js")].exports, "foo")
