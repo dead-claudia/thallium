@@ -2,7 +2,7 @@
 
 [![Build Status](https://travis-ci.org/isiahmeadows/techtonic.svg?branch=master)](https://travis-ci.org/isiahmeadows/techtonic) [![Join the chat at https://gitter.im/isiahmeadows/techtonic](https://badges.gitter.im/isiahmeadows/techtonic.svg)](https://gitter.im/isiahmeadows/techtonic?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
-A simple, unopinionated, modular test framework meant to simplify your tests. It supports Node 0.10 and later, and browser support is also planned.
+A simple, unopinionated, modular test framework meant to simplify your tests. It supports Node 4 and later, and browser support + legacy Node is also planned.
 
 *Note that this is a huge work in progress.*
 
@@ -69,7 +69,7 @@ General information:
     - Destructuring and rest parameters don't.
 - [Bluebird](http://bluebirdjs.com) is used extensively as the Promise implementation.
 - The source code is in `lib/**`.
-- The executables are in `bin/**`, but they won't work. Most of the CLI code is in `lib/cli/**`.
+- The executables are in `bin/**`. Most of the CLI code is in `lib/cli/**`.
 - The documentation and examples are in `docs/**`.
 - The tests are in `test/**`.
     - Mocha is currently used as the runner.
