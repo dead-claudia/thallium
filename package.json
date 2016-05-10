@@ -1,6 +1,6 @@
 {
   "name": "techtonic",
-  "version": "0.0.12",
+  "version": "0.0.13",
   "description": "A simple, unopinionated, modular test framework",
   "main": "index.js",
   "scripts": {
