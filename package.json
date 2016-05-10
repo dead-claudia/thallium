@@ -15,8 +15,13 @@
     "index.d.ts",
     "index.js",
     "lib",
+    "bin",
     "docs"
   ],
+  "bin": {
+    "techtonic": "bin/techtonic.js",
+    "_techtonic": "bin/_techtonic.js"
+  },
   "keywords": [
     "test",
     "testing",
