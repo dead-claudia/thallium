@@ -103,7 +103,7 @@ describe("cli config merging", () => {
             const extra = ["other/**"]
             const config = merge(files, {files: extra}, load({techtonic}))
 
-            t.match(config, {techtonic, files: files.concat(extra)})
+            t.match(config, {techtonic, files})
             t.equal(config.techtonic, techtonic)
         })
 
@@ -115,7 +115,7 @@ describe("cli config merging", () => {
             const config = merge(files, {module, techtonic, files: extra},
                 load({module}))
 
-            t.match(config, {techtonic, files: files.concat(extra)})
+            t.match(config, {techtonic, files})
             t.equal(config.techtonic, techtonic)
         })
     })

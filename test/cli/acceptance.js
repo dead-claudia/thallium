@@ -72,6 +72,7 @@ describe("cli acceptance", () => {
     test("runs simple valid tests", {
         args: `--cwd ${fixture("acceptance/simple")}`,
         code: 0,
+        timeout: 5000,
         messages: `
             start = undefined
             start [0: test 1] = undefined
@@ -88,7 +89,7 @@ describe("cli acceptance", () => {
     test("runs moderately sized test suites", {
         args: `--cwd ${fixture("acceptance")} full-js/**`,
         code: 1,
-        timeout: 2500,
+        timeout: 5000,
 
         /* eslint-disable max-len */
         messages: `
@@ -290,14 +291,14 @@ exit = undefined
             large-coffee/**/*.coffee
         `,
         code: 0,
-        timeout: 3000,
+        timeout: 7500,
         messages: largeCoffeeMessages,
     })
 
     test("runs larger test suites with an inferred non-JS config", {
         args: `--cwd ${fixture("acceptance")} large-coffee/**`,
         code: 0,
-        timeout: 3000,
+        timeout: 7500,
         messages: largeCoffeeMessages,
     })
 })
