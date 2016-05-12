@@ -286,9 +286,9 @@ exit = undefined
 
     test("runs larger test suite with registered extension", {
         args: `
-            --cwd ${fixture("acceptance")}
+            --cwd ${fixture("acceptance/large-coffee")}
             --require coffee:coffee-script/register
-            large-coffee/**/*.coffee
+            test/**/*.coffee
         `,
         code: 0,
         timeout: 7500,
@@ -296,7 +296,7 @@ exit = undefined
     })
 
     test("runs larger test suites with an inferred non-JS config", {
-        args: `--cwd ${fixture("acceptance")} large-coffee/**`,
+        args: `--cwd ${fixture("acceptance/large-coffee")}`,
         code: 0,
         timeout: 7500,
         messages: largeCoffeeMessages,

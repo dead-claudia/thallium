@@ -6,7 +6,7 @@ is trying to represent more real-world usage.
 ###
 
 Promise = require 'bluebird'
-t = require '../../../index.js'
+t = require 'techtonic'
 
 t.test 'core (basic)', ->
     @test('has `base()`').equal @base().base, @base

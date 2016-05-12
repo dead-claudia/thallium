@@ -20,7 +20,6 @@ describe("cli config loader data", () => {
 
     context("isValid()", () => {
         it("exists", () => {
-            t.hasKey(LoaderData, "isValid")
             t.function(LoaderData.isValid)
         })
 
@@ -50,7 +49,6 @@ describe("cli config loader data", () => {
 
     context("getExt()", () => {
         it("exists", () => {
-            t.hasKey(LoaderData, "getExt")
             t.function(LoaderData.getExt)
         })
 
@@ -110,7 +108,6 @@ describe("cli config loader data", () => {
         }
 
         it("exists", () => {
-            t.hasKey(LoaderData, "extractIntoMap")
             t.function(LoaderData.extractIntoMap)
         })
 
@@ -243,12 +240,13 @@ describe("cli config loader data", () => {
         it("calls `load` when `register` is called", () => {
             let called = 0
 
-            const load = mod => {
+            const load = (mod, baseDir) => {
                 called++
                 t.equal(mod, "module")
+                t.equal(baseDir, ".")
             }
 
-            new LoaderData.Simple("module", load).register()
+            new LoaderData.Simple("module", load).register(".")
 
             t.equal(called, 1)
         })
@@ -256,16 +254,17 @@ describe("cli config loader data", () => {
         it("calls `load` only once", () => {
             let called = 0
 
-            const load = mod => {
+            const load = (mod, baseDir) => {
                 called++
                 t.equal(mod, "module")
+                t.equal(baseDir, ".")
             }
 
             const loader = new LoaderData.Simple("module", load)
 
-            loader.register()
-            loader.register()
-            loader.register()
+            loader.register(".")
+            loader.register(".")
+            loader.register(".")
 
             t.equal(called, 1)
         })
@@ -275,12 +274,13 @@ describe("cli config loader data", () => {
         it("calls `load` when `register` is called", () => {
             let called = 0
 
-            const load = mod => {
+            const load = (mod, baseDir) => {
                 called++
                 t.equal(mod, "module")
+                t.equal(baseDir, ".")
             }
 
-            new LoaderData.Register(".mod", "module", load, true).register()
+            new LoaderData.Register(".mod", "module", load, true).register(".")
 
             t.equal(called, 1)
         })
@@ -288,12 +288,13 @@ describe("cli config loader data", () => {
         it("doesn't call `load` when `use` is `false`", () => {
             let called = 0
 
-            const load = mod => {
+            const load = (mod, baseDir) => {
                 called++
                 t.equal(mod, "module")
+                t.equal(baseDir, ".")
             }
 
-            new LoaderData.Register(".mod", "module", load, false).register()
+            new LoaderData.Register(".mod", "module", load, false).register(".")
 
             t.equal(called, 0)
         })
@@ -301,16 +302,17 @@ describe("cli config loader data", () => {
         it("calls `load` only once", () => {
             let called = 0
 
-            const load = mod => {
+            const load = (mod, baseDir) => {
                 called++
                 t.equal(mod, "module")
+                t.equal(baseDir, ".")
             }
 
             const loader = new LoaderData.Register(".mod", "module", load, true)
 
-            loader.register()
-            loader.register()
-            loader.register()
+            loader.register(".")
+            loader.register(".")
+            loader.register(".")
 
             t.equal(called, 1)
         })
@@ -329,7 +331,7 @@ describe("cli config loader data", () => {
                 "bar",
                 "baz",
                 "whatever",
-            ], load, true).register()
+            ], load, true).register(".")
 
             t.equal(called, 1)
             t.match(mods, ["foo"])
@@ -350,7 +352,7 @@ describe("cli config loader data", () => {
                 "bar",
                 "baz",
                 "whatever",
-            ], load, true).register()
+            ], load, true).register(".")
 
             t.equal(called, 4)
             t.match(mods, [
@@ -376,7 +378,7 @@ describe("cli config loader data", () => {
                 "bar",
                 "baz",
                 "whatever",
-            ], load, true).register()
+            ], load, true).register(".")
 
             t.equal(called, 2)
             t.match(mods, ["foo", "bar"])
@@ -397,7 +399,7 @@ describe("cli config loader data", () => {
                 "bar",
                 "baz",
                 "whatever",
-            ], load, true).register()
+            ], load, true).register(".")
 
             t.equal(called, 3)
             t.match(mods, ["foo", "bar", "baz"])

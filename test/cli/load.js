@@ -8,15 +8,18 @@ describe("cli config loading", () => {
         const file = "config.js"
         const map = new Map()
         const result = {config: true}
-        let loaded
+        let loaded, baseDir
 
-        function init(file) {
+        function init(file, base) {
+            debugger
             loaded = file
+            baseDir = base
             return result
         }
 
-        return load(init, file, map).then(config => {
+        return load(init, file, map, ".").then(config => {
             t.equal(loaded, file)
+            t.equal(baseDir, ".")
             t.equal(config, result)
         })
     })
@@ -26,7 +29,9 @@ describe("cli config loading", () => {
         const list = []
         const map = new Map(mods.map(m => [m, {register() { list.push(m) }}]))
 
-        return load(() => {}, "config.js", map).then(() => t.match(list, mods))
+        return load(() => {}, "config.js", map, ".").then(() => {
+            t.match(list, mods)
+        })
     })
 
     it("does both", () => {
@@ -35,16 +40,18 @@ describe("cli config loading", () => {
         const list = []
         const map = new Map(mods.map(m => [m, {register() { list.push(m) }}]))
         const result = {config: true}
-        let loaded
+        let loaded, baseDir
 
-        function init(file) {
+        function init(file, base) {
             loaded = file
+            baseDir = base
             return result
         }
 
-        return load(init, file, map).then(config => {
+        return load(init, file, map, ".").then(config => {
             t.match(list, mods)
             t.equal(loaded, file)
+            t.equal(baseDir, ".")
             t.equal(config, result)
         })
     })

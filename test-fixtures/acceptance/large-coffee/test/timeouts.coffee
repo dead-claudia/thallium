@@ -5,8 +5,8 @@ Note: updates to this should also be reflected in test/core/timeouts.js, as this
 is trying to represent more real-world usage.
 ###
 
-t = require '../../../index.js'
-{n, p} = Util = require '../../../test-util/base.js'
+t = require 'techtonic'
+{n, p} = Util = require '../../../../test-util/base.js'
 
 # Note that this entire section may be flaky on slower machines. Thankfully,
 # these have been tested against a slower machine, so it should hopefully not

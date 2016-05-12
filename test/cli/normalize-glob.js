@@ -1,5 +1,9 @@
 "use strict"
 
+// Note: updates to this should also be reflected in
+// test-fixtures/acceptance/large-coffee/test/normalize-glob.coffee, as it's
+// trying to represent more real-world usage.
+
 const t = require("../../index.js")
 const path = require("path")
 const normalize = require("../../lib/cli/normalize-glob.js")
