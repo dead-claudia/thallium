@@ -11,7 +11,6 @@ describe("cli config loading", () => {
         let loaded, baseDir
 
         function init(file, base) {
-            debugger
             loaded = file
             baseDir = base
             return result
