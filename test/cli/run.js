@@ -20,7 +20,7 @@ describe("cli config runner", function () {
         const tt = t.base().use(assertions)
         const tree = opts.tree(tt)
 
-        tree["node_modules"] = {techtonic: () => tt}
+        tree["node_modules"] = {thallium: () => tt}
 
         const util = Cli.mock(tree)
         const cwd = opts.cwd != null ? opts.cwd : util.cwd()
@@ -41,7 +41,7 @@ describe("cli config runner", function () {
             args: "",
             tree: t => ({
                 test: {
-                    ".techtonic.js"() {
+                    ".tl.js"() {
                         t.reporter(push(ret))
                     },
 
@@ -77,7 +77,7 @@ describe("cli config runner", function () {
             args: "",
             tree: t => ({
                 test: {
-                    ".techtonic.js"() {
+                    ".tl.js"() {
                         t.reporter(push(ret))
                     },
 
@@ -110,7 +110,7 @@ describe("cli config runner", function () {
             args: "",
             tree: t => ({
                 test: {
-                    ".techtonic.coffee"() {
+                    ".tl.coffee"() {
                         t.reporter(push(ret))
                     },
 
@@ -143,7 +143,7 @@ describe("cli config runner", function () {
             args: "",
             tree: t => ({
                 test: {
-                    ".techtonic.js"() {
+                    ".tl.js"() {
                         t.reporter(push(ret))
                     },
 
@@ -186,7 +186,7 @@ describe("cli config runner", function () {
             args: "",
             tree: t => ({
                 test: {
-                    ".techtonic.js"() {
+                    ".tl.js"() {
                         t.reporter(push(ret))
                         t.define("isNope", x => ({
                             test: x === "nope",

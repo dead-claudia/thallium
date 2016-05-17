@@ -5,5 +5,5 @@ exports.push = ret => (arg, done) => {
     done()
 }
 
-exports.n = (type, path, value) => ({type, path, value})
+exports.n = (type, path, value, slow) => ({type, path, value, slow: !!slow})
 exports.p = (name, index) => ({name, index})

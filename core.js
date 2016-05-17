@@ -4,6 +4,6 @@
  * Main entry point, for those wanting to use this framework without the core
  * assertions.
  */
-const Techtonic = require("./lib/techtonic.js")
+const Thallium = require("./lib/thallium.js")
 
-module.exports = new Techtonic()
+module.exports = new Thallium()

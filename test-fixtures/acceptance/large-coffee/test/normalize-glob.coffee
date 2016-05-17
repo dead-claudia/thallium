@@ -5,7 +5,7 @@ Note: updates to this should also be reflected in test/cli/normalize-glob.js, as
 it's trying to represent more real-world usage.
 ###
 
-t = require 'techtonic'
+t = require 'thallium'
 path = require 'path'
 normalize = require '../../../../lib/cli/normalize-glob.js'
 

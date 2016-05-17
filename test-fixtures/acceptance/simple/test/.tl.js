@@ -4,4 +4,4 @@ const t = require("../../../../index.js")
 
 t.reporter(require("../../../../test-util/pipe-reporter.js"))
 
-module.exports = {techtonic: t, files: "./*.js"}
+module.exports = {thallium: t, files: "./*.js"}

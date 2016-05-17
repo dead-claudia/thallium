@@ -6,7 +6,7 @@ assertions available here by default, please consult [here](./assertions.md).
 Notes:
 
 - The CLI is a work in progress, but it will be documented as soon as it is finished.
-- `techtonic` and `techtonic/core` are completely independent from each other, but otherwise carry the same API. The only difference is that the former includes the `techtonic/assertions` plugin (i.e. the core asssertions).
+- `thallium` and `thallium/core` are completely independent from each other, but otherwise carry the same API. The only difference is that the former includes the `thallium/assertions` plugin (i.e. the core asssertions).
 - If you're using Babel, this only exports a single default export.
 - `t.define()`, `t.wrap()`, `t.add()`, etc. can accept Symbols as well as strings. The property is passed through unmodified. This allows for private assertions.
 - `t._` is reserved for internal use, so don't depend on anything in that, other than its possible existence.
@@ -32,15 +32,15 @@ t.test '1 should equal 1', ->
     @equal 1, 1
 ```
 
-This calls the callback on a separate event loop tick, with `this` and the first argument being a new Techtonic instance prototypically inheriting everything of this instance, plugins, reporters, assertions, methods, and all. It is perfectly safe to add new properties and modify existing ones on the inner instance, as none of the changes escape to the outer context.
+This calls the callback on a separate event loop tick, with `this` and the first argument being a new Thallium instance prototypically inheriting everything of this instance, plugins, reporters, assertions, methods, and all. It is perfectly safe to add new properties and modify existing ones on the inner instance, as none of the changes escape to the outer context.
 
 You can skip block tests with `t.testSkip("name", callback)`, which is identical except the test is reported as pending instead.
 
-This returns the current Techtonic instance, for chaining.
+This returns the current Thallium instance, for chaining.
 
 ### t.test("name")
 
-Similar to `t.test("name", callback)`, but instead, it returns a new Techtonic instance that you can chain assertions and other things with as a simple inline subtest.
+Similar to `t.test("name", callback)`, but instead, it returns a new Thallium instance that you can chain assertions and other things with as a simple inline subtest.
 
 ```js
 // This is nice and simple :-)
@@ -120,13 +120,13 @@ t.async 'reads files correctly', ->
     @equal data, 'contents\n'
 ```
 
-This calls the callback on a separate event loop tick, with `this` and the first argument being a new Techtonic instance prototypically inheriting everything of this instance, plugins, reporters, assertions, methods, and all. It is perfectly safe to add new properties and modify existing ones on the inner instance, as none of the changes escape to the outer context.
+This calls the callback on a separate event loop tick, with `this` and the first argument being a new Thallium instance prototypically inheriting everything of this instance, plugins, reporters, assertions, methods, and all. It is perfectly safe to add new properties and modify existing ones on the inner instance, as none of the changes escape to the outer context.
 
 Do note that the test is initialized on a separate event loop tick. Also, the `done` argument is always asynchronous. And if you use the `done` callback, you *must* call it to end the test.
 
 You can skip async tests with `t.asyncSkip("name", callback)`, which is identical except the test is reported as pending instead.
 
-This returns the current Techtonic instance, for chaining.
+This returns the current Thallium instance, for chaining.
 
 ### t.do(func)
 
@@ -140,7 +140,7 @@ t.test("test")
 
 Note that the callback is called with `undefined` as `this` and no arguments. The callback is *not* a plugin, and won't be treated as such.
 
-This returns the current Techtonic instance, for chaining.
+This returns the current Thallium instance, for chaining.
 
 ## Settings-related methods
 
@@ -150,13 +150,13 @@ These are merely getting and/or changing settings for running the tests. All of 
 
 Use one or more [plugins](./plugins.md). These can be single plugins, an array of plugins, or even multiple complex nested arrays of plugins.
 
-This returns the current Techtonic instance, for chaining.
+This returns the current Thallium instance, for chaining.
 
 ### t.reporter(...reporters)
 
 Use one or more [reporters](./reporters.md). These can be single reporters, an array of reporters, or even multiple complex nested arrays of reporters.
 
-This returns the current Techtonic instance, for chaining.
+This returns the current Thallium instance, for chaining.
 
 ### t.reporters()
 
@@ -166,7 +166,7 @@ Get a list of all active reporters for this test, including this test's own repo
 
 Set the max timeout for a test. This is used only by `t.async()` to know how long to wait before it should fail the test. Set the timeout to `0` to inherit the parent's timeout. If the timeout is negative, it will be rounded 0.
 
-This returns the current Techtonic instance, for chaining.
+This returns the current Thallium instance, for chaining.
 
 ### t.timeout()
 
@@ -203,7 +203,7 @@ Most of these are probably only interesting if you're writing [plugins](./plugin
 
 ### t.define("assertion", callback), t.define(methods)
 
-Define one or more assertions on this Techtonic instance. It either accepts a string `name` and a callback or an object with various methods. Either style is equivalent.
+Define one or more assertions on this Thallium instance. It either accepts a string `name` and a callback or an object with various methods. Either style is equivalent.
 
 These assertions are simple functions that accept whatever arguments were passed to it, unmodified, and return an object with at least a `test` and `message` property. These may contain other properties as well, but `expected` and `actual` are treated specially.
 
@@ -241,7 +241,7 @@ t.equal 1, 1 # Passes
 t.equal 1, 2 # AssertionError: Expected 1 to equal 2
 ```
 
-Errors generated from this are automatically handled by Techtonic, and work just as expected in inline tests. Also, methods from this are scoped to that test and its children.
+Errors generated from this are automatically handled by Thallium, and work just as expected in inline tests. Also, methods from this are scoped to that test and its children.
 
 ```js
 // JavaScript
@@ -279,11 +279,11 @@ t.myAssert 1, 1 # ReferenceError: method not defined here
 
 Ad-hoc assertions are most definitely permitted, and the API is made for this to be easy.
 
-This returns the current Techtonic instance, for chaining. Note that it isn't safe to call API methods within the callback.
+This returns the current Thallium instance, for chaining. Note that it isn't safe to call API methods within the callback.
 
 ### t.wrap("method", callback), t.wrap(methods)
 
-Wrap one or more methods on this Techtonic instance. It either accepts a string `name` and a callback or an object with various methods. Either style is equivalent.
+Wrap one or more methods on this Thallium instance. It either accepts a string `name` and a callback or an object with various methods. Either style is equivalent.
 
 When the method is called, the callback is called with the original function bound to the current instance and whatever arguments were passed to the original function, unmodified. `this` is `undefined` in the callback.
 
@@ -291,7 +291,7 @@ Note that this throws an error early if the method doesn't already exist.
 
 ### t.add("method", callback), t.wrap(methods)
 
-Add one or more methods to this Techtonic instance. It either accepts a string `name` and a callback or an object with various methods. Either style is equivalent.
+Add one or more methods to this Thallium instance. It either accepts a string `name` and a callback or an object with various methods. Either style is equivalent.
 
 When the method is called, the callback is called with the current instance (which is also passed as `this`) and whatever arguments were passed to the original function, unmodified.
 
@@ -301,11 +301,11 @@ This is the base AssertionError constructor, largely derived from [`assertion-er
 
 ### t.base()
 
-Create a new, entirely separate Techtonic test instance. This is mostly used for testing, but it's exposed for anyone who needs it. It's like an uncached `require("techtonic/core")`.
+Create a new, entirely separate Thallium test instance. This is mostly used for testing, but it's exposed for anyone who needs it. It's like an uncached `require("thallium/core")`.
 
 ### t.parent()
 
-Get the parent instance of this instance. If this is the base Techtonic instance (i.e. the result of `t.base()` or one of the core exports), then this will return `undefined`.
+Get the parent instance of this instance. If this is the base Thallium instance (i.e. the result of `t.base()` or one of the core exports), then this will return `undefined`.
 
 ### t.inline()
 

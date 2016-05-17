@@ -1,6 +1,6 @@
-# Techtonic
+# Thallium
 
-[![Build Status](https://travis-ci.org/isiahmeadows/techtonic.svg?branch=master)](https://travis-ci.org/isiahmeadows/techtonic) [![Join the chat at https://gitter.im/isiahmeadows/techtonic](https://badges.gitter.im/isiahmeadows/techtonic.svg)](https://gitter.im/isiahmeadows/techtonic?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+[![Build Status](https://travis-ci.org/isiahmeadows/thallium.svg?branch=master)](https://travis-ci.org/isiahmeadows/thallium) [![Join the chat at https://gitter.im/isiahmeadows/thallium](https://badges.gitter.im/isiahmeadows/thallium.svg)](https://gitter.im/isiahmeadows/thallium?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 A simple, unopinionated, modular test framework meant to simplify your tests. It supports Node 4 and later, and browser support + legacy Node is also planned.
 
@@ -9,16 +9,16 @@ A simple, unopinionated, modular test framework meant to simplify your tests. It
 ## Installation
 
 ```
-npm install --save-dev techtonic
+npm install --save-dev thallium
 ```
 
 ## Usage
 
-This is waiting on the completion of the CLI, but for now, you can look at the [documentation](./docs/README.md) and [tests](./test/), which use Techtonic's assertions themselves.
+This is waiting on the completion of the CLI, but for now, you can look at the [documentation](./docs/README.md) and [tests](./test/), which use Thallium's assertions themselves.
 
 Couple specific notes:
 
-1. You can use the framework without the built-in assertions. Just require `techtonic/core`, and implement your own assertions. Matter of fact, the built-in ones are actually their own plugin.
+1. You can use the framework without the built-in assertions. Just require `thallium/core`, and implement your own assertions. Matter of fact, the built-in ones are actually their own plugin.
 
 2. Any test properties you define in your tests are scoped per-test. These include assertions. Example:
 
@@ -71,7 +71,7 @@ General information:
 - The documentation and examples are in `docs/**`.
 - The tests are in `test/**`.
     - Mocha is currently used as the runner.
-    - The assertions are fully self-hosted. Using Techtonic to test Techtonic is awesome!
+    - The assertions are fully self-hosted. Using Thallium to test Thallium is awesome!
     - Fixtures for those tests are in `test-fixtures/**`.
     - Utilities are in `test-util/**`.
     - Some of the test files are mirrored in [CoffeeScript](http://coffeescript.org/) and JavaScript for the acceptance tests. These are very explicitly labeled, so it should be fairly obvious.
@@ -84,7 +84,7 @@ Tips and idioms:
 
 - Classes are used, but inheritance is limited. I also prefer functions over instance methods unless they're something that should be overridable, are more like properties, or are exposed in the API.
 
-    As an exception, classes are usually preferred over closures, to limit nesting.
+    As an exception, classes are usually preferred over closures, to limit nesting and group functionality.
 
 - There are a few useful helpers in `test-util/base.js`, that you may appreciate when you write your tests:
 

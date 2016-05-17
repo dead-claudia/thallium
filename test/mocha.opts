@@ -2,4 +2,3 @@
 --reporter dot
 --check-leaks
 --recursive
---require ./test-util/env.js

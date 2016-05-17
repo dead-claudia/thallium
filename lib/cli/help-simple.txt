@@ -1,4 +1,4 @@
-Usage: techtonic [options...] [--] [file globs...]
+Usage: tl [options...] [--] [file globs...]
 
 Options:
 
@@ -9,7 +9,7 @@ Options:
     Show a more detailed help prompt.
 
 --cwd [directory]
-    Set the current working directory for Techtonic to use.
+    Set the current working directory for Thallium to use.
 
 -c [file], --config [file]
     Use a custom config file.
@@ -18,7 +18,7 @@ Options:
     `require` a given module before loading the config.
 
 -r [ext:module], --require [ext:module]
-    Register an extension with that module (so Techtonic knows it's a register
+    Register an extension with that module (so Thallium knows it's a register
     hook). Usually, you won't need to use this.
 
 --
@@ -27,4 +27,4 @@ Options:
 All unknown options are passed directly to Node. For more details on each
 option, run the following command:
 
-    techtonic --help-detailed
+    tl --help-detailed

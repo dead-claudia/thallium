@@ -1,8 +1,5 @@
 "use strict"
 
-// const path = require("path")
-// const interpret = require("interpret")
-
 const t = require("../../index.js")
 const findConfig = require("../../lib/cli/find-config.js")
 const LoaderData = require("../../lib/cli/loader-data.js")
@@ -33,34 +30,34 @@ describe("cli config finder", () => {
     context("default path", () => {
         finder("when it's JS", {
             tree: {
-                test: {".techtonic.js": "contents"},
+                test: {".tl.js": "contents"},
             },
             args: "",
-            found: "test/.techtonic.js",
+            found: "test/.tl.js",
         })
 
         finder("when it's CoffeeScript", {
             tree: {
-                test: {".techtonic.coffee": "contents"},
+                test: {".tl.coffee": "contents"},
             },
             args: "",
-            found: "test/.techtonic.coffee",
+            found: "test/.tl.coffee",
         })
 
         finder("when it's Babel + JS", {
             tree: {
-                test: {".techtonic.babel.js": "contents"},
+                test: {".tl.babel.js": "contents"},
             },
             args: "",
-            found: "test/.techtonic.babel.js",
+            found: "test/.tl.babel.js",
         })
 
         finder("when it's literate CoffeeScript", {
             tree: {
-                test: {".techtonic.coffee.md": "contents"},
+                test: {".tl.coffee.md": "contents"},
             },
             args: "",
-            found: "test/.techtonic.coffee.md",
+            found: "test/.tl.coffee.md",
         })
     })
 
@@ -75,7 +72,7 @@ describe("cli config finder", () => {
 
         finder("returns null when non-executable extension exists", {
             tree: {
-                test: {".techtonic.json": "contents"},
+                test: {".tl.json": "contents"},
             },
             args: "",
             found: null,
@@ -83,7 +80,7 @@ describe("cli config finder", () => {
 
         finder("returns null when a directory", {
             tree: {
-                test: {".techtonic.js": {}},
+                test: {".tl.js": {}},
             },
             args: "",
             found: null,
@@ -93,7 +90,7 @@ describe("cli config finder", () => {
     context("--config", () => {
         finder("gets a specific config", {
             tree: {
-                test: {".techtonic.js": "contents"},
+                test: {".tl.js": "contents"},
                 other: {"foo.js": "contents"},
             },
             args: "--config other/foo.js",
@@ -102,7 +99,7 @@ describe("cli config finder", () => {
 
         finder("gets a specific config that doesn't exist", {
             tree: {
-                test: {".techtonic.js": "contents"},
+                test: {".tl.js": "contents"},
                 other: {"foo.js": "contents"},
             },
             args: "--config other/what.js",
@@ -111,7 +108,7 @@ describe("cli config finder", () => {
 
         finder("gets a config with an unknown extension", {
             tree: {
-                test: {".techtonic.js": "contents"},
+                test: {".tl.js": "contents"},
                 other: {"foo.config": "contents"},
             },
             args: "--config other/foo.config",
@@ -122,39 +119,39 @@ describe("cli config finder", () => {
     context("from globs", () => {
         finder("when in a single file glob", {
             tree: {
-                src: {".techtonic.coffee": "contents"},
+                src: {".tl.coffee": "contents"},
             },
             args: "src/**/*.test.coffee",
-            found: "src/.techtonic.coffee",
+            found: "src/.tl.coffee",
         })
 
         finder("when in the first of many file globs", {
             tree: {
-                src1: {".techtonic.coffee": "contents"},
+                src1: {".tl.coffee": "contents"},
             },
             args: "src1/**/*.test.coffee src2/**/*.test.ls src3/**/*.test.litcoffee",
-            found: "src1/.techtonic.coffee",
+            found: "src1/.tl.coffee",
         })
 
         finder("when in the middle of many file globs", {
             tree: {
-                src2: {".techtonic.ls": "contents"},
+                src2: {".tl.ls": "contents"},
             },
             args: "src1/**/*.test.coffee src2/**/*.test.ls src3/**/*.test.litcoffee",
-            found: "src2/.techtonic.ls",
+            found: "src2/.tl.ls",
         })
 
         finder("when in the last of many file globs", {
             tree: {
-                src3: {".techtonic.litcoffee": "contents"},
+                src3: {".tl.litcoffee": "contents"},
             },
             args: "src1/**/*.test.coffee src2/**/*.test.ls src3/**/*.test.litcoffee",
-            found: "src3/.techtonic.litcoffee",
+            found: "src3/.tl.litcoffee",
         })
 
         finder("when specified in later globs", {
             tree: {
-                src1: {".techtonic.ls": "contents"},
+                src1: {".tl.ls": "contents"},
             },
             args: "src1/**/*.test.coffee src2/**/*.test.ls src3/**/*.test.litcoffee",
             found: null,
@@ -162,7 +159,7 @@ describe("cli config finder", () => {
 
         finder("when specified in previous globs", {
             tree: {
-                src3: {".techtonic.ls": "contents"},
+                src3: {".tl.ls": "contents"},
             },
             args: "src1/**/*.test.coffee src2/**/*.test.ls src3/**/*.test.litcoffee",
             found: null,
@@ -170,34 +167,34 @@ describe("cli config finder", () => {
 
         finder("when none satisfy any glob ext", {
             tree: {
-                src: {".techtonic.js": "contents"},
+                src: {".tl.js": "contents"},
             },
             args: "src/**/*.test.coffee src/**/*.test.ls src/**/*.test.litcoffee",
-            found: "src/.techtonic.js",
+            found: "src/.tl.js",
         })
 
         finder("when no glob has any ext, but a JS file exists", {
             tree: {
-                test1: {".techtonic.js": "contents"},
+                test1: {".tl.js": "contents"},
             },
             args: "test1/** test2/** test3/**",
-            found: "test1/.techtonic.js",
+            found: "test1/.tl.js",
         })
 
         finder("when no glob has any ext, but a CoffeeScript file exists", {
             tree: {
-                test1: {".techtonic.coffee": "contents"},
+                test1: {".tl.coffee": "contents"},
             },
             args: "test1/** test2/** test3/**",
-            found: "test1/.techtonic.coffee",
+            found: "test1/.tl.coffee",
         })
 
         finder("when no glob has any ext, but a Babel + JS file exists", {
             tree: {
-                test1: {".techtonic.babel.js": "contents"},
+                test1: {".tl.babel.js": "contents"},
             },
             args: "test1/** test2/** test3/**",
-            found: "test1/.techtonic.babel.js",
+            found: "test1/.tl.babel.js",
         })
     })
 
@@ -205,10 +202,10 @@ describe("cli config finder", () => {
         finder("when up a level", {
             tree: {
                 "test": {"test.js": "contents"},
-                ".techtonic.js": "contents",
+                ".tl.js": "contents",
             },
             args: "",
-            found: ".techtonic.js",
+            found: ".tl.js",
         })
 
         finder("when at the root with a deep glob", {
@@ -218,21 +215,21 @@ describe("cli config finder", () => {
                         helpers: {"test.js": "contents"},
                     },
                 },
-                ".techtonic.js": "contents",
+                ".tl.js": "contents",
             },
             args: "test/util/helpers/**",
-            found: ".techtonic.js",
+            found: ".tl.js",
         })
 
         finder("when up a level in the middle", {
             tree: {
                 test: {
                     "helpers": {"test.js": "contents"},
-                    ".techtonic.js": "contents",
+                    ".tl.js": "contents",
                 },
             },
             args: "test/helpers/**",
-            found: "test/.techtonic.js",
+            found: "test/.tl.js",
         })
 
         finder("when in the middle with a deep glob", {
@@ -241,30 +238,30 @@ describe("cli config finder", () => {
                     "util": {
                         helpers: {"test.js": "contents"},
                     },
-                    ".techtonic.js": "contents",
+                    ".tl.js": "contents",
                 },
             },
             args: "test/util/helpers/**",
-            found: "test/.techtonic.js",
+            found: "test/.tl.js",
         })
     })
 
     context("precedence", () => {
         finder("prefers the first glob over others", {
             tree: {
-                test1: {".techtonic.js": "contents"},
-                test2: {".techtonic.js": "contents"},
-                test3: {".techtonic.js": "contents"},
+                test1: {".tl.js": "contents"},
+                test2: {".tl.js": "contents"},
+                test3: {".tl.js": "contents"},
             },
             args: "test1/** test2/** test3/**",
-            found: "test1/.techtonic.js",
+            found: "test1/.tl.js",
         })
 
         finder("prefers --config to globs", {
             tree: {
-                test1: {".techtonic.js": "contents"},
-                test2: {".techtonic.js": "contents"},
-                test3: {".techtonic.js": "contents"},
+                test1: {".tl.js": "contents"},
+                test2: {".tl.js": "contents"},
+                test3: {".tl.js": "contents"},
             },
             args: "--config foo.js test1/** test2/** test3/**",
             found: "foo.js",
@@ -273,23 +270,23 @@ describe("cli config finder", () => {
         finder("prefers --config to JS", {
             tree: {
                 test: {
-                    ".techtonic.coffee": "contents",
-                    ".techtonic.js": "contents",
+                    ".tl.coffee": "contents",
+                    ".tl.js": "contents",
                 },
             },
-            args: "--config test/.techtonic.coffee",
-            found: "test/.techtonic.coffee",
+            args: "--config test/.tl.coffee",
+            found: "test/.tl.coffee",
         })
 
         finder("prefers glob to JS", {
             tree: {
                 test: {
-                    ".techtonic.coffee": "contents",
-                    ".techtonic.js": "contents",
+                    ".tl.coffee": "contents",
+                    ".tl.js": "contents",
                 },
             },
             args: "test/**/*.coffee",
-            found: "test/.techtonic.coffee",
+            found: "test/.tl.coffee",
         })
     })
 

@@ -27,16 +27,16 @@ describe("cli config merging", () => {
             invalid("array", {module: []})
         })
 
-        describe("techtonic", () => {
+        describe("thallium", () => {
             // Just treat any object as a duck. If it blows up in their face, it
             // should hopefully be obvious why.
-            valid("object", {techtonic: {}})
-            invalid("string", {techtonic: "foo"})
-            invalid("number", {techtonic: 1})
-            invalid("true", {techtonic: true})
-            invalid("false", {techtonic: false})
-            invalid("null", {techtonic: null})
-            invalid("array", {techtonic: []})
+            valid("object", {thallium: {}})
+            invalid("string", {thallium: "foo"})
+            invalid("number", {thallium: 1})
+            invalid("true", {thallium: true})
+            invalid("false", {thallium: false})
+            invalid("null", {thallium: null})
+            invalid("array", {thallium: []})
         })
 
         describe("files", () => {
@@ -60,8 +60,8 @@ describe("cli config merging", () => {
     context("merge", () => {
         function load(opts) {
             return name => {
-                t.equal(name, opts.module || "techtonic")
-                return opts.techtonic || {}
+                t.equal(name, opts.module || "thallium")
+                return opts.thallium || {}
             }
         }
 
@@ -70,53 +70,53 @@ describe("cli config merging", () => {
         }
 
         it("merges an empty object", () => {
-            const techtonic = {techtonic: true}
+            const thallium = {thallium: true}
             const files = ["test/**"]
-            const config = merge(files, {}, load({techtonic}))
+            const config = merge(files, {}, load({thallium}))
 
-            t.match(config, {techtonic, files})
-            t.equal(config.techtonic, techtonic)
+            t.match(config, {thallium, files})
+            t.equal(config.thallium, thallium)
         })
 
         it("merges `module`", () => {
-            const techtonic = {techtonic: true}
-            const module = "./some-techtonic-wrapper"
+            const thallium = {thallium: true}
+            const module = "./some-thallium-wrapper"
             const files = ["test/**"]
-            const config = merge(files, {module}, load({module, techtonic}))
+            const config = merge(files, {module}, load({module, thallium}))
 
-            t.match(config, {techtonic, files})
-            t.equal(config.techtonic, techtonic)
+            t.match(config, {thallium, files})
+            t.equal(config.thallium, thallium)
         })
 
-        it("merges `techtonic`", () => {
-            const techtonic = {techtonic: true}
+        it("merges `thallium`", () => {
+            const thallium = {thallium: true}
             const files = ["test/**"]
-            const config = merge(files, {techtonic}, load({}))
+            const config = merge(files, {thallium}, load({}))
 
-            t.match(config, {techtonic, files})
-            t.equal(config.techtonic, techtonic)
+            t.match(config, {thallium, files})
+            t.equal(config.thallium, thallium)
         })
 
         it("merges `files`", () => {
-            const techtonic = {techtonic: true}
+            const thallium = {thallium: true}
             const files = ["test/**"]
             const extra = ["other/**"]
-            const config = merge(files, {files: extra}, load({techtonic}))
+            const config = merge(files, {files: extra}, load({thallium}))
 
-            t.match(config, {techtonic, files})
-            t.equal(config.techtonic, techtonic)
+            t.match(config, {thallium, files})
+            t.equal(config.thallium, thallium)
         })
 
         it("merges everything", () => {
-            const techtonic = {techtonic: true}
-            const module = "./some-techtonic-wrapper"
+            const thallium = {thallium: true}
+            const module = "./some-thallium-wrapper"
             const files = ["test/**"]
             const extra = ["other/**"]
-            const config = merge(files, {module, techtonic, files: extra},
+            const config = merge(files, {module, thallium, files: extra},
                 load({module}))
 
-            t.match(config, {techtonic, files})
-            t.equal(config.techtonic, techtonic)
+            t.match(config, {thallium, files})
+            t.equal(config.thallium, thallium)
         })
     })
 })

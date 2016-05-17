@@ -1,4 +1,4 @@
-Usage: techtonic [options...] [--] [file globs...]
+Usage: tl [options...] [--] [file globs...]
 
 Options:
 
@@ -9,12 +9,12 @@ Options:
     Show this help prompt.
 
 --cwd [directory]
-    Set the current working directory for Techtonic to use. By default, it's
+    Set the current working directory for Thallium to use. By default, it's
     inherited.
 
 -c [file], --config [file]
     Use a custom config file. By default, this is inferred from the first file
-    glob, for example `test/.techtonic.coffee` from a glob of
+    glob, for example `test/.tl.coffee` from a glob of
     `test/**/*.coffee`. If the extension does not match anything, this will
     first try to infer it from the glob before giving up.
 
@@ -24,11 +24,11 @@ Options:
     Require a module before loading the config.
 
 -r [ext:module], --require [ext:module]
-    Register an extension with that module (so Techtonic knows it's a register
+    Register an extension with that module (so Thallium knows it's a register
     hook). Usually you don't even need to register the extension yourself, but
     if either the module or the language itself not listed in node-interpret,
     you'll need to specify an extension. If you're using Babel, you can use
-    `.techtonic.babel.js` to the same effect.
+    `.tl.babel.js` to the same effect.
 
     Note: the preceding dot in `ext` is optional. Both `ext` and `.ext` mean the
     same thing.

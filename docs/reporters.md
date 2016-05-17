@@ -1,6 +1,6 @@
 # Reporters
 
-Techtonic reporters are simple functions that accept a set of event objects. It's written to be very unopinionated, easy to work with, and if you feel a need to convert it to something else, it's very straightforward to do.
+Thallium reporters are simple functions that accept a set of event objects. It's written to be very unopinionated, easy to work with, and if you feel a need to convert it to something else, it's very straightforward to do.
 
 Reporters are simple functions that are called with an event and either return a thenable or accept a `done` callback, resolved or called respectively when you're done processing the event. Do note that if you never call `done` or resolve the promise, the runner will hang.
 
@@ -44,7 +44,7 @@ module.exports = opts => {
 
 ## `"extra"` events after `"exit"`
 
-If you can't handle them after the exit, you can drop a lock like this, so you can avoid processing to keep out of an invalid state. Note that after the `"exit"` event, only two possible events can occur: `"extra"`, since Techtonic has already moved on by then, and `"start"`, which means the tests are being run again, within the same Node process.
+If you can't handle them after the exit, you can drop a lock like this, so you can avoid processing to keep out of an invalid state. Note that after the `"exit"` event, only two possible events can occur: `"extra"`, since Thallium has already moved on by then, and `"start"`, which means the tests are being run again, within the same Node process.
 
 ```js
 module.exports = () => {
@@ -62,4 +62,4 @@ module.exports = () => {
 
 ## Why not event emitters? Why not observables?
 
-I'd like to keep Techtonic simple and less opinionated. It's easy to wrap the current format, and I've even written plugins to help you out in the case of [event emitters](./examples/ee-reporter.js) and [observables](./examples/observable-reporter.js). There's also CoffeeScript equivalents for each ([event emitters](./examples/ee-reporter.coffee) and [observables](./examples/observable-reporter.coffee)). But functions are still simpler to implement and consume, and the events passed are pretty similar.
+I'd like to keep Thallium simple and less opinionated. It's easy to wrap the current format, and I've even written plugins to help you out in the case of [event emitters](./examples/ee-reporter.js) and [observables](./examples/observable-reporter.js). There's also CoffeeScript equivalents for each ([event emitters](./examples/ee-reporter.coffee) and [observables](./examples/observable-reporter.coffee)). But functions are still simpler to implement and consume, and the events passed are pretty similar.

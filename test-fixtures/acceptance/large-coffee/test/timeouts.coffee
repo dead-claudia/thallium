@@ -5,7 +5,7 @@ Note: updates to this should also be reflected in test/core/timeouts.js, as this
 is trying to represent more real-world usage.
 ###
 
-t = require 'techtonic'
+t = require 'thallium'
 {n, p} = Util = require '../../../../test-util/base.js'
 
 # Note that this entire section may be flaky on slower machines. Thankfully,

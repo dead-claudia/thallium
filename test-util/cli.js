@@ -159,8 +159,8 @@ exports.mock = tree => {
     function load(file) {
         // Total hack, but it's easier than implementing Node's resolution
         // algorithm.
-        if (file === "techtonic") {
-            return load("node_modules/techtonic")
+        if (file === "thallium") {
+            return load("node_modules/thallium")
         }
 
         if (interpretMocks[file] != null) return interpretMocks[file]

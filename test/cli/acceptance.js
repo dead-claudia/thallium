@@ -14,7 +14,7 @@ function formatList(msgs) {
 }
 
 describe("cli acceptance", () => {
-    const binary = path.resolve(__dirname, "../../bin/_techtonic.js")
+    const binary = path.resolve(__dirname, "../../bin/_thallium.js")
 
     function test(name, opts) {
         (opts.skip ? it.skip : it)(name, /** @this */ function () {
@@ -63,8 +63,8 @@ describe("cli acceptance", () => {
             .then(list => {
                 const code = list[1] != null ? list[1] : list[2]
 
-                t.equal(code, opts.code)
                 t.equal(formatList(output), formatList(opts.messages))
+                t.equal(code, opts.code)
             })
         })
     }

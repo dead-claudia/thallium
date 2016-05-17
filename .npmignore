@@ -1,5 +1,8 @@
 # This ignores all the extra dev crud.
 bin/README.md
 
-# Not ready for release
-lib/cli
+# Not ready for release. Whitelist these after they are.
+lib/cli/
+lib/reporter/
+r/
+bin/

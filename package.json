@@ -1,5 +1,5 @@
 {
-  "name": "techtonic",
+  "name": "thallium",
   "version": "0.0.16",
   "description": "A simple, unopinionated, modular test framework",
   "main": "index.js",
@@ -15,18 +15,18 @@
     "index.d.ts",
     "index.js",
     "lib",
-    "bin",
     "docs"
   ],
-  "bin": {
-    "techtonic": "bin/techtonic.js",
-    "_techtonic": "bin/_techtonic.js"
+  "bin.ignore": {
+    "tl": "bin/thallium.js",
+    "thallium": "bin/thallium.js",
+    "_thallium": "bin/_thallium.js"
   },
   "keywords": [
     "test",
     "testing",
     "tdd",
-    "techtonic"
+    "thallium"
   ],
   "author": "Isiah Meadows <me@isiahmeadows.com>",
   "license": "ISC",
@@ -42,7 +42,8 @@
     "bluebird": "^3.3.4",
     "glob-stream": "^5.3.2",
     "interpret": "^1.0.0",
-    "resolve": "^1.1.7"
+    "resolve": "^1.1.7",
+    "supports-color": "^3.1.2"
   },
   "directories": {
     "lib": "lib",
@@ -52,7 +53,7 @@
   "engines": {
     "node": ">=4"
   },
-  "repository": "isiahmeadows/techtonic",
-  "bugs": "https://github.com/isiahmeadows/techtonic/issues",
-  "homepage": "https://github.com/isiahmeadows/techtonic#readme"
+  "repository": "isiahmeadows/thallium",
+  "bugs": "https://github.com/isiahmeadows/thallium/issues",
+  "homepage": "https://github.com/isiahmeadows/thallium#readme"
 }

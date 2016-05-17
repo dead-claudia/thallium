@@ -648,4 +648,45 @@ describe("core (reporters)", () => { // eslint-disable-line max-statements
             () => t.fail("Expected a rejection"),
             err => t.equal(err, sentinel))
     })
+
+    it("reports reporter errors", () => {
+        const tt = t.base()
+        const sentinel = createSentinel("sentinel")
+        let reported
+
+        tt.reporter((ev, done) => {
+            if (ev.type === "error") reported = ev.value
+            if (ev.type === "end") throw sentinel
+            return done()
+        })
+
+        return tt.run().then(
+            () => t.fail("Expected a rejection"),
+            rejected => {
+                t.equal(rejected, sentinel)
+                t.equal(reported, sentinel)
+            })
+    })
+
+    // Slightly flaky...
+    it("reports internal errors", () => {
+        const tt = t.base()
+        const sentinel = createSentinel("sentinel")
+        const old = tt._.run
+        let reported
+
+        tt.reporter((ev, done) => {
+            if (ev.type === "error") reported = ev.value
+            return done()
+        })
+
+        tt._.run = () => old.call(tt._).throw(sentinel)
+
+        return tt.run().then(
+            () => t.fail("Expected a rejection"),
+            rejected => {
+                t.equal(rejected, sentinel)
+                t.equal(reported, sentinel)
+            })
+    })
 })
