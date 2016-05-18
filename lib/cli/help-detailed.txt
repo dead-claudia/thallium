@@ -21,7 +21,8 @@ Options:
     If this option is passed multiple times, the last one takes precedence.
 
 -r [module], --require [module]
-    Require a module before loading the config.
+    Require a module before loading the config. This may default-export a
+    thenable as well, to delay execution.
 
 -r [ext:module], --require [ext:module]
     Register an extension with that module (so Thallium knows it's a register
