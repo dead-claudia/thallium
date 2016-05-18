@@ -1,5 +1,6 @@
 "use strict"
 
+var path = require("path")
 var t = require("../../index.js")
 var findConfig = require("../../lib/cli/find-config.js")
 var LoaderData = require("../../lib/cli/loader-data.js")
@@ -14,6 +15,9 @@ describe("cli config finder", function () {
             var mock = Util.mock(opts.tree)
             var loader = new Util.Loader(opts.args, mock)
             var found = opts.found != null ? mock.resolve(opts.found) : null
+
+            mock.chdir(loader.state.args.cwd)
+
             var map = LoaderData.extractIntoMap(loader.state)
             var file = findConfig(loader.state, map)
 
@@ -287,6 +291,285 @@ describe("cli config finder", function () {
             },
             args: "test/**/*.coffee",
             found: "test/.tl.coffee",
+        })
+    })
+
+    context("with different cwd", function () {
+        finder("works with glob + ext", {
+            tree: {
+                module: {
+                    mytest: {
+                        ".tl.js": "contents",
+                        "foo.js": "contents",
+                        "bar.js": "contents",
+                    },
+                },
+                mytest: {
+                    ".tl.coffee": "contents",
+                    "foo.coffee": "contents",
+                    "bar.coffee": "contents",
+                },
+            },
+            args: "--cwd module mytest/**/*.js",
+            found: "module/mytest/.tl.js",
+        })
+
+        finder("works with glob + no ext", {
+            tree: {
+                module: {
+                    mytest: {
+                        ".tl.js": "contents",
+                        "foo.js": "contents",
+                        "bar.js": "contents",
+                    },
+                },
+                mytest: {
+                    ".tl.coffee": "contents",
+                    "foo.coffee": "contents",
+                    "bar.coffee": "contents",
+                },
+            },
+            args: "--cwd module mytest/**",
+            found: "module/mytest/.tl.js",
+        })
+
+        finder("works with default", {
+            tree: {
+                module: {
+                    test: {
+                        ".tl.js": "contents",
+                        "foo.js": "contents",
+                        "bar.js": "contents",
+                    },
+                },
+                test: {
+                    ".tl.coffee": "contents",
+                    "foo.coffee": "contents",
+                    "bar.coffee": "contents",
+                },
+            },
+            args: "--cwd module",
+            found: "module/test/.tl.js",
+        })
+
+        finder("works with --cwd test", {
+            tree: {
+                module: {
+                    test: {
+                        "test": {
+                            ".tl.js": "contents",
+                            "foo.js": "contents",
+                            "bar.js": "contents",
+                        },
+                        ".tl.babel.js": "contents",
+                        "foo.babel.js": "contents",
+                        "bar.babel.js": "contents",
+                    },
+                },
+                test: {
+                    ".tl.coffee": "contents",
+                    "foo.coffee": "contents",
+                    "bar.coffee": "contents",
+                },
+            },
+            args: "--cwd module/test",
+            found: "module/test/test/.tl.js",
+        })
+
+        finder("works with very deep cwd", {
+            tree: {
+                module: {
+                    foo: {
+                        bar: {
+                            test: {
+                                ".tl.js": "contents",
+                                "foo.js": "contents",
+                                "bar.js": "contents",
+                            },
+                        },
+                        test: {
+                            ".tl.babel.js": "contents",
+                            "foo.babel.js": "contents",
+                            "bar.babel.js": "contents",
+                        },
+                    },
+                    test: {
+                        ".tl.ls": "contents",
+                        "foo.ls": "contents",
+                        "bar.ls": "contents",
+                    },
+                },
+                test: {
+                    ".tl.coffee": "contents",
+                    "foo.coffee": "contents",
+                    "bar.coffee": "contents",
+                },
+            },
+            args: "--cwd module/foo/bar",
+            found: "module/foo/bar/test/.tl.js",
+        })
+
+        finder("honors relative --config", {
+            tree: {
+                module: {
+                    test: {
+                        ".tl-config.js": "contents",
+                        ".tl.js": "contents",
+                        "foo.js": "contents",
+                        "bar.js": "contents",
+                    },
+                },
+            },
+            args: "--cwd module --config test/.tl-config.js",
+            found: "module/test/.tl-config.js",
+        })
+
+        // The mock resolves in a platform-specific manner. This also assumes
+        // Unix-style paths.
+        function abs(file) {
+            if (process.platorm === "win32") file = "C:" + file
+            return path.resolve(file)
+        }
+
+        finder("honors absolute --config", {
+            tree: {
+                module: {
+                    other: {
+                        test: {
+                            ".tl-config.js": "contents",
+                            ".tl.js": "contents",
+                        },
+                    },
+                    test: {
+                        ".tl-config.js": "contents",
+                        ".tl.js": "contents",
+                        "foo.js": "contents",
+                        "bar.js": "contents",
+                    },
+                },
+                other: {
+                    test: {
+                        ".tl-config.js": "contents",
+                        ".tl.js": "contents",
+                    },
+                },
+            },
+            args: "--cwd module --config " + abs("/other/test/.tl-config.js"),
+            found: "other/test/.tl-config.js",
+        })
+
+        finder("honors absolute globs", {
+            tree: {
+                module: {
+                    other: {
+                        test: {
+                            ".tl.js": "contents",
+                            "foo.js": "contents",
+                            "bar.js": "contents",
+                        },
+                    },
+                    test: {
+                        ".tl.js": "contents",
+                        "foo.js": "contents",
+                        "bar.js": "contents",
+                    },
+                },
+                other: {
+                    test: {
+                        ".tl.js": "contents",
+                    },
+                },
+            },
+            args: "--cwd module " + abs("/other/test/**"),
+            found: "other/test/.tl.js",
+        })
+
+        finder("recursively searches with absolute globs", {
+            tree: {
+                "module": {
+                    other: {
+                        test: {
+                            ".tl.js": "contents",
+                            "foo.js": "contents",
+                            "bar.js": "contents",
+                        },
+                    },
+                    test: {
+                        ".tl.js": "contents",
+                        "foo.js": "contents",
+                        "bar.js": "contents",
+                    },
+                },
+                ".tl.js": "contents",
+                "other": {
+                    test: {
+                        "foo.js": "contents",
+                        "bar.js": "contents",
+                    },
+                },
+            },
+            args: "--cwd module " + abs("/other/test/**"),
+            found: ".tl.js",
+        })
+
+        finder("recursively searches with relative globs", {
+            tree: {
+                module: {
+                    "other": {
+                        test: {
+                            "foo.js": "contents",
+                            "bar.js": "contents",
+                        },
+                    },
+                    ".tl.js": "contents",
+                },
+            },
+            args: "--cwd module " + abs("/module/other/test/**"),
+            found: "module/.tl.js",
+        })
+
+        finder("recursively searches above cwd with absolute globs", {
+            tree: {
+                "module": {
+                    other: {
+                        test: {
+                            ".tl.js": "contents",
+                            "foo.js": "contents",
+                            "bar.js": "contents",
+                        },
+                    },
+                    test: {
+                        ".tl.js": "contents",
+                        "foo.js": "contents",
+                        "bar.js": "contents",
+                    },
+                },
+                ".tl.js": "contents",
+                "other": {
+                    test: {
+                        "foo.js": "contents",
+                        "bar.js": "contents",
+                    },
+                },
+            },
+            args: "--cwd module/other " + abs("/other/test/**"),
+            found: ".tl.js",
+        })
+
+        finder("recursively searches above cwd with relative globs", {
+            tree: {
+                "module": {
+                    other: {
+                        test: {
+                            "foo.js": "contents",
+                            "bar.js": "contents",
+                        },
+                    },
+                },
+                ".tl.js": "contents",
+            },
+            args: "--cwd module/other " + abs("/module/other/test/**"),
+            found: ".tl.js",
         })
     })
 

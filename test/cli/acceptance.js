@@ -93,7 +93,7 @@ describe("cli acceptance", function () {
     })
 
     test("runs moderately sized test suites", {
-        args: "--cwd " + fixture("acceptance") + " full-js/**",
+        args: ["--cwd", fixture("acceptance"), "full-js/**"],
         code: 1,
         timeout: 5000,
 
@@ -292,17 +292,35 @@ describe("cli acceptance", function () {
 
     test("runs larger test suite with registered extension", {
         args: [
-            "--cwd ", fixture("acceptance/large-coffee"),
-            "--require coffee:coffee-script/register",
+            "--cwd", fixture("acceptance/large-coffee"),
+            "--require", "coffee:coffee-script/register",
             "test/**/*.coffee",
-        ].join(" "),
+        ],
         code: 0,
         timeout: 7500,
         messages: largeCoffeeMessages,
     })
 
     test("runs larger test suites with an inferred non-JS config", {
-        args: "--cwd " + fixture("acceptance/large-coffee"),
+        args: ["--cwd", fixture("acceptance/large-coffee")],
+        code: 0,
+        timeout: 7500,
+        messages: largeCoffeeMessages,
+    })
+
+    var relative = path.relative(
+        process.cwd(),
+        fixture("acceptance/large-coffee/test/**/*.coffee"))
+
+    test("runs larger test suites with relative path", {
+        args: [relative],
+        code: 0,
+        timeout: 7500,
+        messages: largeCoffeeMessages,
+    })
+
+    test("runs larger test suites with --cwd and relative path", {
+        args: ["--cwd", process.cwd(), relative],
         code: 0,
         timeout: 7500,
         messages: largeCoffeeMessages,
