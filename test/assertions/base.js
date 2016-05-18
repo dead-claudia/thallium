@@ -1,5 +1,7 @@
 "use strict"
 
+/* global Map */
+
 var t = require("../../index.js")
 var methods = require("../../lib/methods.js")
 var Util = require("../../test-util/assertions.js")

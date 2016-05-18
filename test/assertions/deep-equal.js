@@ -1,5 +1,7 @@
 "use strict"
 
+/* global Map, Set */
+
 var t = require("../../index.js")
 
 describe("assertions (deep equal)", function () { // eslint-disable-line max-statements, max-len
