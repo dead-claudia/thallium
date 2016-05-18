@@ -4,11 +4,9 @@ var t = require("../../index.js")
 var load = require("../../lib/cli/load.js")
 
 describe("cli config loading", function () {
-    if (typeof Map !== "function") return
-
     it("loads the config file", function () {
         var file = "config.js"
-        var map = new Map()
+        var map = Object.create(null)
         var result = {config: true}
         var loaded, baseDir
 
@@ -28,9 +26,11 @@ describe("cli config loading", function () {
     it("registers all the loaders from the map", function () {
         var mods = ["one", "two", "three", "four", "five"]
         var list = []
-        var map = new Map(mods.map(function (m) {
-            return [m, {register: function () { list.push(m) }}]
-        }))
+        var map = Object.create(null)
+
+        mods.forEach(function (m) {
+            map[m] = {register: function () { list.push(m) }}
+        })
 
         return load(function () {}, "config.js", map, ".").then(function () {
             t.match(list, mods)
@@ -41,11 +41,13 @@ describe("cli config loading", function () {
         var file = "config.js"
         var mods = ["one", "two", "three", "four", "five"]
         var list = []
-        var map = new Map(mods.map(function (m) {
-            return [m, {register: function () { list.push(m) }}]
-        }))
+        var map = Object.create(null)
         var result = {config: true}
         var loaded, baseDir
+
+        mods.forEach(function (m) {
+            map[m] = {register: function () { list.push(m) }}
+        })
 
         function init(file, base) {
             loaded = file

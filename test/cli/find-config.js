@@ -6,11 +6,9 @@ var LoaderData = require("../../lib/cli/loader-data.js")
 var Util = require("../../test-util/cli.js")
 
 describe("cli config finder", function () {
-    if (typeof Map !== "function") return
-
     // It's easiest to depend on LoaderData.extractIntoMap being right, since
-    // I don't have to rely on the data structures instead, which would make the
-    // tests much more redundant.
+    // I am not nearly as coupled to the underlying data representation, and
+    // don't have to redundantly specify the same list.
     function finder(name, opts) {
         it(name, function () {
             var mock = Util.mock(opts.tree)
@@ -22,7 +20,7 @@ describe("cli config finder", function () {
             t.equal(file, found)
 
             if (found != null && LoaderData.isValid(found)) {
-                t.hasOwn(map.get(LoaderData.getExt(found)), "use", true)
+                t.hasOwn(map[LoaderData.getExt(found)], "use", true)
             }
         })
     }

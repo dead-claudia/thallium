@@ -11,7 +11,6 @@ var p = Base.p
 var push = Base.push
 
 describe("cli config runner", /* @this */ function () {
-    if (typeof Map !== "function") return
     this.slow(150)
 
     /**

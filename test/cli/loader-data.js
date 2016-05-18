@@ -9,8 +9,6 @@ var Util = require("../../test-util/cli.js")
 var hasOwn = Object.prototype.hasOwnProperty
 
 describe("cli config loader data", function () {
-    if (typeof Map !== "function") return
-
     function forEachVariantExt(f) {
         for (var key in interpret.jsVariants) {
             if (hasOwn.call(interpret.jsVariants, key)) {
@@ -88,10 +86,46 @@ describe("cli config loader data", function () {
         }
 
         methods(Loader, Util.Loader, {
+            require: function (ext, mod, use) {
+                return new LoaderData.Register(ext, mod, this.load, use)
+            },
+
+            register: function (ext, use) {
+                return this.require(ext, interpret.jsVariants[ext], use)
+            },
+
             // Partially copied from the module itself. Checks and cleans the
             // map of default keys.
             clean: function (map) {
-                Util.Loader.prototype.clean.call(this, map)
+                var list = []
+                var self = this
+
+                for (var ext in map) {
+                    if (hasOwn.call(map, ext)) {
+                        var data = map[ext]
+
+                        // Skip any custom or out-of-order modules.
+                        if (!data.original) continue
+
+                        if (ext === ".js") {
+                            t.deepEqual(data, LoaderData.jsLoader)
+                        } else {
+                            var mod = interpret.jsVariants[ext]
+                            var expected =
+                                new LoaderData.Register(ext, mod, self.load)
+
+                            expected.original = true
+                            t.deepEqual(data, expected)
+                        }
+
+                        list.push(ext)
+                    }
+                }
+
+                for (var i = 0; i < list.length; i++) {
+                    delete map[list[i]]
+                }
+
                 t.equal(this.calls, 0)
                 return map
             },
@@ -105,13 +139,21 @@ describe("cli config loader data", function () {
 
                 if (!Array.isArray(list)) list = [list]
 
-                t.match(loader.clean(map), new Map(list.map(function (l) {
-                    if (Array.isArray(l)) return l
-                    if (typeof l === "string") {
-                        return [l, loader.register(l)]
+                var expected = Object.create(null)
+
+                for (var i = 0; i < list.length; i++) {
+                    var l = list[i]
+
+                    if (Array.isArray(l)) {
+                        expected[l[0]] = l[1]
+                    } else if (typeof l === "string") {
+                        expected[l] = loader.register(l)
+                    } else {
+                        expected[l.ext] = loader.require(l.ext, l.mod, true)
                     }
-                    return [l.ext, loader.require(l.ext, l.mod, true)]
-                })))
+                }
+
+                t.match(loader.clean(map), expected)
             })
         }
 

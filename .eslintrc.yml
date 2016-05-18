@@ -1,5 +1,2 @@
 root: true
 extends: isiahmeadows/node
-globals:
-    Map: true
-    Set: true

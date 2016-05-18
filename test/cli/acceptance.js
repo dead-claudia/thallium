@@ -14,8 +14,6 @@ function formatList(msgs) {
 }
 
 describe("cli acceptance", function () {
-    if (typeof Map !== "function") return
-
     var binary = path.resolve(__dirname, "../../bin/_thallium.js")
 
     function test(name, opts) {
@@ -39,7 +37,7 @@ describe("cli acceptance", function () {
             args.unshift(binary)
 
             var child = cp.spawn(process.argv[0], args, {
-                stdio: ["inherit", "pipe", "inherit"],
+                stdio: [process.stdin, "pipe", process.stderr],
             })
 
             var output = ""

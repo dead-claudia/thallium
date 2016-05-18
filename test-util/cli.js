@@ -3,10 +3,9 @@
 var path = require("path")
 var minimatch = require("minimatch")
 var interpret = require("interpret")
-var t = require("../index.js")
-var methods = require("../lib/methods.js")
 var State = require("../lib/cli/run.js").State
-var LoaderData = require("../lib/cli/loader-data.js")
+
+var hasOwn = Object.prototype.hasOwnProperty
 
 exports.fixture = function (dir) {
     return path.resolve(__dirname, "../test-fixtures", dir)
@@ -40,25 +39,25 @@ function initTree(files, listing, file, entry) {
         throw new TypeError("value for entry " + file + " must exist")
     } else if (typeof entry === "string") {
         // Node tries to execute unknown extensions as JS, but this is better.
-        files.set(file, function (type) {
+        files[file] = function (type) {
             if (type === "read") return entry
             throw new Error(file + " is not executable!")
-        })
+        }
         listing.push(file)
     } else if (typeof entry === "function") {
         // Cache the load, like Node.
         var value
 
-        files.set(file, function (type) {
+        files[file] = function (type) {
             if (type === "load") {
                 if (entry == null) return value
                 return value = entry()
             }
             throw new Error(file + " shouldn't be read!")
-        })
+        }
         listing.push(file)
     } else {
-        files.set(file, {type: "directory"})
+        files[file] = {type: "directory"}
 
         for (var key in entry) {
             if ({}.hasOwnProperty.call(entry, key)) {
@@ -105,7 +104,7 @@ var interpretModules = {} // eslint-disable-line newline-after-var
 })()
 
 exports.mock = function (tree) {
-    var files = new Map()
+    var files = Object.create(null)
     var listing = []
     var cwd = process.platform === "win32" ? "C:\\" : "/"
 
@@ -182,14 +181,14 @@ exports.mock = function (tree) {
         var target = resolve(file)
 
         // Directories are initialized as objects.
-        if (!files.has(target)) throw notFound(file)
+        if (!hasOwn.call(files, target)) throw notFound(file)
 
-        var func = files.get(target)
+        var func = files[target]
 
-        if (typeof func !== "function") func = files.get(target + ".js")
+        if (typeof func !== "function") func = files[target + ".js"]
 
         if (typeof func !== "function") {
-            func = files.get(path.join(target, "index.js"))
+            func = files[path.join(target, "index.js")]
         }
 
         if (typeof func !== "function") throw notFound(file)
@@ -212,7 +211,7 @@ exports.mock = function (tree) {
             var target = resolve(file)
 
             // Directories are initialized as objects.
-            if (!files.has(target)) {
+            if (!hasOwn.call(files, target)) {
                 throw fsError({
                     path: file,
                     message: "no such file or directory",
@@ -222,7 +221,7 @@ exports.mock = function (tree) {
                 })
             }
 
-            var func = files.get(target)
+            var func = files[target]
 
             if (typeof func === "object") {
                 throw fsError({
@@ -241,7 +240,7 @@ exports.mock = function (tree) {
         cwd: function () { return cwd },
         chdir: function (dir) { cwd = resolve(dir) },
         exists: function (file) {
-            return typeof files.get(resolve(file)) === "function"
+            return typeof files[resolve(file)] === "function"
         },
     }
 }
@@ -260,43 +259,3 @@ function Loader(argv, util) {
     this.state = new State({cwd: util.cwd(), argv: argv, util: util})
     this.load = util.load
 }
-
-methods(Loader, {
-    // Partially copied from the module itself. Checks and cleans the
-    // map of default keys.
-    clean: function (map) {
-        var list = []
-        var self = this
-
-        map.forEach(function (data, ext) {
-            // Skip any custom or out-of-order modules.
-            if (!data.original) return
-
-            if (ext === ".js") {
-                t.deepEqual(data, LoaderData.jsLoader)
-            } else {
-                var mod = interpret.jsVariants[ext]
-                var expected = new LoaderData.Register(ext, mod, self.load)
-
-                expected.original = true
-                t.deepEqual(data, expected)
-            }
-
-            list.push(ext)
-        })
-
-        for (var i = 0; i < list.length; i++) {
-            map.delete(list[i])
-        }
-
-        return map
-    },
-
-    require: function (ext, mod, use) {
-        return new LoaderData.Register(ext, mod, this.load, use)
-    },
-
-    register: function (ext, use) {
-        return this.require(ext, interpret.jsVariants[ext], use)
-    },
-})
