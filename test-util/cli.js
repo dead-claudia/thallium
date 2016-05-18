@@ -276,11 +276,10 @@ methods(Loader, {
                 t.deepEqual(data, LoaderData.jsLoader)
             } else {
                 var mod = interpret.jsVariants[ext]
+                var expected = new LoaderData.Register(ext, mod, self.load)
 
-                t.deepEqual(data, Object.assign(
-                    new LoaderData.Register(ext, mod, self.load),
-                    {original: true}
-                ))
+                expected.original = true
+                t.deepEqual(data, expected)
             }
 
             list.push(ext)
