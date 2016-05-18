@@ -1,7 +1,7 @@
 "use strict"
 
-// const t = require("../../index.js")
+// var t = require("../../index.js")
 
-describe("cli config glob iterator", () => {
+describe("cli config glob iterator", function () {
     // TODO
 })

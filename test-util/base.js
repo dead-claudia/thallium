@@ -1,9 +1,16 @@
 "use strict"
 
-exports.push = ret => (arg, done) => {
-    ret.push(arg)
-    done()
+exports.push = function (ret) {
+    return function (arg, done) {
+        ret.push(arg)
+        return done()
+    }
 }
 
-exports.n = (type, path, value, slow) => ({type, path, value, slow: !!slow})
-exports.p = (name, index) => ({name, index})
+exports.n = function (type, path, value, slow) {
+    return {type: type, path: path, value: value, slow: !!slow}
+}
+
+exports.p = function (name, index) {
+    return {name: name, index: index}
+}

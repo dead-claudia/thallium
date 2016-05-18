@@ -2,12 +2,12 @@
 
 /* eslint-env mocha */
 
-const t = require("../index.js")
+var t = require("../index.js")
 
 exports.fail = function (name) {
-    const args = []
+    var args = []
 
-    for (let i = 1; i < arguments.length; i++) {
+    for (var i = 1; i < arguments.length; i++) {
         args.push(arguments[i])
     }
 
@@ -20,8 +20,12 @@ exports.fail = function (name) {
     }
 
     throw new t.AssertionError(
-        `Expected t.${name} to throw an AssertionError`,
+        "Expected t." + name + " to throw an AssertionError",
         t.AssertionError)
 }
 
-exports.basic = (desc, callback) => describe(desc, () => it("works", callback))
+exports.basic = function (desc, callback) {
+    describe(desc, function () {
+        it("works", callback)
+    })
+}

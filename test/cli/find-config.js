@@ -1,21 +1,23 @@
 "use strict"
 
-const t = require("../../index.js")
-const findConfig = require("../../lib/cli/find-config.js")
-const LoaderData = require("../../lib/cli/loader-data.js")
-const Util = require("../../test-util/cli.js")
+var t = require("../../index.js")
+var findConfig = require("../../lib/cli/find-config.js")
+var LoaderData = require("../../lib/cli/loader-data.js")
+var Util = require("../../test-util/cli.js")
 
-describe("cli config finder", () => {
+describe("cli config finder", function () {
+    if (typeof Map !== "function") return
+
     // It's easiest to depend on LoaderData.extractIntoMap being right, since
     // I don't have to rely on the data structures instead, which would make the
     // tests much more redundant.
     function finder(name, opts) {
-        it(name, () => {
-            const mock = Util.mock(opts.tree)
-            const loader = new Util.Loader(opts.args, mock)
-            const found = opts.found != null ? mock.resolve(opts.found) : null
-            const map = LoaderData.extractIntoMap(loader.state)
-            const file = findConfig(loader.state, map)
+        it(name, function () {
+            var mock = Util.mock(opts.tree)
+            var loader = new Util.Loader(opts.args, mock)
+            var found = opts.found != null ? mock.resolve(opts.found) : null
+            var map = LoaderData.extractIntoMap(loader.state)
+            var file = findConfig(loader.state, map)
 
             t.equal(file, found)
 
@@ -27,7 +29,7 @@ describe("cli config finder", () => {
 
     /* eslint-disable max-len */
 
-    context("default path", () => {
+    context("default path", function () {
         finder("when it's JS", {
             tree: {
                 test: {".tl.js": "contents"},
@@ -61,7 +63,7 @@ describe("cli config finder", () => {
         })
     })
 
-    context("no config", () => {
+    context("no config", function () {
         finder("returns null when none exists", {
             tree: {
                 test: {"nope.js": ""},
@@ -87,7 +89,7 @@ describe("cli config finder", () => {
         })
     })
 
-    context("--config", () => {
+    context("--config", function () {
         finder("gets a specific config", {
             tree: {
                 test: {".tl.js": "contents"},
@@ -116,7 +118,7 @@ describe("cli config finder", () => {
         })
     })
 
-    context("from globs", () => {
+    context("from globs", function () {
         finder("when in a single file glob", {
             tree: {
                 src: {".tl.coffee": "contents"},
@@ -198,7 +200,7 @@ describe("cli config finder", () => {
         })
     })
 
-    context("recursion", () => {
+    context("recursion", function () {
         finder("when up a level", {
             tree: {
                 "test": {"test.js": "contents"},
@@ -246,7 +248,7 @@ describe("cli config finder", () => {
         })
     })
 
-    context("precedence", () => {
+    context("precedence", function () {
         finder("prefers the first glob over others", {
             tree: {
                 test1: {".tl.js": "contents"},

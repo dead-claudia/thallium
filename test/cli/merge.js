@@ -1,23 +1,23 @@
 "use strict"
 
-const t = require("../../index.js")
-const m = require("../../lib/cli/merge.js")
+var t = require("../../index.js")
+var m = require("../../lib/cli/merge.js")
 
-describe("cli config merging", () => {
-    context("validate", () => {
+describe("cli config merging", function () {
+    context("validate", function () {
         function valid(name, config) {
-            it(`${name} is valid`, () => { m.validate(config) })
+            it(name + " is valid", function () { m.validate(config) })
         }
 
         function invalid(name, config) {
-            it(`${name} is invalid`, () => {
-                t.throws(() => m.validate(config), TypeError)
+            it(name + " is invalid", function () {
+                t.throws(function () { m.validate(config) }, TypeError)
             })
         }
 
         valid("empty object", {})
 
-        describe("module", () => {
+        describe("module", function () {
             valid("string", {module: "foo"})
             invalid("number", {module: 1})
             invalid("true", {module: true})
@@ -27,7 +27,7 @@ describe("cli config merging", () => {
             invalid("array", {module: []})
         })
 
-        describe("thallium", () => {
+        describe("thallium", function () {
             // Just treat any object as a duck. If it blows up in their face, it
             // should hopefully be obvious why.
             valid("object", {thallium: {}})
@@ -39,7 +39,7 @@ describe("cli config merging", () => {
             invalid("array", {thallium: []})
         })
 
-        describe("files", () => {
+        describe("files", function () {
             valid("[\"test/**\"]", {files: ["test/**"]})
             valid("[\"what???!:\\n\"]", {files: ["what???!:\n"]})
             valid("[]", {files: []})
@@ -57,9 +57,9 @@ describe("cli config merging", () => {
         })
     })
 
-    context("merge", () => {
+    context("merge", function () {
         function load(opts) {
-            return name => {
+            return function (name) {
                 t.equal(name, opts.module || "thallium")
                 return opts.thallium || {}
             }
@@ -69,53 +69,61 @@ describe("cli config merging", () => {
             return m.merge(files, config, load, ".")
         }
 
-        it("merges an empty object", () => {
-            const thallium = {thallium: true}
-            const files = ["test/**"]
-            const config = merge(files, {}, load({thallium}))
+        it("merges an empty object", function () {
+            var thallium = {thallium: true}
+            var files = ["test/**"]
+            var config = merge(files, {}, load({thallium: thallium}))
 
-            t.match(config, {thallium, files})
+            t.match(config, {thallium: thallium, files: files})
             t.equal(config.thallium, thallium)
         })
 
-        it("merges `module`", () => {
-            const thallium = {thallium: true}
-            const module = "./some-thallium-wrapper"
-            const files = ["test/**"]
-            const config = merge(files, {module}, load({module, thallium}))
+        it("merges `module`", function () {
+            var thallium = {thallium: true}
+            var module = "./some-thallium-wrapper"
+            var files = ["test/**"]
+            var config = merge(files, {module: module}, load({
+                module: module,
+                thallium: thallium,
+            }))
 
-            t.match(config, {thallium, files})
+            t.match(config, {thallium: thallium, files: files})
             t.equal(config.thallium, thallium)
         })
 
-        it("merges `thallium`", () => {
-            const thallium = {thallium: true}
-            const files = ["test/**"]
-            const config = merge(files, {thallium}, load({}))
+        it("merges `thallium`", function () {
+            var thallium = {thallium: true}
+            var files = ["test/**"]
+            var config = merge(files, {thallium: thallium}, load({}))
 
-            t.match(config, {thallium, files})
+            t.match(config, {thallium: thallium, files: files})
             t.equal(config.thallium, thallium)
         })
 
-        it("merges `files`", () => {
-            const thallium = {thallium: true}
-            const files = ["test/**"]
-            const extra = ["other/**"]
-            const config = merge(files, {files: extra}, load({thallium}))
+        it("merges `files`", function () {
+            var thallium = {thallium: true}
+            var files = ["test/**"]
+            var extra = ["other/**"]
+            var config = merge(files, {files: extra}, load({
+                thallium: thallium,
+            }))
 
-            t.match(config, {thallium, files})
+            t.match(config, {thallium: thallium, files: files})
             t.equal(config.thallium, thallium)
         })
 
-        it("merges everything", () => {
-            const thallium = {thallium: true}
-            const module = "./some-thallium-wrapper"
-            const files = ["test/**"]
-            const extra = ["other/**"]
-            const config = merge(files, {module, thallium, files: extra},
-                load({module}))
+        it("merges everything", function () {
+            var thallium = {thallium: true}
+            var module = "./some-thallium-wrapper"
+            var files = ["test/**"]
+            var extra = ["other/**"]
+            var config = merge(files, {
+                module: module,
+                thallium: thallium,
+                files: extra,
+            }, load({module: module}))
 
-            t.match(config, {thallium, files})
+            t.match(config, {thallium: thallium, files: files})
             t.equal(config.thallium, thallium)
         })
     })

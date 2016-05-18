@@ -1,33 +1,33 @@
 "use strict"
 
-const t = require("../index.js")
-const Util = require("../test-util/base.js")
-const n = Util.n
-const p = Util.p
+var t = require("../index.js")
+var Util = require("../test-util/base.js")
+var n = Util.n
+var p = Util.p
 
-describe("do()", () => {
-    it("exists", () => {
-        const tt = t.base()
+describe("do()", function () {
+    it("exists", function () {
+        var tt = t.base()
 
         t.hasKey(tt, "do")
         t.function(tt.do)
     })
 
-    it("runs blocks in sync tests", () => {
-        const tt = t.base()
-        const ret = []
-        let len, self // eslint-disable-line consistent-this
+    it("runs blocks in sync tests", function () {
+        var tt = t.base()
+        var ret = []
+        var len, self // eslint-disable-line consistent-this
 
         tt.reporter(Util.push(ret))
 
-        tt.test("test", tt => {
+        tt.test("test", function (tt) {
             tt.do(/** @this */ function () {
                 len = arguments.length
                 self = this
             })
         })
 
-        return tt.run().then(() => {
+        return tt.run().then(function () {
             t.undefined(self)
             t.equal(len, 0)
             t.match(ret, [
@@ -41,20 +41,20 @@ describe("do()", () => {
         })
     })
 
-    it("propagates errors from blocks in sync tests", () => {
-        const tt = t.base()
-        const ret = []
-        const sentinel = new Error("sentinel")
+    it("propagates errors from blocks in sync tests", function () {
+        var tt = t.base()
+        var ret = []
+        var sentinel = new Error("sentinel")
 
-        sentinel.marker = () => {}
+        sentinel.marker = function () {}
 
         tt.reporter(Util.push(ret))
 
-        tt.test("test", tt => {
-            tt.do(() => { throw sentinel })
+        tt.test("test", function (tt) {
+            tt.do(function () { throw sentinel })
         })
 
-        return tt.run().then(() => {
+        return tt.run().then(function () {
             t.match(ret, [
                 n("start", []),
                 n("start", [p("test", 0)]),
@@ -66,14 +66,14 @@ describe("do()", () => {
         })
     })
 
-    it("runs blocks in async tests", () => {
-        const tt = t.base()
-        const ret = []
-        let len, self // eslint-disable-line consistent-this
+    it("runs blocks in async tests", function () {
+        var tt = t.base()
+        var ret = []
+        var len, self // eslint-disable-line consistent-this
 
         tt.reporter(Util.push(ret))
 
-        tt.async("test", (tt, done) => {
+        tt.async("test", function (tt, done) {
             tt.do(/** @this */ function () {
                 len = arguments.length
                 self = this
@@ -82,7 +82,7 @@ describe("do()", () => {
             done()
         })
 
-        return tt.run().then(() => {
+        return tt.run().then(function () {
             t.undefined(self)
             t.equal(len, 0)
             t.match(ret, [
@@ -96,21 +96,21 @@ describe("do()", () => {
         })
     })
 
-    it("propagates errors from blocks in async tests", () => {
-        const tt = t.base()
-        const ret = []
-        const sentinel = new Error("sentinel")
+    it("propagates errors from blocks in async tests", function () {
+        var tt = t.base()
+        var ret = []
+        var sentinel = new Error("sentinel")
 
-        sentinel.marker = () => {}
+        sentinel.marker = function () {}
 
         tt.reporter(Util.push(ret))
 
-        tt.async("test", (tt, done) => {
-            tt.do(() => { throw sentinel })
+        tt.async("test", function (tt, done) {
+            tt.do(function () { throw sentinel })
             done()
         })
 
-        return tt.run().then(() => {
+        return tt.run().then(function () {
             t.match(ret, [
                 n("start", []),
                 n("start", [p("test", 0)]),
@@ -122,10 +122,10 @@ describe("do()", () => {
         })
     })
 
-    it("runs blocks in inline sync tests", () => {
-        const tt = t.base()
-        const ret = []
-        let len, self // eslint-disable-line consistent-this
+    it("runs blocks in inline sync tests", function () {
+        var tt = t.base()
+        var ret = []
+        var len, self // eslint-disable-line consistent-this
 
         tt.reporter(Util.push(ret))
 
@@ -134,7 +134,7 @@ describe("do()", () => {
             self = this
         })
 
-        return tt.run().then(() => {
+        return tt.run().then(function () {
             t.undefined(self)
             t.equal(len, 0)
             t.match(ret, [
@@ -148,18 +148,18 @@ describe("do()", () => {
         })
     })
 
-    it("propagates errors from blocks in inline sync tests", () => {
-        const tt = t.base()
-        const ret = []
-        const sentinel = new Error("sentinel")
+    it("propagates errors from blocks in inline sync tests", function () {
+        var tt = t.base()
+        var ret = []
+        var sentinel = new Error("sentinel")
 
-        sentinel.marker = () => {}
+        sentinel.marker = function () {}
 
         tt.reporter(Util.push(ret))
 
-        tt.test("test").do(() => { throw sentinel })
+        tt.test("test").do(function () { throw sentinel })
 
-        return tt.run().then(() => {
+        return tt.run().then(function () {
             t.match(ret, [
                 n("start", []),
                 n("start", [p("test", 0)]),

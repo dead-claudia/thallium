@@ -29,9 +29,11 @@ function fix(value) {
     return value
 }
 
-module.exports = (ev, done) => {
-    const path = ev.path.map(x => `[${x.index}: ${x.name}]`).join(" > ")
+module.exports = function (ev, done) {
+    var path = ev.path
+    .map(function (x) { return "[" + x.index + ": " + x.name + "]" })
+    .join(" > ")
 
-    console.log(`${ev.type} ${path ? `${path} ` : ""}= ${fix(ev.value)}`)
-    done()
+    console.log(ev.type + " " + (path ? path + " = " : "= ") + fix(ev.value))
+    return done()
 }

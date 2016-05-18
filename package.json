@@ -50,9 +50,6 @@
     "doc": "docs",
     "example": "docs/examples"
   },
-  "engines": {
-    "node": ">=4"
-  },
   "repository": "isiahmeadows/thallium",
   "bugs": "https://github.com/isiahmeadows/thallium/issues",
   "homepage": "https://github.com/isiahmeadows/thallium#readme"

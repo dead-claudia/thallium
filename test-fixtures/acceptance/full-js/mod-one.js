@@ -1,21 +1,24 @@
 "use strict"
 
-const t = require("../../../index.js")
+var Promise = require("bluebird")
+var t = require("../../../index.js")
 
-t.test("mod-one", t => {
+t.test("mod-one", function (t) {
     t.test("1 === 1").equal(1, 1)
 
-    t.test("foo()", t => {
+    t.test("foo()", function (t) {
         t.notEqual(1, 1)
     })
 
-    t.async("bar()", (t, done) => {
-        setTimeout(() => done(new Error("fail")), 0)
+    t.async("bar()", function (t, done) {
+        setTimeout(function () { done(new Error("fail")) }, 0)
     })
 
-    t.async("baz()", () => Promise.reject(new Error("sentinel")))
+    t.async("baz()", function () {
+        return Promise.reject(new Error("sentinel"))
+    })
 
-    t.test("nested", t => {
-        t.test("nested 2", tt => tt.true(true))
+    t.test("nested", function (t) {
+        t.test("nested 2", function (t) { t.true(true) })
     })
 })

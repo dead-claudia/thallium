@@ -1,60 +1,64 @@
 "use strict"
 
-const t = require("../../index.js")
-const assertions = require("../../assertions.js")
-const run1 = require("../../lib/cli/run.js").run
-const Cli = require("../../test-util/cli.js")
-const Base = require("../../test-util/base.js")
-const n = Base.n
-const p = Base.p
-const push = Base.push
+var Promise = require("bluebird")
+var t = require("../../index.js")
+var assertions = require("../../assertions.js")
+var run1 = require("../../lib/cli/run.js").run
+var Cli = require("../../test-util/cli.js")
+var Base = require("../../test-util/base.js")
+var n = Base.n
+var p = Base.p
+var push = Base.push
 
-describe("cli config runner", function () {
-    this.slow(150) // eslint-disable-line no-invalid-this
+describe("cli config runner", /* @this */ function () {
+    if (typeof Map !== "function") return
+    this.slow(150)
 
     /**
      * Most of these are integration tests.
      */
 
     function run(opts) {
-        const tt = t.base().use(assertions)
-        const tree = opts.tree(tt)
+        var tt = t.base().use(assertions)
+        var tree = opts.tree(tt)
 
-        tree["node_modules"] = {thallium: () => tt}
+        tree["node_modules"] = {thallium: function () { return tt }}
 
-        const util = Cli.mock(tree)
-        const cwd = opts.cwd != null ? opts.cwd : util.cwd()
-        let argv = opts.args
+        var util = Cli.mock(tree)
+        var cwd = opts.cwd != null ? opts.cwd : util.cwd()
+        var argv = opts.args
 
         if (typeof argv === "string") {
             argv = opts.args.trim()
             argv = argv ? argv.split(/\s+/g) : []
         }
 
-        return run1({argv, cwd, util})
+        return run1({argv: argv, cwd: cwd, util: util})
     }
 
-    it("runs valid tests in the root", () => {
-        const ret = []
+    it("runs valid tests in the root", function () {
+        var ret = []
 
         return run({
             args: "",
-            tree: t => ({
-                test: {
-                    ".tl.js"() {
-                        t.reporter(push(ret))
-                    },
+            tree: function (t) {
+                return {
+                    test: {
+                        ".tl.js": function () {
+                            t.reporter(push(ret))
+                        },
 
-                    "one.js"() {
-                        t.test("test 1")
-                    },
+                        "one.js": function () {
+                            t.test("test 1")
+                        },
 
-                    "two.js"() {
-                        t.test("test 2")
+                        "two.js": function () {
+                            t.test("test 2")
+                        },
                     },
-                },
-            }),
-        }).then(code => {
+                }
+            },
+        }).then(function (code) {
             t.equal(code, 0)
             t.match(ret, [
                 n("start", []),
@@ -70,27 +74,29 @@ describe("cli config runner", function () {
         })
     })
 
-    it("doesn't run tests without extensions", () => {
-        const ret = []
+    it("doesn't run tests without extensions", function () {
+        var ret = []
 
         return run({
             args: "",
-            tree: t => ({
-                test: {
-                    ".tl.js"() {
-                        t.reporter(push(ret))
-                    },
+            tree: function (t) {
+                return {
+                    test: {
+                        ".tl.js": function () {
+                            t.reporter(push(ret))
+                        },
 
-                    "one"() {
-                        t.test("test 1")
-                    },
+                        "one": function () {
+                            t.test("test 1")
+                        },
 
-                    "two.js"() {
-                        t.test("test 2")
+                        "two.js": function () {
+                            t.test("test 2")
+                        },
                     },
-                },
-            }),
-        }).then(code => {
+                }
+            },
+        }).then(function (code) {
             t.equal(code, 0)
             t.match(ret, [
                 n("start", []),
@@ -103,27 +109,29 @@ describe("cli config runner", function () {
         })
     })
 
-    it("doesn't run tests with wrong extensions", () => {
-        const ret = []
+    it("doesn't run tests with wrong extensions", function () {
+        var ret = []
 
         return run({
             args: "",
-            tree: t => ({
-                test: {
-                    ".tl.coffee"() {
-                        t.reporter(push(ret))
-                    },
+            tree: function (t) {
+                return {
+                    test: {
+                        ".tl.coffee": function () {
+                            t.reporter(push(ret))
+                        },
 
-                    "one.js"() {
-                        t.test("test 1")
-                    },
+                        "one.js": function () {
+                            t.test("test 1")
+                        },
 
-                    "two.coffee"() {
-                        t.test("test 2")
+                        "two.coffee": function () {
+                            t.test("test 2")
+                        },
                     },
-                },
-            }),
-        }).then(code => {
+                }
+            },
+        }).then(function (code) {
             t.equal(code, 0)
             t.match(ret, [
                 n("start", []),
@@ -136,27 +144,29 @@ describe("cli config runner", function () {
         })
     })
 
-    it("runs failing tests", () => {
-        const ret = []
+    it("runs failing tests", function () {
+        var ret = []
 
         return run({
             args: "",
-            tree: t => ({
-                test: {
-                    ".tl.js"() {
-                        t.reporter(push(ret))
-                    },
+            tree: function (t) {
+                return {
+                    test: {
+                        ".tl.js": function () {
+                            t.reporter(push(ret))
+                        },
 
-                    "one.js"() {
-                        t.test("test 1")
-                    },
+                        "one.js": function () {
+                            t.test("test 1")
+                        },
 
-                    "two.js"() {
-                        t.test("test 2").fail("oops")
+                        "two.js": function () {
+                            t.test("test 2").fail("oops")
+                        },
                     },
-                },
-            }),
-        }).then(code => {
+                }
+            },
+        }).then(function (code) {
             t.equal(code, 1)
             t.match(ret, [
                 n("start", []),
@@ -172,63 +182,73 @@ describe("cli config runner", function () {
         })
     })
 
-    it("runs moderately sized test suites", () => {
-        const ret = []
-        const fail1 = new t.AssertionError("Expected 1 to not equal 1", 1, 1)
-        const fail2 = new t.AssertionError("Expected 1 to equal 2", 2, 1)
-        const fail3 = new t.AssertionError("Expected 'yep' to be a nope",
+    it("runs moderately sized test suites", function () {
+        var ret = []
+        var fail1 = new t.AssertionError("Expected 1 to not equal 1", 1, 1)
+        var fail2 = new t.AssertionError("Expected 1 to equal 2", 2, 1)
+        var fail3 = new t.AssertionError("Expected 'yep' to be a nope",
             undefined, "yep")
-        const sentinel = new Error("sentinel")
+        var sentinel = new Error("sentinel")
 
-        sentinel.marker = () => {}
+        sentinel.marker = function () {}
 
         return run({
             args: "",
-            tree: t => ({
-                test: {
-                    ".tl.js"() {
-                        t.reporter(push(ret))
-                        t.define("isNope", x => ({
-                            test: x === "nope",
-                            actual: x,
-                            message: "Expected {actual} to be a nope",
-                        }))
+            tree: function (t) {
+                return {
+                    test: {
+                        ".tl.js": function () {
+                            t.reporter(push(ret))
+                            t.define("isNope", function (x) {
+                                return {
+                                    test: x === "nope",
+                                    actual: x,
+                                    message: "Expected {actual} to be a nope",
+                                }
+                            })
+                        },
+
+                        "mod-one.js": function () {
+                            t.test("mod-one", function (t) {
+                                t.test("1 === 1").equal(1, 1)
+
+                                t.test("foo()", function (t) {
+                                    t.notEqual(1, 1)
+                                })
+
+                                t.async("bar()", function (t, done) {
+                                    setTimeout(function () {
+                                        done(new Error("fail"))
+                                    }, 0)
+                                })
+
+                                t.async("baz()", function () {
+                                    return Promise.reject(sentinel)
+                                })
+
+                                t.test("nested", function (t) {
+                                    t.test("nested 2", function (t) {
+                                        t.true(true)
+                                    })
+                                })
+                            })
+                        },
+
+                        "mod-two.js": function () {
+                            t.test("mod-two", function (t) {
+                                t.test("1 === 2").equal(1, 2)
+
+                                t.test("expandos don't transfer", function (t) {
+                                    t.notHasKey(t, "foo")
+                                })
+
+                                t.test("what a fail...").isNope("yep")
+                            })
+                        },
                     },
-
-                    "mod-one.js"() {
-                        t.test("mod-one", t => {
-                            t.test("1 === 1").equal(1, 1)
-
-                            t.test("foo()", t => {
-                                t.notEqual(1, 1)
-                            })
-
-                            t.async("bar()", (t, done) => {
-                                setTimeout(() => done(new Error("fail")), 0)
-                            })
-
-                            t.async("baz()", () => Promise.reject(sentinel))
-
-                            t.test("nested", t => {
-                                t.test("nested 2", tt => tt.true(true))
-                            })
-                        })
-                    },
-
-                    "mod-two.js"() {
-                        t.test("mod-two", t => {
-                            t.test("1 === 2").equal(1, 2)
-
-                            t.test("expandos don't transfer", t => {
-                                t.notHasKey(t, "foo")
-                            })
-
-                            t.test("what a fail...").isNope("yep")
-                        })
-                    },
-                },
-            }),
-        }).then(code => {
+                }
+            },
+        }).then(function (code) {
             t.equal(code, 1)
             t.match(ret, [
                 n("start", []),

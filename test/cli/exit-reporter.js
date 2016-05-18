@@ -1,79 +1,86 @@
 "use strict"
 
-const t = require("../../index.js")
-const exitReporter = require("../../lib/cli/run.js").exitReporter
-const resolveAny = require("../../lib/util.js").resolveAny
+var t = require("../../index.js")
+var exitReporter = require("../../lib/cli/run.js").exitReporter
+var resolveAny = require("../../lib/util.js").resolveAny
 
-describe("cli exit reporter", () => {
-    const map = {
+describe("cli exit reporter", function () {
+    var map = {
         fail: new Error("fail"),
         extra: new Error("fail"),
     }
 
     function execute(reporter, type) {
-        return resolveAny(reporter, undefined, {
-            type,
-            value: map[type],
-            path: {name: "test", index: 0},
-        })
+        return function () {
+            return resolveAny(reporter, undefined, {
+                type: type,
+                value: map[type],
+                path: {name: "test", index: 0},
+            })
+        }
     }
 
-    for (const type of ["start", "end", "pass", "pending", "exit"]) {
-        it(`doesn't trigger for "${type} events"`, () => {
-            const state = {fail: false}
-            const reporter = exitReporter(state)
+    ["start", "end", "pass", "pending", "exit"]
+    .forEach(function (type) {
+        it("doesn't trigger for \"" + type + "\" events", function () {
+            var state = {fail: false}
+            var reporter = exitReporter(state)
 
-            return execute(reporter, type).then(() => t.false(state.fail))
+            return execute(reporter, type)().then(function () {
+                t.false(state.fail)
+            })
         })
-    }
-
-    for (const type of ["fail", "extra"]) {
-        it(`doesn't trigger for "${type} events"`, () => {
-            const state = {fail: false}
-            const reporter = exitReporter(state)
-
-            return execute(reporter, type).then(() => t.true(state.fail))
-        })
-    }
-
-    it("doesn't trigger from numerous calls", () => {
-        const state = {fail: false}
-        const reporter = exitReporter(state)
-
-        return execute(reporter, "start")
-        .then(() => execute(reporter, "end"))
-        .then(() => execute(reporter, "pass"))
-        .then(() => execute(reporter, "start"))
-        .then(() => execute(reporter, "end"))
-        .then(() => execute(reporter, "pass"))
-        .then(() => t.false(state.fail))
     })
 
-    it("stays triggered", () => {
-        const state = {fail: false}
-        const reporter = exitReporter(state)
+    ;["fail", "extra"].forEach(function (type) {
+        it("does trigger for \"" + type + "\" events", function () {
+            var state = {fail: false}
+            var reporter = exitReporter(state)
 
-        return execute(reporter, "start")
-        .then(() => execute(reporter, "end"))
-        .then(() => execute(reporter, "fail"))
-        .then(() => execute(reporter, "start"))
-        .then(() => execute(reporter, "end"))
-        .then(() => execute(reporter, "pass"))
-        .then(() => t.true(state.fail))
+            return execute(reporter, type)().then(function () {
+                t.true(state.fail)
+            })
+        })
     })
 
-    it("is cleared on \"exit\" + \"start\"", () => {
-        const state = {fail: false}
-        const reporter = exitReporter(state)
+    it("doesn't trigger from numerous calls", function () {
+        var state = {fail: false}
+        var reporter = exitReporter(state)
 
-        return execute(reporter, "start")
-        .then(() => execute(reporter, "end"))
-        .then(() => execute(reporter, "fail"))
-        .then(() => execute(reporter, "start"))
-        .then(() => execute(reporter, "end"))
-        .then(() => execute(reporter, "pass"))
-        .then(() => execute(reporter, "exit"))
-        .then(() => execute(reporter, "start"))
-        .then(() => t.false(state.fail))
+        return execute(reporter, "start")()
+        .then(execute(reporter, "end"))
+        .then(execute(reporter, "pass"))
+        .then(execute(reporter, "start"))
+        .then(execute(reporter, "end"))
+        .then(execute(reporter, "pass"))
+        .then(function () { t.false(state.fail) })
+    })
+
+    it("stays triggered", function () {
+        var state = {fail: false}
+        var reporter = exitReporter(state)
+
+        return execute(reporter, "start")()
+        .then(execute(reporter, "end"))
+        .then(execute(reporter, "fail"))
+        .then(execute(reporter, "start"))
+        .then(execute(reporter, "end"))
+        .then(execute(reporter, "pass"))
+        .then(function () { t.true(state.fail) })
+    })
+
+    it("is cleared on \"exit\" + \"start\"", function () {
+        var state = {fail: false}
+        var reporter = exitReporter(state)
+
+        return execute(reporter, "start")()
+        .then(execute(reporter, "end"))
+        .then(execute(reporter, "fail"))
+        .then(execute(reporter, "start"))
+        .then(execute(reporter, "end"))
+        .then(execute(reporter, "pass"))
+        .then(execute(reporter, "exit"))
+        .then(execute(reporter, "start"))
+        .then(function () { t.false(state.fail) })
     })
 })

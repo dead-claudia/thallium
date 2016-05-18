@@ -5,106 +5,128 @@
  * there is *so* much repetition.
  */
 
-const Util = require("./lib/util.js")
-const deepEqualImpl = require("./lib/deep-equal.js")
+var Util = require("./lib/util.js")
+var deepEqualImpl = require("./lib/deep-equal.js")
 
-const toString = Object.prototype.toString
-const hasOwn = Object.prototype.hasOwnProperty
+var toString = Object.prototype.toString
+var hasOwn = Object.prototype.hasOwnProperty
 
-const looseDeepEqual = (a, b) => deepEqualImpl(a, b, "loose")
-const deepEqual = (a, b) => deepEqualImpl(a, b, "strict")
-const deepEqualMatch = (a, b) => deepEqualImpl(a, b, "match")
+function looseDeepEqual(a, b) {
+    return deepEqualImpl(a, b, "loose")
+}
+
+function deepEqual(a, b) {
+    return deepEqualImpl(a, b, "strict")
+}
+
+function deepEqualMatch(a, b) {
+    return deepEqualImpl(a, b, "match")
+}
 
 // This holds everything to be added.
-const methods = []
-const aliases = []
+var methods = []
+var aliases = []
 
 /**
  * The core assertions export, as a plugin.
  */
-module.exports = t => {
-    methods.forEach(m => t.define(m.name, m.callback))
-    aliases.forEach(alias => t[alias.name] = t[alias.original])
+module.exports = function (t) {
+    methods.forEach(function (m) { t.define(m.name, m.callback) })
+    aliases.forEach(function (alias) { t[alias.name] = t[alias.original] })
 }
 
 // Little helpers so that these functions only need to be created once.
 function define(name, callback) {
-    methods.push({name, callback})
+    methods.push({name: name, callback: callback})
 }
 
 function alias(name, original) {
-    aliases.push({name, original})
+    aliases.push({name: name, original: original})
 }
 
 // Much easier to type
 function negate(name) {
-    return `not${name[0].toUpperCase()}${name.slice(1)}`
+    return "not" + name[0].toUpperCase() + name.slice(1)
 }
 
 // The basic assert. It's almost there for looks, given how easy it is to
 // define your own assertions.
 function sanitize(message) {
-    return message ? `${message}`.replace(/(\{\w+\})/g, "\\$1") : ""
+    return message ? String(message).replace(/(\{\w+\})/g, "\\$1") : ""
 }
 
-define("assert", (test, message) => ({test, message: sanitize(message)}))
-define("fail", message => ({test: false, message: sanitize(message)}))
+define("assert", function (test, message) {
+    return {test: test, message: sanitize(message)}
+})
+
+define("fail", function (message) {
+    return {test: false, message: sanitize(message)}
+})
 
 /**
  * These makes many of the common operators much easier to do.
  */
 function unary(name, func, messages) {
-    define(name, x => ({
-        test: func(x),
-        actual: x,
-        message: messages[0],
-    }))
+    define(name, function (x) {
+        return {
+            test: func(x),
+            actual: x,
+            message: messages[0],
+        }
+    })
 
-    define(negate(name), x => ({
-        test: !func(x),
-        actual: x,
-        message: messages[1],
-    }))
+    define(negate(name), function (x) {
+        return {
+            test: !func(x),
+            actual: x,
+            message: messages[1],
+        }
+    })
 }
 
 function binary(name, func, messages) {
-    define(name, (a, b) => ({
-        test: func(a, b),
-        actual: a,
-        expected: b,
-        message: messages[0],
-    }))
+    define(name, function (a, b) {
+        return {
+            test: func(a, b),
+            actual: a,
+            expected: b,
+            message: messages[0],
+        }
+    })
 
-    define(negate(name), (a, b) => ({
-        test: !func(a, b),
-        actual: a,
-        expected: b,
-        message: messages[1],
-    }))
+    define(negate(name), function (a, b) {
+        return {
+            test: !func(a, b),
+            actual: a,
+            expected: b,
+            message: messages[1],
+        }
+    })
 }
 
-unary("ok", x => !!x, [
+unary("ok", function (x) { return !!x }, [
     "Expected {actual} to be ok",
     "Expected {actual} to not be ok",
 ])
 
-for (const type of "boolean function number object string symbol".split(" ")) {
-    const name = (type[0] === "o" ? "an " : "a ") + type
+"boolean function number object string symbol".split(" ")
+.forEach(function (type) {
+    var name = (type[0] === "o" ? "an " : "a ") + type
 
-    unary(type, x => typeof x === type, [
-        `Expected {actual} to be ${name}`,
-        `Expected {actual} to not be ${name}`,
+    unary(type, function (x) { return typeof x === type }, [
+        "Expected {actual} to be " + name,
+        "Expected {actual} to not be " + name,
     ])
-}
+})
 
-for (const value of [true, false, null, undefined]) {
-    unary(`${value}`, x => x === value, [
-        `Expected {actual} to be ${value}`,
-        `Expected {actual} to not be ${value}`,
+;[true, false, null, undefined].forEach(function (value) {
+    unary(value + "", function (x) { return x === value }, [
+        "Expected {actual} to be " + value,
+        "Expected {actual} to not be " + value,
     ])
-}
+})
 
-unary("exists", x => x != null, [
+unary("exists", function (x) { return x != null }, [
     "Expected {actual} to exist",
     "Expected {actual} to not exist",
 ])
@@ -114,35 +136,43 @@ unary("array", Array.isArray, [
     "Expected {actual} to not be an array",
 ])
 
-define("type", (object, type) => ({
-    test: typeof object === type,
-    expected: type,
-    actual: typeof object,
-    o: object,
-    message: "Expected typeof {o} to be {expected}, but found {actual}",
-}))
+define("type", function (object, type) {
+    return {
+        test: typeof object === type,
+        expected: type,
+        actual: typeof object,
+        o: object,
+        message: "Expected typeof {o} to be {expected}, but found {actual}",
+    }
+})
 
-define("notType", (object, type) => ({
-    test: typeof object !== type,
-    expected: type,
-    o: object,
-    message: "Expected typeof {o} to not be {expected}",
-}))
+define("notType", function (object, type) {
+    return {
+        test: typeof object !== type,
+        expected: type,
+        o: object,
+        message: "Expected typeof {o} to not be {expected}",
+    }
+})
 
-define("instanceof", (object, Type) => ({
-    test: object instanceof Type,
-    expected: Type,
-    actual: object.constructor,
-    o: object,
-    message: "Expected {o} to be an instance of {expected}, but found {actual}",
-}))
+define("instanceof", function (object, Type) {
+    return {
+        test: object instanceof Type,
+        expected: Type,
+        actual: object.constructor,
+        o: object,
+        message: "Expected {o} to be an instance of {expected}, but found {actual}", // eslint-disable-line max-len
+    }
+})
 
-define("notInstanceof", (object, Type) => ({
-    test: !(object instanceof Type),
-    expected: Type,
-    o: object,
-    message: "Expected {o} to not be an instance of {expected}",
-}))
+define("notInstanceof", function (object, Type) {
+    return {
+        test: !(object instanceof Type),
+        expected: Type,
+        o: object,
+        message: "Expected {o} to not be an instance of {expected}",
+    }
+})
 
 binary("equal", Util.strictIs, [
     "Expected {actual} to equal {expected}",
@@ -155,18 +185,24 @@ binary("equalLoose", Util.looseIs, [
 ])
 
 function comp(name, compare, message) {
-    define(name, (a, b) => ({
-        test: compare(a, b),
-        actual: a,
-        expected: b,
-        message,
-    }))
+    define(name, function (a, b) {
+        return {
+            test: compare(a, b),
+            actual: a,
+            expected: b,
+            message: message,
+        }
+    })
 }
 
-comp("atLeast", (a, b) => a >= b, "Expected {actual} to be at least {expected}")
-comp("atMost", (a, b) => a <= b, "Expected {actual} to be at most {expected}")
-comp("above", (a, b) => a > b, "Expected {actual} to be above {expected}")
-comp("below", (a, b) => a < b, "Expected {actual} to be below {expected}")
+/* eslint-disable max-len */
+
+comp("atLeast", function (a, b) { return a >= b }, "Expected {actual} to be at least {expected}")
+comp("atMost", function (a, b) { return a <= b }, "Expected {actual} to be at most {expected}")
+comp("above", function (a, b) { return a > b }, "Expected {actual} to be above {expected}")
+comp("below", function (a, b) { return a < b }, "Expected {actual} to be below {expected}")
+
+/* eslint-enable max-len */
 
 binary("deepEqual", deepEqual, [
     "Expected {actual} to deeply equal {expected}",
@@ -188,35 +224,42 @@ alias("notMatchLoose", "notDeepEqualLoose")
 
 function has(name, equals, check, get, messages) { // eslint-disable-line max-len, max-params
     if (equals === Util.looseIs) {
-        define(name, (object, key, value) => ({
-            test: check(object, key) && equals(get(object, key), value),
-            expected: value,
-            actual: object[key],
-            key, object,
-            message: messages[0],
-        }))
+        define(name, function (object, key, value) {
+            return {
+                test: check(object, key) && equals(get(object, key), value),
+                expected: value,
+                actual: object[key],
+                key: key,
+                object: object,
+                message: messages[0],
+            }
+        })
 
-        define(negate(name), (object, key, value) => ({
-            test: !check(object, key) || !equals(get(object, key), value),
-            actual: value,
-            key, object,
-            message: messages[2],
-        }))
+        define(negate(name), function (object, key, value) {
+            return {
+                test: !check(object, key) || !equals(get(object, key), value),
+                actual: value,
+                key: key,
+                object: object,
+                message: messages[2],
+            }
+        })
     } else {
         define(name, function (object, key, value) {
-            const test = check(object, key)
+            var test = check(object, key)
 
             if (arguments.length >= 3) {
                 return {
                     test: test && equals(get(object, key), value),
                     expected: value,
                     actual: object[key],
-                    key, object,
+                    key: key,
+                    object: object,
                     message: messages[0],
                 }
             } else {
                 return {
-                    test,
+                    test: test,
                     expected: key,
                     actual: object,
                     message: messages[1],
@@ -225,18 +268,19 @@ function has(name, equals, check, get, messages) { // eslint-disable-line max-le
         })
 
         define(negate(name), function (object, key, value) {
-            const test = !check(object, key)
+            var test = !check(object, key)
 
             if (arguments.length >= 3) {
                 return {
                     test: test || !equals(get(object, key), value),
                     actual: value,
-                    key, object,
+                    key: key,
+                    object: object,
                     message: messages[2],
                 }
             } else {
                 return {
-                    test,
+                    test: test,
                     expected: key,
                     actual: object,
                     message: messages[3],
@@ -246,11 +290,25 @@ function has(name, equals, check, get, messages) { // eslint-disable-line max-le
     }
 }
 
-const hasOwnKey = (object, key) => hasOwn.call(object, key)
-const hasInKey = (object, key) => key in object
-const hasObjectGet = (object, key) => object[key]
-const hasInColl = (object, key) => object.has(key)
-const hasCollGet = (object, key) => object.get(key)
+function hasOwnKey(object, key) {
+    return hasOwn.call(object, key)
+}
+
+function hasInKey(object, key) {
+    return key in object
+}
+
+function hasObjectGet(object, key) {
+    return object[key]
+}
+
+function hasInColl(object, key) {
+    return object.has(key)
+}
+
+function hasCollGet(object, key) {
+    return object.get(key)
+}
 
 has("hasOwn", Util.strictIs, hasOwnKey, hasObjectGet, [
     "Expected {object} to have own key {key} equal to {expected}, but found {actual}", // eslint-disable-line max-len
@@ -302,9 +360,9 @@ function getName(func) {
 
 function throws(name, methods) {
     function run(invert) {
-        return (func, matcher) => {
-            let test = false
-            let error
+        return function (func, matcher) {
+            var test = false
+            var error
 
             try {
                 func()
@@ -320,7 +378,7 @@ function throws(name, methods) {
             return {
                 test: test ^ invert,
                 expected: matcher,
-                error,
+                error: error,
                 message: methods.message(matcher, invert, test),
             }
         }
@@ -331,22 +389,22 @@ function throws(name, methods) {
 }
 
 throws("throws", {
-    check(Type, e) {
+    check: function (Type, e) {
         return Type == null || e instanceof Type
     },
 
-    rethrow(matcher, invert, test) {
+    rethrow: function (matcher, invert, test) {
         return matcher != null && !invert && !test
     },
 
-    message(Type, invert, test) {
-        let str = "Expected callback to "
+    message: function (Type, invert, test) {
+        var str = "Expected callback to "
 
         if (invert) str += "not "
         str += "throw"
 
         if (Type != null) {
-            str += ` an instance of ${getName(Type)}`
+            str += " an instance of " + getName(Type)
             if (!invert && test === false) str += ", but found {error}"
         }
 
@@ -355,21 +413,21 @@ throws("throws", {
 })
 
 throws("throwsMatch", {
-    check(matcher, e) {
+    check: function (matcher, e) {
         if (typeof matcher === "string") return e.message === matcher
         if (toString.call(matcher) === "[object RegExp]") {
             return matcher.test(e.message)
         }
         // Not accepting objects yet.
         if (typeof matcher !== "function") {
-            throw new TypeError(`Unexpected matcher type: ${typeof matcher}`)
+            throw new TypeError("Unexpected matcher type: " + typeof matcher)
         }
         return !!matcher(e)
     },
 
-    rethrow() { return false },
+    rethrow: function () { return false },
 
-    message(_, invert, test) {
+    message: function (_, invert, test) {
         if (invert) {
             return "Expected callback to not throw an error that matches {expected}" // eslint-disable-line max-len
         } else if (test === undefined) {
@@ -381,38 +439,49 @@ throws("throwsMatch", {
 })
 
 function len(name, compare, message) {
-    define(name, (object, length) => ({
-        test: object.length != null && compare(object.length, +length),
-        expected: length,
-        actual: object.length,
-        object, message,
-    }))
+    define(name, function (object, length) {
+        return {
+            test: object.length != null && compare(object.length, +length),
+            expected: length,
+            actual: object.length,
+            object: object,
+            message: message,
+        }
+    })
 }
 
 /* eslint-disable max-len */
 
 // Note: these always fail with NaNs.
-len("length", (a, b) => a === b, "Expected {object} to have length {expected}, but found {actual}")
-len("notLength", (a, b) => a !== b, "Expected {object} to not have length {actual}")
-len("lengthAtLeast", (a, b) => a >= b, "Expected {object} to have length at least {expected}, but found {actual}")
-len("lengthAtMost", (a, b) => a <= b, "Expected {object} to have length at most {expected}, but found {actual}")
-len("lengthAbove", (a, b) => a > b, "Expected {object} to have length above {expected}, but found {actual}")
-len("lengthBelow", (a, b) => a < b, "Expected {object} to have length below {expected}, but found {actual}")
+len("length", function (a, b) { return a === b }, "Expected {object} to have length {expected}, but found {actual}")
+len("notLength", function (a, b) { return a !== b }, "Expected {object} to not have length {actual}")
+len("lengthAtLeast", function (a, b) { return a >= b }, "Expected {object} to have length at least {expected}, but found {actual}")
+len("lengthAtMost", function (a, b) { return a <= b }, "Expected {object} to have length at most {expected}, but found {actual}")
+len("lengthAbove", function (a, b) { return a > b }, "Expected {object} to have length above {expected}, but found {actual}")
+len("lengthBelow", function (a, b) { return a < b }, "Expected {object} to have length below {expected}, but found {actual}")
 
 /* eslint-enable max-len */
 
 // Note: these two always fail when dealing with NaNs.
-define("closeTo", (actual, expected, delta) => ({
-    test: Math.abs(actual - expected) <= Math.abs(delta),
-    actual, expected, delta,
-    message: "Expected {actual} to be within {delta} of {expected}",
-}))
+define("closeTo", function (actual, expected, delta) {
+    return {
+        test: Math.abs(actual - expected) <= Math.abs(delta),
+        actual: actual,
+        expected: expected,
+        delta: delta,
+        message: "Expected {actual} to be within {delta} of {expected}",
+    }
+})
 
-define("notCloseTo", (actual, expected, delta) => ({
-    test: Math.abs(actual - expected) > Math.abs(delta),
-    actual, expected, delta,
-    message: "Expected {actual} to not be within {delta} of {expected}",
-}))
+define("notCloseTo", function (actual, expected, delta) {
+    return {
+        test: Math.abs(actual - expected) > Math.abs(delta),
+        actual: actual,
+        expected: expected,
+        delta: delta,
+        message: "Expected {actual} to not be within {delta} of {expected}",
+    }
+})
 
 /* eslint-disable max-len */
 
@@ -453,11 +522,25 @@ define("notCloseTo", (actual, expected, delta) => ({
 
 function makeIncludes(all, func) {
     return function (array, keys) {
+        function check(key) {
+            for (var i = 0; i < array.length; i++) {
+                if (func(key, array[i])) return true
+            }
+            return false
+        }
+
         if (all) {
-            return array.length >= keys.length &&
-                keys.every(key => array.some(i => func(key, i)))
+            if (array.length < keys.length) return false
+
+            for (var i = 0; i < keys.length; i++) {
+                if (!check(keys[i])) return false
+            }
+            return true
         } else {
-            return keys.some(key => array.some(i => func(key, i)))
+            for (var j = 0; j < keys.length; j++) {
+                if (check(keys[j])) return true
+            }
+            return false
         }
     }
 }
@@ -470,20 +553,21 @@ function defineIncludes(name, func, invert, message) {
         return func(array, values)
     }
 
-    define(name, (array, values) => {
+    define(name, function (array, values) {
         if (!Array.isArray(values)) values = [values]
 
         // exclusive or to invert the result if `invert` is true
         return {
             test: !values.length || invert ^ base(array, values),
             actual: array,
-            values, message,
+            values: values,
+            message: message,
         }
     })
 }
 
-const includesAll = makeIncludes(true, Util.strictIs)
-const includesAny = makeIncludes(false, Util.strictIs)
+var includesAll = makeIncludes(true, Util.strictIs)
+var includesAny = makeIncludes(false, Util.strictIs)
 
 /* eslint-disable max-len */
 
@@ -492,32 +576,32 @@ defineIncludes("notIncludesAll", includesAll, true, "Expected {actual} to not ha
 defineIncludes("includesAny", includesAny, false, "Expected {actual} to have any value in {value}")
 defineIncludes("notIncludes", includesAny, true, "Expected {actual} to not have any value in {value}")
 
-const includesLooseAll = makeIncludes(true, Util.looseIs)
-const includesLooseAny = makeIncludes(false, Util.looseIs)
+var includesLooseAll = makeIncludes(true, Util.looseIs)
+var includesLooseAny = makeIncludes(false, Util.looseIs)
 
 defineIncludes("includesLoose", includesLooseAll, false, "Expected {actual} to loosely have all values in {value}")
 defineIncludes("notIncludesLooseAll", includesLooseAll, true, "Expected {actual} to not loosely have all values in {value}")
 defineIncludes("includesLooseAny", includesLooseAny, false, "Expected {actual} to loosely have any value in {value}")
 defineIncludes("notIncludesLoose", includesLooseAny, true, "Expected {actual} to not loosely have any value in {value}")
 
-const includesDeepAll = makeIncludes(true, deepEqual)
-const includesDeepAny = makeIncludes(false, deepEqual)
+var includesDeepAll = makeIncludes(true, deepEqual)
+var includesDeepAny = makeIncludes(false, deepEqual)
 
 defineIncludes("includesDeep", includesDeepAll, false, "Expected {actual} to match all values in {value}")
 defineIncludes("notIncludesDeepAll", includesDeepAll, true, "Expected {actual} to not match all values in {value}")
 defineIncludes("includesDeepAny", includesDeepAny, false, "Expected {actual} to match any value in {value}")
 defineIncludes("notIncludesDeep", includesDeepAny, true, "Expected {actual} to not match any value in {value}")
 
-const includesDeepLooseAll = makeIncludes(true, looseDeepEqual)
-const includesDeepLooseAny = makeIncludes(false, looseDeepEqual)
+var includesDeepLooseAll = makeIncludes(true, looseDeepEqual)
+var includesDeepLooseAny = makeIncludes(false, looseDeepEqual)
 
 defineIncludes("includesDeepLoose", includesDeepLooseAll, false, "Expected {actual} to loosely match all values in {value}")
 defineIncludes("notIncludesDeepLooseAll", includesDeepLooseAll, true, "Expected {actual} to not loosely match all values in {value}")
 defineIncludes("includesDeepLooseAny", includesDeepLooseAny, false, "Expected {actual} to loosely match any value in {value}")
 defineIncludes("notIncludesDeepLoose", includesDeepLooseAny, true, "Expected {actual} to not loosely match any value in {value}")
 
-const includesMatchDeepAll = makeIncludes(true, deepEqualMatch)
-const includesMatchDeepAny = makeIncludes(false, deepEqualMatch)
+var includesMatchDeepAll = makeIncludes(true, deepEqualMatch)
+var includesMatchDeepAny = makeIncludes(false, deepEqualMatch)
 
 defineIncludes("includesMatch", includesMatchDeepAll, false, "Expected {actual} to match all values in {value}")
 defineIncludes("notIncludesMatchAll", includesMatchDeepAll, true, "Expected {actual} to not match all values in {value}")
@@ -545,12 +629,15 @@ function makeHasOverload(name, methods, invert, message) {
         return methods.object(object, keys)
     }
 
-    define(name, (object, keys) => ({
-        // exclusive or to invert the result if `invert` is true
-        test: isEmpty(keys) || invert ^ base(object, keys),
-        actual: object,
-        keys, message,
-    }))
+    define(name, function (object, keys) {
+        return {
+            // exclusive or to invert the result if `invert` is true
+            test: isEmpty(keys) || invert ^ base(object, keys),
+            actual: object,
+            keys: keys,
+            message: message,
+        }
+    })
 }
 
 function makeHasKeys(name, func, invert, message) {
@@ -558,12 +645,15 @@ function makeHasKeys(name, func, invert, message) {
         return object === keys || func(object, keys)
     }
 
-    define(name, (object, keys) => ({
-        // exclusive or to invert the result if `invert` is true
-        test: isEmpty(keys) || invert ^ base(object, keys),
-        actual: object,
-        keys, message,
-    }))
+    define(name, function (object, keys) {
+        return {
+            // exclusive or to invert the result if `invert` is true
+            test: isEmpty(keys) || invert ^ base(object, keys),
+            actual: object,
+            keys: keys,
+            message: message,
+        }
+    })
 }
 
 function hasKeysType(all, func) {
@@ -571,14 +661,24 @@ function hasKeysType(all, func) {
         if (typeof keys !== "object") return true
         if (keys === null) return true
 
-        function f(key) {
+        function check(key) {
             return hasOwn.call(object, key) && func(keys[key], object[key])
         }
 
         if (all) {
-            return Object.keys(keys).every(f)
+            for (var key1 in keys) {
+                if (hasOwn.call(keys, key1) && !check(key1)) {
+                    return false
+                }
+            }
+            return true
         } else {
-            return Object.keys(keys).some(f)
+            for (var key2 in keys) {
+                if (hasOwn.call(keys, key2) && check(key2)) {
+                    return true
+                }
+            }
+            return false
         }
     }
 }
@@ -586,50 +686,58 @@ function hasKeysType(all, func) {
 function hasOverloadType(all, func) {
     return {
         object: hasKeysType(all, func),
-        array(object, keys) {
-            const f = key => hasOwn.call(object, key)
-
-            return all ? keys.every(f) : keys.some(f)
+        array: function (object, keys) {
+            if (all) {
+                for (var i = 0; i < keys.length; i++) {
+                    if (!hasOwn.call(object, keys[i])) return false
+                }
+                return true
+            } else {
+                for (var j = 0; j < keys.length; j++) {
+                    if (hasOwn.call(object, keys[j])) return true
+                }
+                return false
+            }
         },
     }
 }
 
 /* eslint-disable max-len */
 
-const hasAllKeys = hasOverloadType(true, Util.strictIs)
-const hasAnyKeys = hasOverloadType(false, Util.strictIs)
+var hasAllKeys = hasOverloadType(true, Util.strictIs)
+var hasAnyKeys = hasOverloadType(false, Util.strictIs)
 
 makeHasOverload("hasKeys", hasAllKeys, false, "Expected {actual} to have all keys in {keys}")
 makeHasOverload("notHasAllKeys", hasAllKeys, true, "Expected {actual} to not have all keys in {keys}")
 makeHasOverload("hasAnyKeys", hasAnyKeys, false, "Expected {actual} to have any key in {keys}")
 makeHasOverload("notHasKeys", hasAnyKeys, true, "Expected {actual} to not have any key in {keys}")
 
-const hasLooseAllKeys = hasOverloadType(true, Util.looseIs)
-const hasLooseAnyKeys = hasOverloadType(false, Util.looseIs)
+var hasLooseAllKeys = hasOverloadType(true, Util.looseIs)
+var hasLooseAnyKeys = hasOverloadType(false, Util.looseIs)
 
 makeHasOverload("hasLooseKeys", hasLooseAllKeys, false, "Expected {actual} to loosely have all keys in {keys}")
 makeHasOverload("notHasLooseAllKeys", hasLooseAllKeys, true, "Expected {actual} to not loosely have all keys in {keys}")
 makeHasOverload("hasLooseAnyKeys", hasLooseAnyKeys, false, "Expected {actual} to loosely have any key in {keys}")
 makeHasOverload("notHasLooseKeys", hasLooseAnyKeys, true, "Expected {actual} to not loosely have any key in {keys}")
 
-const hasDeepAllKeys = hasKeysType(true, deepEqual)
-const hasDeepAnyKeys = hasKeysType(false, deepEqual)
+var hasDeepAllKeys = hasKeysType(true, deepEqual)
+var hasDeepAnyKeys = hasKeysType(false, deepEqual)
 
 makeHasKeys("hasDeepKeys", hasDeepAllKeys, false, "Expected {actual} to have all keys in {keys}")
 makeHasKeys("notHasDeepAllKeys", hasDeepAllKeys, true, "Expected {actual} to not have all keys in {keys}")
 makeHasKeys("hasDeepAnyKeys", hasDeepAnyKeys, false, "Expected {actual} to have any key in {keys}")
 makeHasKeys("notHasDeepKeys", hasDeepAnyKeys, true, "Expected {actual} to not have any key in {keys}")
 
-const hasDeepLooseAllKeys = hasKeysType(true, looseDeepEqual)
-const hasDeepLooseAnyKeys = hasKeysType(false, looseDeepEqual)
+var hasDeepLooseAllKeys = hasKeysType(true, looseDeepEqual)
+var hasDeepLooseAnyKeys = hasKeysType(false, looseDeepEqual)
 
 makeHasKeys("hasDeepLooseKeys", hasDeepLooseAllKeys, false, "Expected {actual} to loosely match all keys in {keys}")
 makeHasKeys("notHasDeepLooseAllKeys", hasDeepLooseAllKeys, true, "Expected {actual} to not loosely match all keys in {keys}")
 makeHasKeys("hasDeepLooseAnyKeys", hasDeepLooseAnyKeys, false, "Expected {actual} to loosely match any key in {keys}")
 makeHasKeys("notHasDeepLooseKeys", hasDeepLooseAnyKeys, true, "Expected {actual} to not loosely match any key in {keys}")
 
-const hasMatchAllKeys = hasKeysType(true, deepEqualMatch)
-const hasMatchAnyKeys = hasKeysType(false, deepEqualMatch)
+var hasMatchAllKeys = hasKeysType(true, deepEqualMatch)
+var hasMatchAnyKeys = hasKeysType(false, deepEqualMatch)
 
 makeHasKeys("hasMatchKeys", hasMatchAllKeys, false, "Expected {actual} to match all keys in {keys}")
 makeHasKeys("notHasMatchAllKeys", hasMatchAllKeys, true, "Expected {actual} to not match all keys in {keys}")

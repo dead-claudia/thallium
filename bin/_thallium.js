@@ -11,7 +11,7 @@ require("../lib/cli/run.js").run({
     util: require("../lib/cli/util.js"), // eslint-disable-line global-require
 })
 .then(process.exit)
-.catch(e => {
+.catch(function (e) {
     console.error(e.stack)
     process.exit(1)
 })

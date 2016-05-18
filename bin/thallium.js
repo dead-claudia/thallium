@@ -5,23 +5,23 @@ if (require.main !== module) {
     throw new Error("This is not a module!")
 }
 
-const cp = require("child_process")
-const path = require("path")
-const help = require("../lib/cli/help.js")
+var cp = require("child_process")
+var path = require("path")
+var help = require("../lib/cli/help.js")
 
-const args = {
+var args = {
     config: null,
     register: [],
     module: null,
     cwd: null,
 }
 
-const node = []
-const rest = []
-let last, i
+var node = []
+var rest = []
+var last, i
 
 for (i = 2; i < process.argv.length; i++) {
-    const arg = process.argv[i]
+    var arg = process.argv[i]
 
     if (last != null) {
         if (Array.isArray(args[last])) args[last].push(arg)
@@ -52,13 +52,13 @@ for (i = 2; i < process.argv.length; i++) {
 // Append the rest.
 while (i < process.argv.length) rest.push(process.argv[i++])
 
-process.exit(cp.spawnSync(process.argv[0], [].concat(...[
+process.exit(cp.spawnSync(process.argv[0], Array.prototype.concat.apply([], [
     node,
     [path.resolve(__dirname, "_thallium.js")],
     args.config == null ? [] : ["--config", args.config],
     args.module == null ? [] : ["--module", args.module],
     args.cwd == null ? [] : ["--cwd", args.cwd],
-    args.register.map(arg => ["--register", arg]),
+    args.register.map(function (arg) { return ["--register", arg] }),
     ["--"],
     rest,
 ]), {

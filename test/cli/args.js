@@ -1,26 +1,26 @@
 "use strict"
 
-const path = require("path")
+var path = require("path")
 
-const t = require("../../index.js")
-const Args = require("../../lib/cli/args.js")
+var t = require("../../index.js")
+var Args = require("../../lib/cli/args.js")
 
-describe("cli arguments", () => {
-    const defaultCwd = "base"
+describe("cli arguments", function () {
+    var defaultCwd = "base"
 
     function alias(description, str, opts) {
         opts.cwd = opts.cwd || defaultCwd
 
         str = str.trim()
-        it(description, () => {
-            const parsed = Args.parse(defaultCwd, str ? str.split(/\s+/g) : [])
+        it(description, function () {
+            var parsed = Args.parse(defaultCwd, str ? str.split(/\s+/g) : [])
 
             t.match(parsed, new Args.Args(opts))
         })
     }
 
-    context("basic pass", () => {
-        const it = alias
+    context("basic pass", function () {
+        var it = alias
 
         it("works with defaults", "", {})
         it("works with --help", "--help", {help: "simple"})
@@ -43,31 +43,33 @@ describe("cli arguments", () => {
             "-r module/register",
             {require: ["module/register"]})
 
-        const my = path.join("my-test", "**", "*")
-        const other = path.join("other-test", "**", "*")
+        var my = path.join("my-test", "**", "*")
+        var other = path.join("other-test", "**", "*")
 
         it("works with file arguments",
-            `${my} ${other}`,
+            my + " " + other,
             {files: [my, other]})
 
         it("works with rest files with invalid options",
-            `${my} -- --weird-file`,
+            my + " -- --weird-file",
             {files: [my, "--weird-file"]})
 
         it("works with rest files with valid options",
-            `${my} -- --help`,
+            my + " -- --help",
             {files: [my, "--help"]})
 
         it("ignores invalid options", "--why -AM -i --here", {})
     })
 
-    context("basic fail", () => {
+    context("basic fail", function () {
         function throws(str) {
             str = str.trim()
-            const args = str ? str.split(/\s+/g) : []
+            var args = str ? str.split(/\s+/g) : []
 
-            it(`fails with missing argument for ${str}`, () => {
-                t.throws(() => Args.parse("base", args), Args.ArgumentError)
+            it("fails with missing argument for " + str, function () {
+                t.throws(function () {
+                    Args.parse("base", args)
+                }, Args.ArgumentError)
             })
         }
 
@@ -82,8 +84,8 @@ describe("cli arguments", () => {
         throws("--require --")
     })
 
-    context("multiple pass", () => {
-        const it = alias
+    context("multiple pass", function () {
+        var it = alias
 
         it("works with multiple hooks via --require",
             "--require foo:module1 --require bar:module2",

@@ -1,6 +1,6 @@
 "use strict"
 
-const t = require("../../../index.js")
+var t = require("../../../index.js")
 
 t.reporter(require("../../../test-util/pipe-reporter.js"))
 

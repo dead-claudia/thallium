@@ -1,79 +1,79 @@
 "use strict"
 
-const t = require("../../index.js")
-const Util = require("../../test-util/base.js")
+var t = require("../../index.js")
+var Util = require("../../test-util/base.js")
 
-const n = Util.n
-const p = Util.p
+var n = Util.n
+var p = Util.p
 
-describe("core (asynchronous behavior)", () => {
-    it("with normal tests", () => {
-        const tt = t.base()
-        let called = false
+describe("core (asynchronous behavior)", function () {
+    it("with normal tests", function () {
+        var tt = t.base()
+        var called = false
 
-        tt.test("test", () => { called = true })
+        tt.test("test", function () { called = true })
 
-        const ret = tt.run().then(() => t.true(called))
+        var ret = tt.run().then(function () { t.true(called) })
 
         t.false(called)
         return ret
     })
 
-    it("with shorthand tests", () => {
-        const tt = t.base()
-        let called = false
+    it("with shorthand tests", function () {
+        var tt = t.base()
+        var called = false
 
-        tt.define("assert", () => {
+        tt.define("assert", function () {
             called = true
             return {test: false}
         })
 
         tt.test("test").assert()
 
-        const ret = tt.run().then(() => t.true(called))
+        var ret = tt.run().then(function () { t.true(called) })
 
         t.false(called)
         return ret
     })
 
-    it("with async tests + sync done call", () => {
-        const tt = t.base()
-        let called = false
+    it("with async tests + sync done call", function () {
+        var tt = t.base()
+        var called = false
 
-        tt.async("test", (_, done) => {
+        tt.async("test", function (_, done) {
             called = true
             return done()
         })
 
-        const ret = tt.run().then(() => t.true(called))
+        var ret = tt.run().then(function () { t.true(called) })
 
         t.false(called)
         return ret
     })
 
-    it("with async tests + async done call", () => {
-        const tt = t.base()
-        let called = false
+    it("with async tests + async done call", function () {
+        var tt = t.base()
+        var called = false
 
-        tt.async("test", (_, done) => {
+        tt.async("test", function (_, done) {
             called = true
-            setTimeout(() => done(), 0)
+            setTimeout(function () { done() }, 0)
         })
 
-        const ret = tt.run().then(() => t.true(called))
+        var ret = tt.run().then(function () { t.true(called) })
 
         t.false(called)
         return ret
     })
 
-    it("with async tests + duplicate thenable resolution", () => {
-        const tt = t.base()
-        let called = false
+    it("with async tests + duplicate thenable resolution", function () {
+        var tt = t.base()
+        var called = false
 
-        tt.async("test", () => {
+        tt.async("test", function () {
             called = true
             return {
-                then(resolve) {
+                then: function (resolve) {
                     resolve()
                     resolve()
                     resolve()
@@ -81,26 +81,26 @@ describe("core (asynchronous behavior)", () => {
             }
         })
 
-        const ret = tt.run().then(() => t.true(called))
+        var ret = tt.run().then(function () { t.true(called) })
 
         t.false(called)
         return ret
     })
 
-    it("with async tests + duplicate thenable rejection", () => {
-        const tt = t.base()
-        let called = false
-        const ret = []
-        const sentinel = new Error("sentinel")
+    it("with async tests + duplicate thenable rejection", function () {
+        var tt = t.base()
+        var called = false
+        var ret = []
+        var sentinel = new Error("sentinel")
 
-        sentinel.marker = () => {}
+        sentinel.marker = function () {}
 
         tt.reporter(Util.push(ret))
 
-        tt.async("test", () => {
+        tt.async("test", function () {
             called = true
             return {
-                then(_, reject) {
+                then: function (_, reject) {
                     reject(sentinel)
                     reject()
                     reject()
@@ -108,7 +108,7 @@ describe("core (asynchronous behavior)", () => {
             }
         })
 
-        const result = tt.run().then(() => {
+        var result = tt.run().then(function () {
             t.match(ret, [
                 n("start", []),
                 n("start", [p("test", 0)]),
@@ -123,20 +123,20 @@ describe("core (asynchronous behavior)", () => {
         return result
     })
 
-    it("with async tests + mixed thenable (resolve first)", () => {
-        const tt = t.base()
-        let called = false
-        const ret = []
-        const sentinel = new Error("sentinel")
+    it("with async tests + mixed thenable (resolve first)", function () {
+        var tt = t.base()
+        var called = false
+        var ret = []
+        var sentinel = new Error("sentinel")
 
-        sentinel.marker = () => {}
+        sentinel.marker = function () {}
 
         tt.reporter(Util.push(ret))
 
-        tt.async("test", () => {
+        tt.async("test", function () {
             called = true
             return {
-                then(resolve, reject) {
+                then: function (resolve, reject) {
                     resolve()
                     reject(sentinel)
                     resolve()
@@ -145,7 +145,7 @@ describe("core (asynchronous behavior)", () => {
             }
         })
 
-        const result = tt.run().then(() => {
+        var result = tt.run().then(function () {
             t.match(ret, [
                 n("start", []),
                 n("start", [p("test", 0)]),
@@ -160,21 +160,21 @@ describe("core (asynchronous behavior)", () => {
         return result
     })
 
-    it("with async tests + mixed thenable (reject first)", () => {
-        const tt = t.base()
-        let called = false
-        const ret = []
-        const sentinel = new Error("sentinel")
+    it("with async tests + mixed thenable (reject first)", function () {
+        var tt = t.base()
+        var called = false
+        var ret = []
+        var sentinel = new Error("sentinel")
 
-        sentinel.marker = () => {}
+        sentinel.marker = function () {}
 
         tt.reporter(Util.push(ret))
 
-        tt.async("test", () => {
+        tt.async("test", function () {
             called = true
 
             return {
-                then(resolve, reject) {
+                then: function (resolve, reject) {
                     reject(sentinel)
                     resolve()
                     reject()
@@ -183,7 +183,7 @@ describe("core (asynchronous behavior)", () => {
             }
         })
 
-        const result = tt.run().then(() => {
+        var result = tt.run().then(function () {
             t.match(ret, [
                 n("start", []),
                 n("start", [p("test", 0)]),

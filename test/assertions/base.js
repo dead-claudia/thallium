@@ -1,13 +1,14 @@
 "use strict"
 
-const t = require("../../index.js")
-const Util = require("../../test-util/assertions.js")
-const fail = Util.fail
-const basic = Util.basic
+var t = require("../../index.js")
+var methods = require("../../lib/methods.js")
+var Util = require("../../test-util/assertions.js")
+var fail = Util.fail
+var basic = Util.basic
 
-describe("assertions (base)", () => {
-    describe("t.assert()", () => {
-        it("works", () => {
+describe("assertions (base)", function () { // eslint-disable-line max-len, max-statements
+    describe("t.assert()", function () {
+        it("works", function () {
             function fail(arg, message) {
                 try {
                     t.assert(arg, message)
@@ -24,7 +25,7 @@ describe("assertions (base)", () => {
             t.assert({})
             t.assert([])
             t.assert(new Date())
-            t.assert(Symbol())
+            if (typeof Symbol === "function") t.assert(Symbol()) // eslint-disable-line no-undef, max-len
 
             fail(undefined, "message")
             fail(null, "message")
@@ -34,7 +35,7 @@ describe("assertions (base)", () => {
             fail(NaN, "message")
         })
 
-        it("escapes the message", () => {
+        it("escapes the message", function () {
             fail("assert", undefined, "{test}")
             fail("assert", null, "{test}")
             fail("assert", false, "{test}")
@@ -44,7 +45,7 @@ describe("assertions (base)", () => {
         })
     })
 
-    basic("t.ok()", () => {
+    basic("t.ok()", function () {
         t.ok(true)
         t.ok(1)
         t.ok(Infinity)
@@ -52,7 +53,7 @@ describe("assertions (base)", () => {
         t.ok({})
         t.ok([])
         t.ok(new Date())
-        t.ok(Symbol())
+        if (typeof Symbol === "function") t.ok(Symbol()) // eslint-disable-line no-undef, max-len
 
         fail("ok")
         fail("ok", undefined)
@@ -63,7 +64,7 @@ describe("assertions (base)", () => {
         fail("ok", NaN)
     })
 
-    basic("t.notOk()", () => {
+    basic("t.notOk()", function () {
         fail("notOk", true)
         fail("notOk", 1)
         fail("notOk", Infinity)
@@ -71,7 +72,7 @@ describe("assertions (base)", () => {
         fail("notOk", {})
         fail("notOk", [])
         fail("notOk", new Date())
-        fail("notOk", Symbol())
+        if (typeof Symbol === "function") fail("notOk", Symbol()) // eslint-disable-line no-undef, max-len
 
         t.notOk()
         t.notOk(undefined)
@@ -82,7 +83,7 @@ describe("assertions (base)", () => {
         t.notOk(NaN)
     })
 
-    basic("t.equal()", () => {
+    basic("t.equal()", function () {
         t.equal(0, 0)
         t.equal(1, 1)
         t.equal(null, null)
@@ -92,7 +93,7 @@ describe("assertions (base)", () => {
         t.equal("", "")
         t.equal("foo", "foo")
 
-        const obj = {}
+        var obj = {}
 
         t.equal(obj, obj)
 
@@ -102,7 +103,7 @@ describe("assertions (base)", () => {
         fail("equal", 1, "1")
     })
 
-    basic("t.notEqual()", () => {
+    basic("t.notEqual()", function () {
         fail("notEqual", 0, 0)
         fail("notEqual", 1, 1)
         fail("notEqual", null, null)
@@ -112,7 +113,7 @@ describe("assertions (base)", () => {
         fail("notEqual", "", "")
         fail("notEqual", "foo", "foo")
 
-        const obj = {}
+        var obj = {}
 
         fail("notEqual", obj, obj)
 
@@ -122,7 +123,7 @@ describe("assertions (base)", () => {
         t.notEqual(1, "1")
     })
 
-    basic("t.equalLoose()", () => {
+    basic("t.equalLoose()", function () {
         t.equalLoose(0, 0)
         t.equalLoose(1, 1)
         t.equalLoose(null, null)
@@ -134,7 +135,7 @@ describe("assertions (base)", () => {
         t.equalLoose(null, undefined)
         t.equalLoose(1, "1")
 
-        const obj = {}
+        var obj = {}
 
         t.equalLoose(obj, obj)
 
@@ -142,7 +143,7 @@ describe("assertions (base)", () => {
         fail("equalLoose", 0, 1)
     })
 
-    basic("t.notEqualLoose()", () => {
+    basic("t.notEqualLoose()", function () {
         fail("notEqualLoose", 0, 0)
         fail("notEqualLoose", 1, 1)
         fail("notEqualLoose", null, null)
@@ -154,7 +155,7 @@ describe("assertions (base)", () => {
         fail("notEqualLoose", null, undefined)
         fail("notEqualLoose", 1, "1")
 
-        const obj = {}
+        var obj = {}
 
         fail("notEqualLoose", obj, obj)
 
@@ -162,7 +163,7 @@ describe("assertions (base)", () => {
         t.notEqualLoose(0, 1)
     })
 
-    basic("t.deepEqual()", () => {
+    basic("t.deepEqual()", function () {
         t.deepEqual(0, 0)
         t.deepEqual(1, 1)
         t.deepEqual(null, null)
@@ -172,7 +173,7 @@ describe("assertions (base)", () => {
         t.deepEqual("", "")
         t.deepEqual("foo", "foo")
 
-        const obj = {}
+        var obj = {}
 
         t.deepEqual(obj, obj)
 
@@ -186,7 +187,7 @@ describe("assertions (base)", () => {
             {a: [2, 3], b: [4]})
     })
 
-    basic("t.notDeepEqual()", () => {
+    basic("t.notDeepEqual()", function () {
         fail("notDeepEqual", 0, 0)
         fail("notDeepEqual", 1, 1)
         fail("notDeepEqual", null, null)
@@ -196,7 +197,7 @@ describe("assertions (base)", () => {
         fail("notDeepEqual", "", "")
         fail("notDeepEqual", "foo", "foo")
 
-        const obj = {}
+        var obj = {}
 
         fail("notDeepEqual", obj, obj)
 
@@ -210,7 +211,7 @@ describe("assertions (base)", () => {
             {a: [2, 3], b: [4]})
     })
 
-    basic("t.deepEqualLoose()", () => {
+    basic("t.deepEqualLoose()", function () {
         t.deepEqualLoose(0, 0)
         t.deepEqualLoose(1, 1)
         t.deepEqualLoose(null, null)
@@ -220,7 +221,7 @@ describe("assertions (base)", () => {
         t.deepEqualLoose("", "")
         t.deepEqualLoose("foo", "foo")
 
-        const obj = {}
+        var obj = {}
 
         t.deepEqualLoose(obj, obj)
 
@@ -234,7 +235,7 @@ describe("assertions (base)", () => {
             {a: [2, 3], b: [4]})
     })
 
-    basic("t.notDeepEqualLoose()", () => {
+    basic("t.notDeepEqualLoose()", function () {
         fail("notDeepEqualLoose", 0, 0)
         fail("notDeepEqualLoose", 1, 1)
         fail("notDeepEqualLoose", null, null)
@@ -244,7 +245,7 @@ describe("assertions (base)", () => {
         fail("notDeepEqualLoose", "", "")
         fail("notDeepEqualLoose", "foo", "foo")
 
-        const obj = {}
+        var obj = {}
 
         fail("notDeepEqualLoose", obj, obj)
 
@@ -258,12 +259,12 @@ describe("assertions (base)", () => {
             {a: [2, 3], b: [4]})
     })
 
-    class F {
-        constructor() { this.value = 1 }
-        get prop() { return 1 }
-    }
+    function F() { this.value = 1 }
+    methods(F, {
+        get prop() { return 1 },
+    })
 
-    basic("t.hasOwn()", () => {
+    basic("t.hasOwn()", function () {
         t.hasOwn({prop: 1}, "prop")
         t.hasOwn({prop: 1}, "prop", 1)
         t.hasOwn(new F(), "value", 1)
@@ -277,7 +278,7 @@ describe("assertions (base)", () => {
         fail("hasOwn", new F(), "value", 2)
     })
 
-    basic("t.notHasOwn()", () => {
+    basic("t.notHasOwn()", function () {
         fail("notHasOwn", {prop: 1}, "prop")
         fail("notHasOwn", {prop: 1}, "prop", 1)
         fail("notHasOwn", new F(), "value", 1)
@@ -291,7 +292,7 @@ describe("assertions (base)", () => {
         t.notHasOwn(new F(), "value", 2)
     })
 
-    basic("t.hasOwnLoose()", () => {
+    basic("t.hasOwnLoose()", function () {
         t.hasOwnLoose({prop: 1}, "prop", 1)
         t.hasOwnLoose(new F(), "value", 1)
         t.hasOwnLoose({prop: 1}, "prop", "1")
@@ -301,7 +302,7 @@ describe("assertions (base)", () => {
         fail("hasOwnLoose", new F(), "value", 2)
     })
 
-    basic("t.notHasOwnLoose()", () => {
+    basic("t.notHasOwnLoose()", function () {
         fail("notHasOwnLoose", {prop: 1}, "prop", 1)
         fail("notHasOwnLoose", new F(), "value", 1)
         fail("notHasOwnLoose", {prop: 1}, "prop", "1")
@@ -311,7 +312,7 @@ describe("assertions (base)", () => {
         t.notHasOwnLoose(new F(), "value", 2)
     })
 
-    basic("t.hasKey()", () => {
+    basic("t.hasKey()", function () {
         t.hasKey({prop: 1}, "prop")
         t.hasKey({prop: 1}, "prop", 1)
         t.hasKey(new F(), "value", 1)
@@ -325,7 +326,7 @@ describe("assertions (base)", () => {
         fail("hasKey", new F(), "value", 2)
     })
 
-    basic("t.notHasKey()", () => {
+    basic("t.notHasKey()", function () {
         fail("notHasKey", {prop: 1}, "prop")
         fail("notHasKey", {prop: 1}, "prop", 1)
         fail("notHasKey", new F(), "value", 1)
@@ -339,7 +340,7 @@ describe("assertions (base)", () => {
         t.notHasKey(new F(), "value", 2)
     })
 
-    basic("t.hasKeyLoose()", () => {
+    basic("t.hasKeyLoose()", function () {
         t.hasKeyLoose({prop: 1}, "prop", 1)
         t.hasKeyLoose(new F(), "value", 1)
         t.hasKeyLoose(new F(), "prop", 1)
@@ -349,7 +350,7 @@ describe("assertions (base)", () => {
         fail("hasKeyLoose", new F(), "value", 2)
     })
 
-    basic("t.notHasKeyLoose()", () => {
+    basic("t.notHasKeyLoose()", function () {
         fail("notHasKeyLoose", {prop: 1}, "prop", 1)
         fail("notHasKeyLoose", new F(), "value", 1)
         fail("notHasKeyLoose", new F(), "prop", 1)
@@ -359,35 +360,37 @@ describe("assertions (base)", () => {
         t.notHasKeyLoose(new F(), "value", 2)
     })
 
-    basic("t.has()", () => {
-        t.has(new Map([["prop", 1]]), "prop")
-        t.has(new Map([["prop", 1]]), "prop", 1)
+    if (typeof Map !== "undefined") {
+        basic("t.has()", function () {
+            t.has(new Map([["prop", 1]]), "prop")
+            t.has(new Map([["prop", 1]]), "prop", 1)
 
-        fail("has", new Map([["prop", 1]]), "value")
-        fail("has", new Map([["prop", 1]]), "prop", 2)
-        fail("has", new Map([["prop", 1]]), "prop", "1")
-    })
+            fail("has", new Map([["prop", 1]]), "value")
+            fail("has", new Map([["prop", 1]]), "prop", 2)
+            fail("has", new Map([["prop", 1]]), "prop", "1")
+        })
 
-    basic("t.notHas()", () => {
-        fail("notHas", new Map([["prop", 1]]), "prop")
-        fail("notHas", new Map([["prop", 1]]), "prop", 1)
+        basic("t.notHas()", function () {
+            fail("notHas", new Map([["prop", 1]]), "prop")
+            fail("notHas", new Map([["prop", 1]]), "prop", 1)
 
-        t.notHas(new Map([["prop", 1]]), "value")
-        t.notHas(new Map([["prop", 1]]), "prop", 2)
-        t.notHas(new Map([["prop", 1]]), "prop", "1")
-    })
+            t.notHas(new Map([["prop", 1]]), "value")
+            t.notHas(new Map([["prop", 1]]), "prop", 2)
+            t.notHas(new Map([["prop", 1]]), "prop", "1")
+        })
 
-    basic("t.hasLoose()", () => {
-        t.hasLoose(new Map([["prop", 1]]), "prop", 1)
-        t.hasLoose(new Map([["prop", 1]]), "prop", "1")
+        basic("t.hasLoose()", function () {
+            t.hasLoose(new Map([["prop", 1]]), "prop", 1)
+            t.hasLoose(new Map([["prop", 1]]), "prop", "1")
 
-        fail("hasLoose", new Map([["prop", 1]]), "prop", 2)
-    })
+            fail("hasLoose", new Map([["prop", 1]]), "prop", 2)
+        })
 
-    basic("t.notHasLoose()", () => {
-        fail("notHasLoose", new Map([["prop", 1]]), "prop", 1)
-        fail("notHasLoose", new Map([["prop", 1]]), "prop", "1")
+        basic("t.notHasLoose()", function () {
+            fail("notHasLoose", new Map([["prop", 1]]), "prop", 1)
+            fail("notHasLoose", new Map([["prop", 1]]), "prop", "1")
 
-        t.notHasLoose(new Map([["prop", 1]]), "prop", 2)
-    })
+            t.notHasLoose(new Map([["prop", 1]]), "prop", 2)
+        })
+    }
 })

@@ -14,7 +14,7 @@ npm install --save-dev thallium
 
 ## Usage
 
-This is waiting on the completion of the CLI, but for now, you can look at the [documentation](./docs/README.md) and [tests](./test/), which use Thallium's assertions themselves.
+This is waiting on the completion of the CLI, but for now, you can look at the [documentation](http://github.com/isiahmeadows/thallium/blob/master/docs/README.md) and [tests](http://github.com/isiahmeadows/thallium/tree/master/test/), which use Thallium's assertions themselves.
 
 Couple specific notes:
 
@@ -41,18 +41,19 @@ Couple specific notes:
 
 ## API
 
-See the [documentation](./docs/README.md).
+See the [documentation](http://github.com/isiahmeadows/thallium/blob/master/docs/README.md).
 
 ## Roadmap
 
-1. Set up [AppVeyor](https://www.appveyor.com/) to run tests on Windows. Currently, it's only actively tested on Linux.
-2. Create basic reporters for TAP, spec, dot, etc.
+This list is in a very rough chronological order.
+
+1. Create basic reporters for TAP, spec, dot, etc.
+2. Set up [AppVeyor](https://www.appveyor.com/) to run tests on Windows. Currently, it's only actively tested on Linux.
 3. Finish documenting this project. This mainly includes the core assertions and CLI.
-4. Bring this back to pure ES5 to test in older versions of Node. It's easier to prototype in ES6, but many browsers and runtimes don't support that.
-5. Port this to the browser via Browserify/Webpack.
-    - I'll also rewrite [`util-inspect`](https://www.npmjs.com/package/util-inspect) based on Node's [`util.inspect`](https://nodejs.org/api/util.html#util_util_inspect_object_options) after finishing the port, since that module is completely untested, and has no understanding of ES6. :worried:
-6. Write a few plugins for `describe`/`it`, `before{,Each}`/`after{,Each}` hooks, REPL friendliness\*, etc.
-7. Write lots of blog posts.\*\* :smile:
+4. Port this to the browser via Browserify/Webpack.
+    - I may also rewrite [`util-inspect`](https://www.npmjs.com/package/util-inspect) based on Node's [`util.inspect`](https://nodejs.org/api/util.html#util_util_inspect_object_options) after finishing the port, since that module is completely untested, and has no understanding of ES6. :worried:
+5. Write a few plugins for `describe`/`it`, `before{,Each}`/`after{,Each}` hooks, REPL friendliness\*, etc.
+6. Write lots of blog posts.\*\* :smile:
 
 \* *That's something from Lisp-land I really wish was here...*
 
@@ -62,10 +63,10 @@ See the [documentation](./docs/README.md).
 
 General information:
 
-- This is written partially in ES6, up to what Node 4 supports.
-    - Arrow functions, `let`/`const` declarations, and classes exist.
-    - Destructuring and rest parameters don't.
-- [Bluebird](http://bluebirdjs.com) is used extensively as the Promise implementation.
+- This is written in pure ES5. No arrow functions, etc.
+    - There is a class-ish utility [here](http://github.com/isiahmeadows/thallium/blob/master/lib/methods.js), so those are easy.
+    - I also use a few Lispish techniques to simplify the code.
+- [Bluebird](http://bluebirdjs.com) is used as the Promise implementation.
 - The source code is in `lib/**`.
 - The executables are in `bin/**`. Most of the CLI code is in `lib/cli/**`.
 - The documentation and examples are in `docs/**`.
@@ -75,7 +76,7 @@ General information:
     - Fixtures for those tests are in `test-fixtures/**`.
     - Utilities are in `test-util/**`.
     - Some of the test files are mirrored in [CoffeeScript](http://coffeescript.org/) and JavaScript for the acceptance tests. These are very explicitly labeled, so it should be fairly obvious.
-- This uses [eslint-config-isiahmeadows](https://npmjs.com/package/eslint-config-isiahmeadows) for its presets (specifically `isiahmeadows/node-4`). In case you're curious what those settings are, you can start with [the index file](https://github.com/isiahmeadows/eslint-config-isiahmeadows/blob/master/index.js), which the rest are only minor variations of.
+- This uses [eslint-config-isiahmeadows](https://npmjs.com/package/eslint-config-isiahmeadows) for its presets (specifically `isiahmeadows/node`). In case you're curious what those settings are, you can start with [the index file](https://github.com/isiahmeadows/eslint-config-isiahmeadows/blob/master/index.js), which the rest are only minor variations of.
 - For the few CoffeeScript files littered around, this uses [CoffeeLint](http://www.coffeelint.org/) to lint them. They exist for testing and examples.
 
 Tips and idioms:

@@ -1,14 +1,16 @@
 "use strict"
 
-const t = require("../../index.js")
-const load = require("../../lib/cli/load.js")
+var t = require("../../index.js")
+var load = require("../../lib/cli/load.js")
 
-describe("cli config loading", () => {
-    it("loads the config file", () => {
-        const file = "config.js"
-        const map = new Map()
-        const result = {config: true}
-        let loaded, baseDir
+describe("cli config loading", function () {
+    if (typeof Map !== "function") return
+
+    it("loads the config file", function () {
+        var file = "config.js"
+        var map = new Map()
+        var result = {config: true}
+        var loaded, baseDir
 
         function init(file, base) {
             loaded = file
@@ -16,30 +18,34 @@ describe("cli config loading", () => {
             return result
         }
 
-        return load(init, file, map, ".").then(config => {
+        return load(init, file, map, ".").then(function (config) {
             t.equal(loaded, file)
             t.equal(baseDir, ".")
             t.equal(config, result)
         })
     })
 
-    it("registers all the loaders from the map", () => {
-        const mods = ["one", "two", "three", "four", "five"]
-        const list = []
-        const map = new Map(mods.map(m => [m, {register() { list.push(m) }}]))
+    it("registers all the loaders from the map", function () {
+        var mods = ["one", "two", "three", "four", "five"]
+        var list = []
+        var map = new Map(mods.map(function (m) {
+            return [m, {register: function () { list.push(m) }}]
+        }))
 
-        return load(() => {}, "config.js", map, ".").then(() => {
+        return load(function () {}, "config.js", map, ".").then(function () {
             t.match(list, mods)
         })
     })
 
-    it("does both", () => {
-        const file = "config.js"
-        const mods = ["one", "two", "three", "four", "five"]
-        const list = []
-        const map = new Map(mods.map(m => [m, {register() { list.push(m) }}]))
-        const result = {config: true}
-        let loaded, baseDir
+    it("does both", function () {
+        var file = "config.js"
+        var mods = ["one", "two", "three", "four", "five"]
+        var list = []
+        var map = new Map(mods.map(function (m) {
+            return [m, {register: function () { list.push(m) }}]
+        }))
+        var result = {config: true}
+        var loaded, baseDir
 
         function init(file, base) {
             loaded = file
@@ -47,7 +53,7 @@ describe("cli config loading", () => {
             return result
         }
 
-        return load(init, file, map, ".").then(config => {
+        return load(init, file, map, ".").then(function (config) {
             t.match(list, mods)
             t.equal(loaded, file)
             t.equal(baseDir, ".")

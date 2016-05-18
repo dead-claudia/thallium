@@ -2,32 +2,36 @@
 
 /* eslint max-nested-callbacks: [2, 5] */
 
-const t = require("../../index.js")
-const Util = require("../../test-util/base.js")
-const p = Util.p
-const n = Util.n
+var t = require("../../index.js")
+var Util = require("../../test-util/base.js")
+var p = Util.p
+var n = Util.n
 
-describe("core (selection)", () => {
-    const fail = t => t.define("fail", () => ({test: false, message: "fail"}))
+describe("core (selection)", function () {
+    function fail(t) {
+        t.define("fail", function () {
+            return {test: false, message: "fail"}
+        })
+    }
 
-    describe("skip", () => {
-        it("tests with callbacks", () => {
-            const tt = t.base().use(fail)
-            const ret = []
+    describe("skip", function () {
+        it("tests with callbacks", function () {
+            var tt = t.base().use(fail)
+            var ret = []
 
             tt.reporter(Util.push(ret))
 
-            tt.test("one", tt => {
-                tt.testSkip("inner", tt => tt.fail())
+            tt.test("one", function (tt) {
+                tt.testSkip("inner", function (tt) { tt.fail() })
                 tt.test("other")
             })
 
-            tt.test("two", tt => {
+            tt.test("two", function (tt) {
                 tt.test("inner")
                 tt.test("other")
             })
 
-            return tt.run().then(() => {
+            return tt.run().then(function () {
                 t.match(ret, [
                     n("start", []),
                     n("start", [p("one", 0)]),
@@ -52,23 +56,23 @@ describe("core (selection)", () => {
             })
         })
 
-        it("tests without callbacks", () => {
-            const tt = t.base().use(fail)
-            const ret = []
+        it("tests without callbacks", function () {
+            var tt = t.base().use(fail)
+            var ret = []
 
             tt.reporter(Util.push(ret))
 
-            tt.test("one", tt => {
+            tt.test("one", function (tt) {
                 tt.testSkip("inner").fail()
                 tt.test("other")
             })
 
-            tt.test("two", tt => {
+            tt.test("two", function (tt) {
                 tt.test("inner")
                 tt.test("other")
             })
 
-            return tt.run().then(() => {
+            return tt.run().then(function () {
                 t.match(ret, [
                     n("start", []),
                     n("start", [p("one", 0)]),
@@ -93,23 +97,23 @@ describe("core (selection)", () => {
             })
         })
 
-        it("async tests", () => {
-            const tt = t.base().use(fail)
-            const ret = []
+        it("async tests", function () {
+            var tt = t.base().use(fail)
+            var ret = []
 
             tt.reporter(Util.push(ret))
 
-            tt.test("one", tt => {
-                tt.asyncSkip("inner", tt => tt.fail())
+            tt.test("one", function (tt) {
+                tt.asyncSkip("inner", function (tt) { tt.fail() })
                 tt.test("other")
             })
 
-            tt.test("two", tt => {
+            tt.test("two", function (tt) {
                 tt.test("inner")
                 tt.test("other")
             })
 
-            return tt.run().then(() => {
+            return tt.run().then(function () {
                 t.match(ret, [
                     n("start", []),
                     n("start", [p("one", 0)]),
@@ -134,12 +138,12 @@ describe("core (selection)", () => {
             })
         })
 
-        it("inline tests run directly", () => {
-            const ret = []
-            const tt = t.base().reporter(Util.push(ret))
-            const ttt = tt.testSkip("test")
+        it("inline tests run directly", function () {
+            var ret = []
+            var tt = t.base().reporter(Util.push(ret))
+            var ttt = tt.testSkip("test")
 
-            return ttt.run().then(() => {
+            return ttt.run().then(function () {
                 t.match(ret, [
                     n("pending", [p("test", 0)]),
                     n("exit", [p("test", 0)]),
@@ -148,25 +152,25 @@ describe("core (selection)", () => {
         })
     })
 
-    describe("only", () => {
-        it("tests with callbacks", () => {
-            const tt = t.base().use(fail)
-            const ret = []
+    describe("only", function () {
+        it("tests with callbacks", function () {
+            var tt = t.base().use(fail)
+            var ret = []
 
             tt.reporter(Util.push(ret))
             tt.only(["one", "inner"])
 
-            tt.test("one", tt => {
-                tt.test("inner", () => {})
-                tt.test("other", tt => tt.fail())
+            tt.test("one", function (tt) {
+                tt.test("inner", function () {})
+                tt.test("other", function (tt) { tt.fail() })
             })
 
-            tt.test("two", tt => {
-                tt.test("inner", tt => tt.fail())
-                tt.test("other", tt => tt.fail())
+            tt.test("two", function (tt) {
+                tt.test("inner", function (tt) { tt.fail() })
+                tt.test("other", function (tt) { tt.fail() })
             })
 
-            return tt.run().then(() => {
+            return tt.run().then(function () {
                 t.match(ret, [
                     n("start", []),
                     n("start", [p("one", 0)]),
@@ -181,24 +185,24 @@ describe("core (selection)", () => {
             })
         })
 
-        it("tests without callbacks", () => {
-            const tt = t.base().use(fail)
-            const ret = []
+        it("tests without callbacks", function () {
+            var tt = t.base().use(fail)
+            var ret = []
 
             tt.reporter(Util.push(ret))
             tt.only(["one", "inner"])
 
-            tt.test("one", tt => {
+            tt.test("one", function (tt) {
                 tt.test("inner")
                 tt.test("other").fail()
             })
 
-            tt.test("two", tt => {
+            tt.test("two", function (tt) {
                 tt.test("inner").fail()
                 tt.test("other").fail()
             })
 
-            return tt.run().then(() => {
+            return tt.run().then(function () {
                 t.match(ret, [
                     n("start", []),
                     n("start", [p("one", 0)]),
@@ -213,24 +217,24 @@ describe("core (selection)", () => {
             })
         })
 
-        it("async tests", () => {
-            const tt = t.base().use(fail)
-            const ret = []
+        it("async tests", function () {
+            var tt = t.base().use(fail)
+            var ret = []
 
             tt.reporter(Util.push(ret))
             tt.only(["one", "inner"])
 
-            tt.test("one", tt => {
-                tt.async("inner", (_, done) => done())
-                tt.async("other", tt => tt.fail())
+            tt.test("one", function (tt) {
+                tt.async("inner", function (_, done) { done() })
+                tt.async("other", function (tt) { tt.fail() })
             })
 
-            tt.test("two", tt => {
-                tt.async("inner", tt => tt.fail())
-                tt.async("other", tt => tt.fail())
+            tt.test("two", function (tt) {
+                tt.async("inner", function (tt) { tt.fail() })
+                tt.async("other", function (tt) { tt.fail() })
             })
 
-            return tt.run().then(() => {
+            return tt.run().then(function () {
                 t.match(ret, [
                     n("start", []),
                     n("start", [p("one", 0)]),
@@ -245,24 +249,24 @@ describe("core (selection)", () => {
             })
         })
 
-        it("tests as index with callbacks", () => {
-            const tt = t.base().use(fail)
-            const ret = []
+        it("tests as index with callbacks", function () {
+            var tt = t.base().use(fail)
+            var ret = []
 
             tt.reporter(Util.push(ret))
             tt.only(["one", "inner"])
 
-            tt.test("0", tt => {
-                tt.test("inner", () => {})
+            tt.test("0", function (tt) {
+                tt.test("inner", function () {})
                 tt.test("other").fail()
             })
 
-            tt.test("1", tt => {
+            tt.test("1", function (tt) {
                 tt.test("inner").fail()
                 tt.test("other").fail()
             })
 
-            return tt.run().then(() => {
+            return tt.run().then(function () {
                 t.match(ret, [
                     n("start", []),
                     n("end", []),
@@ -271,24 +275,24 @@ describe("core (selection)", () => {
             })
         })
 
-        it("tests as index index without callbacks", () => {
-            const tt = t.base().use(fail)
-            const ret = []
+        it("tests as index index without callbacks", function () {
+            var tt = t.base().use(fail)
+            var ret = []
 
             tt.reporter(Util.push(ret))
             tt.only(["one", "inner"])
 
-            tt.test("0", tt => {
+            tt.test("0", function (tt) {
                 tt.test("inner")
                 tt.test("other").fail()
             })
 
-            tt.test("1", tt => {
+            tt.test("1", function (tt) {
                 tt.test("inner").fail()
                 tt.test("other").fail()
             })
 
-            return tt.run().then(() => {
+            return tt.run().then(function () {
                 t.match(ret, [
                     n("start", []),
                     n("end", []),
@@ -297,24 +301,24 @@ describe("core (selection)", () => {
             })
         })
 
-        it("async tests as index", () => {
-            const tt = t.base().use(fail)
-            const ret = []
+        it("async tests as index", function () {
+            var tt = t.base().use(fail)
+            var ret = []
 
             tt.reporter(Util.push(ret))
             tt.only(["one", "inner"])
 
-            tt.test("0", tt => {
-                tt.async("inner", (_, done) => done())
-                tt.async("other", tt => tt.fail())
+            tt.test("0", function (tt) {
+                tt.async("inner", function (_, done) { done() })
+                tt.async("other", function (tt) { tt.fail() })
             })
 
-            tt.test("1", tt => {
-                tt.async("inner", tt => tt.fail())
-                tt.async("other", tt => tt.fail())
+            tt.test("1", function (tt) {
+                tt.async("inner", function (tt) { tt.fail() })
+                tt.async("other", function (tt) { tt.fail() })
             })
 
-            return tt.run().then(() => {
+            return tt.run().then(function () {
                 t.match(ret, [
                     n("start", []),
                     n("end", []),
@@ -323,24 +327,24 @@ describe("core (selection)", () => {
             })
         })
 
-        it("against regexp", () => {
-            const tt = t.base().use(fail)
-            const ret = []
+        it("against regexp", function () {
+            var tt = t.base().use(fail)
+            var ret = []
 
             tt.reporter(Util.push(ret))
             tt.only([/^one$/, "inner"])
 
-            tt.test("one", tt => {
-                tt.test("inner", () => {})
-                tt.test("other", tt => tt.fail())
+            tt.test("one", function (tt) {
+                tt.test("inner", function () {})
+                tt.test("other", function (tt) { tt.fail() })
             })
 
-            tt.test("two", tt => {
-                tt.test("inner", tt => tt.fail())
-                tt.test("other", tt => tt.fail())
+            tt.test("two", function (tt) {
+                tt.test("inner", function (tt) { tt.fail() })
+                tt.test("other", function (tt) { tt.fail() })
             })
 
-            return tt.run().then(() => {
+            return tt.run().then(function () {
                 t.match(ret, [
                     n("start", []),
                     n("start", [p("one", 0)]),

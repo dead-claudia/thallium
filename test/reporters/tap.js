@@ -3,40 +3,49 @@
 // Note: the reports *must* be well formed. The reporter assumes the reports are
 // correct, and will *not* verify this.
 
-const inspect = require("util").inspect
-const Promise = require("bluebird")
-const resolveAny = require("../../lib/util.js").resolveAny
-const t = require("../../index.js")
-const tap = require("../../r/tap.js")
-const Util = require("../../test-util/base.js")
-const p = Util.p
-const n = Util.n
+var inspect = require("util").inspect
+var Promise = require("bluebird")
+var resolveAny = require("../../lib/util.js").resolveAny
+var t = require("../../index.js")
+var tap = require("../../r/tap.js")
+var Util = require("../../test-util/base.js")
+var p = Util.p
+var n = Util.n
 
-describe("reporter tap", () => { // eslint-disable-line max-statements
+describe("reporter tap", function () { // eslint-disable-line max-statements
+    function printLines(prefix, lines) {
+        return [prefix].concat(lines.map(function (line) {
+            return "    " + line
+        }))
+    }
+
     function stack(err) {
-        const stack = err.stack.split(/\r?\n/g)
+        var stack = err.stack.split(/\r?\n/g)
 
         if (err.name === "AssertionError") {
             stack.shift()
         }
 
-        return ["  stack: |-"].concat(stack.map(line => `    ${line}`))
+        return printLines("  stack: |-", stack)
     }
 
     function printError(err) {
-        const lines = inspect(err).split(/\r?\n/g)
+        var lines = inspect(err).split(/\r?\n/g)
 
-        return ["  value: |-"].concat(lines.map(line => `    ${line}`))
+        return printLines("  value: |-", lines)
     }
 
     function test(name, opts) {
-        it(name, () => {
-            const list = []
-            const reporter = tap({print(arg) { list.push(arg) }})
+        it(name, function () {
+            var list = []
+            var reporter = tap({print: function (arg) { list.push(arg) }})
 
-            return Promise.each(opts.input, i =>
-                resolveAny(reporter, undefined, i))
-            .then(() => t.match(list, opts.output))
+            return Promise.each(opts.input, function (i) {
+                return resolveAny(reporter, undefined, i)
+            })
+            .then(function () {
+                t.match(list, opts.output)
+            })
         })
     }
 
@@ -80,7 +89,7 @@ describe("reporter tap", () => { // eslint-disable-line max-statements
         ],
     })
 
-    const sentinel = new Error("sentinel")
+    var sentinel = new Error("sentinel")
 
     test("fail 2 with Error", {
         input: [
@@ -166,7 +175,7 @@ describe("reporter tap", () => { // eslint-disable-line max-statements
         ]),
     })
 
-    const assertion = new t.AssertionError("Expected 1 to equal 2", 1, 2)
+    var assertion = new t.AssertionError("Expected 1 to equal 2", 1, 2)
 
     test("fail 2 with AssertionError", {
         input: [
@@ -416,7 +425,7 @@ describe("reporter tap", () => { // eslint-disable-line max-statements
         ]),
     })
 
-    const wrongType = new TypeError("undefined is not a function")
+    var wrongType = new TypeError("undefined is not a function")
 
     test("extra fail", {
         input: [
@@ -916,7 +925,7 @@ describe("reporter tap", () => { // eslint-disable-line max-statements
         /* eslint-enable max-len */
     })
 
-    context("restarting", () => {
+    context("restarting", function () {
         test("empty test", {
             input: [
                 n("start", []),
@@ -983,7 +992,7 @@ describe("reporter tap", () => { // eslint-disable-line max-statements
             ],
         })
 
-        const sentinel = new Error("sentinel")
+        var sentinel = new Error("sentinel")
 
         test("fail 2 with Error", {
             input: [
@@ -1132,7 +1141,7 @@ describe("reporter tap", () => { // eslint-disable-line max-statements
             ]),
         })
 
-        const assertion = new t.AssertionError("Expected 1 to equal 2", 1, 2)
+        var assertion = new t.AssertionError("Expected 1 to equal 2", 1, 2)
 
         test("fail 2 with AssertionError", {
             input: [

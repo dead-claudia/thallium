@@ -1,10 +1,10 @@
 "use strict"
 
-const t = require("../../index.js")
-const fail = require("../../test-util/assertions.js").fail
+var t = require("../../index.js")
+var fail = require("../../test-util/assertions.js").fail
 
-describe("assertions (has keys)", () => {
-    it("correct aliases", () => {
+describe("assertions (has keys)", function () {
+    it("correct aliases", function () {
         t.equal(t.hasMatchLooseKeys, t.hasDeepLooseKeys)
         t.equal(t.notHasMatchLooseAllKeys, t.notHasDeepLooseAllKeys)
         t.equal(t.hasMatchLooseAnyKeys, t.hasDeepLooseAnyKeys)
@@ -14,9 +14,9 @@ describe("assertions (has keys)", () => {
     // It"s much easier to find problems when the tests are generated.
     function shallow(name, opts) {
         function run(succeed) {
-            const args = []
+            var args = []
 
-            for (let i = 1; i < arguments.length; i++) {
+            for (var i = 1; i < arguments.length; i++) {
                 args.push(arguments[i])
             }
 
@@ -27,78 +27,93 @@ describe("assertions (has keys)", () => {
             }
         }
 
-        describe(`t.${name}()`, () => {
-            it("exists", () => {
+        describe("t." + name + "()", function () {
+            it("exists", function () {
                 t.function(t[name])
             })
 
             if (opts.keys) {
-                it("checks number keys", () => {
+                it("checks number keys", function () {
                     run(!opts.invert,
                         {1: true, 2: true, 3: false},
                         [1])
                 })
 
-                it("checks string keys", () => {
+                it("checks string keys", function () {
                     run(!opts.invert,
                         {foo: true, bar: false, baz: 1},
                         ["foo"])
                 })
             }
 
-            it("checks numbers", () => {
+            it("checks numbers", function () {
                 run(!opts.invert,
                     {1: true, 2: true, 3: false},
                     {1: true})
             })
 
-            it("checks strings", () => {
+            it("checks strings", function () {
                 run(!opts.invert, {foo: true, bar: false, baz: 1}, {foo: true})
             })
 
-            it("is strict", () => {
+            it("is strict", function () {
                 run(opts.invert ^ opts.loose,
                     {foo: "1", bar: 2, baz: 3},
                     {foo: 1})
             })
 
-            it("checks objects", () => {
-                const obj1 = {}
-                const obj2 = {}
-                const obj3 = {}
+            it("checks objects", function () {
+                var obj1 = {}
+                var obj2 = {}
+                var obj3 = {}
 
                 run(!opts.invert,
-                    {obj1, obj3, prop: 3, foo: "foo"},
-                    {obj1, obj3})
+                    {obj1: obj1, obj3: obj3, prop: 3, foo: "foo"},
+                    {obj1: obj1, obj3: obj3})
 
-                run(!opts.invert, {obj1, obj2, obj3}, {obj1, obj2, obj3})
-                run(!opts.invert, {obj1, obj2, obj3}, {obj1, obj3})
-                run(!(opts.invert ^ opts.all), {obj1, obj3}, {obj1, obj2, obj3})
+                run(!opts.invert,
+                    {obj1: obj1, obj2: obj2, obj3: obj3},
+                    {obj1: obj1, obj2: obj2, obj3: obj3})
+
+                run(!opts.invert,
+                    {obj1: obj1, obj2: obj2, obj3: obj3},
+                    {obj1: obj1, obj3: obj3})
 
                 run(!(opts.invert ^ opts.all),
-                    {obj1, obj3, prop: 3, foo: "foo"},
-                    {obj1, obj2, obj3})
+                    {obj1: obj1, obj3: obj3},
+                    {obj1: obj1, obj2: obj2, obj3: obj3})
+
+                run(!(opts.invert ^ opts.all),
+                    {obj1: obj1, obj3: obj3, prop: 3, foo: "foo"},
+                    {obj1: obj1, obj2: obj2, obj3: obj3})
             })
 
-            it("checks nothing", () => {
+            it("checks nothing", function () {
                 run(true, {foo: {}, bar: {}}, {})
             })
 
-            it("checks missing keys", () => {
+            it("checks missing keys", function () {
                 if (opts.keys) run(opts.invert, {foo: 1, bar: 2, baz: 3}, [10])
                 run(opts.invert, {foo: 1, bar: 2, baz: 3}, {a: 10})
                 run(opts.invert, {foo: 1, bar: 2, baz: 3}, {foo: 10})
             })
 
-            it("checks missing objects", () => {
-                const obj1 = {}
-                const obj2 = {}
-                const obj3 = {}
+            it("checks missing objects", function () {
+                var obj1 = {}
+                var obj2 = {}
+                var obj3 = {}
 
-                run(opts.invert, {obj1, obj2, a: 3, b: "foo", c: {}}, {c: {}})
-                run(opts.invert, {obj1, obj2, obj3}, {a: {}})
-                run(opts.invert, {obj1, obj2, obj3}, {a: []})
-                run(opts.invert ^ !opts.all, {obj1, obj2, obj3}, {a: [], obj1})
+                run(opts.invert,
+                    {obj1: obj1, obj2: obj2, a: 3, b: "foo", c: {}},
+                    {c: {}})
+
+                run(opts.invert, {obj1: obj1, obj2: obj2, obj3: obj3}, {a: {}})
+
+                run(opts.invert, {obj1: obj1, obj2: obj2, obj3: obj3}, {a: []})
+
+                run(opts.invert ^ !opts.all,
+                    {obj1: obj1, obj2: obj2, obj3: obj3},
+                    {a: [], obj1: obj1})
             })
         })
     }
@@ -116,9 +131,9 @@ describe("assertions (has keys)", () => {
 
     function deep(name, opts) {
         function run(succeed) {
-            const args = []
+            var args = []
 
-            for (let i = 1; i < arguments.length; i++) {
+            for (var i = 1; i < arguments.length; i++) {
                 args.push(arguments[i])
             }
 
@@ -129,41 +144,49 @@ describe("assertions (has keys)", () => {
             }
         }
 
-        describe(`t.${name}()`, () => {
-            it("exists", () => {
+        describe("t." + name + "()", function () {
+            it("exists", function () {
                 t.function(t[name])
             })
 
-            it("checks numbers", () => {
+            it("checks numbers", function () {
                 run(!opts.invert, {1: true, 2: false, 3: 0}, {1: true})
             })
 
-            it("checks strings", () => {
+            it("checks strings", function () {
                 run(!opts.invert, {foo: 1, bar: 2, baz: 3}, {foo: 1})
             })
 
-            it("is strict", () => {
+            it("is strict", function () {
                 run(opts.invert ^ opts.loose,
                     {foo: "1", bar: 2, baz: 3},
                     {foo: 1})
             })
 
-            it("checks objects", () => {
-                const obj1 = {}
-                const obj2 = {}
-                const obj3 = {}
+            it("checks objects", function () {
+                var obj1 = {}
+                var obj2 = {}
+                var obj3 = {}
 
                 run(!opts.invert,
-                    {obj1, obj3, prop: 3, foo: "foo"},
-                    {obj1, obj3})
+                    {obj1: obj1, obj3: obj3, prop: 3, foo: "foo"},
+                    {obj1: obj1, obj3: obj3})
 
-                run(!opts.invert, {obj1, obj2, obj3}, {obj1, obj2, obj3})
-                run(!opts.invert, {obj1, obj2, obj3}, {obj1, obj3})
-                run(!(opts.invert ^ opts.all), {obj1, obj3}, {obj1, obj2, obj3})
+                run(!opts.invert,
+                    {obj1: obj1, obj2: obj2, obj3: obj3},
+                    {obj1: obj1, obj2: obj2, obj3: obj3})
+
+                run(!opts.invert,
+                    {obj1: obj1, obj2: obj2, obj3: obj3},
+                    {obj1: obj1, obj3: obj3})
 
                 run(!(opts.invert ^ opts.all),
-                    {obj1, obj3, foo: 3, bar: "foo"},
-                    {obj1, obj2, obj3})
+                    {obj1: obj1, obj3: obj3},
+                    {obj1: obj1, obj2: obj2, obj3: obj3})
+
+                run(!(opts.invert ^ opts.all),
+                    {obj1: obj1, obj3: obj3, foo: 3, bar: "foo"},
+                    {obj1: obj1, obj2: obj2, obj3: obj3})
 
                 run(!opts.invert,
                     {foo: {foo: 1}, bar: {foo: 2}, baz: 3, quux: {}},
@@ -178,15 +201,15 @@ describe("assertions (has keys)", () => {
                     {bar: []})
             })
 
-            it("checks nothing", () => {
+            it("checks nothing", function () {
                 run(true, [{}, {}], [])
             })
 
-            it("checks missing numbers", () => {
+            it("checks missing numbers", function () {
                 run(opts.invert, {foo: 1, bar: 2, baz: 3}, {foo: 10})
             })
 
-            it("checks missing objects", () => {
+            it("checks missing objects", function () {
                 run(opts.invert,
                     {foo: {foo: 1}, bar: {bar: 2}, baz: {}},
                     {quux: []})
