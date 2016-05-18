@@ -1,6 +1,7 @@
 "use strict"
 
 var interpret = require("interpret")
+var Promise = require("bluebird")
 var t = require("../../index.js")
 var methods = require("../../lib/methods.js")
 var LoaderData = require("../../lib/cli/loader-data.js")
@@ -306,9 +307,11 @@ describe("cli config loader data", function () {
                 t.equal(baseDir, ".")
             }
 
-            new LoaderData.Simple("module", load).register(".")
-
-            t.equal(called, 1)
+            return new LoaderData.Simple("module", load)
+            .register(".")
+            .then(function () {
+                t.equal(called, 1)
+            })
         })
 
         it("calls `load` only once", function () {
@@ -322,11 +325,13 @@ describe("cli config loader data", function () {
 
             var loader = new LoaderData.Simple("module", load)
 
-            loader.register(".")
-            loader.register(".")
-            loader.register(".")
-
-            t.equal(called, 1)
+            return Promise.resolve()
+            .then(function () { return loader.register(".") })
+            .then(function () { return loader.register(".") })
+            .then(function () { return loader.register(".") })
+            .then(function () {
+                t.equal(called, 1)
+            })
         })
     })
 
@@ -340,9 +345,11 @@ describe("cli config loader data", function () {
                 t.equal(baseDir, ".")
             }
 
-            new LoaderData.Register(".mod", "module", load, true).register(".")
-
-            t.equal(called, 1)
+            return new LoaderData.Register(".mod", "module", load, true)
+            .register(".")
+            .then(function () {
+                t.equal(called, 1)
+            })
         })
 
         it("doesn't call `load` when `use` is `false`", function () {
@@ -354,9 +361,11 @@ describe("cli config loader data", function () {
                 t.equal(baseDir, ".")
             }
 
-            new LoaderData.Register(".mod", "module", load, false).register(".")
-
-            t.equal(called, 0)
+            return new LoaderData.Register(".mod", "module", load, false)
+            .register(".")
+            .then(function () {
+                t.equal(called, 0)
+            })
         })
 
         it("calls `load` only once", function () {
@@ -370,11 +379,13 @@ describe("cli config loader data", function () {
 
             var loader = new LoaderData.Register(".mod", "module", load, true)
 
-            loader.register(".")
-            loader.register(".")
-            loader.register(".")
-
-            t.equal(called, 1)
+            return Promise.resolve()
+            .then(function () { return loader.register(".") })
+            .then(function () { return loader.register(".") })
+            .then(function () { return loader.register(".") })
+            .then(function () {
+                t.equal(called, 1)
+            })
         })
 
         it("calls `load` once if the first module in a list works", function () { // eslint-disable-line max-len
@@ -386,15 +397,16 @@ describe("cli config loader data", function () {
                 mods.push(mod)
             }
 
-            new LoaderData.Register(".mod", [
+            return new LoaderData.Register(".mod", [
                 "foo",
                 "bar",
                 "baz",
                 "whatever",
             ], load, true).register(".")
-
-            t.equal(called, 1)
-            t.match(mods, ["foo"])
+            .then(function () {
+                t.equal(called, 1)
+                t.match(mods, ["foo"])
+            })
         })
 
         it("calls `load` for every module if only the last works", function () {
@@ -407,20 +419,21 @@ describe("cli config loader data", function () {
                 if (called < 4) throw new Error("nope")
             }
 
-            new LoaderData.Register(".mod", [
+            return new LoaderData.Register(".mod", [
                 "foo",
                 "bar",
                 "baz",
                 "whatever",
             ], load, true).register(".")
-
-            t.equal(called, 4)
-            t.match(mods, [
-                "foo",
-                "bar",
-                "baz",
-                "whatever",
-            ])
+            .then(function () {
+                t.equal(called, 4)
+                t.match(mods, [
+                    "foo",
+                    "bar",
+                    "baz",
+                    "whatever",
+                ])
+            })
         })
 
         it("calls `load` for some modules if one in the middle works", function () { // eslint-disable-line max-len
@@ -433,15 +446,16 @@ describe("cli config loader data", function () {
                 if (called < 2) throw new Error("nope")
             }
 
-            new LoaderData.Register(".mod", [
+            return new LoaderData.Register(".mod", [
                 "foo",
                 "bar",
                 "baz",
                 "whatever",
             ], load, true).register(".")
-
-            t.equal(called, 2)
-            t.match(mods, ["foo", "bar"])
+            .then(function () {
+                t.equal(called, 2)
+                t.match(mods, ["foo", "bar"])
+            })
         })
 
         it("understands register objects", function () {
@@ -454,7 +468,7 @@ describe("cli config loader data", function () {
                 if (called === 2) throw new Error("nope")
             }
 
-            new LoaderData.Register(".mod", [
+            return new LoaderData.Register(".mod", [
                 {
                     module: "foo",
                     register: function () { throw new Error("nope") },
@@ -463,9 +477,10 @@ describe("cli config loader data", function () {
                 "baz",
                 "whatever",
             ], load, true).register(".")
-
-            t.equal(called, 3)
-            t.match(mods, ["foo", "bar", "baz"])
+            .then(function () {
+                t.equal(called, 3)
+                t.match(mods, ["foo", "bar", "baz"])
+            })
         })
     })
 })

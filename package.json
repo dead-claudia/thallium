@@ -15,9 +15,10 @@
     "index.d.ts",
     "index.js",
     "lib",
+    "bin",
     "docs"
   ],
-  "bin.ignore": {
+  "bin": {
     "tl": "bin/thallium.js",
     "thallium": "bin/thallium.js",
     "_thallium": "bin/_thallium.js"

@@ -1,6 +1,10 @@
 #!/usr/bin/env node
 "use strict"
 
+/* eslint-disable no-process-exit */
+// This script filters out Thallium's arguments, and fires `_thallium.js` with
+// them.
+
 if (require.main !== module) {
     throw new Error("This is not a module!")
 }
@@ -52,6 +56,7 @@ for (i = 2; i < process.argv.length; i++) {
 // Append the rest.
 while (i < process.argv.length) rest.push(process.argv[i++])
 
+// If only I could literally substitute the process...
 process.exit(cp.spawnSync(process.argv[0], Array.prototype.concat.apply([], [
     node,
     [path.resolve(__dirname, "_thallium.js")],
