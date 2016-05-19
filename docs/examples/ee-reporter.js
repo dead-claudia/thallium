@@ -11,7 +11,7 @@
 // - "leave" - test left
 // - "pass" - test passed
 // - "fail" - test failed
-// - "pending" - test pending
+// - "skip" - test skipped
 // - "end" - end of the test suite
 // - "extra" - extra `done` call
 //

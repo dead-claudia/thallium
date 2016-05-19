@@ -8,7 +8,7 @@ export interface Callback<T> {
 }
 
 export type TestType =
-    "start" | "end" | "pass" | "fail" | "pending" | "exit" | "extra";
+    "start" | "end" | "pass" | "fail" | "skip" | "exit" | "extra";
 
 export interface TestLocation {
     name: string;
@@ -30,7 +30,7 @@ export interface StartReport extends TestReport<"start", void> {}
 export interface EndReport extends TestReport<"end", void> {}
 export interface PassReport extends TestReport<"pass", void> {}
 export interface FailReport extends TestReport<"fail", any> {}
-export interface PendingReport extends TestReport<"pending", void> {}
+export interface PendingReport extends TestReport<"skip", void> {}
 export interface ExitReport extends TestReport<"exit", void> {}
 export interface ExtraReport extends TestReport<"extra", ExtraReportData> {}
 

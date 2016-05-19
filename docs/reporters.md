@@ -2,7 +2,7 @@
 
 Thallium reporters are simple functions that accept a set of event objects. It's written to be very unopinionated, easy to work with, and if you feel a need to convert it to something else, it's very straightforward to do.
 
-Reporters are simple functions that are called with an event and either return a thenable or accept a `done` callback, resolved or called respectively when you're done processing the event. Do note that if you never call `done` or resolve the promise, the runner will hang.
+Reporters are called with an event and either return a thenable or accept a `done` callback, resolved or called respectively when you're done processing the event. Do note that you must call `done` or return an eventually resolved promise, or the runner *will* hang.
 
 ## Events
 
@@ -12,7 +12,7 @@ Each event is specified by the `type` property:
 - `"end"` - This marks the end of all tests or a single test block. The `value` property is `undefined`.
 - `"pass"` - This marks a passing test block. The `value` property is `undefined`.
 - `"fail"` - This marks a failing test block. The `value` property is the error that was thrown, unmodified.
-- `"pending"` - This marks a pending test block, from `t.testSkip()` or `t.asyncSkip()`. The `value` property is `undefined`.
+- `"skip"` - This marks a skipped test block, from `t.testSkip()` or `t.asyncSkip()`. The `value` property is `undefined`.
 - `"exit"` - This marks the end of all running tests. The `value` property is `undefined`. If you need to buffer any events, this marks the end of the stream (except for possible `"extra"` events), so you can start your final processing.
 - `"extra"` - This marks an extra call to `done` in an asynchronous test. The `value` property is an object where `count` denotes how many times `done` was called overall, and `value` denotes the last value the callback was called with.
 

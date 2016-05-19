@@ -57,11 +57,8 @@ describe("reporter tap", function () { // eslint-disable-line max-statements
         ],
         output: [
             "TAP version 13",
-            "# tests 0",
-            "# passing 0",
-            "# failing 0",
-            "# pending 0",
             "1..0",
+            "# tests 0",
         ],
     })
 
@@ -81,11 +78,9 @@ describe("reporter tap", function () { // eslint-disable-line max-statements
             "TAP version 13",
             "ok 1 test",
             "ok 2 test",
-            "# tests 2",
-            "# passing 2",
-            "# failing 0",
-            "# pending 0",
             "1..2",
+            "# tests 2",
+            "# pass 2",
         ],
     })
 
@@ -113,11 +108,9 @@ describe("reporter tap", function () { // eslint-disable-line max-statements
             "  ---",
         ], stack(sentinel), [
             "  ...",
-            "# tests 2",
-            "# passing 0",
-            "# failing 2",
-            "# pending 0",
             "1..2",
+            "# tests 2",
+            "# fail 2",
         ]),
     })
 
@@ -140,11 +133,10 @@ describe("reporter tap", function () { // eslint-disable-line max-statements
             "  ---",
         ], stack(sentinel), [
             "  ...",
-            "# tests 2",
-            "# passing 1",
-            "# failing 1",
-            "# pending 0",
             "1..2",
+            "# tests 2",
+            "# pass 1",
+            "# fail 1",
         ]),
     })
 
@@ -167,11 +159,10 @@ describe("reporter tap", function () { // eslint-disable-line max-statements
         ], stack(sentinel), [
             "  ...",
             "ok 2 two",
-            "# tests 2",
-            "# passing 1",
-            "# failing 1",
-            "# pending 0",
             "1..2",
+            "# tests 2",
+            "# pass 1",
+            "# fail 1",
         ]),
     })
 
@@ -203,11 +194,9 @@ describe("reporter tap", function () { // eslint-disable-line max-statements
             "  actual: 2",
         ], stack(assertion), [
             "  ...",
-            "# tests 2",
-            "# passing 0",
-            "# failing 2",
-            "# pending 0",
             "1..2",
+            "# tests 2",
+            "# fail 2",
         ]),
     })
 
@@ -232,11 +221,10 @@ describe("reporter tap", function () { // eslint-disable-line max-statements
             "  actual: 2",
         ], stack(assertion), [
             "  ...",
-            "# tests 2",
-            "# passing 1",
-            "# failing 1",
-            "# pending 0",
             "1..2",
+            "# tests 2",
+            "# pass 1",
+            "# fail 1",
         ]),
     })
 
@@ -261,19 +249,18 @@ describe("reporter tap", function () { // eslint-disable-line max-statements
         ], stack(assertion), [
             "  ...",
             "ok 2 two",
-            "# tests 2",
-            "# passing 1",
-            "# failing 1",
-            "# pending 0",
             "1..2",
+            "# tests 2",
+            "# pass 1",
+            "# fail 1",
         ]),
     })
 
-    test("pending 2", {
+    test("skip 2", {
         input: [
             n("start", []),
-            n("pending", [p("one", 0)]),
-            n("pending", [p("two", 1)]),
+            n("skip", [p("one", 0)]),
+            n("skip", [p("two", 1)]),
             n("end", []),
             n("exit", []),
         ],
@@ -281,21 +268,19 @@ describe("reporter tap", function () { // eslint-disable-line max-statements
             "TAP version 13",
             "ok 1 # skip one",
             "ok 2 # skip two",
-            "# tests 0",
-            "# passing 0",
-            "# failing 0",
-            "# pending 2",
             "1..2",
+            "# tests 0",
+            "# skip 2",
         ],
     })
 
-    test("pass + pending", {
+    test("pass + skip", {
         input: [
             n("start", []),
             n("start", [p("one", 0)]),
             n("end", [p("one", 0)]),
             n("pass", [p("one", 0)]),
-            n("pending", [p("two", 1)]),
+            n("skip", [p("two", 1)]),
             n("end", []),
             n("exit", []),
         ],
@@ -303,18 +288,17 @@ describe("reporter tap", function () { // eslint-disable-line max-statements
             "TAP version 13",
             "ok 1 one",
             "ok 2 # skip two",
-            "# tests 1",
-            "# passing 1",
-            "# failing 0",
-            "# pending 1",
             "1..2",
+            "# tests 1",
+            "# pass 1",
+            "# skip 1",
         ],
     })
 
-    test("pending + pass", {
+    test("skip + pass", {
         input: [
             n("start", []),
-            n("pending", [p("one", 0)]),
+            n("skip", [p("one", 0)]),
             n("start", [p("two", 1)]),
             n("end", [p("two", 1)]),
             n("pass", [p("two", 1)]),
@@ -325,21 +309,20 @@ describe("reporter tap", function () { // eslint-disable-line max-statements
             "TAP version 13",
             "ok 1 # skip one",
             "ok 2 two",
-            "# tests 1",
-            "# passing 1",
-            "# failing 0",
-            "# pending 1",
             "1..2",
+            "# tests 1",
+            "# pass 1",
+            "# skip 1",
         ],
     })
 
-    test("fail + pending", {
+    test("fail + skip", {
         input: [
             n("start", []),
             n("start", [p("one", 0)]),
             n("end", [p("one", 0)]),
             n("fail", [p("one", 0)], sentinel),
-            n("pending", [p("two", 1)]),
+            n("skip", [p("two", 1)]),
             n("end", []),
             n("exit", []),
         ],
@@ -350,18 +333,17 @@ describe("reporter tap", function () { // eslint-disable-line max-statements
         ], stack(sentinel), [
             "  ...",
             "ok 2 # skip two",
-            "# tests 1",
-            "# passing 0",
-            "# failing 1",
-            "# pending 1",
             "1..2",
+            "# tests 1",
+            "# fail 1",
+            "# skip 1",
         ]),
     })
 
-    test("pending + fail", {
+    test("skip + fail", {
         input: [
             n("start", []),
-            n("pending", [p("one", 0)]),
+            n("skip", [p("one", 0)]),
             n("start", [p("two", 1)]),
             n("end", [p("two", 1)]),
             n("fail", [p("two", 1)], sentinel),
@@ -375,11 +357,10 @@ describe("reporter tap", function () { // eslint-disable-line max-statements
             "  ---",
         ], stack(sentinel), [
             "  ...",
-            "# tests 1",
-            "# passing 0",
-            "# failing 1",
-            "# pending 1",
             "1..2",
+            "# tests 1",
+            "# fail 1",
+            "# skip 1",
         ]),
     })
 
@@ -404,6 +385,8 @@ describe("reporter tap", function () { // eslint-disable-line max-statements
         ],
         output: [].concat([
             "TAP version 13",
+            "# test",
+            "# test inner",
             "ok 1 test inner fail",
             "ok 2 test inner",
             "not ok 3 test inner fail # extra",
@@ -417,11 +400,10 @@ describe("reporter tap", function () { // eslint-disable-line max-statements
         ], printError(sentinel), [
             "  ...",
             "ok 5 test",
-            "# tests 3",
-            "# passing 3",
-            "# failing 1",
-            "# pending 0",
             "1..5",
+            "# tests 3",
+            "# pass 3",
+            "# fail 1",
         ]),
     })
 
@@ -448,6 +430,8 @@ describe("reporter tap", function () { // eslint-disable-line max-statements
         ],
         output: [].concat([
             "TAP version 13",
+            "# test",
+            "# test inner",
             "not ok 1 test inner fail",
             "  ---",
         ], stack(wrongType), [
@@ -464,11 +448,10 @@ describe("reporter tap", function () { // eslint-disable-line max-statements
         ], printError(sentinel), [
             "  ...",
             "ok 5 test",
-            "# tests 3",
-            "# passing 2",
-            "# failing 1",
-            "# pending 0",
             "1..5",
+            "# tests 3",
+            "# pass 2",
+            "# fail 1",
         ]),
     })
 
@@ -485,6 +468,8 @@ describe("reporter tap", function () { // eslint-disable-line max-statements
         ],
         output: [].concat([
             "TAP version 13",
+            "# test",
+            "# test inner",
             "not ok 1 test inner fail",
             "  ---",
         ], stack(wrongType), [
@@ -649,6 +634,7 @@ describe("reporter tap", function () { // eslint-disable-line max-statements
 
         output: [
             "TAP version 13",
+            "# core (basic)",
             "ok 1 core (basic) has `base()`",
             "ok 2 core (basic) has `test()`",
             "ok 3 core (basic) has `parent()`",
@@ -660,24 +646,29 @@ describe("reporter tap", function () { // eslint-disable-line max-statements
             "ok 9 core (basic) runs successful inline tests within tests",
             "ok 10 core (basic) accepts a callback with `t.run()`",
             "ok 11 core (basic)",
+            "# cli normalize glob",
+            "# cli normalize glob current directory",
             "ok 12 cli normalize glob current directory normalizes a file",
             "ok 13 cli normalize glob current directory normalizes a glob",
             "ok 14 cli normalize glob current directory retains trailing slashes",
             "ok 15 cli normalize glob current directory retains negative",
             "ok 16 cli normalize glob current directory retains negative + trailing slashes",
             "ok 17 cli normalize glob current directory",
+            "# cli normalize glob absolute directory",
             "ok 18 cli normalize glob absolute directory normalizes a file",
             "ok 19 cli normalize glob absolute directory normalizes a glob",
             "ok 20 cli normalize glob absolute directory retains trailing slashes",
             "ok 21 cli normalize glob absolute directory retains negative",
             "ok 22 cli normalize glob absolute directory retains negative + trailing slashes",
             "ok 23 cli normalize glob absolute directory",
+            "# cli normalize glob relative directory",
             "ok 24 cli normalize glob relative directory normalizes a file",
             "ok 25 cli normalize glob relative directory normalizes a glob",
             "ok 26 cli normalize glob relative directory retains trailing slashes",
             "ok 27 cli normalize glob relative directory retains negative",
             "ok 28 cli normalize glob relative directory retains negative + trailing slashes",
             "ok 29 cli normalize glob relative directory",
+            "# cli normalize glob edge cases",
             "ok 30 cli normalize glob edge cases normalizes `.` with a cwd of `.`",
             "ok 31 cli normalize glob edge cases normalizes `..` with a cwd of `.`",
             "ok 32 cli normalize glob edge cases normalizes `.` with a cwd of `..`",
@@ -687,6 +678,7 @@ describe("reporter tap", function () { // eslint-disable-line max-statements
             "ok 36 cli normalize glob edge cases removes excess combined junk",
             "ok 37 cli normalize glob edge cases",
             "ok 38 cli normalize glob",
+            "# core (timeouts)",
             "ok 39 core (timeouts) succeeds with own",
             "ok 40 core (timeouts) fails with own",
             "ok 41 core (timeouts) succeeds with inherited",
@@ -696,11 +688,9 @@ describe("reporter tap", function () { // eslint-disable-line max-statements
             "ok 45 core (timeouts) gets own sync inner timeout",
             "ok 46 core (timeouts) gets default timeout",
             "ok 47 core (timeouts)",
-            "# tests 47",
-            "# passing 47",
-            "# failing 0",
-            "# pending 0",
             "1..47",
+            "# tests 47",
+            "# pass 47",
         ],
 
         /* eslint-enable max-len */
@@ -721,7 +711,7 @@ describe("reporter tap", function () { // eslint-disable-line max-statements
             n("start", [p("core (basic)", 0), p("has `parent()`", 2)]),
             n("end", [p("core (basic)", 0), p("has `parent()`", 2)]),
             n("pass", [p("core (basic)", 0), p("has `parent()`", 2)]),
-            n("pending", [p("core (basic)", 0), p("can accept a string + function", 3)]),
+            n("skip", [p("core (basic)", 0), p("can accept a string + function", 3)]),
             n("start", [p("core (basic)", 0), p("can accept a string", 4)]),
             n("end", [p("core (basic)", 0), p("can accept a string", 4)]),
             n("pass", [p("core (basic)", 0), p("can accept a string", 4)]),
@@ -771,7 +761,7 @@ describe("reporter tap", function () { // eslint-disable-line max-statements
             n("start", [p("cli normalize glob", 1), p("absolute directory", 1), p("retains trailing slashes", 2)]),
             n("end", [p("cli normalize glob", 1), p("absolute directory", 1), p("retains trailing slashes", 2)]),
             n("pass", [p("cli normalize glob", 1), p("absolute directory", 1), p("retains trailing slashes", 2)]),
-            n("pending", [p("cli normalize glob", 1), p("absolute directory", 1), p("retains negative", 3)]),
+            n("skip", [p("cli normalize glob", 1), p("absolute directory", 1), p("retains negative", 3)]),
             n("start", [p("cli normalize glob", 1), p("absolute directory", 1), p("retains negative + trailing slashes", 4)]),
             n("end", [p("cli normalize glob", 1), p("absolute directory", 1), p("retains negative + trailing slashes", 4)]),
             n("pass", [p("cli normalize glob", 1), p("absolute directory", 1), p("retains negative + trailing slashes", 4)]),
@@ -822,7 +812,7 @@ describe("reporter tap", function () { // eslint-disable-line max-statements
             n("end", [p("cli normalize glob", 1)]),
             n("pass", [p("cli normalize glob", 1)]),
             n("start", [p("core (timeouts)", 2)]),
-            n("pending", [p("core (timeouts)", 2), p("succeeds with own", 0)]),
+            n("skip", [p("core (timeouts)", 2), p("succeeds with own", 0)]),
             n("start", [p("core (timeouts)", 2), p("fails with own", 1)]),
             n("end", [p("core (timeouts)", 2), p("fails with own", 1)]),
             n("pass", [p("core (timeouts)", 2), p("fails with own", 1)]),
@@ -839,7 +829,7 @@ describe("reporter tap", function () { // eslint-disable-line max-statements
             n("extra", [p("core (timeouts)", 2), p("fails with own", 1)], {count: 2, value: wrongType}),
             n("end", [p("core (timeouts)", 2), p("gets own inline set timeout", 5)]),
             n("fail", [p("core (timeouts)", 2), p("gets own inline set timeout", 5)], sentinel),
-            n("pending", [p("core (timeouts)", 2), p("gets own sync inner timeout", 6)]),
+            n("skip", [p("core (timeouts)", 2), p("gets own sync inner timeout", 6)]),
             n("start", [p("core (timeouts)", 2), p("gets default timeout", 7)]),
             n("end", [p("core (timeouts)", 2), p("gets default timeout", 7)]),
             n("pass", [p("core (timeouts)", 2), p("gets default timeout", 7)]),
@@ -851,6 +841,7 @@ describe("reporter tap", function () { // eslint-disable-line max-statements
 
         output: [].concat([
             "TAP version 13",
+            "# core (basic)",
             "ok 1 core (basic) has `base()`",
             "ok 2 core (basic) has `test()`",
             "ok 3 core (basic) has `parent()`",
@@ -865,6 +856,8 @@ describe("reporter tap", function () { // eslint-disable-line max-statements
             "ok 9 core (basic) runs successful inline tests within tests",
             "ok 10 core (basic) accepts a callback with `t.run()`",
             "ok 11 core (basic)",
+            "# cli normalize glob",
+            "# cli normalize glob current directory",
             "not ok 12 cli normalize glob current directory normalizes a file",
             "  ---",
         ], stack(sentinel), [
@@ -874,12 +867,14 @@ describe("reporter tap", function () { // eslint-disable-line max-statements
             "ok 15 cli normalize glob current directory retains negative",
             "ok 16 cli normalize glob current directory retains negative + trailing slashes",
             "ok 17 cli normalize glob current directory",
+            "# cli normalize glob absolute directory",
             "ok 18 cli normalize glob absolute directory normalizes a file",
             "ok 19 cli normalize glob absolute directory normalizes a glob",
             "ok 20 cli normalize glob absolute directory retains trailing slashes",
             "ok 21 # skip cli normalize glob absolute directory retains negative",
             "ok 22 cli normalize glob absolute directory retains negative + trailing slashes",
             "ok 23 cli normalize glob absolute directory",
+            "# cli normalize glob relative directory",
             "ok 24 cli normalize glob relative directory normalizes a file",
             "ok 25 cli normalize glob relative directory normalizes a glob",
             "ok 26 cli normalize glob relative directory retains trailing slashes",
@@ -889,6 +884,7 @@ describe("reporter tap", function () { // eslint-disable-line max-statements
         ], stack(wrongType), [
             "  ...",
             "ok 29 cli normalize glob relative directory",
+            "# cli normalize glob edge cases",
             "ok 30 cli normalize glob edge cases normalizes `.` with a cwd of `.`",
             "ok 31 cli normalize glob edge cases normalizes `..` with a cwd of `.`",
             "ok 32 cli normalize glob edge cases normalizes `.` with a cwd of `..`",
@@ -899,6 +895,7 @@ describe("reporter tap", function () { // eslint-disable-line max-statements
             "ok 37 cli normalize glob edge cases",
             "ok 38 cli normalize glob",
             "ok 39 # skip core (timeouts) succeeds with own",
+            "# core (timeouts)",
             "ok 40 core (timeouts) fails with own",
             "ok 41 core (timeouts) succeeds with inherited",
             "ok 42 core (timeouts) fails with inherited",
@@ -915,11 +912,11 @@ describe("reporter tap", function () { // eslint-disable-line max-statements
             "ok 46 # skip core (timeouts) gets own sync inner timeout",
             "ok 47 core (timeouts) gets default timeout",
             "ok 48 core (timeouts)",
-            "# tests 43",
-            "# passing 39",
-            "# failing 5",
-            "# pending 4",
             "1..48",
+            "# tests 43",
+            "# pass 39",
+            "# fail 5",
+            "# skip 4",
         ]),
 
         /* eslint-enable max-len */
@@ -937,17 +934,11 @@ describe("reporter tap", function () { // eslint-disable-line max-statements
             ],
             output: [
                 "TAP version 13",
-                "# tests 0",
-                "# passing 0",
-                "# failing 0",
-                "# pending 0",
                 "1..0",
+                "# tests 0",
                 "TAP version 13",
-                "# tests 0",
-                "# passing 0",
-                "# failing 0",
-                "# pending 0",
                 "1..0",
+                "# tests 0",
             ],
         })
 
@@ -976,19 +967,15 @@ describe("reporter tap", function () { // eslint-disable-line max-statements
                 "TAP version 13",
                 "ok 1 test",
                 "ok 2 test",
-                "# tests 2",
-                "# passing 2",
-                "# failing 0",
-                "# pending 0",
                 "1..2",
+                "# tests 2",
+                "# pass 2",
                 "TAP version 13",
                 "ok 1 test",
                 "ok 2 test",
-                "# tests 2",
-                "# passing 2",
-                "# failing 0",
-                "# pending 0",
                 "1..2",
+                "# tests 2",
+                "# pass 2",
             ],
         })
 
@@ -1025,11 +1012,9 @@ describe("reporter tap", function () { // eslint-disable-line max-statements
                 "  ---",
             ], stack(sentinel), [
                 "  ...",
-                "# tests 2",
-                "# passing 0",
-                "# failing 2",
-                "# pending 0",
                 "1..2",
+                "# tests 2",
+                "# fail 2",
                 "TAP version 13",
                 "not ok 1 one",
                 "  ---",
@@ -1039,11 +1024,9 @@ describe("reporter tap", function () { // eslint-disable-line max-statements
                 "  ---",
             ], stack(sentinel), [
                 "  ...",
-                "# tests 2",
-                "# passing 0",
-                "# failing 2",
-                "# pending 0",
                 "1..2",
+                "# tests 2",
+                "# fail 2",
             ]),
         })
 
@@ -1075,22 +1058,20 @@ describe("reporter tap", function () { // eslint-disable-line max-statements
                 "  ---",
             ], stack(sentinel), [
                 "  ...",
-                "# tests 2",
-                "# passing 1",
-                "# failing 1",
-                "# pending 0",
                 "1..2",
+                "# tests 2",
+                "# pass 1",
+                "# fail 1",
                 "TAP version 13",
                 "ok 1 one",
                 "not ok 2 two",
                 "  ---",
             ], stack(sentinel), [
                 "  ...",
-                "# tests 2",
-                "# passing 1",
-                "# failing 1",
-                "# pending 0",
                 "1..2",
+                "# tests 2",
+                "# pass 1",
+                "# fail 1",
             ]),
         })
 
@@ -1122,22 +1103,20 @@ describe("reporter tap", function () { // eslint-disable-line max-statements
             ], stack(sentinel), [
                 "  ...",
                 "ok 2 two",
-                "# tests 2",
-                "# passing 1",
-                "# failing 1",
-                "# pending 0",
                 "1..2",
+                "# tests 2",
+                "# pass 1",
+                "# fail 1",
                 "TAP version 13",
                 "not ok 1 one",
                 "  ---",
             ], stack(sentinel), [
                 "  ...",
                 "ok 2 two",
-                "# tests 2",
-                "# passing 1",
-                "# failing 1",
-                "# pending 0",
                 "1..2",
+                "# tests 2",
+                "# pass 1",
+                "# fail 1",
             ]),
         })
 
@@ -1178,11 +1157,9 @@ describe("reporter tap", function () { // eslint-disable-line max-statements
                 "  actual: 2",
             ], stack(assertion), [
                 "  ...",
-                "# tests 2",
-                "# passing 0",
-                "# failing 2",
-                "# pending 0",
                 "1..2",
+                "# tests 2",
+                "# fail 2",
                 "TAP version 13",
                 "not ok 1 one",
                 "  ---",
@@ -1196,11 +1173,9 @@ describe("reporter tap", function () { // eslint-disable-line max-statements
                 "  actual: 2",
             ], stack(assertion), [
                 "  ...",
-                "# tests 2",
-                "# passing 0",
-                "# failing 2",
-                "# pending 0",
                 "1..2",
+                "# tests 2",
+                "# fail 2",
             ]),
         })
 
@@ -1234,11 +1209,10 @@ describe("reporter tap", function () { // eslint-disable-line max-statements
                 "  actual: 2",
             ], stack(assertion), [
                 "  ...",
-                "# tests 2",
-                "# passing 1",
-                "# failing 1",
-                "# pending 0",
                 "1..2",
+                "# tests 2",
+                "# pass 1",
+                "# fail 1",
                 "TAP version 13",
                 "ok 1 one",
                 "not ok 2 two",
@@ -1247,11 +1221,10 @@ describe("reporter tap", function () { // eslint-disable-line max-statements
                 "  actual: 2",
             ], stack(assertion), [
                 "  ...",
-                "# tests 2",
-                "# passing 1",
-                "# failing 1",
-                "# pending 0",
                 "1..2",
+                "# tests 2",
+                "# pass 1",
+                "# fail 1",
             ]),
         })
 
@@ -1285,11 +1258,10 @@ describe("reporter tap", function () { // eslint-disable-line max-statements
             ], stack(assertion), [
                 "  ...",
                 "ok 2 two",
-                "# tests 2",
-                "# passing 1",
-                "# failing 1",
-                "# pending 0",
                 "1..2",
+                "# tests 2",
+                "# pass 1",
+                "# fail 1",
                 "TAP version 13",
                 "not ok 1 one",
                 "  ---",
@@ -1298,11 +1270,10 @@ describe("reporter tap", function () { // eslint-disable-line max-statements
             ], stack(assertion), [
                 "  ...",
                 "ok 2 two",
-                "# tests 2",
-                "# passing 1",
-                "# failing 1",
-                "# pending 0",
                 "1..2",
+                "# tests 2",
+                "# pass 1",
+                "# fail 1",
             ]),
         })
     })

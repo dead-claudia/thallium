@@ -34,7 +34,7 @@ t.test '1 should equal 1', ->
 
 This calls the callback on a separate event loop tick, with `this` and the first argument being a new Thallium instance prototypically inheriting everything of this instance, plugins, reporters, assertions, methods, and all. It is perfectly safe to add new properties and modify existing ones on the inner instance, as none of the changes escape to the outer context.
 
-You can skip block tests with `t.testSkip("name", callback)`, which is identical except the test is reported as pending instead.
+You can skip block tests with `t.testSkip("name", callback)`, which is identical except the test is reported as skipped instead.
 
 This returns the current Thallium instance, for chaining.
 
@@ -51,7 +51,7 @@ It is perfectly safe to add new properties and modify existing ones on the new i
 
 Do note that the assertions are run on a separate event loop tick, even though the property access is all on the same one.
 
-You can skip inline tests with `t.testSkip("name")`, which is identical except the test is reported as pending instead.
+You can skip inline tests with `t.testSkip("name")`, which is identical except the test is reported as skipped instead.
 
 ### t.async("name", callback)
 
@@ -124,7 +124,7 @@ This calls the callback on a separate event loop tick, with `this` and the first
 
 Do note that the test is initialized on a separate event loop tick. Also, the `done` argument is always asynchronous. And if you use the `done` callback, you *must* call it to end the test.
 
-You can skip async tests with `t.asyncSkip("name", callback)`, which is identical except the test is reported as pending instead.
+You can skip async tests with `t.asyncSkip("name", callback)`, which is identical except the test is reported as skipped instead.
 
 This returns the current Thallium instance, for chaining.
 

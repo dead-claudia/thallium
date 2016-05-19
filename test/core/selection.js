@@ -35,7 +35,7 @@ describe("core (selection)", function () {
                 t.match(ret, [
                     n("start", []),
                     n("start", [p("one", 0)]),
-                    n("pending", [p("one", 0), p("inner", 0)]),
+                    n("skip", [p("one", 0), p("inner", 0)]),
                     n("start", [p("one", 0), p("other", 1)]),
                     n("end", [p("one", 0), p("other", 1)]),
                     n("pass", [p("one", 0), p("other", 1)]),
@@ -76,7 +76,7 @@ describe("core (selection)", function () {
                 t.match(ret, [
                     n("start", []),
                     n("start", [p("one", 0)]),
-                    n("pending", [p("one", 0), p("inner", 0)]),
+                    n("skip", [p("one", 0), p("inner", 0)]),
                     n("start", [p("one", 0), p("other", 1)]),
                     n("end", [p("one", 0), p("other", 1)]),
                     n("pass", [p("one", 0), p("other", 1)]),
@@ -117,7 +117,7 @@ describe("core (selection)", function () {
                 t.match(ret, [
                     n("start", []),
                     n("start", [p("one", 0)]),
-                    n("pending", [p("one", 0), p("inner", 0)]),
+                    n("skip", [p("one", 0), p("inner", 0)]),
                     n("start", [p("one", 0), p("other", 1)]),
                     n("end", [p("one", 0), p("other", 1)]),
                     n("pass", [p("one", 0), p("other", 1)]),
@@ -145,7 +145,7 @@ describe("core (selection)", function () {
 
             return ttt.run().then(function () {
                 t.match(ret, [
-                    n("pending", [p("test", 0)]),
+                    n("skip", [p("test", 0)]),
                     n("exit", [p("test", 0)]),
                 ])
             })
