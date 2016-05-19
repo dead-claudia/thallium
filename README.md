@@ -1,5 +1,7 @@
 # Thallium
 
+[![browser support](https://ci.testling.com/isiahmeadows/thallium.png)
+](https://ci.testling.com/isiahmeadows/thallium)
 [![Build Status](https://travis-ci.org/isiahmeadows/thallium.svg?branch=master)](https://travis-ci.org/isiahmeadows/thallium) [![Join the chat at https://gitter.im/isiahmeadows/thallium](https://badges.gitter.im/isiahmeadows/thallium.svg)](https://gitter.im/isiahmeadows/thallium?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 A simple, unopinionated, modular test framework meant to simplify your tests. It supports Node 4 and later, and browser support + legacy Node is also planned.
@@ -47,11 +49,10 @@ See the [documentation](http://github.com/isiahmeadows/thallium/blob/master/docs
 
 This list is in a very rough chronological order.
 
-1. Create basic reporters for TAP, spec, dot, etc.
+1. Create basic reporters for ~~TAP,~~ spec, dot, etc.
 2. Set up [AppVeyor](https://www.appveyor.com/) to run tests on Windows. Currently, it's only actively tested on Linux.
 3. Finish documenting this project. This mainly includes the core assertions and CLI.
-4. Port this to the browser via Browserify/Webpack.
-    - I may also rewrite [`util-inspect`](https://www.npmjs.com/package/util-inspect) based on Node's [`util.inspect`](https://nodejs.org/api/util.html#util_util_inspect_object_options) after finishing the port, since that module is completely untested, and has no understanding of ES6. :worried:
+4. Reimplement [`util-inspect`](https://www.npmjs.com/package/util-inspect) for browsers based on Node's current [`util.inspect`](https://nodejs.org/api/util.html#util_util_inspect_object_options), since that module is completely untested and is unaware of ES6. :worried:
 5. Write a few plugins for `describe`/`it`, `before{,Each}`/`after{,Each}` hooks, REPL friendliness\*, etc.
 6. Write lots of blog posts.\*\* :smile:
 
@@ -63,6 +64,8 @@ This list is in a very rough chronological order.
 
 General information:
 
+- This is tested on Node 0.10 and 0.12 (I know they're unsupported, but it's helps with compatibility).
+- This is tested through [Testling CI](https://ci.testling.com) as well.
 - This is written in pure ES5. No arrow functions, etc.
     - There is a class-ish utility [here](http://github.com/isiahmeadows/thallium/blob/master/lib/methods.js), so those are easy.
     - I also use a few Lispish techniques to simplify the code.

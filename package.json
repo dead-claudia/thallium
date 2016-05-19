@@ -7,6 +7,24 @@
     "lint": "eslint . && coffeelint .",
     "test": "npm run lint && mocha"
   },
+  "testling": {
+    "browsers": [
+      "ie/10..latest",
+      "chrome/20..canary",
+      "firefox/10..nightly",
+      "safari/latest",
+      "opera/17.0..next",
+      "iphone/6",
+      "ipad/6"
+    ],
+    "files": [
+      "test/assertions/**/*.js",
+      "test/core/**/*.js",
+      "test/reporters/tap.js",
+      "test/*.js"
+    ],
+    "harness": "mocha"
+  },
   "files": [
     "assertions.d.ts",
     "assertions.js",

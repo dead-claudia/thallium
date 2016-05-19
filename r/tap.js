@@ -142,7 +142,7 @@ methods(Dispatcher, {
 // This is synchronous, and the `print` option must act synchronously.
 module.exports = function (opts) {
     if (opts == null) opts = {}
-    if (opts.print == null) opts.print = console.log
+    if (opts.print == null) opts.print = console.log.bind(console)
 
     var dispatcher = new Dispatcher(opts)
 
