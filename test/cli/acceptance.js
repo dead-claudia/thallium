@@ -14,7 +14,7 @@ function formatList(msgs) {
 }
 
 describe("cli acceptance", function () {
-    var binary = path.resolve(__dirname, "../../bin/_thallium.js")
+    var binary = path.resolve(__dirname, "../../bin/thallium.js")
 
     function test(name, opts) {
         (opts.skip ? it.skip : it)(name, /** @this */ function () {
@@ -27,16 +27,9 @@ describe("cli acceptance", function () {
                 opts.messages = opts.messages.join(newline)
             }
 
-            var args = opts.args
+            opts.args.unshift(binary)
 
-            if (typeof args === "string") {
-                args = args.trim()
-                args = args ? args.split(/\s+/g) : []
-            }
-
-            args.unshift(binary)
-
-            var child = cp.spawn(process.argv[0], args, {
+            var child = cp.spawn(process.argv[0], opts.args, {
                 stdio: [process.stdin, "pipe", process.stderr],
             })
 
@@ -76,7 +69,7 @@ describe("cli acceptance", function () {
     }
 
     test("runs simple valid tests", {
-        args: "--cwd " + fixture("acceptance/simple"),
+        args: ["--cwd", fixture("acceptance/simple")],
         code: 0,
         timeout: 5000,
         messages: [

@@ -15,8 +15,7 @@ var help = require("../lib/cli/help.js")
 
 var args = {
     config: null,
-    register: [],
-    module: null,
+    require: [],
     cwd: null,
 }
 
@@ -39,17 +38,15 @@ for (i = 2; i < process.argv.length; i++) {
         process.exit()
     } else if (/^(-c|--config)$/.test(arg)) {
         last = "config"
-    } else if (/^(-r|--register)$/.test(arg)) {
-        last = "register"
-    } else if (/^(-m|--module)$/.test(arg)) {
-        last = "module"
+    } else if (/^(-r|--require)$/.test(arg)) {
+        last = "require"
     } else if (arg === "--cwd") {
         last = "cwd"
     } else if (arg === "--") {
         i++
         break
     } else {
-        (/-/.test(arg) ? node : rest).push(arg)
+        (/^-/.test(arg) ? node : rest).push(arg)
     }
 }
 
@@ -57,16 +54,21 @@ for (i = 2; i < process.argv.length; i++) {
 while (i < process.argv.length) rest.push(process.argv[i++])
 
 // If only I could literally substitute the process...
-process.exit(cp.spawnSync(process.argv[0], Array.prototype.concat.apply([], [
+function exit(code) {
+    if (code != null) process.exit(code)
+}
+
+cp.spawn(process.argv[0], Array.prototype.concat.apply([], [
     node,
     [path.resolve(__dirname, "_thallium.js")],
     args.config == null ? [] : ["--config", args.config],
-    args.module == null ? [] : ["--module", args.module],
     args.cwd == null ? [] : ["--cwd", args.cwd],
-    args.register.map(function (arg) { return ["--register", arg] }),
+    args.require.map(function (arg) { return ["--require", arg] }),
     ["--"],
     rest,
 ]), {
     cwd: process.cwd(),
     stdio: "inherit",
-}).code)
+})
+.on("exit", exit)
+.on("close", exit)
