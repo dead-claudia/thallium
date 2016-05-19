@@ -10,6 +10,7 @@
   "testling": {
     "browsers": [
       "ie/10..latest",
+      "edge/latest",
       "chrome/20..canary",
       "firefox/10..nightly",
       "safari/latest",

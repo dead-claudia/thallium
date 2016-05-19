@@ -1,21 +1,31 @@
 "use strict"
 
-var t = require("../index.js")
+var inspect = require("util").inspect
+var AssertionError = require("../index.js").AssertionError
 
 describe("class AssertionError", function () {
-    it("exists", function () {
-        t.function(t.AssertionError)
+    it("is an error", function () {
+        if (!(new AssertionError("message") instanceof Error)) {
+            throw new Error("Expected t.AssertionError to subclass Error")
+        }
     })
 
-    it("is an error", function () {
-        t.instanceof(new t.AssertionError("message"), Error)
-    })
+    function equal(e, prop, expected) {
+        if (!{}.hasOwnProperty.call(e, prop)) {
+            throw new Error("Expected error to have own " + prop + " property")
+        }
+
+        if (e[prop] !== expected) {
+            throw new Error("Expected e." + prop + " to equal " +
+                inspect(expected) + ", but found " + inspect(e[prop]))
+        }
+    }
 
     it("correctly sets properties", function () {
-        t.match(new t.AssertionError("message", 1, 2), {
-            message: "message",
-            expected: 1,
-            actual: 2,
-        })
+        var e = new AssertionError("message", 1, 2)
+
+        equal(e, "message", "message")
+        equal(e, "expected", 1)
+        equal(e, "actual", 2)
     })
 })
