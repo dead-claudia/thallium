@@ -16,7 +16,7 @@ function formatList(msgs) {
     return msgs.replace(/\r?\n/g, "\n").replace(/\n{2,}/g, "\n").trim()
 }
 
-describe("cli acceptance", function () {
+describe("cli end-to-end (FLAKE)", function () {
     var binary = path.resolve(__dirname, "../../bin/thallium.js")
 
     function test(name, opts) {
@@ -190,16 +190,16 @@ describe("cli acceptance", function () {
         "pass [1: cli common] > [3: globParent()] > [9: gets a base name from a complex brace glob] = undefined",
         "leave [1: cli common] > [3: globParent()] = undefined",
         "leave [1: cli common] = undefined",
-        "enter [2: core (timeouts)] = undefined",
-        "pass [2: core (timeouts)] > [0: succeeds with own] = undefined",
-        "pass [2: core (timeouts)] > [1: fails with own] = undefined",
-        "pass [2: core (timeouts)] > [2: succeeds with inherited] = undefined",
-        "pass [2: core (timeouts)] > [3: fails with inherited] = undefined",
-        "pass [2: core (timeouts)] > [4: gets own set timeout] = undefined",
-        "pass [2: core (timeouts)] > [5: gets own inline set timeout] = undefined",
-        "pass [2: core (timeouts)] > [6: gets own sync inner timeout] = undefined",
-        "pass [2: core (timeouts)] > [7: gets default timeout] = undefined",
-        "leave [2: core (timeouts)] = undefined",
+        "enter [2: core (timeouts) (FLAKE)] = undefined",
+        "pass [2: core (timeouts) (FLAKE)] > [0: succeeds with own] = undefined",
+        "pass [2: core (timeouts) (FLAKE)] > [1: fails with own] = undefined",
+        "pass [2: core (timeouts) (FLAKE)] > [2: succeeds with inherited] = undefined",
+        "pass [2: core (timeouts) (FLAKE)] > [3: fails with inherited] = undefined",
+        "pass [2: core (timeouts) (FLAKE)] > [4: gets own set timeout] = undefined",
+        "pass [2: core (timeouts) (FLAKE)] > [5: gets own inline set timeout] = undefined",
+        "pass [2: core (timeouts) (FLAKE)] > [6: gets own sync inner timeout] = undefined",
+        "pass [2: core (timeouts) (FLAKE)] > [7: gets default timeout] = undefined",
+        "leave [2: core (timeouts) (FLAKE)] = undefined",
         "end = undefined",
     ]
 

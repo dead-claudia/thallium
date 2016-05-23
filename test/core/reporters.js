@@ -568,7 +568,8 @@ describe("core (reporters)", function () { // eslint-disable-line max-statements
             })
     })
 
-    // Slightly flaky...
+    // This is a bit too tightly coupled to the implementation than I'd normally
+    // be comfortable with...
     it("reports internal errors", function () {
         var tt = t.base()
         var sentinel = createSentinel("sentinel")

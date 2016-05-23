@@ -1,7 +1,7 @@
 "use strict"
 
 // Note: updates to this should also be reflected in
-// test-fixtures/acceptance/mid-coffee/timeouts.coffee, as it's trying to
+// test-fixtures/mid-coffee/timeouts.coffee, as it's trying to
 // represent more real-world usage.
 
 var t = require("../../index.js")
@@ -12,7 +12,7 @@ var p = Util.p
 // Note that this entire section may be flaky on slower machines. Thankfully,
 // these have been tested against a slower machine, so it should hopefully not
 // be too bad.
-describe("core (timeouts)", function () {
+describe("core (timeouts) (FLAKE)", function () {
     it("succeeds with own", function () {
         var tt = t.base()
         var ret = []

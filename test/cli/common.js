@@ -1,7 +1,7 @@
 "use strict"
 
 // Note: updates to this must be reflected in
-// test-fixtures/acceptance/mid-coffee/test/common.coffee, as it's
+// test-fixtures/mid-coffee/test/common.coffee, as it's
 // trying to represent more real-world usage.
 
 var t = require("../../index.js")

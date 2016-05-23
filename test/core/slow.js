@@ -10,7 +10,7 @@ var p = Util.p
 // Note that this entire section may be flaky on slower machines. Thankfully,
 // these have been tested against a slower machine, so it should hopefully not
 // be too bad.
-describe.skip("core (slow)", function () {
+describe.skip("core (slow) (FLAKE)", function () {
     it("succeeds with own", function () {
         var tt = t.base()
         var ret = []

@@ -49,7 +49,7 @@ I use [Bluebird](http://bluebirdjs.com) extensively for promises, as it makes co
 - `test` - This contains all the tests, and generally mirrors `lib` in its file structure. Mocha is currently used as the test runner, and the assertions are fully self-hosted. Using Thallium to test Thallium is awesome!
 
 - `test-fixtures` - This contains the fixtures for the various tests.
-    - Some of the `test` files are mirrored in [CoffeeScript](http://coffeescript.org/) within `test-fixtures/acceptance/large-coffee` to help aid in more real-world usage. These are very explicitly and clearly labeled, so it should be very hard to miss.
+    - Some of the `test` files are mirrored in [CoffeeScript](http://coffeescript.org/) within `test-fixtures/large-coffee` to help aid in more real-world usage. These are very explicitly and clearly labeled, so it should be very hard to miss.
 
 - `test-util` - This contains various test-related utilities, including the mocks. Here's a few in `test-util/base.js` you might appreciate knowing about:
 
@@ -68,6 +68,10 @@ I use [Bluebird](http://bluebirdjs.com) extensively for promises, as it makes co
 - `exports.foo = bar` is preferred over `module.exports.foo = bar`.
 
 ## Tips and idioms
+
+- All non-deterministic tests/groups of tests are suffixed with `(FLAKE)`. This includes part of one of the end-to-end fixtures. This helps me know at a glance whether rerunning it is an option, since Mocha doesn't have a good third-party interface for retries.
+
+    There's only a few of them, but they are either testing an inherently time-dependent feature, or they're dealing with the file system, and the output is order-dependent.
 
 - If you're on Linux and have [`nvm`](https://github.com/creationix/nvm) installed, there's a little `test.sh` script you can run, which will test everything Travis sees on your local machine, installing them if necessary. Note that it doesn't actually update existing installations for you, though. It's not quite *that* magical.
 

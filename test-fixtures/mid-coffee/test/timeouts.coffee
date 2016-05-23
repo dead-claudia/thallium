@@ -11,7 +11,7 @@ t = require 'thallium'
 # Note that this entire section may be flaky on slower machines. Thankfully,
 # these have been tested against a slower machine, so it should hopefully not
 # be too bad.
-t.test 'core (timeouts)', ->
+t.test 'core (timeouts) (FLAKE)', ->
     @async 'succeeds with own', ->
         tt = @base()
         ret = []

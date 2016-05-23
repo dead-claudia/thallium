@@ -1,7 +1,7 @@
 "use strict"
 
 // Note: updates to this should also be reflected in
-// test-fixtures/acceptance/mid-coffee/basic.coffee, as it's trying to
+// test-fixtures/basic.coffee, as it's trying to
 // represent more real-world usage.
 
 var Promise = require("bluebird")

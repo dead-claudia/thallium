@@ -53,17 +53,22 @@ This list is in a very rough chronological order.
     - Note that these four I've listed are directly blocking 0.1.
     - Also, create a playground fixture for developing new reporters, to make design much easier.
 2. Set up [AppVeyor](https://www.appveyor.com/) to run tests on Windows. Currently, it's only actively tested on Linux and in browsers.
-3. Allow for multiple configs that override and augment each other, initial negative globs that act based on the config's files (or the default), and a way to evaluate a module directly in the CLI relative to the current working directory.
-    - That last one will be a bit more difficult than the others.
+3. Allow for multiple composable configs, initial negative globs based on the config's list (or the default), and a way to evaluate a config snippet via an argument.
 4. Finish documenting this project. This mainly includes the core assertions.
-5. Reimplement [`util-inspect`](https://www.npmjs.com/package/util-inspect) for browsers based on Node's current [`util.inspect`](https://nodejs.org/api/util.html#util_util_inspect_object_options), since that module is completely untested and is unaware of ES6. :worried:
-6. Write a few plugins/utilities for `describe`/`it`, `before{,Each}`/`after{,Each}` hooks, REPL friendliness\*, etc.
-    - I'd also like to eventually include the patience diff as a reporter option, which would be helpful for automated integration/acceptance tests with a lot of data (this project is one of them), but it'll be really difficult considering how hard it is to find details on it, and the fact it likely needs ported first.
-7. Write lots of blog posts.\*\* :smile:
+5. Support flaky tests via retries. This can't fully self-host until that gets fixed, because it does have a few flakes.
+7. Write a few plugins/utilities for `describe`/`it`, `before{,Each}`/`after{,Each}` hooks, REPL friendliness\*, etc.
+    - I'd also like to eventually include the patience diff as a reporter option, since it deals with larger diffs a little more readably, a plus for integration/end-to-end tests, but there doesn't appear to be a JS port yet, and algorithm documentation is scarce.
+8. Write lots of blog posts.\*\* :smile:
 
 \* *That's something from Lisp-land I really wish was here...*
 
 \*\* *And port this to Python, when I can find time.*
+
+Also, at some point, I'd like to do the following:
+
+- Reimplement [`util-inspect`](https://www.npmjs.com/package/util-inspect) for browsers based on Node's current [`util.inspect`](https://nodejs.org/api/util.html#util_util_inspect_object_options), since that ponyfill module is completely untested and is unaware of ES6. :worried:
+- Implement my own glob-based walker for this to eliminate order non-determinism. To my knowledge, none of the more popular utilities are deterministic, and determinism is very helpful for testing. Plus, a specialized variant would load things much quicker.
+- Implement something like `mocha --watch` for this.
 
 ## Contributing
 
