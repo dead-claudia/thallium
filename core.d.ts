@@ -7,39 +7,40 @@ export interface Callback<T> {
     (err?: Error): T;
 }
 
-export type TestType =
-    "start" | "end" | "pass" | "fail" | "skip" | "exit" | "extra";
+export type ReportType =
+    "start" | "enter" | "leave" | "pass" | "fail" | "skip" | "end" | "extra";
 
-export interface TestLocation {
+export interface Location {
     name: string;
     index: number;
 }
 
-export interface TestReport<T extends TestType, U> {
+export interface Report<T extends ReportType, U> {
     type: T;
     value: U;
-    path: TestLocation[];
+    path: Location[];
 }
 
-export interface ExtraReportData {
+export interface ExtraCall {
     count: number;
     value: any;
 }
 
-export interface StartReport extends TestReport<"start", void> {}
-export interface EndReport extends TestReport<"end", void> {}
-export interface PassReport extends TestReport<"pass", void> {}
-export interface FailReport extends TestReport<"fail", any> {}
-export interface PendingReport extends TestReport<"skip", void> {}
-export interface ExitReport extends TestReport<"exit", void> {}
-export interface ExtraReport extends TestReport<"extra", ExtraReportData> {}
+export interface StartReport extends Report<"start", void> {}
+export interface EnterReport extends Report<"enter", void> {}
+export interface LeaveReport extends Report<"leave", void> {}
+export interface PassReport extends Report<"pass", void> {}
+export interface FailReport extends Report<"fail", any> {}
+export interface SkipReport extends Report<"skip", void> {}
+export interface EndReport extends Report<"end", void> {}
+export interface ExtraReport extends Report<"extra", ExtraCall> {}
 
 export interface Plugin<T extends Test> {
     (t: T): any;
 }
 
 export interface Reporter {
-    (item: TestReport<TestType, any>, done: Callback<void>): any;
+    (item: Report<ReportType, any>, done: Callback<void>): any;
 
     // Whether this needs to block everything else. Useful if you need to
     // have sole async access to a resource, and there's no lock available.
@@ -94,7 +95,20 @@ export interface ObjectMap<T> {
     [name: string]: T;
 }
 
+export interface AsyncDone<T> {
+    (test: T, done: Callback<void>): any;
+}
+
+export interface AsyncReturn<T> {
+    (test: T): PromiseLike<any> | Iterator<any>;
+}
+
+export type AsyncCallback<T> = AsyncDone<T> | AsyncReturn<T>
+
 export interface Test {
+    // Opaque internal object - you may only depend on its existence.
+    _: Object;
+
     AssertionError: typeof AssertionError;
 
     // Exposed for testing, but might be interesting for consumers.
@@ -162,13 +176,8 @@ export interface Test {
 
     // Define an async test. This may return a promise, a generator, or call
     // `done` with a possible error. Use asyncSkip to skip it.
-    async(name: string, run: (test: this, done: Callback<void>) => any): this;
-    async(name: string, run: (test: this) => PromiseLike<any>): this;
-    async(name: string, run: (test: this) => Iterator<any>): this;
-
-    asyncSkip(name: string, run: (test: this, done: Callback<void>) => any): this;
-    asyncSkip(name: string, run: (test: this) => PromiseLike<any>): this;
-    asyncSkip(name: string, run: (test: this) => Iterator<any>): this;
+    async(name: string, run: AsyncCallback<this>): this;
+    asyncSkip(name: string, run: AsyncCallback<this>): this;
 
     // Run a block when assertions are run. This exists primarily for
     // inline tests, in case they have specific setup to do.

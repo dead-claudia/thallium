@@ -3,19 +3,39 @@
 import * as Core from "./core";
 
 export {
-    AssertionError,
-    TestLocation,
-    TestReport,
-    ExtraReportData,
+    NestedArray,
+    Nested,
+    Callback,
+
+    ReportType,
+    Location,
+    Report,
+    ExtraCall,
     StartReport,
-    EndReport,
+    EnterReport,
+    LeaveReport,
     PassReport,
     FailReport,
-    PendingReport,
-    ExitReport,
+    SkipReport,
+    EndReport,
     ExtraReport,
+
+    Plugin,
     Reporter,
+
+    DefineImpl,
+    WrapImpl,
+    AddImpl,
+
     AssertionResult,
+    AssertionError,
+
+    IteratorResult,
+    Iterator,
+    ObjectMap,
+    AsyncDone,
+    AsyncReturn,
+    AsyncCallback,
 } from "./core";
 
 import {Assertions} from "./assertions";
