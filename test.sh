@@ -11,7 +11,7 @@
 # won't likely gain support anytime soon.
 
 eslint $(dirname $0) --cache || exit $?
-coffeelint $(dirname $0) || exit $?
+coffeelint $(dirname $0) --cache || exit $?
 
 for i in 0.10 0.12 1 2 3 4 5 6; do
     nvm which $i > /dev/null 2>&1 || nvm install $i || exit $?
