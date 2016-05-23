@@ -1,21 +1,37 @@
 # Reporters
 
-Thallium reporters are simple functions that accept a set of event objects. It's written to be very unopinionated, easy to work with, and if you feel a need to convert it to something else, it's very straightforward to do.
+Thallium comes with a few built-in reporters, but currently, they are a work in progress. At the time of writing, there are two reporters finished, but there are more to come:
 
-Reporters are called with an event and either return a thenable or accept a `done` callback, resolved or called respectively when you're done processing the event. Do note that you must call `done` or return an eventually resolved promise, or the runner *will* hang.
+- `thallium/r/tap` - A [TAP-compatible](https://testanything.org) reporter, for you to use with various tools.
+- `thallium/r/spec` - A reporter modeled very closely to Mocha's default `spec` reporter.
+
+Each built-in reporter must be called like so, and if you don't, you'll get reminded with an error:
+
+```js
+// Note the function call of the default export.
+t.reporter(require("thallium/r/spec")())
+```
+
+Each reporter accepts an object with a `print` function, which will be called with each line, dependent on the window size of the terminal. Note that terminal colors may be embedded in the output, if colors are supported or forced through setting the `THALLIUM_COLORS` variable.
+
+---
+
+If you would prefer to create your own reporter, it's relatively straightforward to do so. Thallium reporters are simple functions that accept a set of event objects. It's written to be very unopinionated, easy to work with, and if you feel a need to convert it to something else, it's very straightforward to do.
+
+Reporters are called with an event and either return a thenable or accept a `done` callback. Note that you must either resolve the thenable or call the `done` callback *at some point*, because Thallium waits for all reporters to finish before continuing what it was doing.
 
 ## Events
 
 Each event is specified by the `type` property:
 
-- `"start"` - This marks the start of all running tests, and is the first event fired.
-- `"enter"` - This marks the start of all child tests within a single test block.
-- `"leave"` - This marks the end of all child tests within a single test block.
-- `"pass"` - This marks a passing test block with no children.
-- `"fail"` - This marks a failing test block with no children. The `value` property is the error that was thrown, unmodified.
-- `"skip"` - This marks a skipped test block with no children, via `t.testSkip()` or `t.asyncSkip()`.
-- `"end"` - This marks the end of all running tests, and is the last event fired.
-- `"extra"` - This marks an extra call to `done` in an asynchronous test. The `value` property is an object with the following properties:
+- `"start"` - Marks the start of all running tests, and is the first event fired.
+- `"enter"` - Marks the start of all child tests within a single test block.
+- `"leave"` - Marks the end of all child tests within a single test block.
+- `"pass"` - Marks a passing test block with no children.
+- `"fail"` - Marks a failing test block with no children. The `value` is the error that was thrown, untouched.
+- `"skip"` - Marks a skipped test block with no children, via `t.testSkip()` or `t.asyncSkip()`.
+- `"end"` - Marks the end of all running tests, and is the last event fired.
+- `"extra"` - Marks an extra call to `done` in an async test. The `value` is an object with the following properties:
 
     - `count` - how many times `done` has been called in total so far
     - `value` denotes the last value the callback was called with.
@@ -52,7 +68,9 @@ Events are called in the following order:
 
 Normally, reporters are all called at the same time on each event, to speed up calling asynchronous reporters.
 
-If your reporter is asynchronous *and* needs to be the only one running (like writing asynchronously to the console), you should add a truthy `block` property to your reporter. It's generally not preferred, though.
+If your reporter is synchronous, remember to call `done` or return a resolved `Promise`/thenable at the end.
+
+If your reporter is async *and* needs to be the only one running (like writing asynchronously to the console), you should add a truthy `block` property to your reporter. For async work, it's not preferred because it blocks other reporters.
 
 ## Options
 
