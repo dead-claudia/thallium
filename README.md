@@ -49,7 +49,7 @@ See the [documentation](http://github.com/isiahmeadows/thallium/blob/master/docs
 
 This list is in a very rough chronological order.
 
-1. Create basic reporters for ~~TAP,~~ spec, dot, DOM, etc.
+1. Create basic reporters for ~~TAP,~~ ~~spec,~~ dot, DOM, etc.
     - Note that these four I've listed are directly blocking 0.1.
     - Also, create a playground fixture for developing new reporters, to make design much easier.
 2. Set up [AppVeyor](https://www.appveyor.com/) to run tests on Windows. Currently, it's only actively tested on Linux and in browsers.
