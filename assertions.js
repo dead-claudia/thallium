@@ -571,42 +571,42 @@ var includesAny = makeIncludes(false, Util.strictIs)
 
 /* eslint-disable max-len */
 
-defineIncludes("includes", includesAll, false, "Expected {actual} to have all values in {value}")
-defineIncludes("notIncludesAll", includesAll, true, "Expected {actual} to not have all values in {value}")
-defineIncludes("includesAny", includesAny, false, "Expected {actual} to have any value in {value}")
-defineIncludes("notIncludes", includesAny, true, "Expected {actual} to not have any value in {value}")
+defineIncludes("includes", includesAll, false, "Expected {actual} to have all values in {values}")
+defineIncludes("notIncludesAll", includesAll, true, "Expected {actual} to not have all values in {values}")
+defineIncludes("includesAny", includesAny, false, "Expected {actual} to have any value in {values}")
+defineIncludes("notIncludes", includesAny, true, "Expected {actual} to not have any value in {values}")
 
 var includesLooseAll = makeIncludes(true, Util.looseIs)
 var includesLooseAny = makeIncludes(false, Util.looseIs)
 
-defineIncludes("includesLoose", includesLooseAll, false, "Expected {actual} to loosely have all values in {value}")
-defineIncludes("notIncludesLooseAll", includesLooseAll, true, "Expected {actual} to not loosely have all values in {value}")
-defineIncludes("includesLooseAny", includesLooseAny, false, "Expected {actual} to loosely have any value in {value}")
-defineIncludes("notIncludesLoose", includesLooseAny, true, "Expected {actual} to not loosely have any value in {value}")
+defineIncludes("includesLoose", includesLooseAll, false, "Expected {actual} to loosely have all values in {values}")
+defineIncludes("notIncludesLooseAll", includesLooseAll, true, "Expected {actual} to not loosely have all values in {values}")
+defineIncludes("includesLooseAny", includesLooseAny, false, "Expected {actual} to loosely have any value in {values}")
+defineIncludes("notIncludesLoose", includesLooseAny, true, "Expected {actual} to not loosely have any value in {values}")
 
 var includesDeepAll = makeIncludes(true, deepEqual)
 var includesDeepAny = makeIncludes(false, deepEqual)
 
-defineIncludes("includesDeep", includesDeepAll, false, "Expected {actual} to match all values in {value}")
-defineIncludes("notIncludesDeepAll", includesDeepAll, true, "Expected {actual} to not match all values in {value}")
-defineIncludes("includesDeepAny", includesDeepAny, false, "Expected {actual} to match any value in {value}")
-defineIncludes("notIncludesDeep", includesDeepAny, true, "Expected {actual} to not match any value in {value}")
+defineIncludes("includesDeep", includesDeepAll, false, "Expected {actual} to match all values in {values}")
+defineIncludes("notIncludesDeepAll", includesDeepAll, true, "Expected {actual} to not match all values in {values}")
+defineIncludes("includesDeepAny", includesDeepAny, false, "Expected {actual} to match any value in {values}")
+defineIncludes("notIncludesDeep", includesDeepAny, true, "Expected {actual} to not match any value in {values}")
 
 var includesDeepLooseAll = makeIncludes(true, looseDeepEqual)
 var includesDeepLooseAny = makeIncludes(false, looseDeepEqual)
 
-defineIncludes("includesDeepLoose", includesDeepLooseAll, false, "Expected {actual} to loosely match all values in {value}")
-defineIncludes("notIncludesDeepLooseAll", includesDeepLooseAll, true, "Expected {actual} to not loosely match all values in {value}")
-defineIncludes("includesDeepLooseAny", includesDeepLooseAny, false, "Expected {actual} to loosely match any value in {value}")
-defineIncludes("notIncludesDeepLoose", includesDeepLooseAny, true, "Expected {actual} to not loosely match any value in {value}")
+defineIncludes("includesDeepLoose", includesDeepLooseAll, false, "Expected {actual} to loosely match all values in {values}")
+defineIncludes("notIncludesDeepLooseAll", includesDeepLooseAll, true, "Expected {actual} to not loosely match all values in {values}")
+defineIncludes("includesDeepLooseAny", includesDeepLooseAny, false, "Expected {actual} to loosely match any value in {values}")
+defineIncludes("notIncludesDeepLoose", includesDeepLooseAny, true, "Expected {actual} to not loosely match any value in {values}")
 
 var includesMatchDeepAll = makeIncludes(true, deepEqualMatch)
 var includesMatchDeepAny = makeIncludes(false, deepEqualMatch)
 
-defineIncludes("includesMatch", includesMatchDeepAll, false, "Expected {actual} to match all values in {value}")
-defineIncludes("notIncludesMatchAll", includesMatchDeepAll, true, "Expected {actual} to not match all values in {value}")
-defineIncludes("includesMatchAny", includesMatchDeepAny, false, "Expected {actual} to match any value in {value}")
-defineIncludes("notIncludesMatch", includesMatchDeepAny, true, "Expected {actual} to not match any value in {value}")
+defineIncludes("includesMatch", includesMatchDeepAll, false, "Expected {actual} to match all values in {values}")
+defineIncludes("notIncludesMatchAll", includesMatchDeepAll, true, "Expected {actual} to not match all values in {values}")
+defineIncludes("includesMatchAny", includesMatchDeepAny, false, "Expected {actual} to match any value in {values}")
+defineIncludes("notIncludesMatch", includesMatchDeepAny, true, "Expected {actual} to not match any value in {values}")
 
 alias("includesMatchLoose", "includesDeepLoose")
 alias("notIncludesMatchLooseAll", "notIncludesDeepLooseAll")
