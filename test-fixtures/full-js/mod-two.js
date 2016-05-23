@@ -1,6 +1,6 @@
 "use strict"
 
-var t = require("../../../index.js")
+var t = require("../../index.js")
 
 t.test("mod-two", function (t) {
     t.test("1 === 2").equal(1, 2)

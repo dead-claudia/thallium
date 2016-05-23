@@ -47,11 +47,8 @@ describe("core (iterators)", function () {
                 return tt.run().then(function () {
                     t.match(ret, [
                         n("start", []),
-                        n("start", [p("test", 0)]),
-                        n("end", [p("test", 0)]),
                         last(sentinel),
                         n("end", []),
-                        n("exit", []),
                     ])
                     t.match(list, [undefined, 0, 1, 2, 3, 4].slice(0, len + 1))
                     if (iter.check) iter.check()

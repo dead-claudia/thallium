@@ -60,6 +60,7 @@
   },
   "dependencies": {
     "bluebird": "^3.3.4",
+    "diff": "^2.2.2",
     "glob-stream": "^5.3.2",
     "interpret": "^1.0.0",
     "resolve": "^1.1.7",

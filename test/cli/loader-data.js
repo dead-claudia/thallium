@@ -458,7 +458,7 @@ describe("cli config loader data", function () {
             })
         })
 
-        it("understands register objects", function () {
+        it("reads unspecified register objects", function () {
             var mods = []
             var called = 0
 
@@ -468,7 +468,7 @@ describe("cli config loader data", function () {
                 if (called === 2) throw new Error("nope")
             }
 
-            return new LoaderData.Register(".mod", [
+            var loader = new LoaderData.Register(".mod", [
                 {
                     module: "foo",
                     register: function () { throw new Error("nope") },
@@ -476,10 +476,86 @@ describe("cli config loader data", function () {
                 "bar",
                 "baz",
                 "whatever",
-            ], load, true).register(".")
+            ], load, false)
+
+            loader.use = true
+
+            return loader.register(".")
             .then(function () {
                 t.equal(called, 3)
                 t.match(mods, ["foo", "bar", "baz"])
+            })
+        })
+
+        it("reads nothing from explicitly specified modules", function () {
+            var mods = []
+            var called = 0
+
+            function load(mod) {
+                called++
+                mods.push(mod)
+                if (called === 2) throw new Error("nope")
+            }
+
+            return new LoaderData.Register(".mod", ["foo"], load, true)
+            .register(".")
+            .then(function () {
+                t.equal(called, 1)
+                t.match(mods, ["foo"])
+            })
+        })
+
+        it("reads thenables from explicitly specified modules", function () {
+            var mods = []
+            var called = 0
+            var init = 0
+
+            function load(mod) {
+                called++
+                mods.push(mod)
+                if (called === 2) throw new Error("nope")
+                return {
+                    then: function (resolve) {
+                        init++
+                        resolve()
+                    },
+                }
+            }
+
+            return new LoaderData.Register(".mod", ["foo"], load, true)
+            .register(".")
+            .then(function () {
+                t.equal(called, 1)
+                t.equal(init, 1)
+                t.match(mods, ["foo"])
+            })
+        })
+
+        it("reads ES6 default-exported thenables from explicitly specified modules", function () { // eslint-disable-line max-len
+            var mods = []
+            var called = 0
+            var init = 0
+
+            function load(mod) {
+                called++
+                mods.push(mod)
+                if (called === 2) throw new Error("nope")
+                return {
+                    default: {
+                        then: function (resolve) {
+                            init++
+                            resolve()
+                        },
+                    },
+                }
+            }
+
+            return new LoaderData.Register(".mod", ["foo"], load, true)
+            .register(".")
+            .then(function () {
+                t.equal(called, 1)
+                t.equal(init, 1)
+                t.match(mods, ["foo"])
             })
         })
     })

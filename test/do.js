@@ -32,11 +32,8 @@ describe("do()", function () {
             t.equal(len, 0)
             t.match(ret, [
                 n("start", []),
-                n("start", [p("test", 0)]),
-                n("end", [p("test", 0)]),
                 n("pass", [p("test", 0)]),
                 n("end", []),
-                n("exit", []),
             ])
         })
     })
@@ -57,11 +54,8 @@ describe("do()", function () {
         return tt.run().then(function () {
             t.match(ret, [
                 n("start", []),
-                n("start", [p("test", 0)]),
-                n("end", [p("test", 0)]),
                 n("fail", [p("test", 0)], sentinel),
                 n("end", []),
-                n("exit", []),
             ])
         })
     })
@@ -87,11 +81,8 @@ describe("do()", function () {
             t.equal(len, 0)
             t.match(ret, [
                 n("start", []),
-                n("start", [p("test", 0)]),
-                n("end", [p("test", 0)]),
                 n("pass", [p("test", 0)]),
                 n("end", []),
-                n("exit", []),
             ])
         })
     })
@@ -113,11 +104,8 @@ describe("do()", function () {
         return tt.run().then(function () {
             t.match(ret, [
                 n("start", []),
-                n("start", [p("test", 0)]),
-                n("end", [p("test", 0)]),
                 n("fail", [p("test", 0)], sentinel),
                 n("end", []),
-                n("exit", []),
             ])
         })
     })
@@ -139,11 +127,8 @@ describe("do()", function () {
             t.equal(len, 0)
             t.match(ret, [
                 n("start", []),
-                n("start", [p("test", 0)]),
-                n("end", [p("test", 0)]),
                 n("pass", [p("test", 0)]),
                 n("end", []),
-                n("exit", []),
             ])
         })
     })
@@ -162,11 +147,8 @@ describe("do()", function () {
         return tt.run().then(function () {
             t.match(ret, [
                 n("start", []),
-                n("start", [p("test", 0)]),
-                n("end", [p("test", 0)]),
                 n("fail", [p("test", 0)], sentinel),
                 n("end", []),
-                n("exit", []),
             ])
         })
     })

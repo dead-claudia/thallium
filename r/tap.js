@@ -3,162 +3,169 @@
 // This is a basic TAP-generating reporter.
 
 var methods = require("../lib/methods.js")
-var Tree = require("../lib/reporter/tree.js")
-var BasePrinter = require("../lib/reporter/base-printer.js")
+var Reporter = require("../lib/reporter.js")
 var inspect = require("util").inspect
-var Text = require("../lib/reporter/text.js")
+
+var Status = Reporter.Status
 
 function shouldBreakLines(minLength, str) {
-    return str.length > Text.windowWidth - minLength ||
+    return str.length > Reporter.windowWidth - minLength ||
         /\r?\n|[:?-]/.test(str)
 }
 
 function Printer() {
-    BasePrinter.apply(this, arguments)
+    Reporter.Printer.apply(this, arguments)
 }
 
-methods(Printer, BasePrinter, {
+methods(Printer, Reporter.Printer, {
+    reset: function () {
+        Reporter.Printer.prototype.reset.call(this)
+        this.counter = 0
+    },
+
     printTemplate: function (ev, tmpl, skip) {
-        var path = ev.path.map(function (i) { return i.name }).join(" ")
+        var path = Reporter.joinPath(ev)
 
         if (!skip) this.counter++
 
-        return this.opts.print(
+        return this.print(
             tmpl.replace(/%c/g, this.counter)
                 .replace(/%p/g, path.replace(/\$/g, "$$$$")))
     },
 
-    printLines: function (key, value, skipFirst) {
-        this.opts.print("  " + key + ": |-")
-
-        var lines = value.split(/\r?\n/)
+    printLines: function (value, skipFirst) {
+        var lines = value.replace(/^/gm, "    ").split(/\r?\n/)
 
         for (var i = +!!skipFirst; i < lines.length; i++) {
-            this.opts.print("    " + lines[i])
+            this.print(lines[i])
+        }
+    },
+
+    printRaw: function (key, str) {
+        if (shouldBreakLines(key.length, str)) {
+            this.print("  " + key + ": |-")
+            this.printLines(str, false)
+        } else {
+            this.print("  " + key + ": " + str)
         }
     },
 
     printValue: function (key, value) {
-        var str = inspect(value)
+        return this.printRaw(key, inspect(value))
+    },
 
-        if (shouldBreakLines(key.length, str)) {
-            this.printLines(key, str, false)
+    printError: function (err) {
+        // Let's *not* depend on the constructor being Thallium's...
+        if (err instanceof Error) {
+            if (err.name === "AssertionError") {
+                this.printValue("expected", err.expected)
+                this.printValue("actual", err.actual)
+
+                var message = err.message
+
+                err.message = ""
+                this.printRaw("message", message)
+                this.print("  stack: |-")
+                this.printLines(err.stack, true)
+                err.message = message
+            } else {
+                this.print("  stack: |-")
+                this.printLines(err.stack, false)
+            }
         } else {
-            this.opts.print("  " + key + ": " + value)
+            this.printValue(err)
         }
-    },
-
-    printAssertion: function (err) {
-        this.printValue("expected", err.expected)
-        this.printValue("actual", err.actual)
-
-        var message = err.message
-
-        err.message = ""
-        this.printLines("stack", err.stack, true)
-        err.message = message
-    },
-
-    printStack: function (err) {
-        this.printLines("stack", err.stack)
     },
 })
 
 function Dispatcher(opts) {
     this._ = new Printer(opts)
+    this._.tree.status = Status.Unknown
 }
 
 methods(Dispatcher, {
-    start: function (ev) {
-        if (!this._.running) {
-            this._.opts.print("TAP version 13")
-            this._.running = true
-        }
+    start: function () {
+        this._.print("TAP version 13")
+        this._.running = true
+    },
 
-        ev.path.pop()
-
+    enter: function (ev) {
         // Print a leading comment, to make some TAP formatters prettier.
-        if (ev.path.length && !this._.tree.hasPath(ev.path)) {
-            this._.printTemplate(ev, "# %p", true)
-            // Add the path.
-            this._.tree.getPath(ev.path)
-        }
+        this._.tests++
+        this._.pass++
+        this._.tree.getPath(ev.path).status = Status.Passing
+        this._.printTemplate(ev, "# %p", true)
+        this._.printTemplate(ev, "ok %c")
     },
 
     // This is meaningless for the output.
-    end: function () {},
+    leave: function () {},
 
     pass: function (ev) {
         this._.tests++
-        this._.printTemplate(ev, "ok %c %p")
         this._.pass++
-        this._.tree.getPath(ev.path).status = Tree.PASSING
+        this._.printTemplate(ev, "ok %c %p")
+        this._.tree.getPath(ev.path).status = Status.Passing
     },
 
     fail: function (ev) {
         this._.tests++
-        this._.printTemplate(ev, "not ok %c %p")
-        this._.opts.print("  ---")
-        this._.printError(ev.value)
-        this._.opts.print("  ...")
         this._.fail++
-        this._.tree.getPath(ev.path).status = Tree.FAILING
+        this._.printTemplate(ev, "not ok %c %p")
+        this._.print("  ---")
+        this._.printError(ev.value)
+        this._.print("  ...")
+        this._.tree.getPath(ev.path).status = Status.Failing
     },
 
     skip: function (ev) {
-        if (!this._.running) {
-            this._.opts.print("TAP version 13")
-            this._.running = true
-        }
         this._.skip++
         this._.printTemplate(ev, "ok %c # skip %p")
+        this._.tree.getPath(ev.path).status = Status.Skipped
     },
 
     extra: function (ev) {
         var tree = this._.tree.getPath(ev.path)
 
-        if (!tree.status) {
+        if (tree.status < Status.Passing) {
             throw new Error("(Thallium internal) unreachable")
         }
 
         // Only resolve once.
-        if (tree.status === Tree.PASSING) {
-            tree.status = Tree.FAILING
+        if (tree.status === Status.Passing) {
+            tree.status = Status.Failing
             this._.fail++
         }
 
         this._.printTemplate(ev, "not ok %c %p # extra")
-        this._.opts.print("  ---")
+        this._.print("  ---")
         this._.printValue("count", ev.value.count)
         this._.printValue("value", ev.value.value)
-        this._.opts.print("  ...")
+        this._.print("  ...")
     },
 
-    exit: function () {
-        this._.opts.print("1.." + this._.counter)
-        this._.opts.print("# tests " + this._.tests)
+    end: function () {
+        this._.print("1.." + this._.counter)
+        this._.print("# tests " + this._.tests)
 
-        if (this._.pass) this._.opts.print("# pass " + this._.pass)
-        if (this._.fail) this._.opts.print("# fail " + this._.fail)
-        if (this._.skip) this._.opts.print("# skip " + this._.skip)
+        if (this._.pass) this._.print("# pass " + this._.pass)
+        if (this._.fail) this._.print("# fail " + this._.fail)
+        if (this._.skip) this._.print("# skip " + this._.skip)
 
         this._.reset()
     },
 
     error: function (ev) {
-        this._.opts.print("Bail out!")
-        this._.opts.print("  ---")
+        this._.print("Bail out!")
+        this._.print("  ---")
         this._.printError(ev.value)
-        this._.opts.print("  ...")
+        this._.print("  ...")
         this._.reset()
     },
 })
 
 // This is synchronous, and the `print` option must act synchronously.
 module.exports = function (opts) {
-    if (opts == null) opts = {}
-    if (opts.print == null) opts.print = console.log.bind(console)
-
     var dispatcher = new Dispatcher(opts)
 
     return function (ev, done) {

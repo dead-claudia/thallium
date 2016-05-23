@@ -61,14 +61,9 @@ describe("cli config runner", /* @this */ function () {
             t.equal(code, 0)
             t.match(ret, [
                 n("start", []),
-                n("start", [p("test 1", 0)]),
-                n("end", [p("test 1", 0)]),
                 n("pass", [p("test 1", 0)]),
-                n("start", [p("test 2", 1)]),
-                n("end", [p("test 2", 1)]),
                 n("pass", [p("test 2", 1)]),
                 n("end", []),
-                n("exit", []),
             ])
         })
     })
@@ -99,11 +94,8 @@ describe("cli config runner", /* @this */ function () {
             t.equal(code, 0)
             t.match(ret, [
                 n("start", []),
-                n("start", [p("test 2", 0)]),
-                n("end", [p("test 2", 0)]),
                 n("pass", [p("test 2", 0)]),
                 n("end", []),
-                n("exit", []),
             ])
         })
     })
@@ -134,11 +126,8 @@ describe("cli config runner", /* @this */ function () {
             t.equal(code, 0)
             t.match(ret, [
                 n("start", []),
-                n("start", [p("test 2", 0)]),
-                n("end", [p("test 2", 0)]),
                 n("pass", [p("test 2", 0)]),
                 n("end", []),
-                n("exit", []),
             ])
         })
     })
@@ -169,14 +158,9 @@ describe("cli config runner", /* @this */ function () {
             t.equal(code, 1)
             t.match(ret, [
                 n("start", []),
-                n("start", [p("test 1", 0)]),
-                n("end", [p("test 1", 0)]),
                 n("pass", [p("test 1", 0)]),
-                n("start", [p("test 2", 1)]),
-                n("end", [p("test 2", 1)]),
                 n("fail", [p("test 2", 1)], new t.AssertionError("oops")),
                 n("end", []),
-                n("exit", []),
             ])
         })
     })
@@ -251,41 +235,21 @@ describe("cli config runner", /* @this */ function () {
             t.equal(code, 1)
             t.match(ret, [
                 n("start", []),
-                n("start", [p("mod-one", 0)]),
-                n("start", [p("mod-one", 0), p("1 === 1", 0)]),
-                n("end", [p("mod-one", 0), p("1 === 1", 0)]),
+                n("enter", [p("mod-one", 0)]),
                 n("pass", [p("mod-one", 0), p("1 === 1", 0)]),
-                n("start", [p("mod-one", 0), p("foo()", 1)]),
-                n("end", [p("mod-one", 0), p("foo()", 1)]),
                 n("fail", [p("mod-one", 0), p("foo()", 1)], fail1),
-                n("start", [p("mod-one", 0), p("bar()", 2)]),
-                n("end", [p("mod-one", 0), p("bar()", 2)]),
                 n("fail", [p("mod-one", 0), p("bar()", 2)], new Error("fail")),
-                n("start", [p("mod-one", 0), p("baz()", 3)]),
-                n("end", [p("mod-one", 0), p("baz()", 3)]),
                 n("fail", [p("mod-one", 0), p("baz()", 3)], sentinel),
-                n("start", [p("mod-one", 0), p("nested", 4)]),
-                n("start", [p("mod-one", 0), p("nested", 4), p("nested 2", 0)]),
-                n("end", [p("mod-one", 0), p("nested", 4), p("nested 2", 0)]),
+                n("enter", [p("mod-one", 0), p("nested", 4)]),
                 n("pass", [p("mod-one", 0), p("nested", 4), p("nested 2", 0)]),
-                n("end", [p("mod-one", 0), p("nested", 4)]),
-                n("pass", [p("mod-one", 0), p("nested", 4)]),
-                n("end", [p("mod-one", 0)]),
-                n("pass", [p("mod-one", 0)]),
-                n("start", [p("mod-two", 1)]),
-                n("start", [p("mod-two", 1), p("1 === 2", 0)]),
-                n("end", [p("mod-two", 1), p("1 === 2", 0)]),
+                n("leave", [p("mod-one", 0), p("nested", 4)]),
+                n("leave", [p("mod-one", 0)]),
+                n("enter", [p("mod-two", 1)]),
                 n("fail", [p("mod-two", 1), p("1 === 2", 0)], fail2),
-                n("start", [p("mod-two", 1), p("expandos don't transfer", 1)]),
-                n("end", [p("mod-two", 1), p("expandos don't transfer", 1)]),
                 n("pass", [p("mod-two", 1), p("expandos don't transfer", 1)]),
-                n("start", [p("mod-two", 1), p("what a fail...", 2)]),
-                n("end", [p("mod-two", 1), p("what a fail...", 2)]),
                 n("fail", [p("mod-two", 1), p("what a fail...", 2)], fail3),
-                n("end", [p("mod-two", 1)]),
-                n("pass", [p("mod-two", 1)]),
+                n("leave", [p("mod-two", 1)]),
                 n("end", []),
-                n("exit", []),
             ])
         })
     })

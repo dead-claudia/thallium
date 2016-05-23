@@ -16,7 +16,7 @@
 //  Type  |  Test name     |   Subtest name      |
 //   |    |      |         |        |            |
 //  \|/  \|/    \|/       \|/      \|/          \|/
-// start [0: test name] > [1: subtest name] = "value"
+// extra [0: test name] > [1: subtest name] = "value"
 
 function fix(value) {
     if (typeof value === "string") return JSON.stringify(value)

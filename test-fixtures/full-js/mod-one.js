@@ -1,7 +1,7 @@
 "use strict"
 
 var Promise = require("bluebird")
-var t = require("../../../index.js")
+var t = require("../../index.js")
 
 t.test("mod-one", function (t) {
     t.test("1 === 1").equal(1, 1)

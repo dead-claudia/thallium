@@ -20,7 +20,7 @@ describe("cli exit reporter", function () {
         }
     }
 
-    ["start", "end", "pass", "pending", "exit"]
+    ["start", "pass", "skip", "end"]
     .forEach(function (type) {
         it("doesn't trigger for \"" + type + "\" events", function () {
             var state = {fail: false}
@@ -48,10 +48,7 @@ describe("cli exit reporter", function () {
         var reporter = exitReporter(state)
 
         return execute(reporter, "start")()
-        .then(execute(reporter, "end"))
         .then(execute(reporter, "pass"))
-        .then(execute(reporter, "start"))
-        .then(execute(reporter, "end"))
         .then(execute(reporter, "pass"))
         .then(function () { t.false(state.fail) })
     })
@@ -61,25 +58,19 @@ describe("cli exit reporter", function () {
         var reporter = exitReporter(state)
 
         return execute(reporter, "start")()
-        .then(execute(reporter, "end"))
         .then(execute(reporter, "fail"))
-        .then(execute(reporter, "start"))
-        .then(execute(reporter, "end"))
         .then(execute(reporter, "pass"))
         .then(function () { t.true(state.fail) })
     })
 
-    it("is cleared on \"exit\" + \"start\"", function () {
+    it("is cleared on \"end\" + \"start\"", function () {
         var state = {fail: false}
         var reporter = exitReporter(state)
 
         return execute(reporter, "start")()
-        .then(execute(reporter, "end"))
         .then(execute(reporter, "fail"))
-        .then(execute(reporter, "start"))
-        .then(execute(reporter, "end"))
         .then(execute(reporter, "pass"))
-        .then(execute(reporter, "exit"))
+        .then(execute(reporter, "end"))
         .then(execute(reporter, "start"))
         .then(function () { t.false(state.fail) })
     })

@@ -8,7 +8,6 @@
 //
 // Events:
 // - "enter" - test entered
-// - "leave" - test left
 // - "pass" - test passed
 // - "fail" - test failed
 // - "skip" - test skipped
@@ -27,7 +26,6 @@ function readList(reporters) {
         } else if (typeof reporter === "object" && reporter != null) {
             reporters[i] = (ev, done) => {
                 if (ev.type === "start") ev.type = "enter"
-                else if (ev.type === "end") ev.type = "leave"
                 else if (ev.type === "exit") ev.type = "end"
 
                 reporter.emit(ev.type, ev.value, ev.path)

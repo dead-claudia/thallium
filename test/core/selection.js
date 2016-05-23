@@ -34,24 +34,15 @@ describe("core (selection)", function () {
             return tt.run().then(function () {
                 t.match(ret, [
                     n("start", []),
-                    n("start", [p("one", 0)]),
+                    n("enter", [p("one", 0)]),
                     n("skip", [p("one", 0), p("inner", 0)]),
-                    n("start", [p("one", 0), p("other", 1)]),
-                    n("end", [p("one", 0), p("other", 1)]),
                     n("pass", [p("one", 0), p("other", 1)]),
-                    n("end", [p("one", 0)]),
-                    n("pass", [p("one", 0)]),
-                    n("start", [p("two", 1)]),
-                    n("start", [p("two", 1), p("inner", 0)]),
-                    n("end", [p("two", 1), p("inner", 0)]),
+                    n("leave", [p("one", 0)]),
+                    n("enter", [p("two", 1)]),
                     n("pass", [p("two", 1), p("inner", 0)]),
-                    n("start", [p("two", 1), p("other", 1)]),
-                    n("end", [p("two", 1), p("other", 1)]),
                     n("pass", [p("two", 1), p("other", 1)]),
-                    n("end", [p("two", 1)]),
-                    n("pass", [p("two", 1)]),
+                    n("leave", [p("two", 1)]),
                     n("end", []),
-                    n("exit", []),
                 ])
             })
         })
@@ -75,24 +66,15 @@ describe("core (selection)", function () {
             return tt.run().then(function () {
                 t.match(ret, [
                     n("start", []),
-                    n("start", [p("one", 0)]),
+                    n("enter", [p("one", 0)]),
                     n("skip", [p("one", 0), p("inner", 0)]),
-                    n("start", [p("one", 0), p("other", 1)]),
-                    n("end", [p("one", 0), p("other", 1)]),
                     n("pass", [p("one", 0), p("other", 1)]),
-                    n("end", [p("one", 0)]),
-                    n("pass", [p("one", 0)]),
-                    n("start", [p("two", 1)]),
-                    n("start", [p("two", 1), p("inner", 0)]),
-                    n("end", [p("two", 1), p("inner", 0)]),
+                    n("leave", [p("one", 0)]),
+                    n("enter", [p("two", 1)]),
                     n("pass", [p("two", 1), p("inner", 0)]),
-                    n("start", [p("two", 1), p("other", 1)]),
-                    n("end", [p("two", 1), p("other", 1)]),
                     n("pass", [p("two", 1), p("other", 1)]),
-                    n("end", [p("two", 1)]),
-                    n("pass", [p("two", 1)]),
+                    n("leave", [p("two", 1)]),
                     n("end", []),
-                    n("exit", []),
                 ])
             })
         })
@@ -116,24 +98,15 @@ describe("core (selection)", function () {
             return tt.run().then(function () {
                 t.match(ret, [
                     n("start", []),
-                    n("start", [p("one", 0)]),
+                    n("enter", [p("one", 0)]),
                     n("skip", [p("one", 0), p("inner", 0)]),
-                    n("start", [p("one", 0), p("other", 1)]),
-                    n("end", [p("one", 0), p("other", 1)]),
                     n("pass", [p("one", 0), p("other", 1)]),
-                    n("end", [p("one", 0)]),
-                    n("pass", [p("one", 0)]),
-                    n("start", [p("two", 1)]),
-                    n("start", [p("two", 1), p("inner", 0)]),
-                    n("end", [p("two", 1), p("inner", 0)]),
+                    n("leave", [p("one", 0)]),
+                    n("enter", [p("two", 1)]),
                     n("pass", [p("two", 1), p("inner", 0)]),
-                    n("start", [p("two", 1), p("other", 1)]),
-                    n("end", [p("two", 1), p("other", 1)]),
                     n("pass", [p("two", 1), p("other", 1)]),
-                    n("end", [p("two", 1)]),
-                    n("pass", [p("two", 1)]),
+                    n("leave", [p("two", 1)]),
                     n("end", []),
-                    n("exit", []),
                 ])
             })
         })
@@ -145,8 +118,8 @@ describe("core (selection)", function () {
 
             return ttt.run().then(function () {
                 t.match(ret, [
-                    n("skip", [p("test", 0)]),
-                    n("exit", [p("test", 0)]),
+                    n("start", [p("test", 0)]),
+                    n("end", [p("test", 0)]),
                 ])
             })
         })
@@ -173,14 +146,10 @@ describe("core (selection)", function () {
             return tt.run().then(function () {
                 t.match(ret, [
                     n("start", []),
-                    n("start", [p("one", 0)]),
-                    n("start", [p("one", 0), p("inner", 0)]),
-                    n("end", [p("one", 0), p("inner", 0)]),
+                    n("enter", [p("one", 0)]),
                     n("pass", [p("one", 0), p("inner", 0)]),
-                    n("end", [p("one", 0)]),
-                    n("pass", [p("one", 0)]),
+                    n("leave", [p("one", 0)]),
                     n("end", []),
-                    n("exit", []),
                 ])
             })
         })
@@ -205,14 +174,10 @@ describe("core (selection)", function () {
             return tt.run().then(function () {
                 t.match(ret, [
                     n("start", []),
-                    n("start", [p("one", 0)]),
-                    n("start", [p("one", 0), p("inner", 0)]),
-                    n("end", [p("one", 0), p("inner", 0)]),
+                    n("enter", [p("one", 0)]),
                     n("pass", [p("one", 0), p("inner", 0)]),
-                    n("end", [p("one", 0)]),
-                    n("pass", [p("one", 0)]),
+                    n("leave", [p("one", 0)]),
                     n("end", []),
-                    n("exit", []),
                 ])
             })
         })
@@ -237,14 +202,10 @@ describe("core (selection)", function () {
             return tt.run().then(function () {
                 t.match(ret, [
                     n("start", []),
-                    n("start", [p("one", 0)]),
-                    n("start", [p("one", 0), p("inner", 0)]),
-                    n("end", [p("one", 0), p("inner", 0)]),
+                    n("enter", [p("one", 0)]),
                     n("pass", [p("one", 0), p("inner", 0)]),
-                    n("end", [p("one", 0)]),
-                    n("pass", [p("one", 0)]),
+                    n("leave", [p("one", 0)]),
                     n("end", []),
-                    n("exit", []),
                 ])
             })
         })
@@ -270,7 +231,6 @@ describe("core (selection)", function () {
                 t.match(ret, [
                     n("start", []),
                     n("end", []),
-                    n("exit", []),
                 ])
             })
         })
@@ -296,7 +256,6 @@ describe("core (selection)", function () {
                 t.match(ret, [
                     n("start", []),
                     n("end", []),
-                    n("exit", []),
                 ])
             })
         })
@@ -322,7 +281,6 @@ describe("core (selection)", function () {
                 t.match(ret, [
                     n("start", []),
                     n("end", []),
-                    n("exit", []),
                 ])
             })
         })
@@ -347,14 +305,10 @@ describe("core (selection)", function () {
             return tt.run().then(function () {
                 t.match(ret, [
                     n("start", []),
-                    n("start", [p("one", 0)]),
-                    n("start", [p("one", 0), p("inner", 0)]),
-                    n("end", [p("one", 0), p("inner", 0)]),
+                    n("enter", [p("one", 0)]),
                     n("pass", [p("one", 0), p("inner", 0)]),
-                    n("end", [p("one", 0)]),
-                    n("pass", [p("one", 0)]),
+                    n("leave", [p("one", 0)]),
                     n("end", []),
-                    n("exit", []),
                 ])
             })
         })

@@ -1,7 +1,7 @@
 "use strict"
 
 // Note: updates to this should also be reflected in
-// test-fixtures/acceptance/large-coffee/timeouts.coffee, as it's trying to
+// test-fixtures/acceptance/mid-coffee/timeouts.coffee, as it's trying to
 // represent more real-world usage.
 
 var t = require("../../index.js")
@@ -28,11 +28,8 @@ describe("core (timeouts)", function () {
         return tt.run().then(function () {
             t.match(ret, [
                 n("start", []),
-                n("start", [p("test", 0)]),
-                n("end", [p("test", 0)]),
                 n("pass", [p("test", 0)]),
                 n("end", []),
-                n("exit", []),
             ])
         })
     })
@@ -52,11 +49,8 @@ describe("core (timeouts)", function () {
         return tt.run().then(function () {
             t.match(ret, [
                 n("start", []),
-                n("start", [p("test", 0)]),
-                n("end", [p("test", 0)]),
                 n("fail", [p("test", 0)], new Error("Timeout of 50 reached.")),
                 n("end", []),
-                n("exit", []),
             ])
         })
     })
@@ -74,14 +68,10 @@ describe("core (timeouts)", function () {
         return tt.run().then(function () {
             t.match(ret, [
                 n("start", []),
-                n("start", [p("test", 0)]),
-                n("start", [p("test", 0), p("inner", 0)]),
-                n("end", [p("test", 0), p("inner", 0)]),
+                n("enter", [p("test", 0)]),
                 n("pass", [p("test", 0), p("inner", 0)]),
-                n("end", [p("test", 0)]),
-                n("pass", [p("test", 0)]),
+                n("leave", [p("test", 0)]),
                 n("end", []),
-                n("exit", []),
             ])
         })
     })
@@ -102,15 +92,11 @@ describe("core (timeouts)", function () {
         return tt.run().then(function () {
             t.match(ret, [
                 n("start", []),
-                n("start", [p("test", 0)]),
-                n("start", [p("test", 0), p("inner", 0)]),
-                n("end", [p("test", 0), p("inner", 0)]),
+                n("enter", [p("test", 0)]),
                 n("fail", [p("test", 0), p("inner", 0)],
                     new Error("Timeout of 50 reached.")),
-                n("end", [p("test", 0)]),
-                n("pass", [p("test", 0)]),
+                n("leave", [p("test", 0)]),
                 n("end", []),
-                n("exit", []),
             ])
         })
     })

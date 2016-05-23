@@ -118,38 +118,19 @@ describe("core (safety)", function () {
         return tt.run().then(function () {
             t.match(ret, [
                 n("start", []),
-                n("start", [p("one", 0)]),
-                n("end", [p("one", 0)]),
                 n("fail", [p("one", 0)], error),
-                n("start", [p("two", 1)]),
-                n("end", [p("two", 1)]),
                 n("fail", [p("two", 1)], error),
-                n("start", [p("three", 2)]),
-                n("end", [p("three", 2)]),
                 n("fail", [p("three", 2)], error),
-                n("start", [p("four", 3)]),
-                n("end", [p("four", 3)]),
                 n("fail", [p("four", 3)], error),
-                n("start", [p("five", 4)]),
-                n("start", [p("five", 4), p("inner", 0)]),
-                n("end", [p("five", 4), p("inner", 0)]),
+                n("enter", [p("five", 4)]),
                 n("fail", [p("five", 4), p("inner", 0)], error),
-                n("end", [p("five", 4)]),
-                n("pass", [p("five", 4)]),
-                n("start", [p("six", 5)]),
-                n("start", [p("six", 5), p("inner", 0)]),
-                n("end", [p("six", 5), p("inner", 0)]),
+                n("leave", [p("five", 4)]),
+                n("enter", [p("six", 5)]),
                 n("fail", [p("six", 5), p("inner", 0)], error),
-                n("end", [p("six", 5)]),
-                n("pass", [p("six", 5)]),
-                n("start", [p("seven", 6)]),
-                n("end", [p("seven", 6)]),
+                n("leave", [p("six", 5)]),
                 n("fail", [p("seven", 6)], error),
-                n("start", [p("eight", 7)]),
-                n("end", [p("eight", 7)]),
                 n("fail", [p("eight", 7)], error),
                 n("end", []),
-                n("exit", []),
             ])
         })
     })
@@ -172,8 +153,17 @@ describe("core (safety)", function () {
         })
 
         return tt.run().then(function () {
+            for (var i = 0; i < ret.length; i++) {
+                var entry = ret[i]
+
+                if (entry.type === "extra") {
+                    t.string(entry.value.stack)
+                    delete entry.value.stack
+                }
+            }
+
             t.includesDeepAny(
-                [4, 5, 6, 7, 8, 9, 10, 11, 12].map(function (i) {
+                [3, 4, 5, 6].map(function (i) {
                     var splice1 = n("extra",
                         [p("test", 0), p("inner", 0), p("fail", 0)],
                         {count: 2, value: undefined})
@@ -184,18 +174,13 @@ describe("core (safety)", function () {
 
                     var node = [
                         n("start", []),
-                        n("start", [p("test", 0)]),
-                        n("start", [p("test", 0), p("inner", 0)]),
-                        n("start", [p("test", 0), p("inner", 0), p("fail", 0)]),
+                        n("enter", [p("test", 0)]),
+                        n("enter", [p("test", 0), p("inner", 0)]),
                         // Extras should first appear here.
-                        n("end", [p("test", 0), p("inner", 0), p("fail", 0)]),
                         n("pass", [p("test", 0), p("inner", 0), p("fail", 0)]),
-                        n("end", [p("test", 0), p("inner", 0)]),
-                        n("pass", [p("test", 0), p("inner", 0)]),
-                        n("end", [p("test", 0)]),
-                        n("pass", [p("test", 0)]),
+                        n("leave", [p("test", 0), p("inner", 0)]),
+                        n("leave", [p("test", 0)]),
                         n("end", []),
-                        n("exit", []),
                     ]
 
                     node.splice(i, 0, splice1, splice2)

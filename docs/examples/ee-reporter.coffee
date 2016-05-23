@@ -9,12 +9,14 @@
 # t.reporter() -> EventEmitter
 #
 # Events:
+# - "start" - all tests started
 # - "enter" - test entered
-# - "leave" - test left
+# - "leave" - test entered
 # - "pass" - test passed
 # - "fail" - test failed
 # - "skip" - test skipped
-# - "end" - end of the test suite
+# - "end" - all tests finished
+# - "error" - internal or reporter error
 # - "extra" - extra `done` call
 #
 # Each event is called the `value` and `path` properties as arguments.
@@ -27,12 +29,6 @@ readList = (reporters) ->
         else if typeof reporter is 'object' and reporter?
             reporters[i] = do (reporter) ->
                 (ev, done) ->
-                    ev.type = switch ev.type
-                        when 'start' then 'enter'
-                        when 'end' then 'leave'
-                        when 'exit' then 'end'
-                        else ev.type
-
                     reporter.emit ev.type, ev.value, ev.path
                     done()
         else

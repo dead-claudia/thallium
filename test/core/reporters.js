@@ -111,14 +111,9 @@ describe("core (reporters)", function () { // eslint-disable-line max-statements
         return tt.run().then(function () {
             t.match(ret, [
                 n("start", []),
-                n("start", [p("test", 0)]),
-                n("end", [p("test", 0)]),
                 n("pass", [p("test", 0)]),
-                n("start", [p("test", 1)]),
-                n("end", [p("test", 1)]),
                 n("pass", [p("test", 1)]),
                 n("end", []),
-                n("exit", []),
             ])
         })
     })
@@ -136,14 +131,9 @@ describe("core (reporters)", function () { // eslint-disable-line max-statements
         return tt.run().then(function () {
             t.match(ret, [
                 n("start", []),
-                n("start", [p("one", 0)]),
-                n("end", [p("one", 0)]),
                 n("fail", [p("one", 0)], sentinel),
-                n("start", [p("two", 1)]),
-                n("end", [p("two", 1)]),
                 n("fail", [p("two", 1)], sentinel),
                 n("end", []),
-                n("exit", []),
             ])
         })
     })
@@ -161,14 +151,9 @@ describe("core (reporters)", function () { // eslint-disable-line max-statements
         return tt.run().then(function () {
             t.match(ret, [
                 n("start", []),
-                n("start", [p("one", 0)]),
-                n("end", [p("one", 0)]),
                 n("fail", [p("one", 0)], sentinel),
-                n("start", [p("two", 1)]),
-                n("end", [p("two", 1)]),
                 n("pass", [p("two", 1)]),
                 n("end", []),
-                n("exit", []),
             ])
         })
     })
@@ -185,14 +170,9 @@ describe("core (reporters)", function () { // eslint-disable-line max-statements
         return tt.run().then(function () {
             t.match(ret, [
                 n("start", []),
-                n("start", [p("test", 0)]),
-                n("end", [p("test", 0)]),
                 n("pass", [p("test", 0)]),
-                n("start", [p("test", 1)]),
-                n("end", [p("test", 1)]),
                 n("pass", [p("test", 1)]),
                 n("end", []),
-                n("exit", []),
             ])
         })
     })
@@ -211,14 +191,9 @@ describe("core (reporters)", function () { // eslint-disable-line max-statements
         return tt.run().then(function () {
             t.match(ret, [
                 n("start", []),
-                n("start", [p("one", 0)]),
-                n("end", [p("one", 0)]),
                 n("fail", [p("one", 0)], new t.AssertionError("fail")),
-                n("start", [p("two", 1)]),
-                n("end", [p("two", 1)]),
                 n("fail", [p("two", 1)], new t.AssertionError("fail")),
                 n("end", []),
-                n("exit", []),
             ])
         })
     })
@@ -237,14 +212,9 @@ describe("core (reporters)", function () { // eslint-disable-line max-statements
         return tt.run().then(function () {
             t.match(ret, [
                 n("start", []),
-                n("start", [p("one", 0)]),
-                n("end", [p("one", 0)]),
                 n("fail", [p("one", 0)], new t.AssertionError("fail")),
-                n("start", [p("two", 1)]),
-                n("end", [p("two", 1)]),
                 n("pass", [p("two", 1)]),
                 n("end", []),
-                n("exit", []),
             ])
         })
     })
@@ -261,14 +231,9 @@ describe("core (reporters)", function () { // eslint-disable-line max-statements
         return tt.run().then(function () {
             t.match(ret, [
                 n("start", []),
-                n("start", [p("test", 0)]),
-                n("end", [p("test", 0)]),
                 n("pass", [p("test", 0)]),
-                n("start", [p("test", 1)]),
-                n("end", [p("test", 1)]),
                 n("pass", [p("test", 1)]),
                 n("end", []),
-                n("exit", []),
             ])
         })
     })
@@ -286,14 +251,9 @@ describe("core (reporters)", function () { // eslint-disable-line max-statements
         return tt.run().then(function () {
             t.match(ret, [
                 n("start", []),
-                n("start", [p("one", 0)]),
-                n("end", [p("one", 0)]),
                 n("fail", [p("one", 0)], sentinel),
-                n("start", [p("two", 1)]),
-                n("end", [p("two", 1)]),
                 n("fail", [p("two", 1)], sentinel),
                 n("end", []),
-                n("exit", []),
             ])
         })
     })
@@ -311,14 +271,9 @@ describe("core (reporters)", function () { // eslint-disable-line max-statements
         return tt.run().then(function () {
             t.match(ret, [
                 n("start", []),
-                n("start", [p("one", 0)]),
-                n("end", [p("one", 0)]),
                 n("fail", [p("one", 0)], sentinel),
-                n("start", [p("two", 1)]),
-                n("end", [p("two", 1)]),
                 n("pass", [p("two", 1)]),
                 n("end", []),
-                n("exit", []),
             ])
         })
     })
@@ -335,14 +290,9 @@ describe("core (reporters)", function () { // eslint-disable-line max-statements
         return tt.run().then(function () {
             t.match(ret, [
                 n("start", []),
-                n("start", [p("test", 0)]),
-                n("end", [p("test", 0)]),
                 n("pass", [p("test", 0)]),
-                n("start", [p("test", 1)]),
-                n("end", [p("test", 1)]),
                 n("pass", [p("test", 1)]),
                 n("end", []),
-                n("exit", []),
             ])
         })
     })
@@ -360,14 +310,9 @@ describe("core (reporters)", function () { // eslint-disable-line max-statements
         return tt.run().then(function () {
             t.match(ret, [
                 n("start", []),
-                n("start", [p("one", 0)]),
-                n("end", [p("one", 0)]),
                 n("fail", [p("one", 0)], sentinel),
-                n("start", [p("two", 1)]),
-                n("end", [p("two", 1)]),
                 n("fail", [p("two", 1)], sentinel),
                 n("end", []),
-                n("exit", []),
             ])
         })
     })
@@ -385,14 +330,9 @@ describe("core (reporters)", function () { // eslint-disable-line max-statements
         return tt.run().then(function () {
             t.match(ret, [
                 n("start", []),
-                n("start", [p("one", 0)]),
-                n("end", [p("one", 0)]),
                 n("fail", [p("one", 0)], sentinel),
-                n("start", [p("two", 1)]),
-                n("end", [p("two", 1)]),
                 n("pass", [p("two", 1)]),
                 n("end", []),
-                n("exit", []),
             ])
         })
     })
@@ -411,17 +351,11 @@ describe("core (reporters)", function () { // eslint-disable-line max-statements
         return tt.run().then(function () {
             t.match(ret, [
                 n("start", []),
-                n("start", [p("test", 0)]),
-                n("start", [p("test", 0), p("one", 0)]),
-                n("end", [p("test", 0), p("one", 0)]),
+                n("enter", [p("test", 0)]),
                 n("pass", [p("test", 0), p("one", 0)]),
-                n("start", [p("test", 0), p("two", 1)]),
-                n("end", [p("test", 0), p("two", 1)]),
                 n("pass", [p("test", 0), p("two", 1)]),
-                n("end", [p("test", 0)]),
-                n("pass", [p("test", 0)]),
+                n("leave", [p("test", 0)]),
                 n("end", []),
-                n("exit", []),
             ])
         })
     })
@@ -447,26 +381,15 @@ describe("core (reporters)", function () { // eslint-disable-line max-statements
         return tt.run().then(function () {
             t.match(ret, [
                 n("start", []),
-                n("start", [p("parent one", 0)]),
-                n("start", [p("parent one", 0), p("child one", 0)]),
-                n("end", [p("parent one", 0), p("child one", 0)]),
+                n("enter", [p("parent one", 0)]),
                 n("fail", [p("parent one", 0), p("child one", 0)], sentinel1),
-                n("start", [p("parent one", 0), p("child two", 1)]),
-                n("end", [p("parent one", 0), p("child two", 1)]),
                 n("fail", [p("parent one", 0), p("child two", 1)], sentinel1),
-                n("end", [p("parent one", 0)]),
-                n("pass", [p("parent one", 0)]),
-                n("start", [p("parent two", 1)]),
-                n("start", [p("parent two", 1), p("child one", 0)]),
-                n("end", [p("parent two", 1), p("child one", 0)]),
+                n("leave", [p("parent one", 0)]),
+                n("enter", [p("parent two", 1)]),
                 n("fail", [p("parent two", 1), p("child one", 0)], sentinel2),
-                n("start", [p("parent two", 1), p("child two", 1)]),
-                n("end", [p("parent two", 1), p("child two", 1)]),
                 n("fail", [p("parent two", 1), p("child two", 1)], sentinel2),
-                n("end", [p("parent two", 1)]),
-                n("pass", [p("parent two", 1)]),
+                n("leave", [p("parent two", 1)]),
                 n("end", []),
-                n("exit", []),
             ])
         })
     })
@@ -492,26 +415,15 @@ describe("core (reporters)", function () { // eslint-disable-line max-statements
         return tt.run().then(function () {
             t.match(ret, [
                 n("start", []),
-                n("start", [p("parent one", 0)]),
-                n("start", [p("parent one", 0), p("child one", 0)]),
-                n("end", [p("parent one", 0), p("child one", 0)]),
+                n("enter", [p("parent one", 0)]),
                 n("fail", [p("parent one", 0), p("child one", 0)], sentinel1),
-                n("start", [p("parent one", 0), p("child two", 1)]),
-                n("end", [p("parent one", 0), p("child two", 1)]),
                 n("pass", [p("parent one", 0), p("child two", 1)]),
-                n("end", [p("parent one", 0)]),
-                n("pass", [p("parent one", 0)]),
-                n("start", [p("parent two", 1)]),
-                n("start", [p("parent two", 1), p("child one", 0)]),
-                n("end", [p("parent two", 1), p("child one", 0)]),
+                n("leave", [p("parent one", 0)]),
+                n("enter", [p("parent two", 1)]),
                 n("fail", [p("parent two", 1), p("child one", 0)], sentinel2),
-                n("start", [p("parent two", 1), p("child two", 1)]),
-                n("end", [p("parent two", 1), p("child two", 1)]),
                 n("pass", [p("parent two", 1), p("child two", 1)]),
-                n("end", [p("parent two", 1)]),
-                n("pass", [p("parent two", 1)]),
+                n("leave", [p("parent two", 1)]),
                 n("end", []),
-                n("exit", []),
             ])
         })
     })
@@ -527,12 +439,8 @@ describe("core (reporters)", function () { // eslint-disable-line max-statements
         .run().then(function () {
             t.match(ret, [
                 n("start", [p("test", 0)]),
-                n("start", [p("test", 0), p("foo", 0)]),
-                n("end", [p("test", 0), p("foo", 0)]),
                 n("pass", [p("test", 0), p("foo", 0)]),
                 n("end", [p("test", 0)]),
-                n("pass", [p("test", 0)]),
-                n("exit", [p("test", 0)]),
             ])
         })
     })
@@ -581,38 +489,20 @@ describe("core (reporters)", function () { // eslint-disable-line max-statements
         return tt.run().then(function () {
             t.match(ret, [
                 n("start", []),
-                n("start", [p("mod-one", 0)]),
-                n("start", [p("mod-one", 0), p("1 === 1", 0)]),
-                n("end", [p("mod-one", 0), p("1 === 1", 0)]),
+                n("enter", [p("mod-one", 0)]),
                 n("pass", [p("mod-one", 0), p("1 === 1", 0)]),
-                n("start", [p("mod-one", 0), p("foo()", 1)]),
-                n("end", [p("mod-one", 0), p("foo()", 1)]),
                 n("fail", [p("mod-one", 0), p("foo()", 1)], fail1),
-                n("start", [p("mod-one", 0), p("bar()", 2)]),
-                n("end", [p("mod-one", 0), p("bar()", 2)]),
                 n("fail", [p("mod-one", 0), p("bar()", 2)], new Error("fail")),
-                n("start", [p("mod-one", 0), p("baz()", 3)]),
-                n("end", [p("mod-one", 0), p("baz()", 3)]),
                 n("fail", [p("mod-one", 0), p("baz()", 3)], sentinel),
-                n("start", [p("mod-one", 0), p("nested", 4)]),
-                n("start", [p("mod-one", 0), p("nested", 4), p("nested 2", 0)]),
-                n("end", [p("mod-one", 0), p("nested", 4), p("nested 2", 0)]),
+                n("enter", [p("mod-one", 0), p("nested", 4)]),
                 n("pass", [p("mod-one", 0), p("nested", 4), p("nested 2", 0)]),
-                n("end", [p("mod-one", 0), p("nested", 4)]),
-                n("pass", [p("mod-one", 0), p("nested", 4)]),
-                n("end", [p("mod-one", 0)]),
-                n("pass", [p("mod-one", 0)]),
-                n("start", [p("mod-two", 1)]),
-                n("start", [p("mod-two", 1), p("1 === 2", 0)]),
-                n("end", [p("mod-two", 1), p("1 === 2", 0)]),
+                n("leave", [p("mod-one", 0), p("nested", 4)]),
+                n("leave", [p("mod-one", 0)]),
+                n("enter", [p("mod-two", 1)]),
                 n("fail", [p("mod-two", 1), p("1 === 2", 0)], fail2),
-                n("start", [p("mod-two", 1), p("expandos don't transfer", 1)]),
-                n("end", [p("mod-two", 1), p("expandos don't transfer", 1)]),
                 n("pass", [p("mod-two", 1), p("expandos don't transfer", 1)]),
-                n("end", [p("mod-two", 1)]),
-                n("pass", [p("mod-two", 1)]),
+                n("leave", [p("mod-two", 1)]),
                 n("end", []),
-                n("exit", []),
             ])
         })
     })
@@ -636,14 +526,9 @@ describe("core (reporters)", function () { // eslint-disable-line max-statements
         return tt.run().then(function () {
             t.match(ret, [
                 n("start", []),
-                n("start", [p("test", 0)]),
-                n("end", [p("test", 0)]),
                 n("pass", [p("test", 0)]),
-                n("start", [p("test", 1)]),
-                n("end", [p("test", 1)]),
                 n("pass", [p("test", 1)]),
                 n("end", []),
-                n("exit", []),
             ])
         })
     })
@@ -671,7 +556,7 @@ describe("core (reporters)", function () { // eslint-disable-line max-statements
 
         tt.reporter(function (ev, done) {
             if (ev.type === "error") reported = ev.value
-            if (ev.type === "end") throw sentinel
+            if (ev.type === "start") throw sentinel
             return done()
         })
 

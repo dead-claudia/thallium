@@ -26,11 +26,8 @@ describe.skip("core (slow)", function () {
         return tt.run().then(function () {
             t.match(ret, [
                 n("start", []),
-                n("start", [p("test", 0)]),
-                n("end", [p("test", 0)]),
                 n("pass", [p("test", 0)]),
                 n("end", []),
-                n("exit", []),
             ])
         })
     })
@@ -50,11 +47,8 @@ describe.skip("core (slow)", function () {
         return tt.run().then(function () {
             t.match(ret, [
                 n("start", []),
-                n("start", [p("test", 0)]),
-                n("end", [p("test", 0)]),
                 n("pass", [p("test", 0)], undefined, true),
                 n("end", []),
-                n("exit", []),
             ])
         })
     })
@@ -72,14 +66,10 @@ describe.skip("core (slow)", function () {
         return tt.run().then(function () {
             t.match(ret, [
                 n("start", []),
-                n("start", [p("test", 0)]),
-                n("start", [p("test", 0), p("inner", 0)]),
-                n("end", [p("test", 0), p("inner", 0)]),
+                n("enter", [p("test", 0)]),
                 n("pass", [p("test", 0), p("inner", 0)]),
-                n("end", [p("test", 0)]),
-                n("pass", [p("test", 0)]),
+                n("leave", [p("test", 0)]),
                 n("end", []),
-                n("exit", []),
             ])
         })
     })
@@ -100,14 +90,10 @@ describe.skip("core (slow)", function () {
         return tt.run().then(function () {
             t.match(ret, [
                 n("start", []),
-                n("start", [p("test", 0)]),
-                n("start", [p("test", 0), p("inner", 0)]),
-                n("end", [p("test", 0), p("inner", 0)]),
+                n("enter", [p("test", 0)]),
                 n("pass", [p("test", 0), p("inner", 0)], undefined, true),
-                n("end", [p("test", 0)]),
-                n("pass", [p("test", 0)]),
+                n("leave", [p("test", 0)]),
                 n("end", []),
-                n("exit", []),
             ])
         })
     })
