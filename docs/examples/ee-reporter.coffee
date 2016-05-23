@@ -6,19 +6,9 @@
 #
 # API:
 #
-# t.reporter() -> EventEmitter
+# t.reporter(...ee: EventEmitter | Reporter)
 #
-# Events:
-# - "start" - all tests started
-# - "enter" - test entered
-# - "leave" - test entered
-# - "pass" - test passed
-# - "fail" - test failed
-# - "skip" - test skipped
-# - "end" - all tests finished
-# - "error" - internal or reporter error
-# - "extra" - extra `done` call
-#
+# Events are the same as what's in the API.
 # Each event is called the `value` and `path` properties as arguments.
 
 # `t.reporter()` accepts multiple reporters or nested arrays of them

@@ -4,16 +4,9 @@
 //
 // API:
 //
-// t.reporter() -> EventEmitter
+// t.reporter(...ee: EventEmitter | Reporter)
 //
-// Events:
-// - "enter" - test entered
-// - "pass" - test passed
-// - "fail" - test failed
-// - "skip" - test skipped
-// - "end" - end of the test suite
-// - "extra" - extra `done` call
-//
+// Events are the same as what's in the API.
 // Each event is called the `value` and `path` properties as arguments.
 
 // `t.reporter()` accepts multiple reporters or nested arrays of them
@@ -25,9 +18,6 @@ function readList(reporters) {
             readList(reporter)
         } else if (typeof reporter === "object" && reporter != null) {
             reporters[i] = (ev, done) => {
-                if (ev.type === "start") ev.type = "enter"
-                else if (ev.type === "exit") ev.type = "end"
-
                 reporter.emit(ev.type, ev.value, ev.path)
                 return done()
             }
