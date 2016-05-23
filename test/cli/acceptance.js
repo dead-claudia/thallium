@@ -1,7 +1,10 @@
 "use strict"
 
-// Note: these tests can be a bit flaky in the time it takes, thus the timeout
-// is higher for some.
+// Note: these tests are flaky for the following reasons:
+//
+// 1. The tests may take a while, which is why the timeouts are relatively high.
+// 2. The order the files are read are non-deterministic, but they are rarely
+//    read in non-alphabetical order.
 
 var Promise = require("bluebird")
 var path = require("path")
