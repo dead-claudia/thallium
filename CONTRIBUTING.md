@@ -63,11 +63,8 @@ I use [Bluebird](http://bluebirdjs.com) extensively for promises, as it makes co
 
 - This is linted with ESLint, and uses my [`isiahmeadows/node` preset](https://npmjs.com/package/eslint-config-isiahmeadows) for the main code base and `isiahmeadows/es6` for the examples.
 - [CoffeeLint](http://www.coffeelint.org/) is used to lint the few CoffeeScript files littered around, mostly there for testing and examples.
-
 - Classes are used, but inheritance is limited. They are usually used for grouping functionality and unnesting functions, but functions are usually preferred for callbacks and one-off things that don't involve delaying execution.
-
-- File names are lower cased, and imported namespaces are capitalized like constructors.
-
+- File names are lower cased, and namespaces are capitalized like constructors, except for ones imported from Node builtins and ones treated as values.
 - `exports.foo = bar` is preferred over `module.exports.foo = bar`.
 
 ## Tips and idioms
