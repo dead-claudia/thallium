@@ -48,10 +48,10 @@ I use [Bluebird](http://bluebirdjs.com) extensively for promises, as it makes co
 
 - `test` - This contains all the tests, and generally mirrors `lib` in its file structure. Mocha is currently used as the test runner, and the assertions are fully self-hosted. Using Thallium to test Thallium is awesome!
 
-- `test-fixtures` - This contains the fixtures for the various tests.
-    - Some of the `test` files are mirrored in [CoffeeScript](http://coffeescript.org/) within `test-fixtures/large-coffee` to help aid in more real-world usage. These are very explicitly and clearly labeled, so it should be very hard to miss.
+- `fixtures` - This contains the fixtures for the various tests.
+    - Some of the `test` files are mirrored in [CoffeeScript](http://coffeescript.org/) within `fixtures/large-coffee` to help aid in more real-world usage. These are very explicitly and clearly labeled, so it should be very hard to miss.
 
-- `test-util` - This contains various test-related utilities, including the mocks. Here's a few in `test-util/base.js` you might appreciate knowing about:
+- `helpers` - This contains various test-related utilities, including the mocks. Here's a few in `helpers/base.js` you might appreciate knowing about:
 
     - `push(array)` - A Thallium reporter that accepts an array destination to push its reports into.
     - `n(type, path, value)` - Create a reporter node of a given type, path, and value.

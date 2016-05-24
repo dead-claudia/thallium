@@ -1,8 +1,8 @@
 "use strict"
 
-var m = require("../../lib/messages.js")
+var m = require("../../lib/common.js").m
 var t = require("../../index.js")
-var Util = require("../../test-util/base.js")
+var Util = require("../../helpers/base.js")
 var p = Util.p
 var n = Util.n
 

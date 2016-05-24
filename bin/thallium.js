@@ -11,7 +11,16 @@ if (require.main !== module) {
 
 var cp = require("child_process")
 var path = require("path")
-var help = require("../lib/cli/help.js")
+var fs = require("fs")
+
+function help(value) {
+    var file = value === "detailed" ? "help-detailed.txt" : "help-simple.txt"
+
+    // Pad the top by a line.
+    console.log()
+    console.log(fs.readFileSync(
+        path.resolve(__dirname, "../lib", file), "utf-8"))
+}
 
 var args = {
     config: null,

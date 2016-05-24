@@ -1,11 +1,11 @@
 "use strict"
 
 // Note: updates to this should also be reflected in
-// test-fixtures/mid-coffee/timeouts.coffee, as it's trying to
+// fixtures/mid-coffee/timeouts.coffee, as it's trying to
 // represent more real-world usage.
 
 var t = require("../../index.js")
-var Util = require("../../test-util/base.js")
+var Util = require("../../helpers/base.js")
 var n = Util.n
 var p = Util.p
 

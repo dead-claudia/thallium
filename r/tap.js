@@ -2,7 +2,7 @@
 
 // This is a basic TAP-generating reporter.
 
-var methods = require("../lib/methods.js")
+var methods = require("../lib/common.js").methods
 var Reporter = require("../lib/reporter.js")
 var inspect = require("util").inspect
 

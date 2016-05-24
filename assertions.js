@@ -5,7 +5,7 @@
  * there is *so* much repetition.
  */
 
-var Util = require("./lib/util.js")
+var Util = require("./lib/common.js")
 var deepEqualImpl = require("./lib/deep-equal.js")
 
 var toString = Object.prototype.toString

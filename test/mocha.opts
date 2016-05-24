@@ -2,3 +2,4 @@
 --reporter dot
 --check-leaks
 --recursive
+--require ./helpers/init.js

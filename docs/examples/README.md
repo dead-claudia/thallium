@@ -11,6 +11,6 @@ each of them.
     [return an Observable when called without arguments](./observable-reporter.js) +
     [CoffeeScript version](./observable-reporter.coffee)
 
-Also, the end-to-end tests in [this directory](http://github.com/isiahmeadows/thallium/tree/master/test-fixtures/large-coffee)
+Also, the end-to-end tests in [this directory](http://github.com/isiahmeadows/thallium/tree/master/fixtures/large-coffee)
 provide a good example of how you could write some of your tests. They mirror
 some of the existing tests to demonstrate a real-world scenario.

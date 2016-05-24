@@ -1,7 +1,7 @@
 "use strict"
 
 var t = require("../../index.js")
-var Util = require("../../test-util/base.js")
+var Util = require("../../helpers/base.js")
 var assertions = require("../../assertions.js")
 
 var n = Util.n

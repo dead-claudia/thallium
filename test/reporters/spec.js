@@ -4,11 +4,11 @@
 // correct, and it will *not* verify this.
 
 var Promise = require("bluebird")
-var resolveAny = require("../../lib/util.js").resolveAny
+var resolveAny = require("../../lib/common.js").resolveAny
 var t = require("../../index.js")
 var spec = require("../../r/spec.js")
 var Reporter = require("../../lib/reporter.js")
-var Util = require("../../test-util/base.js")
+var Util = require("../../helpers/base.js")
 
 var Symbols = Reporter.Symbols
 var c = Reporter.color

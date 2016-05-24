@@ -1,7 +1,7 @@
 "use strict"
 
 var t = require("../../index.js")
-var Util = require("../../test-util/assertions.js")
+var Util = require("../../helpers/base.js")
 var fail = Util.fail
 var basic = Util.basic
 

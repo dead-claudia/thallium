@@ -5,10 +5,10 @@
 
 var inspect = require("util").inspect
 var Promise = require("bluebird")
-var resolveAny = require("../../lib/util.js").resolveAny
+var resolveAny = require("../../lib/common.js").resolveAny
 var t = require("../../index.js")
 var tap = require("../../r/tap.js")
-var Util = require("../../test-util/base.js")
+var Util = require("../../helpers/base.js")
 var p = Util.p
 var n = Util.n
 
