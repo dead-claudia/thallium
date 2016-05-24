@@ -25,7 +25,9 @@ This framework, unlike most test frameworks, emphasizes code and convention over
 
 ## Configuration
 
-You may also include a config file, named `.tl.js`. This file is loaded via `require` automatically, no extra flags or anything, and it is all executed code. This module may optionally default-export an object of the following items, or a thenable to it. Note that if you're using ES6 modules that transpile `export default {}` to `exports.default = {}`, that is also honored as a default export, and handled accordingly.
+You may also include a config file, named `.tl.js` in either your test directory (if it's not in `test`, you'll need to specify a glob at the CLI) or the project root.
+
+This file is loaded via `require` automatically, no extra flags or anything, and it is all executed code. This module may optionally default-export an object of the following items, or a thenable to it. Note that if you're using ES6 modules that transpile `export default {}` to `exports.default = {}`, that is also honored as a default export, and handled accordingly.
 
 ```js
 // Your .tl.js, with default values
@@ -40,15 +42,18 @@ module.exports = {
     module: "thallium",
 
     /**
-     * This gives Thallium a direct instance to use.
+     * This gives Thallium a direct instance to use. Note that `module` is
+     * pointless if you use this. It's permitted for similar reasons to above.
      */
     thallium: require("thallium"),
 
     /**
      * This gives Thallium one or more globs (it can be an array of them) to use
-     * to find and load test files. Note that this intentionally does not match
-     * dot files unless you explicitly specify one. It uses node-glob under the
-     * hood, but it also supports negation.
+     * to find and load test files, relative to the config itself. Note that
+     * this intentionally does not match dot files unless you explicitly specify
+     * one, because Thallium, among others like ESLint, will use those for
+     * various reasons. It uses node-glob under the hood, but it also supports
+     * negation in the same way as the CLI.
      */
     files: "test/**/*.js",
 }

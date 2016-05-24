@@ -35,6 +35,7 @@
     "index.js",
     "lib",
     "bin",
+    "r",
     "docs"
   ],
   "bin": {

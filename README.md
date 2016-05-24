@@ -49,25 +49,32 @@ See the [documentation](http://github.com/isiahmeadows/thallium/blob/master/docs
 
 This list is in a very rough chronological order.
 
-1. Create basic reporters for ~~TAP,~~ ~~spec,~~ dot, DOM, etc.
-    - Note that these four I've listed are directly blocking 0.1.
-    - Also, create a playground fixture for developing new reporters, to make design much easier.
-2. Set up [AppVeyor](https://www.appveyor.com/) to run tests on Windows. Currently, it's only actively tested on Linux and in browsers.
-3. Allow for multiple composable configs, initial negative globs based on the config's list (or the default), and a way to evaluate a config snippet via an argument.
-4. Finish documenting this project. This mainly includes the core assertions.
-5. Support flaky tests via retries. This can't fully self-host until that gets fixed, because it does have a few flakes.
-7. Write a few plugins/utilities for `describe`/`it`, `before{,Each}`/`after{,Each}` hooks, REPL friendliness\*, etc.
-    - I'd also like to eventually include the patience diff as a reporter option, since it deals with larger diffs a little more readably, a plus for integration/end-to-end tests, but there doesn't appear to be a JS port yet, and algorithm documentation is scarce.
-8. Write lots of blog posts.\*\* :smile:
+1. Create basic reporters for ~~TAP,~~ ~~spec,~~ dot, and DOM.
+    - Note that these four + a Browserified bundle are directly blocking 0.1.
+    - Also, create a playground fixture for developing new reporters, to make designing them much easier.
+2. Finish documenting this project. This mainly includes the core assertions.
+3. Support flaky tests via first-class retries. This would be enormously useful for several.
+4. Allow reporters to be removed, with an on-remove hook for the reporter in case external resources need reclaimed.
+5. Create a nice REPL driver for Node, in addition to the CLI.\*
+    - This will just be a module + sugar binary, so you can use it with any language.
+6. Write a few plugins/utilities for `describe`/`it` (likely trivial), `before{,Each}`/`after{,Each}` hooks, etc.
+    - This will include more reporters as well.
+7. Write lots of blog posts.\*\* :smile:
+    - Why `before{,Each}` and friends aren't in core
+    - Why this uses code *for* configuration, unlike nearly every other test framework out there.
 
 \* *That's something from Lisp-land I really wish was here...*
 
-\*\* *And port this to Python, when I can find time.*
+\*\* *And maybe port this to Python, if/when I can find time.*
 
-Also, at some point, I'd like to do the following:
+Also, at some point, I'd like to do the following, in no particular order:
 
+- Set up [AppVeyor](https://www.appveyor.com/) to run tests on Windows. Currently, it's only actively tested on Linux and in browsers.
+- Profile this thing. Currently, it runs slower than Mocha, but I know I can do better.
+- Allow initial negative globs based on the config's list (or the default)
 - Reimplement [`util-inspect`](https://www.npmjs.com/package/util-inspect) for browsers based on Node's current [`util.inspect`](https://nodejs.org/api/util.html#util_util_inspect_object_options), since that ponyfill module is completely untested and is unaware of ES6. :worried:
-- Implement my own glob-based walker for this to eliminate order non-determinism. To my knowledge, none of the more popular utilities are deterministic, and determinism is very helpful for testing. Plus, a specialized variant would load things much quicker.
+- Implement my own glob-based walker for this to eliminate order non-determinism and speed up resolution. To my knowledge, none of the more popular utilities are deterministic, and determinism is very helpful for testing. Plus, a specialized variant would load things much quicker. :smile:
+- Include the patience diff as a reporter option, since it deals with larger diffs a little more readably, a plus for data-heavy integration/end-to-end tests, but there doesn't appear to be a JS port yet, and algorithm documentation is scarce.
 - Implement something like `mocha --watch` for this.
 
 ## Contributing
