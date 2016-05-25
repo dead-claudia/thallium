@@ -2,26 +2,31 @@
 
 // This is a basic TAP-generating reporter.
 
+var Promise = require("bluebird")
 var methods = require("../lib/common.js").methods
-var Reporter = require("../lib/reporter.js")
-var c = Reporter.color
+var R = require("../lib/reporter.js")
+var c = R.color
 
-function ErrorSpec(ev, extra) {
-    this.event = ev
-    this.extra = extra
+function Reporter() {
+    R.Reporter.apply(this, arguments)
 }
 
-function Printer() {
-    Reporter.Printer.apply(this, arguments)
+function simpleInspect(value) {
+    if (value instanceof Error) {
+        return value.stack
+    } else {
+        return R.inspect(value)
+    }
 }
 
-methods(Printer, Reporter.Printer, {
+methods(Reporter, R.Reporter, {
     reset: function () {
-        Reporter.Printer.prototype.reset.call(this)
+        R.Reporter.prototype.reset.call(this)
 
         this.errorSpecs = []
         this.level = 1
         this.initialDepth = 0
+        this.lastIsNested = false
     },
 
     indent: function () {
@@ -39,174 +44,191 @@ methods(Printer, Reporter.Printer, {
     printFailList: function (pre, str) {
         var parts = str.split(/\r?\n/g)
 
-        this.print("    " + c("fail", pre + parts[0].trim()))
-
-        for (var i = 1; i < parts.length; i++) {
-            this.print("      " + c("fail", parts[i].trim()))
-        }
+        return this.print("    " + c("fail", pre + parts[0].trim()))
+        .return(parts.slice(1)).each(/** @this */ function (part) {
+            return this.print("      " + c("fail", part.trim()))
+        })
     },
 
     printError: function (path, index, value) {
-        this.print("  " + c("plain", index + 1 + ") " + path + ":"))
-
-        if (value instanceof Error) {
-            this.printFailList("", value.stack)
-        } else {
-            this.printFailList("", Reporter.inspect(value))
-        }
+        return this.print("  " + c("plain", index + 1 + ") " + path + ":"))
+        .then(/** @this */ function () {
+            return this.printFailList("", simpleInspect(value))
+        })
     },
 
     printExtra: function (path, index, value) {
-        this.print("  " + c("plain", index + 1 + ") " + path + ": (extra)"))
-        this.printFailList("- value: ", Reporter.inspect(value.value))
-        this.printFailList("- ", value.stack)
+        var str = c("plain", index + 1 + ") " + path + ": (extra)")
+
+        return this.print("  " + str)
+        .tap(/** @this */ function () {
+            return this.printFailList("- value: ", R.inspect(value.value))
+        })
+        .then(/** @this */ function () {
+            return this.printFailList("- ", value.stack)
+        })
     },
 
     initStatus: function (ev, status) {
         this.tree.getPath(ev.path).status = status
         this.tests++
     },
-})
 
-function Dispatcher(opts) {
-    this._ = new Printer(opts)
-}
-
-methods(Dispatcher, {
-    start: function (ev) {
-        this._.reset()
-        this._.print()
-
-        if (ev.path.length > 0) {
-            var indent = "  "
-
-            for (var i = 0; i < ev.path.length; i++) {
-                this._.print(indent + ev.path[i].name)
-                indent += "  "
-            }
-
-            this._.level = ev.path.length + 1
-        }
+    printReport: function (ev, status, init) {
+        return Promise.bind(this).then(/** @this */ function () {
+            if (this.lastIsNested && this.level === 1) return this.print()
+            else return undefined
+        })
+        .then(/** @this */ function () {
+            this.initStatus(ev, status)
+            this.lastIsNested = false
+            return this.print(this.indent() + init.call(this, ev))
+        })
     },
 
-    enter: function (ev) {
-        if (this._.pass && this._.level === 1) this._.print()
-        this._.initStatus(ev, [])
-        this._.pass++
-        this._.print(this._.indent() + this._.name(ev))
-        this._.level++
+    printTestTotal: function () {
+        if (this.tests === 1) return this.print(c("plain", "  1 test"))
+        else return this.print(c("plain", "  " + this.tests + " tests"))
     },
 
-    leave: function () {
-        this._.level--
-    },
-
-    pass: function (ev) {
-        this._.initStatus(ev, [])
-        this._.pass++
-        this._.print(this._.indent() +
-            c("checkmark", Reporter.Symbols.Pass + " ") +
-            c("pass", this._.name(ev)))
-    },
-
-    fail: function (ev) {
-        var index = this._.errorSpecs.length
-        var status = [index]
-
-        this._.initStatus(ev, status)
-        this._.fail++
-        this._.errorSpecs.push(new ErrorSpec(ev, false))
-        this._.print(this._.indent() +
-            c("fail", index + 1 + ") " + this._.name(ev)))
-    },
-
-    skip: function (ev) {
-        this._.tree.getPath(ev.path).status = []
-        this._.skip++
-        this._.print(this._.indent() + c("skip", "- " + this._.name(ev)))
-    },
-
-    // These get printed at the end
-    extra: function (ev) {
-        var status = this._.tree.getPath(ev.path).status
-
-        if (!status.length) this._.fail++
-        status.push(this._.errorSpecs.length)
-        this._.errorSpecs.push(new ErrorSpec(ev, true))
-    },
-
-    end: function () {
-        if (!this._.tests && !this._.skip) {
-            this._.print(c("plain", "  0 tests"))
-            this._.print()
-            return
+    printSummary: function () {
+        if (!this.pass && !this.skip && !this.fail) {
+            return undefined
         }
 
-        this._.print()
+        var p = Promise.bind(this)
 
-        if (this._.tests === 1) this._.print(c("plain", "  1 test"))
-        else this._.print(c("plain", "  " + this._.tests + " tests"))
-
-        if (this._.pass || this._.skip || this._.fail) {
-            if (this._.pass) {
-                this._.print(c("bright pass", "  ") +
-                    c("green", this._.pass + " passing"))
-            }
-
-            if (this._.skip) {
-                this._.print(c("skip", "  " + this._.skip + " skipped"))
-            }
-
-            if (this._.fail) {
-                this._.print(c("bright fail", "  ") +
-                    c("fail", this._.fail + " failing"))
-            }
-
-            this._.print()
+        if (this.pass) {
+            p = p.then(/** @this */ function () {
+                return this.print(c("bright pass", "  ") +
+                    c("green", this.pass + " passing"))
+            })
         }
 
-        if (!this._.errorSpecs.length) return
+        if (this.skip) {
+            p = p.then(/** @this */ function () {
+                return this.print(c("skip", "  " + this.skip + " skipped"))
+            })
+        }
 
-        for (var i = 0; i < this._.errorSpecs.length; i++) {
-            var spec = this._.errorSpecs[i]
-            var path = Reporter.joinPath(spec.event)
+        if (this.fail) {
+            p = p.then(/** @this */ function () {
+                return this.print(c("bright fail", "  ") +
+                    c("fail", this.fail + " failing"))
+            })
+        }
+
+        return p.then(this.print)
+    },
+
+    printErrorList: function () {
+        if (!this.errorSpecs.length) return undefined
+        return Promise.bind(this, this.errorSpecs)
+        .each(/** @this */ function (spec, i) {
+            var path = R.joinPath(spec.event)
+            var p
 
             if (spec.extra) {
-                this._.printExtra(path, i, spec.event.value)
+                p = this.printExtra(path, i, spec.event.value)
             } else {
-                this._.printError(path, i, spec.event.value)
+                p = this.printError(path, i, spec.event.value)
             }
 
-            this._.print()
-        }
+            return p.return().then(this.print)
+        })
     },
 
-    error: function (ev) {
-        var stack
+    report: function (ev) {
+        switch (ev.type) {
+        case "start":
+            this.reset()
 
-        if (ev.value instanceof Error) {
-            stack = ev.value.stack.split(/\r?\n/g)
-        } else {
-            stack = Reporter.inspect(ev.value).split(/\r?\n/g)
+            if (ev.path.length === 0) return this.print()
+
+            this.level = 0
+            return this.print()
+            .return(ev.path).each(/** @this */ function (entry) {
+                this.indent++
+                return this.print(this.indent() + entry.name)
+            })
+            .then(/** @this */ function () { this.level++ })
+
+        case "enter":
+            return this.printReport(ev, [], /** @this */ function (ev) {
+                this.pass++
+                return this.name(ev)
+            })
+            .then(/** @this */ function () { this.level++ })
+
+        case "leave":
+            this.level--
+            this.lastIsNested = true
+            return undefined
+
+        case "pass":
+            return this.printReport(ev, [], /** @this */ function (ev) {
+                this.pass++
+                return c("checkmark", R.Symbols.Pass + " ") +
+                    c("pass", this.name(ev))
+            })
+
+        case "fail":
+            var index = this.errorSpecs.length
+
+            return this.printReport(ev, [index], /** @this */ function (ev) {
+                this.fail++
+                this.errorSpecs.push({event: ev, extra: false})
+                return c("fail", index + 1 + ") " + this.name(ev))
+            })
+
+        case "skip":
+            return this.printReport(ev, [], /** @this */ function (ev) {
+                this.tests-- // Skipped tests shouldn't be counted in the total
+                this.skip++
+                return c("skip", "- " + this.name(ev))
+            })
+
+        case "extra":
+            // Ignore calls after `end`, as there is no graceful way to handle
+            // them
+            if (!this.tests) return undefined
+
+            // Extra calls get printed at the end
+            var status = this.tree.getPath(ev.path).status
+
+            if (!status.length) this.fail++
+            status.push(this.errorSpecs.length)
+            this.errorSpecs.push({event: ev, extra: true})
+            return undefined
+
+        case "end":
+            if (!this.tests && !this.skip) {
+                return this.print(c("plain", "  0 tests")).then(this.print)
+            }
+
+            return this.print()
+            .then(/** @this */ function () {
+                if (this.tests === 1) return this.print(c("plain", "  1 test"))
+                else return this.print(c("plain", "  " + this.tests + " tests"))
+            })
+            .then(this.printSummary)
+            .then(this.printErrorList)
+
+        case "error":
+            return this.print()
+            .return(simpleInspect(ev.value).split(/\r?\n/g))
+            .each(this.print)
+            .then(this.reset)
+
+        default:
+            throw new TypeError("Unknown report type: \"" + ev.type + "\"")
         }
-
-        this._.print()
-
-        for (var i = 0; i < stack.length; i++) {
-            this._.print(stack[i])
-        }
-
-        // Pitch it all.
-        this._.reset()
     },
 })
 
-// This is synchronous, and the `print` option must act synchronously.
 module.exports = function (opts) {
-    var dispatcher = new Dispatcher(opts)
+    var reporter = new Reporter(opts).reporter()
 
-    return function (ev, done) {
-        dispatcher[ev.type](ev)
-        return done()
-    }
+    reporter.block = true
+    return reporter
 }

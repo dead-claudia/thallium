@@ -2,51 +2,52 @@
 
 // This is a basic TAP-generating reporter.
 
+var Promise = require("bluebird")
 var methods = require("../lib/common.js").methods
-var Reporter = require("../lib/reporter.js")
+var R = require("../lib/reporter.js")
 var inspect = require("util").inspect
 
-var Status = Reporter.Status
+var Status = R.Status
 
 function shouldBreakLines(minLength, str) {
-    return str.length > Reporter.windowWidth - minLength ||
+    return str.length > R.windowWidth - minLength ||
         /\r?\n|[:?-]/.test(str)
 }
 
-function Printer() {
-    Reporter.Printer.apply(this, arguments)
+function Reporter() {
+    R.Reporter.apply(this, arguments)
 }
 
-methods(Printer, Reporter.Printer, {
+methods(Reporter, R.Reporter, {
     reset: function () {
-        Reporter.Printer.prototype.reset.call(this)
+        R.Reporter.prototype.reset.call(this)
         this.counter = 0
     },
 
     printTemplate: function (ev, tmpl, skip) {
-        var path = Reporter.joinPath(ev)
-
         if (!skip) this.counter++
 
         return this.print(
             tmpl.replace(/%c/g, this.counter)
-                .replace(/%p/g, path.replace(/\$/g, "$$$$")))
+                .replace(/%p/g, R.joinPath(ev).replace(/\$/g, "$$$$")))
     },
 
     printLines: function (value, skipFirst) {
         var lines = value.replace(/^/gm, "    ").split(/\r?\n/)
 
-        for (var i = +!!skipFirst; i < lines.length; i++) {
-            this.print(lines[i])
-        }
+        if (skipFirst) lines = lines.slice(1)
+        return Promise.bind(this, lines).each(this.print)
     },
 
     printRaw: function (key, str) {
         if (shouldBreakLines(key.length, str)) {
-            this.print("  " + key + ": |-")
-            this.printLines(str, false)
+            return this.print("  " + key + ": |-")
+            .bind(this)
+            .then(/** @this */ function () {
+                return this.printLines(str, false)
+            })
         } else {
-            this.print("  " + key + ": " + str)
+            return this.print("  " + key + ": " + str)
         }
     },
 
@@ -54,122 +55,151 @@ methods(Printer, Reporter.Printer, {
         return this.printRaw(key, inspect(value))
     },
 
-    printError: function (err) {
+    printError: function (ev) {
+        var err = ev.value
+
         // Let's *not* depend on the constructor being Thallium's...
-        if (err instanceof Error) {
-            if (err.name === "AssertionError") {
-                this.printValue("expected", err.expected)
-                this.printValue("actual", err.actual)
+        if (!(err instanceof Error)) {
+            return this.printValue(err)
+        }
 
-                var message = err.message
+        if (err.name !== "AssertionError") {
+            return this.print("  stack: |-").bind(this)
+            .then(/** @this */ function () {
+                return this.printLines(err.stack, false)
+            })
+        }
 
-                err.message = ""
-                this.printRaw("message", message)
-                this.print("  stack: |-")
-                this.printLines(err.stack, true)
-                err.message = message
-            } else {
-                this.print("  stack: |-")
-                this.printLines(err.stack, false)
+        return Promise.bind(this)
+        .then(/** @this */ function () {
+            return this.printValue("expected", err.expected)
+        })
+        .then(/** @this */ function () {
+            return this.printValue("actual", err.actual)
+        })
+        .then(/** @this */ function () {
+            return this.printRaw("message", err.message)
+        })
+        .then(/** @this */ function () {
+            return this.print("  stack: |-")
+        })
+        .then(/** @this */ function () {
+            var message = err.message
+
+            err.message = ""
+            return this.printLines(err.stack, true)
+            .then(function () { err.message = message })
+        })
+    },
+
+    report: function (ev) {
+        switch (ev.type) {
+        case "start":
+            this.running = true
+            return this.print("TAP version 13")
+
+        case "enter":
+            // Print a leading comment, to make some TAP formatters prettier.
+            this.tests++
+            this.pass++
+            this.tree.getPath(ev.path).status = Status.Passing
+            return this.printTemplate(ev, "# %p", true)
+            .bind(this).then(/** @this */ function () {
+                return this.printTemplate(ev, "ok %c")
+            })
+
+        // This is meaningless for the output.
+        case "leave": return undefined
+
+        case "pass":
+            this.tests++
+            this.pass++
+            this.tree.getPath(ev.path).status = Status.Passing
+            return this.printTemplate(ev, "ok %c %p")
+
+        case "fail":
+            this.tests++
+            this.fail++
+            this.tree.getPath(ev.path).status = Status.Failing
+            return this.printTemplate(ev, "not ok %c %p").bind(this)
+            .then(/** @this */ function () { return this.print("  ---") })
+            .then(/** @this */ function () { return this.printError(ev) })
+            .then(/** @this */ function () { return this.print("  ...") })
+
+        case "skip":
+            this.skip++
+            this.tree.getPath(ev.path).status = Status.Skipped
+            return this.printTemplate(ev, "ok %c # skip %p")
+
+        case "extra":
+            // Ignore calls after `end`, as there is no graceful way to handle
+            // them
+            if (!this.counter) return undefined
+
+            var tree = this.tree.getPath(ev.path)
+
+            if (tree.status < Status.Passing) {
+                throw new Error("(Thallium internal) unreachable")
             }
-        } else {
-            this.printValue(err)
+
+            // Only resolve once.
+            if (tree.status === Status.Passing) {
+                tree.status = Status.Failing
+                this.fail++
+            }
+
+            return this.printTemplate(ev, "not ok %c %p # extra").bind(this)
+            .then(/** @this */ function () { return this.print("  ---") })
+            .tap(/** @this */ function () {
+                return this.printValue("count", ev.value.count)
+            })
+            .tap(/** @this */ function () {
+                return this.printValue("value", ev.value.value)
+            })
+            .then(/** @this */ function () { return this.print("  ...") })
+
+        case "end":
+            var p = this.print("1.." + this.counter)
+            .bind(this).then(/** @this */ function () {
+                return this.print("# tests " + this.tests)
+            })
+
+            if (this.pass) {
+                p = p.then(/** @this */ function () {
+                    return this.print("# pass " + this.pass)
+                })
+            }
+
+            if (this.fail) {
+                p = p.then(/** @this */ function () {
+                    return this.print("# fail " + this.fail)
+                })
+            }
+
+            if (this.skip) {
+                p = p.then(/** @this */ function () {
+                    return this.print("# skip " + this.skip)
+                })
+            }
+
+            return p.then(/** @this */ function () { this.reset() })
+
+        case "error":
+            return this.print("Bail out!").bind(this)
+            .then(/** @this */ function () { return this.print("  ---") })
+            .then(/** @this */ function () { return this.printError(ev) })
+            .then(/** @this */ function () { return this.print("  ...") })
+            .then(/** @this */ function () { this.reset() })
+
+        default:
+            throw new TypeError("Unknown report type: \"" + ev.type + "\"")
         }
     },
 })
 
-function Dispatcher(opts) {
-    this._ = new Printer(opts)
-    this._.tree.status = Status.Unknown
-}
-
-methods(Dispatcher, {
-    start: function () {
-        this._.print("TAP version 13")
-        this._.running = true
-    },
-
-    enter: function (ev) {
-        // Print a leading comment, to make some TAP formatters prettier.
-        this._.tests++
-        this._.pass++
-        this._.tree.getPath(ev.path).status = Status.Passing
-        this._.printTemplate(ev, "# %p", true)
-        this._.printTemplate(ev, "ok %c")
-    },
-
-    // This is meaningless for the output.
-    leave: function () {},
-
-    pass: function (ev) {
-        this._.tests++
-        this._.pass++
-        this._.printTemplate(ev, "ok %c %p")
-        this._.tree.getPath(ev.path).status = Status.Passing
-    },
-
-    fail: function (ev) {
-        this._.tests++
-        this._.fail++
-        this._.printTemplate(ev, "not ok %c %p")
-        this._.print("  ---")
-        this._.printError(ev.value)
-        this._.print("  ...")
-        this._.tree.getPath(ev.path).status = Status.Failing
-    },
-
-    skip: function (ev) {
-        this._.skip++
-        this._.printTemplate(ev, "ok %c # skip %p")
-        this._.tree.getPath(ev.path).status = Status.Skipped
-    },
-
-    extra: function (ev) {
-        var tree = this._.tree.getPath(ev.path)
-
-        if (tree.status < Status.Passing) {
-            throw new Error("(Thallium internal) unreachable")
-        }
-
-        // Only resolve once.
-        if (tree.status === Status.Passing) {
-            tree.status = Status.Failing
-            this._.fail++
-        }
-
-        this._.printTemplate(ev, "not ok %c %p # extra")
-        this._.print("  ---")
-        this._.printValue("count", ev.value.count)
-        this._.printValue("value", ev.value.value)
-        this._.print("  ...")
-    },
-
-    end: function () {
-        this._.print("1.." + this._.counter)
-        this._.print("# tests " + this._.tests)
-
-        if (this._.pass) this._.print("# pass " + this._.pass)
-        if (this._.fail) this._.print("# fail " + this._.fail)
-        if (this._.skip) this._.print("# skip " + this._.skip)
-
-        this._.reset()
-    },
-
-    error: function (ev) {
-        this._.print("Bail out!")
-        this._.print("  ---")
-        this._.printError(ev.value)
-        this._.print("  ...")
-        this._.reset()
-    },
-})
-
-// This is synchronous, and the `print` option must act synchronously.
 module.exports = function (opts) {
-    var dispatcher = new Dispatcher(opts)
+    var reporter = new Reporter(opts).reporter()
 
-    return function (ev, done) {
-        dispatcher[ev.type](ev)
-        return done()
-    }
+    reporter.block = true
+    return reporter
 }
