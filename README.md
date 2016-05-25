@@ -16,7 +16,11 @@ npm install --save-dev thallium
 
 ## Usage
 
-This is waiting on the completion of the reporters, but for now, you can look at the [documentation](http://github.com/isiahmeadows/thallium/blob/master/docs/README.md) and [tests](http://github.com/isiahmeadows/thallium/tree/master/test/), which use Thallium's assertions for nearly everything.
+Check out the [CLI documentation](http://github.com/isiahmeadows/thallium/blob/master/docs/cli.md)
+
+```
+tl
+```
 
 Couple specific notes:
 
@@ -70,8 +74,10 @@ This list is in a very rough chronological order.
 Also, at some point, I'd like to do the following, in no particular order:
 
 - Set up [AppVeyor](https://www.appveyor.com/) to run tests on Windows. Currently, it's only actively tested on Linux and in browsers.
-- Profile this thing. Currently, it runs slower than Mocha, but I know I can do better.
-- Allow initial negative globs based on the config's list (or the default)
+- Trim the stack traces on reported errors and offer that to others as well.
+- Profile and optimize this thing. Currently, the CLI runs slightly slower than Mocha, but I know I can do better.
+    - For one, the config search doesn't have to be synchronous.
+- Allow initial negative globs based on the config's list (or the default).
 - Reimplement [`util-inspect`](https://www.npmjs.com/package/util-inspect) for browsers based on Node's current [`util.inspect`](https://nodejs.org/api/util.html#util_util_inspect_object_options), since that ponyfill module is completely untested and is unaware of ES6. :worried:
 - Implement my own glob-based walker for this to eliminate order non-determinism and speed up resolution. To my knowledge, none of the more popular utilities are deterministic, and determinism is very helpful for testing. Plus, a specialized variant would load things much quicker. :smile:
 - Include the patience diff as a reporter option, since it deals with larger diffs a little more readably, a plus for data-heavy integration/end-to-end tests, but there doesn't appear to be a JS port yet, and algorithm documentation is scarce.

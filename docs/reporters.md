@@ -31,6 +31,7 @@ Each event is specified by the `type` property:
 - `"fail"` - Marks a failing test block with no children. The `value` is the error that was thrown, untouched.
 - `"skip"` - Marks a skipped test block with no children, via `t.testSkip()` or `t.asyncSkip()`.
 - `"end"` - Marks the end of all running tests, and is the last event fired.
+- `"error"` - An internal/reporter error, provided for pretty-printing and the ability to close resources.
 - `"extra"` - Marks an extra call to `done` in an async test. The `value` is an object with the following properties:
 
     - `count` - how many times `done` has been called in total so far
@@ -41,6 +42,8 @@ Each event has the following properties:
 - `type` - The event's type, as a string.
 - `value` - The value associated with the event, or `undefined` if none was specified above for the event's type.
 - `path` - The path to the test, from the top-most parent to the current test. For the base test, this is an empty array. Each entry of this array is an object with `name` representing the name of the associated test and `index` representing the 0-based index of the test.
+
+Additionally, there is an `"error"` event that handles errors either internally or from the reporter itself. At this point, it's recommended to close the reporter, as it's no longer safe to continue. As an exception, errors from handling `"extra"` reports are silently ignored for practical reasons (it's an exceptionally complex problem, where I'd have to roll my own async abstraction), and errors from handling `"error"` reports are fatal. If you would prefer to just propagate those errors, you can simply rethrow the event's `value`.
 
 ## Event Order
 
@@ -85,6 +88,8 @@ module.exports = opts => {
     }
 }
 ```
+
+The built-in reporters do this as well.
 
 ## `"extra"` events after `"end"`
 
