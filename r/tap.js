@@ -198,8 +198,5 @@ methods(Reporter, R.Reporter, {
 })
 
 module.exports = function (opts) {
-    var reporter = new Reporter(opts).reporter()
-
-    reporter.block = true
-    return reporter
+    return new Reporter(opts).reporter()
 }

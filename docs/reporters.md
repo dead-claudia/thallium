@@ -73,7 +73,7 @@ Normally, reporters are all called at the same time on each event, to speed up c
 
 If your reporter is synchronous, remember to call `done` or return a resolved `Promise`/thenable at the end.
 
-If your reporter is async *and* needs to be the only one running (like writing asynchronously to the console), you should add a truthy `block` property to your reporter. For async work, it's not preferred because it blocks other reporters.
+If your reporter is async *and* needs to be the only one running for some reason (like multiple reporters working with a poorly written server), you should add a truthy `block` property to your reporter. It's not preferred, because if you want to, for example, use a reporter that logs to a file, that will have to wait until after the blocking reporter finishes.
 
 ## Options
 
