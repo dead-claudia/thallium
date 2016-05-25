@@ -55,7 +55,6 @@ This list is in a very rough chronological order.
 
 1. Create basic reporters for ~~TAP,~~ ~~spec,~~ dot, and DOM.
     - Note that these four + a Browserified bundle are directly blocking 0.1.
-    - Also, create a playground fixture for developing new reporters, to make designing them much easier.
 2. Finish documenting this project. This mainly includes the core assertions.
 3. Support flaky tests via first-class retries. This would be enormously useful for several.
 4. Allow reporters to be removed, with an on-remove hook for the reporter in case external resources need reclaimed.
