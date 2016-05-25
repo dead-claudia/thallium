@@ -1,7 +1,5 @@
 # Thallium
 
-[![browser support](https://ci.testling.com/isiahmeadows/thallium.png)
-](https://ci.testling.com/isiahmeadows/thallium)
 [![Build Status](https://travis-ci.org/isiahmeadows/thallium.svg?branch=master)](https://travis-ci.org/isiahmeadows/thallium) [![Join the chat at https://gitter.im/isiahmeadows/thallium](https://badges.gitter.im/isiahmeadows/thallium.svg)](https://gitter.im/isiahmeadows/thallium?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 A simple, unopinionated, modular test framework meant to simplify your tests. It supports Node 4 and later, and browser support + legacy Node is also planned.
@@ -54,7 +52,7 @@ See the [documentation](http://github.com/isiahmeadows/thallium/blob/master/docs
 This list is in a very rough chronological order.
 
 1. Create basic reporters for ~~TAP,~~ ~~spec,~~ dot, and DOM.
-    - Note that these four + a Browserified bundle are directly blocking 0.1.
+    - Note that these four + browser tests through Firefox in Travis are directly blocking 0.1.
 2. Finish documenting this project. This mainly includes the core assertions.
 3. Support flaky tests via first-class retries. This would be enormously useful for several.
 4. Allow reporters to be removed, with an on-remove hook for the reporter in case external resources need reclaimed.
@@ -72,7 +70,7 @@ This list is in a very rough chronological order.
 
 Also, at some point, I'd like to do the following, in no particular order:
 
-- Set up [AppVeyor](https://www.appveyor.com/) to run tests on Windows. Currently, it's only actively tested on Linux and in browsers.
+- Set up [AppVeyor](https://www.appveyor.com/) to run tests on Windows. Currently, it's only actively tested on Linux ~~and in browsers~~ (as soon as I can get [Sauce Labs](https://saucelabs.com/) and [zuul](https://github.com/defunctzombie/zuul) running...likely with a complex [Webpack](https://webpack.github.io) setup).
 - Trim the stack traces on reported errors and offer that to others as well.
 - Profile and optimize this thing. Currently, the CLI runs slightly slower than Mocha, but I know I can do better.
     - For one, the config search doesn't have to be synchronous.
