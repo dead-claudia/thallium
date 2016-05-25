@@ -10,7 +10,7 @@ if (require.main !== module) {
 require("../lib/cli-run.js").run({
     cwd: process.cwd(),
     argv: process.argv.slice(2),
-    util: require("../lib/cli-fs-util.js"), // eslint-disable-line global-require
+    util: require("../lib/cli-fs-util.js"), // eslint-disable-line global-require, max-len
 })
 .catch(function (e) {
     console.error(e.stack)
