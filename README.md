@@ -51,8 +51,9 @@ See the [documentation](http://github.com/isiahmeadows/thallium/blob/master/docs
 
 This list is in a very rough chronological order.
 
-1. Create basic reporters for ~~TAP,~~ ~~spec,~~ dot, and DOM.
-    - Note that these four + browser tests through Firefox in Travis are directly blocking 0.1.
+1. Create basic reporters for ~~TAP,~~ ~~spec,~~ and dot.
+    - I plan on adding browser support + DOM support *after* I write a proper CommonJS loader for the browser. Due to the architecture, I can't load the tests correctly otherwise.
+    - Note that these three are directly blocking 0.1.
 2. Finish documenting this project. This mainly includes the core assertions.
 3. Support flaky tests via first-class retries. This would be enormously useful for several.
 4. Allow reporters to be removed, with an on-remove hook for the reporter in case external resources need reclaimed.
@@ -70,7 +71,9 @@ This list is in a very rough chronological order.
 
 Also, at some point, I'd like to do the following, in no particular order:
 
-- Set up [AppVeyor](https://www.appveyor.com/) to run tests on Windows. Currently, it's only actively tested on Linux ~~and in browsers~~ (as soon as I can get [Sauce Labs](https://saucelabs.com/) and [zuul](https://github.com/defunctzombie/zuul) running...likely with a complex [Webpack](https://webpack.github.io) setup).
+- Set up [AppVeyor](https://www.appveyor.com/) to run tests on Windows. Currently, it's only actively tested on Linux ~~and in browsers~~.
+    - I'm planning on using [Sauce Labs](https://saucelabs.com/) and [Karma](https://karma-runner.github.io) after 1.0 is released, because I need the custom `context.html` config feature added in [this PR](https://github.com/karma-runner/karma/pull/1825). The reason is because I need a CommonJS loader and a [generator script](http://github.com/isiahmeadows/thallium/blob/master/scripts/generate-browser-entry.js) to load the tests.
+    - I also have to write a loader from scratch, because none of the other ones actually work like they should. This also means re-implementing Node's resolver.
 - Trim the stack traces on reported errors and offer that to others as well.
 - Profile and optimize this thing. Currently, the CLI runs slightly slower than Mocha, but I know I can do better.
     - For one, the config search doesn't have to be synchronous.

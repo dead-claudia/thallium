@@ -11,7 +11,7 @@ t.test("mod-one", function (t) {
     })
 
     t.async("bar()", function (t, done) {
-        setTimeout(function () { done(new Error("fail")) }, 0)
+        global.setTimeout(function () { done(new Error("fail")) }, 0)
     })
 
     t.async("baz()", function () {

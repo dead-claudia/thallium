@@ -7,14 +7,14 @@ var Promise = require("bluebird")
 var resolveAny = require("../../lib/common.js").resolveAny
 var t = require("../../index.js")
 var spec = require("../../r/spec.js")
-var Reporter = require("../../lib/reporter.js")
+var R = require("../../lib/reporter/index.js")
 var Util = require("../../helpers/base.js")
 
-var Symbols = Reporter.Symbols
-var c = Reporter.color
+var Symbols = R.Symbols
+var c = R.color
 var p = Util.p
 var n = Util.n
-var oldUseColors = Reporter.useColors()
+var oldUseColors = R.useColors()
 
 describe("reporter spec", function () {
     it("is not itself a reporter", function () {
@@ -28,9 +28,9 @@ describe("reporter spec", function () {
     })
 
     function run(useColors) { // eslint-disable-line max-statements
-        Reporter.useColors(useColors)
-        beforeEach(function () { Reporter.useColors(useColors) })
-        afterEach(function () { Reporter.useColors(oldUseColors) })
+        R.useColors(useColors)
+        beforeEach(function () { R.useColors(useColors) })
+        afterEach(function () { R.useColors(oldUseColors) })
 
         function stack(err) {
             var lines = ("    " + err.stack.replace(/^ +/gm, "      "))

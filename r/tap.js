@@ -4,7 +4,7 @@
 
 var Promise = require("bluebird")
 var methods = require("../lib/common.js").methods
-var R = require("../lib/reporter.js")
+var R = require("../lib/reporter/index.js")
 var inspect = require("util").inspect
 
 var Status = R.Status

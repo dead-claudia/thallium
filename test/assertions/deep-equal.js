@@ -1,6 +1,6 @@
 "use strict"
 
-/* global Map, Set */
+/* global Map, Set, Buffer */
 
 var t = require("../../index.js")
 

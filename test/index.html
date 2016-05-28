@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<title>Mocha tests</title>
+<link rel="stylesheet" href="../node_modules/mocha/mocha.css">
+
+<!--
+Because the loader is oddly buggy, and doesn't do its proper feature tests
+-->
+<script>
+window.performance = {mark: function () {}}
+var define
+</script>
+
+<div id="mocha"></div>
+<script src="../node_modules/mocha/mocha.js"></script>
+<script>mocha.setup("bdd")</script>
+<script src="../node_modules/browserify-loader/browserify-loader.js" main="../helpers/browser-entry.js"></script>

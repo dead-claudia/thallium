@@ -1,9 +1,11 @@
 "use strict"
 
+/* eslint-env node */
+
 var path = require("path")
 var minimatch = require("minimatch")
 var interpret = require("interpret")
-var State = require("../lib/cli-run.js").State
+var State = require("../lib/cli/run.js").State
 var methods = require("../lib/common.js").methods
 
 var hasOwn = Object.prototype.hasOwnProperty

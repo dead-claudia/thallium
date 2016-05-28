@@ -462,13 +462,13 @@ describe("core (reporters)", function () { // eslint-disable-line max-statements
             })
 
             tt.async("bar()", function (t, done) {
-                setTimeout(function () { done(new Error("fail")) }, 0)
+                global.setTimeout(function () { done(new Error("fail")) }, 0)
             })
 
             tt.async("baz()", function () {
                 return {
                     then: function (_, reject) {
-                        setTimeout(function () { reject(sentinel) }, 0)
+                        global.setTimeout(function () { reject(sentinel) }, 0)
                     },
                 }
             })

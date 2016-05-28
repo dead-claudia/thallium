@@ -5,9 +5,9 @@
 // it's trying to represent more real-world usage. The rest don't need ported
 // over.
 
-var t = require("../index.js")
+var t = require("../../index.js")
 var path = require("path")
-var Common = require("../lib/cli-common.js")
+var Common = require("../../lib/cli/common.js")
 
 function p(str) {
     return str.replace(/[\\\/]/g, path.sep)

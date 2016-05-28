@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 "use strict"
 
+/* eslint-env node */
 /* eslint-disable no-process-exit */
 // This script filters out Thallium's arguments, and fires `_thallium.js` with
 // them.

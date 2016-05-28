@@ -3,10 +3,10 @@
 var path = require("path")
 var interpret = require("interpret")
 var Promise = require("bluebird")
-var t = require("../index.js")
-var methods = require("../lib/common.js").methods
-var Loader = require("../lib/cli-loader.js")
-var Util = require("../helpers/cli.js")
+var t = require("../../index.js")
+var methods = require("../../lib/common.js").methods
+var Loader = require("../../lib/cli/loader.js")
+var Util = require("../../helpers/cli.js")
 
 var hasOwn = Object.prototype.hasOwnProperty
 

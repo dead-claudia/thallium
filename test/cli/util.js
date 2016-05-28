@@ -1,9 +1,9 @@
 "use strict"
 
 var path = require("path")
-var t = require("../index.js")
-var Util = require("../lib/cli-fs-util.js")
-var fixture = require("../helpers/cli.js").fixture
+var t = require("../../index.js")
+var Util = require("../../lib/cli/util.js")
+var fixture = require("../../helpers/cli.js").fixture
 
 // Mostly sanity tests.
 describe("cli fs utils", function () {

@@ -8,16 +8,16 @@
 
 var Promise = require("bluebird")
 var path = require("path")
-var t = require("../index.js")
+var t = require("../../index.js")
 var cp = require("child_process")
-var fixture = require("../helpers/cli.js").fixture
+var fixture = require("../../helpers/cli.js").fixture
 
 function formatList(msgs) {
     return msgs.replace(/\r?\n/g, "\n").replace(/\n{2,}/g, "\n").trim()
 }
 
 describe("cli end-to-end (FLAKE)", function () {
-    var binary = path.resolve(__dirname, "../bin/thallium.js")
+    var binary = path.resolve(__dirname, "../../bin/thallium.js")
 
     function test(name, opts) {
         (opts.skip ? it.skip : it)(name, /** @this */ function () {

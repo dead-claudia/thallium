@@ -57,7 +57,7 @@ describe("core (asynchronous behavior)", function () {
 
         tt.async("test", function (_, done) {
             called = true
-            setTimeout(function () { done() }, 0)
+            global.setTimeout(function () { done() }, 0)
         })
 
         var ret = tt.run().then(function () { t.true(called) })

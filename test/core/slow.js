@@ -41,7 +41,7 @@ describe.skip("core (slow) (FLAKE)", function () {
         tt.async("test", function (tt, done) {
             tt.slow(50)
             // It's highly unlikely the engine will take this long to finish
-            setTimeout(function () { done() }, 200)
+            global.setTimeout(function () { done() }, 200)
         })
 
         return tt.run().then(function () {
@@ -84,7 +84,7 @@ describe.skip("core (slow) (FLAKE)", function () {
         .slow(50)
         .async("inner", function (tt, done) {
             // It's highly unlikely the engine will take this long to finish.
-            setTimeout(function () { done() }, 200)
+            global.setTimeout(function () { done() }, 200)
         })
 
         return tt.run().then(function () {

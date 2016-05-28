@@ -1,13 +1,13 @@
 'use strict'
 
 ###
-Note: updates to this must be reflected in test/cli-common.js, as it's trying to
+Note: updates to this must be reflected in test/cli/common.js, as it's trying to
 represent more real-world usage.
 ###
 
 t = require 'thallium'
 path = require 'path'
-Common = require '../../../lib/cli-common.js'
+Common = require '../../../lib/cli/common.js'
 
 p = (str) -> str.replace /[\\\/]/g, path.sep
 

@@ -1,12 +1,12 @@
 "use strict"
 
 var Promise = require("bluebird")
-var t = require("../index.js")
-var assertions = require("../assertions.js")
-var resolveAny = require("../lib/common.js").resolveAny
-var Run = require("../lib/cli-run.js")
-var Cli = require("../helpers/cli.js")
-var Base = require("../helpers/base.js")
+var t = require("../../index.js")
+var assertions = require("../../assertions.js")
+var resolveAny = require("../../lib/common.js").resolveAny
+var Run = require("../../lib/cli/run.js")
+var Cli = require("../../helpers/cli.js")
+var Base = require("../../helpers/base.js")
 var n = Base.n
 var p = Base.p
 var push = Base.push

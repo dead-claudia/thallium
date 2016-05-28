@@ -43,7 +43,7 @@ describe("core (timeouts) (FLAKE)", function () {
         tt.async("test", function (tt, done) {
             tt.timeout(50)
             // It's highly unlikely the engine will take this long to finish
-            setTimeout(function () { done() }, 200)
+            global.setTimeout(function () { done() }, 200)
         })
 
         return tt.run().then(function () {
@@ -86,7 +86,7 @@ describe("core (timeouts) (FLAKE)", function () {
         .timeout(50)
         .async("inner", function (tt, done) {
             // It's highly unlikely the engine will take this long to finish.
-            setTimeout(function () { done() }, 200)
+            global.setTimeout(function () { done() }, 200)
         })
 
         return tt.run().then(function () {

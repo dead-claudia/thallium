@@ -4,7 +4,7 @@
 
 var Promise = require("bluebird")
 var methods = require("../lib/common.js").methods
-var R = require("../lib/reporter.js")
+var R = require("../lib/reporter/index.js")
 var c = R.color
 
 function Reporter() {
