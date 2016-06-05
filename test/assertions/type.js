@@ -1,7 +1,7 @@
 "use strict"
 
 var t = require("../../index.js")
-var methods = require("../../lib/common.js").methods
+var methods = require("../../lib/methods.js")
 var Util = require("../../helpers/base.js")
 var fail = Util.fail
 var basic = Util.basic

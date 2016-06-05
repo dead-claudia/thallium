@@ -7,5 +7,4 @@ lot left to do in this framework.
 - [Core assertions](http://github.com/isiahmeadows/thallium/blob/master/docs/assertions.md)
 - [CLI](http://github.com/isiahmeadows/thallium/blob/master/docs/cli.md)
 - [Plugins](http://github.com/isiahmeadows/thallium/blob/master/docs/plugins.md)
-- [Extra safety](http://github.com/isiahmeadows/thallium/blob/master/docs/safety.md)
 - [Examples](http://github.com/isiahmeadows/thallium/blob/master/docs/examples/README.md)

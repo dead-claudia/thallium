@@ -13,14 +13,14 @@ t = require 'thallium'
 # be too bad.
 t.test 'core (timeouts) (FLAKE)', ->
     @async 'succeeds with own', ->
-        tt = @base()
+        tt = @reflect().base()
         ret = []
 
         tt.reporter Util.push(ret)
 
         tt.async 'test', (_, done) ->
             # It's highly unlikely the engine will take this long to finish.
-            @timeout(10)
+            @timeout 10
             done()
 
         tt.run().then =>
@@ -31,15 +31,15 @@ t.test 'core (timeouts) (FLAKE)', ->
             ]
 
     @async 'fails with own', ->
-        tt = @base()
+        tt = @reflect().base()
         ret = []
 
         tt.reporter Util.push(ret)
 
         tt.async 'test', (_, done) ->
-            @timeout(50)
+            @timeout 50
             # It's highly unlikely the engine will take this long to finish
-            setTimeout((-> done()), 200)
+            setTimeout (-> done()), 200
 
         tt.run().then =>
             @match ret, [
@@ -49,7 +49,7 @@ t.test 'core (timeouts) (FLAKE)', ->
             ]
 
     @async 'succeeds with inherited', ->
-        tt = @base()
+        tt = @reflect().base()
         ret = []
 
         tt.reporter Util.push(ret)
@@ -68,7 +68,7 @@ t.test 'core (timeouts) (FLAKE)', ->
             ]
 
     @async 'fails with inherited', ->
-        tt = @base()
+        tt = @reflect().base()
         ret = []
 
         tt.reporter Util.push(ret)
@@ -77,7 +77,7 @@ t.test 'core (timeouts) (FLAKE)', ->
         .timeout 50
         .async 'inner', (_, done) ->
             # It's highly unlikely the engine will take this long to finish.
-            setTimeout((-> done()), 200)
+            setTimeout (-> done()), 200
 
         tt.run().then =>
             @match ret, [
@@ -89,39 +89,58 @@ t.test 'core (timeouts) (FLAKE)', ->
                 n 'end', []
             ]
 
-    @async 'gets own set timeout', ->
-        tt = @base()
-        timeout = undefined
+    @async 'gets own block timeout', ->
+        tt = @reflect().base()
+        active = raw = undefined
 
         tt.test 'test', ->
             @timeout 50
-            timeout = @timeout()
+            active = @reflect().activeTimeout()
+            raw = @reflect().timeout()
 
-        tt.run().then => @equal(timeout, 50)
+        tt.run().then =>
+            @equal active, 50
+            @equal raw, 50
 
-    @async 'gets own inline set timeout', ->
-        tt = @base()
-        timeout = undefined
+    @test 'gets own inline timeout', ->
+        tt = @reflect().base()
+        ttt = tt.test('test').timeout 50
+
+        @equal ttt.reflect().activeTimeout(), 50
+        @equal ttt.reflect().timeout(), 50
+
+    @async 'gets inherited block timeout', ->
+        tt = @reflect().base()
+        active = raw = undefined
 
         tt.test 'test'
         .timeout 50
-        .test 'inner', -> timeout = @timeout()
+        .test 'inner', ->
+            active = @reflect().activeTimeout()
+            raw = @reflect().timeout()
 
-        tt.run().then => @equal(timeout, 50)
+        tt.run().then =>
+            @equal active, 50
+            @equal raw, 0
 
-    @async 'gets own sync inner timeout', ->
-        tt = @base()
+    @test 'gets inherited inline timeout', ->
+        tt = @reflect().base()
 
-        timeout = tt.test 'test'
+        ttt = tt.test 'test'
         .timeout 50
-        .test('inner').timeout()
+        .test 'inner'
 
-        tt.run().then => @equal(timeout, 50)
+        @equal ttt.reflect().activeTimeout(), 50
+        @equal ttt.reflect().timeout(), 0
 
     @async 'gets default timeout', ->
-        tt = t.base()
-        timeout = undefined
+        tt = @reflect().base()
+        active = raw = undefined
 
-        tt.test 'test', -> timeout = @timeout()
+        tt.test 'test', ->
+            active = @reflect().activeTimeout()
+            raw = @reflect().timeout()
 
-        tt.run().then => @equal(timeout, 2000)
+        tt.run().then =>
+            @equal active, 2000
+            @equal raw, 0

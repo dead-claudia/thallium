@@ -3,7 +3,7 @@
 var Promise = require("bluebird")
 var t = require("../../index.js")
 var assertions = require("../../assertions.js")
-var resolveAny = require("../../lib/common.js").resolveAny
+var resolveAny = require("../../lib/core/common.js").resolveAny
 var Run = require("../../lib/cli/run.js")
 var Cli = require("../../helpers/cli.js")
 var Base = require("../../helpers/base.js")
@@ -154,7 +154,7 @@ describe("cli runner", function () {
          */
 
         function run(opts) {
-            var tt = t.base().use(assertions)
+            var tt = t.reflect().base().use(assertions)
             var tree = opts.tree(tt)
 
             tree["node_modules"] = {thallium: function () { return tt }}
@@ -270,6 +270,7 @@ describe("cli runner", function () {
 
         it("runs failing tests", function () {
             var ret = []
+            var AssertionError = t.reflect().AssertionError
 
             return run({
                 args: "",
@@ -295,17 +296,18 @@ describe("cli runner", function () {
                 t.match(ret, [
                     n("start", []),
                     n("pass", [p("test 1", 0)]),
-                    n("fail", [p("test 2", 1)], new t.AssertionError("oops")),
+                    n("fail", [p("test 2", 1)], new AssertionError("oops")),
                     n("end", []),
                 ])
             })
         })
 
         it("runs moderately sized test suites", function () {
+            var AssertionError = t.reflect().AssertionError
             var ret = []
-            var fail1 = new t.AssertionError("Expected 1 to not equal 1", 1, 1)
-            var fail2 = new t.AssertionError("Expected 1 to equal 2", 2, 1)
-            var fail3 = new t.AssertionError("Expected 'yep' to be a nope",
+            var fail1 = new AssertionError("Expected 1 to not equal 1", 1, 1)
+            var fail2 = new AssertionError("Expected 1 to equal 2", 2, 1)
+            var fail3 = new AssertionError("Expected 'yep' to be a nope",
                 undefined, "yep")
             var sentinel = new Error("sentinel")
 

@@ -3,13 +3,9 @@
 // This is a basic TAP-generating reporter.
 
 var Promise = require("bluebird")
-var methods = require("../lib/common.js").methods
+var methods = require("../lib/methods.js")
 var R = require("../lib/reporter/index.js")
 var c = R.color
-
-function Reporter() {
-    R.Reporter.apply(this, arguments)
-}
 
 function simpleInspect(value) {
     if (value instanceof Error) {
@@ -19,13 +15,16 @@ function simpleInspect(value) {
     }
 }
 
+function Reporter() {
+    R.Reporter.apply(this, arguments)
+}
+
 methods(Reporter, R.Reporter, {
     reset: function () {
         R.Reporter.prototype.reset.call(this)
 
         this.errorSpecs = []
         this.level = 1
-        this.initialDepth = 0
         this.lastIsNested = false
     },
 
@@ -86,11 +85,6 @@ methods(Reporter, R.Reporter, {
         })
     },
 
-    printTestTotal: function () {
-        if (this.tests === 1) return this.print(c("plain", "  1 test"))
-        else return this.print(c("plain", "  " + this.tests + " tests"))
-    },
-
     printSummary: function () {
         if (!this.pass && !this.skip && !this.fail) {
             return undefined
@@ -122,7 +116,6 @@ methods(Reporter, R.Reporter, {
     },
 
     printErrorList: function () {
-        if (!this.errorSpecs.length) return undefined
         return Promise.bind(this, this.errorSpecs)
         .each(/** @this */ function (spec, i) {
             var path = R.joinPath(spec.event)

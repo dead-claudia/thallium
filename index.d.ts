@@ -3,13 +3,12 @@
 import * as Core from "./core";
 
 export {
-    NestedArray,
-    Nested,
     Callback,
 
     ReportType,
     Location,
     Report,
+    TestReport,
     ExtraCall,
     StartReport,
     EnterReport,
@@ -30,6 +29,7 @@ export {
     AssertionResult,
     AssertionError,
 
+    Reflect,
     IteratorResult,
     Iterator,
     ObjectMap,

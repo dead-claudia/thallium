@@ -14,7 +14,7 @@ var p = Util.p
 // be too bad.
 describe("core (timeouts) (FLAKE)", function () {
     it("succeeds with own", function () {
-        var tt = t.base()
+        var tt = t.reflect().base()
         var ret = []
 
         tt.reporter(Util.push(ret))
@@ -35,7 +35,7 @@ describe("core (timeouts) (FLAKE)", function () {
     })
 
     it("fails with own", function () {
-        var tt = t.base()
+        var tt = t.reflect().base()
         var ret = []
 
         tt.reporter(Util.push(ret))
@@ -56,7 +56,7 @@ describe("core (timeouts) (FLAKE)", function () {
     })
 
     it("succeeds with inherited", function () {
-        var tt = t.base()
+        var tt = t.reflect().base()
         var ret = []
 
         tt.reporter(Util.push(ret))
@@ -77,7 +77,7 @@ describe("core (timeouts) (FLAKE)", function () {
     })
 
     it("fails with inherited", function () {
-        var tt = t.base()
+        var tt = t.reflect().base()
         var ret = []
 
         tt.reporter(Util.push(ret))
@@ -101,45 +101,69 @@ describe("core (timeouts) (FLAKE)", function () {
         })
     })
 
-    it("gets own set timeout", function () {
-        var tt = t.base()
-        var timeout
+    it("gets own block timeout", function () {
+        var tt = t.reflect().base()
+        var active, raw
 
         tt.test("test", function (tt) {
             tt.timeout(50)
-            timeout = tt.timeout()
+            active = tt.reflect().activeTimeout()
+            raw = tt.reflect().timeout()
         })
 
-        return tt.run().then(function () { t.equal(timeout, 50) })
+        return tt.run().then(function () {
+            t.equal(active, 50)
+            t.equal(raw, 50)
+        })
     })
 
-    it("gets own inline set timeout", function () {
-        var tt = t.base()
-        var timeout
+    it("gets own inline timeout", function () {
+        var tt = t.reflect().base()
+        var ttt = tt.test("test").timeout(50)
+
+        t.equal(ttt.reflect().activeTimeout(), 50)
+        t.equal(ttt.reflect().timeout(), 50)
+    })
+
+    it("gets inherited block timeout", function () {
+        var tt = t.reflect().base()
+        var active, raw
 
         tt.test("test")
         .timeout(50)
-        .test("inner", function (tt) { timeout = tt.timeout() })
+        .test("inner", function (tt) {
+            active = tt.reflect().activeTimeout()
+            raw = tt.reflect().timeout()
+        })
 
-        return tt.run().then(function () { t.equal(timeout, 50) })
+        return tt.run().then(function () {
+            t.equal(active, 50)
+            t.equal(raw, 0)
+        })
     })
 
-    it("gets own sync inner timeout", function () {
-        var tt = t.base()
-
-        var timeout = tt.test("test")
+    it("gets inherited inline timeout", function () {
+        var tt = t.reflect().base()
+        var ttt = tt.test("test")
         .timeout(50)
-        .test("inner").timeout()
+        .test("inner")
 
-        return tt.run().then(function () { t.equal(timeout, 50) })
+        t.equal(ttt.reflect().activeTimeout(), 50)
+        t.equal(ttt.reflect().timeout(), 0)
     })
 
     it("gets default timeout", function () {
-        var tt = t.base()
-        var timeout
+        var tt = t.reflect().base()
+        var active, raw
 
-        tt.test("test", function (tt) { timeout = tt.timeout() })
+        tt.test("test", function (tt) {
+            active = tt.reflect().activeTimeout()
+            raw = tt.reflect().timeout()
+        })
 
-        return tt.run().then(function () { t.equal(timeout, 2000) })
+        return tt.run().then(function () {
+            t.equal(active, 2000)
+            t.equal(raw, 0)
+        })
     })
 })

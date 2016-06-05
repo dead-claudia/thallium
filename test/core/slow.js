@@ -1,6 +1,6 @@
 "use strict"
 
-// TODO: implement this in core
+// TODO: implement this
 
 var t = require("../../index.js")
 var Util = require("../../helpers/base.js")
@@ -12,7 +12,7 @@ var p = Util.p
 // be too bad.
 describe.skip("core (slow) (FLAKE)", function () {
     it("succeeds with own", function () {
-        var tt = t.base()
+        var tt = t.reflect().base()
         var ret = []
 
         tt.reporter(Util.push(ret))
@@ -33,7 +33,7 @@ describe.skip("core (slow) (FLAKE)", function () {
     })
 
     it("fails with own", function () {
-        var tt = t.base()
+        var tt = t.reflect().base()
         var ret = []
 
         tt.reporter(Util.push(ret))
@@ -54,7 +54,7 @@ describe.skip("core (slow) (FLAKE)", function () {
     })
 
     it("succeeds with inherited", function () {
-        var tt = t.base()
+        var tt = t.reflect().base()
         var ret = []
 
         tt.reporter(Util.push(ret))
@@ -75,7 +75,7 @@ describe.skip("core (slow) (FLAKE)", function () {
     })
 
     it("fails with inherited", function () {
-        var tt = t.base()
+        var tt = t.reflect().base()
         var ret = []
 
         tt.reporter(Util.push(ret))
@@ -98,45 +98,69 @@ describe.skip("core (slow) (FLAKE)", function () {
         })
     })
 
-    it("gets own set slow timeout", function () {
-        var tt = t.base()
-        var slow
+    it("gets own block slow", function () {
+        var tt = t.reflect().base()
+        var active, raw
 
         tt.test("test", function (tt) {
             tt.slow(50)
-            slow = tt.slow()
+            active = tt.reflect().activeSlow()
+            raw = tt.reflect().slow()
         })
 
-        return tt.run().then(function () { t.equal(slow, 50) })
+        return tt.run().then(function () {
+            t.equal(active, 50)
+            t.equal(raw, 50)
+        })
     })
 
-    it("gets own inline set slow timeout", function () {
-        var tt = t.base()
-        var slow
+    it("gets own inline slow", function () {
+        var tt = t.reflect().base()
+        var ttt = tt.test("test").slow(50)
+
+        t.equal(ttt.reflect().activeSlow(), 50)
+        t.equal(ttt.reflect().slow(), 50)
+    })
+
+    it("gets inherited block slow", function () {
+        var tt = t.reflect().base()
+        var active, raw
 
         tt.test("test")
         .slow(50)
-        .test("inner", function (tt) { slow = tt.slow() })
+        .test("inner", function (tt) {
+            active = tt.reflect().activeSlow()
+            raw = tt.reflect().slow()
+        })
 
-        return tt.run().then(function () { t.equal(slow, 50) })
+        return tt.run().then(function () {
+            t.equal(active, 50)
+            t.equal(raw, 0)
+        })
     })
 
-    it("gets own sync inner slow timeout", function () {
-        var tt = t.base()
-
-        var slow = tt.test("test")
+    it("gets inherited inline slow", function () {
+        var tt = t.reflect().base()
+        var ttt = tt.test("test")
         .slow(50)
-        .test("inner").slow()
+        .test("inner")
 
-        return tt.run().then(function () { t.equal(slow, 50) })
+        t.equal(ttt.reflect().activeSlow(), 50)
+        t.equal(ttt.reflect().slow(), 0)
     })
 
-    it("gets default slow timeout", function () {
-        var tt = t.base()
-        var slow
+    it("gets default slow", function () {
+        var tt = t.reflect().base()
+        var active, raw
 
-        tt.test("test", function (tt) { slow = tt.slow() })
+        tt.test("test", function (tt) {
+            active = tt.reflect().activeSlow()
+            raw = tt.reflect().slow()
+        })
 
-        return tt.run().then(function () { t.equal(slow, 75) })
+        return tt.run().then(function () {
+            t.equal(active, 2000)
+            t.equal(raw, 0)
+        })
     })
 })

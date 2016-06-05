@@ -9,13 +9,25 @@ Notes:
 - `thallium` and `thallium/core` are completely independent from each other, but otherwise carry the same API. The only difference is that the former includes the `thallium/assertions` plugin (i.e. the core asssertions).
 - If you're using Babel, this only exports a single default export.
 - `t.define()`, `t.wrap()`, `t.add()`, etc. can accept Symbols as well as strings. The property is passed through unmodified. This allows for private assertions.
-- `t._` is reserved for internal use, so don't depend on anything in that, other than its possible existence.
+- `t._` and `reflect._` are reserved for internal use, so please leave those alone.
+- Don't change `reflect` on the current instance, as it's very important for plugin developers. `add`, `wrap`, and `define` all throw errors if it's accessed, anyways.
 
-## Base methods
+This also catches some of the simpler dumb mistakes like forgetting to include the `t` argument in a child test, by reporting an error instead of going into an invalid state. All the state-dependent API methods check this, both in the primary and reflection APIs.
 
-These are the methods you might appreciate knowing if you're just using the framework.
+```js
+// Did you catch it?
+t.test("test", function () {
+    t.test("inner", function (t) {
+        t.equal(1, 1)
+    })
+})
+```
 
-### t.test("name", callback)
+## Primary API
+
+These are the most common methods you'll ever use.
+
+### t.test("name", callback), t.testSkip("name", callback)
 
 The basic testing method, used for defining block tests. Should be familiar to you if you have used Tape or other similar modules.
 
@@ -38,7 +50,7 @@ You can skip block tests with `t.testSkip("name", callback)`, which is identical
 
 This returns the current Thallium instance, for chaining.
 
-### t.test("name")
+### t.test("name"), t.testSkip("name")
 
 Similar to `t.test("name", callback)`, but instead, it returns a new Thallium instance that you can chain assertions and other things with as a simple inline subtest.
 
@@ -53,9 +65,9 @@ Do note that the assertions are run on a separate event loop tick, even though t
 
 You can skip inline tests with `t.testSkip("name")`, which is identical except the test is reported as skipped instead.
 
-### t.async("name", callback)
+### t.async("name", callback), t.asyncSkip("name", callback)
 
-This defines an asynchronous test. The callback can either take an extra `done` argument, return a thenable, or return an iterator of thenables and/or plain objects. Generators work as callbacks.
+This defines an asynchronous test. The callback can either take an extra `done` argument, return a thenable, or return an iterator of thenables and/or plain objects. Generators work as callbacks. Also, it does detect extra `done` calls and reports them accordingly.
 
 ```js
 const fs = require("fs")
@@ -128,80 +140,7 @@ You can skip async tests with `t.asyncSkip("name", callback)`, which is identica
 
 This returns the current Thallium instance, for chaining.
 
-### t.do(func)
-
-These run a function when the assertions are being run, and is guaranteed to report errors thrown as within that test. This is probably mostly useful for plugin authors dealing with inline tests, for simple setup and/or cleanup within those. Note that it isn't safe to call API methods within this, though.
-
-```js
-t.test("test")
-.do(foo.initValue)
-.equal(foo.getValue(), "something")
-```
-
-Note that the callback is called with `undefined` as `this` and no arguments. The callback is *not* a plugin, and won't be treated as such.
-
-This returns the current Thallium instance, for chaining.
-
-## Settings-related methods
-
-These are merely getting and/or changing settings for running the tests. All of these are scoped to their respective test (and child tests).
-
-### t.use(...plugins)
-
-Use one or more [plugins](./plugins.md). These can be single plugins, an array of plugins, or even multiple complex nested arrays of plugins.
-
-This returns the current Thallium instance, for chaining.
-
-### t.reporter(...reporters)
-
-Use one or more [reporters](./reporters.md). These can be single reporters, an array of reporters, or even multiple complex nested arrays of reporters.
-
-This returns the current Thallium instance, for chaining.
-
-### t.reporters()
-
-Get a list of all active reporters for this test, including this test's own reporters and all inherited ones.
-
-### t.timeout(timeout)
-
-Set the max timeout for a test. This is used only by `t.async()` to know how long to wait before it should fail the test. Set the timeout to `0` to inherit the parent's timeout. If the timeout is negative, it will be rounded 0.
-
-This returns the current Thallium instance, for chaining.
-
-### t.timeout()
-
-Get the currently active max timeout for a test.
-
-### t.only(...paths)
-
-Only run tests that are inside this path. This can be set for a parent test or even subtests. It's much like Mocha's `--grep`, but more flexible. Also, only the whitelisted tests specified in the `paths` run.
-
-The `paths` are used as an exclusive union of tests and their children to run.
-
-```js
-t.only(["one"], ["two", "inner 1"])
-
-t.test("one", t => {
-    t.test("inner").equal(1, 1)
-})
-
-t.test("two", t => {
-    t.test("inner 1").equal(0, 0)
-
-    // Doesn't run
-    t.test("inner 2").equal(0, 1)
-})
-```
-
-Do note that this must be run *before* the test in question can initialize, because it changes the implementation when the test is created. If your path involves more than one part, it won't matter in practice, but it does affect things if it only contains one part.
-
-Also, empty arrays match no test, and passing no arguments will prevent all tests from running.
-
-## Reflective methods
-
-Most of these are probably only interesting if you're writing [plugins](./plugins.md).
-
-### t.define("assertion", callback), t.define(methods)
+### t.define("assertion", callback), t.define({assertion: callback})
 
 Define one or more assertions on this Thallium instance. It either accepts a string `name` and a callback or an object with various methods. Either style is equivalent.
 
@@ -277,48 +216,149 @@ t.test "define", ->
 t.myAssert 1, 1 # ReferenceError: method not defined here
 ```
 
-Ad-hoc assertions are most definitely permitted, and the API is made for this to be easy.
+Ad-hoc assertions are most definitely okay, and the API is made for this to be easy.
+
+Do note that if you specify the name of any of the API methods, an error will be thrown, so you don't accidentally change things that others may depend on.
 
 This returns the current Thallium instance, for chaining. Note that it isn't safe to call API methods within the callback.
 
-### t.wrap("method", callback), t.wrap(methods)
+### t.use(...plugins)
 
-Wrap one or more methods on this Thallium instance. It either accepts a string `name` and a callback or an object with various methods. Either style is equivalent.
+Use one or more [plugins](./plugins.md). For memory reasons, you can't use the same plugin twice on the same test without wrapping it.
 
-When the method is called, the callback is called with the original function bound to the current instance and whatever arguments were passed to the original function, unmodified. `this` is `undefined` in the callback.
+This returns the current Thallium instance, for chaining.
 
-Note that this throws an error early if the method doesn't already exist.
+### t.reporter(...reporters)
 
-### t.add("method", callback), t.wrap(methods)
+Use one or more [reporters](./reporters.md).
+
+Note that if you add a reporter to a child test, it becomes the primary set, but I plan on fixing this inconsistency.
+
+This returns the current Thallium instance, for chaining.
+
+### t.timeout(timeout)
+
+Set the max timeout for a test. This is used only by `t.async()` to know how long to wait before it should fail the test. Set the timeout to `0` to inherit the parent's timeout. If the timeout is negative, it will be rounded 0.
+
+This returns the current Thallium instance, for chaining.
+
+### t.only(...paths)
+
+Only run tests that are inside this path. This can be set for a parent test or even subtests. It's much like Mocha's `--grep`, but more flexible. Also, only the whitelisted tests specified in the `paths` run.
+
+The `paths` are used as an exclusive union of tests and their children to run.
+
+```js
+t.only(["one"], ["two", "inner 1"])
+
+t.test("one", t => {
+    t.test("inner").equal(1, 1)
+})
+
+t.test("two", t => {
+    t.test("inner 1").equal(0, 0)
+
+    // Doesn't run
+    t.test("inner 2").equal(0, 1)
+})
+```
+
+Do note that this must be run *before* the test in question can initialize, because it changes the implementation when the test is created. If your path involves more than one part, it won't matter in practice, but it does affect things if it only contains one part.
+
+Also, empty arrays match no test, and passing no arguments will prevent all tests from running.
+
+## Reflection
+
+Most of these are probably only interesting if you're writing [plugins](./plugins.md). They permit some more low-level introspection of individual tests, and make it easier to do some of the other things you need to do.
+
+### t.reflect()
+
+Get a Reflect instance for access into the various introspection APIs.
+
+### reflect.define("assertion", callback), reflect.define({assertion: callback})
+
+This has the same effect as calling `t.define()` with the same arguments, although if `t.define()` was changed at any point, this will always point to the original, so it carries stronger guarantees. Also, this returns `undefined` instead of the current instance.
+
+### reflect.do(func)
+
+These run a function when the assertions are being run, and is guaranteed to report errors thrown as within that test. This is probably mostly useful for plugin authors dealing with inline tests, for simple setup and/or cleanup within those. Note that it isn't safe to call API methods within this, though.
+
+```js
+t.test("test")
+.do(foo.initValue)
+.equal(foo.getValue(), "something")
+```
+
+Note that the callback is called with `undefined` as `this` and no arguments. The callback is *not* a plugin, and won't be treated as such.
+
+### reflect.wrap("method", callback), reflect.wrap({method: callback})
+
+Wrap one or more existing methods on this Thallium instance. It either accepts a string `name` and a callback or an object with various methods. Either style is equivalent.
+
+When the method is called, the callback is called with the original function bound to the current instance and whatever arguments were passed to the original function, unmodified. `this` is the current instance in the callback.
+
+Note that this throws an error early if the method doesn't already exist, or if it's either `reflect` or `_`.
+
+### reflect.add("method", callback), reflect.wrap({method: callback})
 
 Add one or more methods to this Thallium instance. It either accepts a string `name` and a callback or an object with various methods. Either style is equivalent.
 
-When the method is called, the callback is called with the current instance (which is also passed as `this`) and whatever arguments were passed to the original function, unmodified.
+When the method is called, the callback is called with the current instance (which is also passed as `this`) followed by whatever arguments were passed to the original function, unmodified.
 
-### class t.AssertionError(message, expected, actual)
+Note that this throws an error early if the method already exists (even if it's inherited), or if it's either `reflect` or `_`.
 
-This is the base AssertionError constructor, largely derived from [`assertion-error`](http://npm.im/assertion-error), but specialized for this module. Chances are, you probably have no need of this unless you're writing a plugin, but it's exported just in case.
+### class reflect.AssertionError(message, expected, actual)
 
-### t.base()
+This is a reference to the base AssertionError constructor, largely derived from [`assertion-error`](http://npm.im/assertion-error), but specialized for this module.
+
+### reflect.base()
 
 Create a new, entirely separate Thallium test instance. This is mostly used for testing, but it's exposed for anyone who needs it. It's like an uncached `require("thallium/core")`.
 
-### t.parent()
+### reflect.parent()
 
-Get the parent instance of this instance. If this is the base Thallium instance (i.e. the result of `t.base()` or one of the core exports), then this will return `undefined`.
+Get the parent instance of this instance. If this is the base Thallium instance (i.e. the result of `reflect.base()` or one of the core exports), then this will return `undefined`.
 
-### t.inline()
+### reflect.methods()
 
-Check if this is an inline test (i.e. defined as `t.test("test").equal(1, 1)`). This is mostly intended for plugin authors.
+Get the associated methods of this instance, as in where the reflect instance came from.
 
-### t.checkInit()
+### reflect.runnable()
 
-Assert that this test is still being initialized. Unless you're writing a [plugin](./plugins.md), you probably will never need this. An equivalent is called by every core method except for the following (all pure accessors except for `t.base()`):
+Check if this is a runnable test (i.e. not blacklisted by `t.only()` or skipped).
 
-- `t.reporters()`
-- `t.timeout()`
-- `t.base()`
-- `t.parent()`
-- `t.inline()`
+### reflect.skipped()
 
-This aids in [safety](./safety.md), which this framework does help.
+Check if this is a skipped test (i.e. defined by `t.testSkip("test")`, etc.).
+
+### reflect.skipped()
+
+Check if this is a root test. This is true at the global scope and for any result of `reflect.base()`.
+
+### reflect.inline()
+
+Check if this is an inline test (i.e. defined as `t.test("test").equal(1, 1)`).
+
+### reflect.async()
+
+Check if this is an async test (i.e. defined as `t.async("test", callback)`).
+
+### reflect.checkInit()
+
+Assert that this test is currently being initialized. If you are doing an operation that is affected by test state, you *must* check this so your users don't get surprised by their tests accidentally getting in an invalid state. If you're using `reflect.add()` or `reflect.define()`/`t.define()`, this is already done for you, so you probably won't be calling this directly very often.
+
+### reflect.reporters()
+
+Get a list of all own reporters, or an empty list if there were none.
+
+### reflect.activeReporters()
+
+Get the currently active reporter list.
+
+### reflect.timeout()
+
+Get the own timeout, or 0 if it's inherited or `Infinity` if it was disabled.
+
+### reflect.activeReporters()
+
+Get the currently active timeout, or the framework default of 2000 ms.

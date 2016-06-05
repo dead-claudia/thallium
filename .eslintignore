@@ -2,3 +2,4 @@ node_modules
 
 # Thallium uses dot files for its configs, and these need tested.
 !fixtures/**/.*
+!playground/**/.*

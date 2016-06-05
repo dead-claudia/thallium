@@ -9,70 +9,76 @@ Promise = require 'bluebird'
 t = require 'thallium'
 
 t.test 'core (basic)', ->
-    @test('has `base()`').equal @base().base, @base
-    @test('has `test()`').function @base().test
+    @test 'reflect()', ->
+        @test('exists').function @reflect
+        @test('has base()').function @reflect().base
 
-    @test 'has `parent()`', ->
-        tt = @base()
-        @hasKey tt, 'parent'
-        @function tt.parent
-        @equal tt.test('test').parent(), tt
-        @undefined tt.parent()
+        @test 'has parent()', ->
+            tt = @reflect().base()
 
-    @test 'can accept a string + function', ->
-        @base().test 'test', ->
+            @undefined tt.reflect().parent()
+            @equal tt.test('test').reflect().parent(), tt
 
-    @test 'can accept a string', ->
-        @base().test 'test'
+    @test 'test()', ->
+        @test('exists').function @reflect().base().test
 
-    @test 'returns the current instance when given a callback', ->
-        tt = @base()
-        test = tt.test 'test', ->
-        @equal(test, tt)
+        @test 'accepts a string + function', ->
+            tt = @reflect().base()
+            tt.test 'test', ->
 
-    @test 'returns a prototypal clone when not given a callback', ->
-        tt = @base()
-        test = tt.test('test')
+        @test 'accepts a string', ->
+            tt = @reflect().base()
+            tt.test('test')
 
-        @notEqual test, tt
-        @equal Object.getPrototypeOf(test), tt
+        @test 'returns the current instance when given a callback', ->
+            tt = @reflect().base()
+            test = tt.test 'test', ->
+            @equal test, tt
 
-    @async 'runs block tests within tests', ->
-        tt = @base()
-        called = 0
+        @test 'returns a prototypal clone when not given a callback', ->
+            tt = @reflect().base()
+            test = tt.test('test')
 
-        tt.test 'test', ->
-            @test 'foo', -> called++
+            @notEqual test, tt
+            @equal Object.getPrototypeOf(test), tt
 
-        tt.run().then => @equal(called, 1)
+    @test 'run()', ->
+        @test('exists').function @reflect().base().run
 
-    @async 'runs successful inline tests within tests', ->
-        tt = @base()
-        err = undefined
+        @async 'runs block tests within tests', ->
+            tt = @reflect().base()
+            called = 0
 
-        tt.reporter (res, done) ->
-            if res.type is 'fail'
-                err = res.value
+            tt.test 'test', ->
+                @test 'foo', -> called++
 
-            done()
+            tt.run().then => @equal called, 1
 
-        tt.test 'test', ->
-            @test('foo').use ->
+        @async 'runs successful inline tests within tests', ->
+            tt = @reflect().base()
+            err = undefined
 
-        tt.run().then => @notOk(err)
+            tt.reporter (res, done) ->
+                if res.type is 'fail'
+                    err = res.value
+                done()
 
-    @async 'accepts a callback with `t.run()`', ->
-        tt = @base()
-        err = undefined
+            tt.test 'test', ->
+                @test('foo').use ->
 
-        tt.reporter (res, done) ->
-            if res.type is 'fail'
-                err = res.value
+            tt.run().then => @notOk err
 
-            done()
+        @async 'accepts a callback', ->
+            tt = @reflect().base()
+            err = undefined
 
-        tt.test 'test', ->
-            @test('foo').use ->
+            tt.reporter (res, done) ->
+                if res.type is 'fail'
+                    err = res.value
+                done()
 
-        Promise.fromCallback (cb) -> tt.run(cb)
-        .then => @notOk(err)
+            tt.test 'test', ->
+                @test('foo').use ->
+
+            Promise.fromCallback (cb) -> tt.run(cb)
+            .then => @notOk err

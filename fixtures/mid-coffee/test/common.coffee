@@ -114,7 +114,7 @@ t.test 'cli common', ->
     @test 'normalizeGlob()', ->
         {normalizeGlob} = Common
 
-        @add 'check', (_, name, base, {file, glob, dir, negate, negateDir}) ->
+        check = (name, base, {file, glob, dir, negate, negateDir}) =>
             @test name, ->
                 @test 'normalizes a file', ->
                     @equal normalizeGlob(file[0], base), p(file[1])
@@ -131,21 +131,21 @@ t.test 'cli common', ->
                 @test 'retains negative + trailing slashes', ->
                     @equal normalizeGlob(negateDir[0], base), p(negateDir[1])
 
-        @check 'current directory', '.',
+        check 'current directory', '.',
             file: ['a', 'a']
             glob: ['a/*.js', 'a/*.js']
             dir: ['a/*/', 'a/*/']
             negate: ['!a/*', '!a/*']
             negateDir: ['!a/*/', '!a/*/']
 
-        @check 'absolute directory', __dirname,
+        check 'absolute directory', __dirname,
             file: ['a', path.resolve(__dirname, 'a')]
             glob: ['a/*.js', path.resolve(__dirname, 'a/*.js')]
             dir: ['a/*/', path.resolve(__dirname, 'a/*') + '/']
             negate: ['!a/*', '!' + path.resolve(__dirname, 'a/*')]
             negateDir: ['!a/*/', '!' + path.resolve(__dirname, 'a/*') + '/']
 
-        @check 'relative directory', 'foo',
+        check 'relative directory', 'foo',
             file: ['a', 'foo/a']
             glob: ['a/*.js', 'foo/a/*.js']
             dir: ['a/*/', 'foo/a/*/']

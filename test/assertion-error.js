@@ -1,12 +1,12 @@
 "use strict"
 
 var inspect = require("util").inspect
-var AssertionError = require("../index.js").AssertionError
+var AssertionError = require("../index.js").reflect().AssertionError
 
 describe("class AssertionError", function () {
     it("is an error", function () {
         if (!(new AssertionError("message") instanceof Error)) {
-            throw new Error("Expected t.AssertionError to subclass Error")
+            throw new Error("Expected AssertionError to subclass Error")
         }
     })
 

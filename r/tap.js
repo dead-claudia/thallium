@@ -3,7 +3,7 @@
 // This is a basic TAP-generating reporter.
 
 var Promise = require("bluebird")
-var methods = require("../lib/common.js").methods
+var methods = require("../lib/methods.js")
 var R = require("../lib/reporter/index.js")
 var inspect = require("util").inspect
 

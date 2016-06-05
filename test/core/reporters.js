@@ -25,16 +25,16 @@ describe("core (reporters)", function () { // eslint-disable-line max-statements
     }
 
     it("added individually correctly", function () {
-        var tt = t.base()
+        var tt = t.reflect().base()
 
         function plugin() {}
 
         tt.reporter(plugin)
-        t.match(tt.reporters(), [plugin])
+        t.match(tt.reflect().reporters(), [plugin])
     })
 
     it("added in batches correctly", function () {
-        var tt = t.base()
+        var tt = t.reflect().base()
 
         function plugin1() {}
         function plugin2() {}
@@ -42,14 +42,14 @@ describe("core (reporters)", function () { // eslint-disable-line max-statements
         function plugin4() {}
         function plugin5() {}
 
-        tt.reporter([plugin1, plugin2, [[plugin3], plugin4], [[[plugin5]]]])
-        t.match(tt.reporters(), [
-            plugin1, plugin2, plugin3, plugin4, plugin5,
-        ])
+        tt.reporter(plugin1, plugin2, plugin3, plugin4, plugin5)
+        t.match(
+            tt.reflect().reporters(),
+            [plugin1, plugin2, plugin3, plugin4, plugin5])
     })
 
     it("added on children correctly", function () {
-        var tt = t.base()
+        var tt = t.reflect().base()
 
         function plugin1() {}
         function plugin2() {}
@@ -61,16 +61,20 @@ describe("core (reporters)", function () { // eslint-disable-line max-statements
         tt.reporter(plugin6)
 
         var ttt = tt.test("test")
-        .reporter([plugin1, plugin2, [[plugin3], plugin4], [[[plugin5]]]])
+        .reporter(plugin1, plugin2, plugin3, plugin4, plugin5)
 
-        t.match(ttt.reporters(), [
-            plugin1, plugin2, plugin3, plugin4, plugin5,
-        ])
-        t.match(tt.reporters(), [plugin6])
+        t.match(
+            ttt.reflect().reporters(),
+            [plugin1, plugin2, plugin3, plugin4, plugin5])
+
+        t.match(
+            ttt.reflect().activeReporters(),
+            [plugin1, plugin2, plugin3, plugin4, plugin5])
+        t.match(tt.reflect().reporters(), [plugin6])
     })
 
     it("read on children correctly", function () {
-        var tt = t.base()
+        var tt = t.reflect().base()
 
         function plugin1() {}
         function plugin2() {}
@@ -78,29 +82,32 @@ describe("core (reporters)", function () { // eslint-disable-line max-statements
         function plugin4() {}
         function plugin5() {}
 
-        tt.reporter([plugin1, plugin2, [[plugin3], plugin4], [[[plugin5]]]])
+        tt.reporter(plugin1, plugin2, plugin3, plugin4, plugin5)
         var ttt = tt.test("test")
 
-        t.match(ttt.reporters(), [
-            plugin1, plugin2, plugin3, plugin4, plugin5,
-        ])
+        t.match(ttt.reflect().reporters(), [])
+
+        t.match(
+            ttt.reflect().activeReporters(),
+            [plugin1, plugin2, plugin3, plugin4, plugin5])
     })
 
     it("only added once", function () {
-        var tt = t.base()
+        var tt = t.reflect().base()
 
         function plugin1() {}
         function plugin2() {}
         function plugin3() {}
 
-        tt.reporter([plugin1, plugin2, plugin3])
-        tt.reporter([plugin3, plugin1])
+        tt.reporter(plugin1, plugin2, plugin3)
+        tt.reporter(plugin3, plugin1)
 
-        t.match(tt.reporters(), [plugin1, plugin2, plugin3])
+        t.match(tt.reflect().reporters(), [plugin1, plugin2, plugin3])
+        t.match(tt.reflect().activeReporters(), [plugin1, plugin2, plugin3])
     })
 
     it("called correctly with sync passing", function () {
-        var tt = t.base()
+        var tt = t.reflect().base()
         var ret = []
 
         tt.reporter(Util.push(ret))
@@ -119,7 +126,7 @@ describe("core (reporters)", function () { // eslint-disable-line max-statements
     })
 
     it("called correctly with sync failing", function () {
-        var tt = t.base()
+        var tt = t.reflect().base()
         var ret = []
         var sentinel = createSentinel("sentinel")
 
@@ -139,7 +146,7 @@ describe("core (reporters)", function () { // eslint-disable-line max-statements
     })
 
     it("called correctly with sync both", function () {
-        var tt = t.base()
+        var tt = t.reflect().base()
         var ret = []
         var sentinel = createSentinel("sentinel")
 
@@ -159,7 +166,7 @@ describe("core (reporters)", function () { // eslint-disable-line max-statements
     })
 
     it("called correctly with inline passing", function () {
-        var tt = t.base()
+        var tt = t.reflect().base()
         var ret = []
 
         tt.reporter(Util.push(ret))
@@ -178,7 +185,8 @@ describe("core (reporters)", function () { // eslint-disable-line max-statements
     })
 
     it("called correctly with inline failing", function () {
-        var tt = t.base()
+        var AssertionError = t.reflect().AssertionError
+        var tt = t.reflect().base()
         var ret = []
 
         tt.reporter(Util.push(ret))
@@ -191,15 +199,16 @@ describe("core (reporters)", function () { // eslint-disable-line max-statements
         return tt.run().then(function () {
             t.match(ret, [
                 n("start", []),
-                n("fail", [p("one", 0)], new t.AssertionError("fail")),
-                n("fail", [p("two", 1)], new t.AssertionError("fail")),
+                n("fail", [p("one", 0)], new AssertionError("fail")),
+                n("fail", [p("two", 1)], new AssertionError("fail")),
                 n("end", []),
             ])
         })
     })
 
     it("called correctly with inline both", function () {
-        var tt = t.base()
+        var AssertionError = t.reflect().AssertionError
+        var tt = t.reflect().base()
         var ret = []
 
         tt.reporter(Util.push(ret))
@@ -212,7 +221,7 @@ describe("core (reporters)", function () { // eslint-disable-line max-statements
         return tt.run().then(function () {
             t.match(ret, [
                 n("start", []),
-                n("fail", [p("one", 0)], new t.AssertionError("fail")),
+                n("fail", [p("one", 0)], new AssertionError("fail")),
                 n("pass", [p("two", 1)]),
                 n("end", []),
             ])
@@ -220,7 +229,7 @@ describe("core (reporters)", function () { // eslint-disable-line max-statements
     })
 
     it("called correctly with async passing", function () {
-        var tt = t.base()
+        var tt = t.reflect().base()
         var ret = []
 
         tt.reporter(Util.push(ret))
@@ -239,7 +248,7 @@ describe("core (reporters)", function () { // eslint-disable-line max-statements
     })
 
     it("called correctly with async failing", function () {
-        var tt = t.base()
+        var tt = t.reflect().base()
         var ret = []
         var sentinel = createSentinel("sentinel")
 
@@ -259,7 +268,7 @@ describe("core (reporters)", function () { // eslint-disable-line max-statements
     })
 
     it("called correctly with async both", function () {
-        var tt = t.base()
+        var tt = t.reflect().base()
         var ret = []
         var sentinel = createSentinel("sentinel")
 
@@ -279,7 +288,7 @@ describe("core (reporters)", function () { // eslint-disable-line max-statements
     })
 
     it("called correctly with async + promise passing", function () {
-        var tt = t.base()
+        var tt = t.reflect().base()
         var ret = []
 
         tt.reporter(Util.push(ret))
@@ -298,7 +307,7 @@ describe("core (reporters)", function () { // eslint-disable-line max-statements
     })
 
     it("called correctly with async + promise failing", function () {
-        var tt = t.base()
+        var tt = t.reflect().base()
         var ret = []
         var sentinel = createSentinel("sentinel")
 
@@ -318,7 +327,7 @@ describe("core (reporters)", function () { // eslint-disable-line max-statements
     })
 
     it("called correctly with async + promise both", function () {
-        var tt = t.base()
+        var tt = t.reflect().base()
         var ret = []
         var sentinel = createSentinel("sentinel")
 
@@ -338,7 +347,7 @@ describe("core (reporters)", function () { // eslint-disable-line max-statements
     })
 
     it("called correctly with child passing tests", function () {
-        var tt = t.base()
+        var tt = t.reflect().base()
         var ret = []
 
         tt.reporter(Util.push(ret))
@@ -361,7 +370,7 @@ describe("core (reporters)", function () { // eslint-disable-line max-statements
     })
 
     it("called correctly with child failing tests", function () {
-        var tt = t.base()
+        var tt = t.reflect().base()
         var ret = []
         var sentinel1 = createSentinel("sentinel one")
         var sentinel2 = createSentinel("sentinel two")
@@ -395,7 +404,7 @@ describe("core (reporters)", function () { // eslint-disable-line max-statements
     })
 
     it("called correctly with child both", function () {
-        var tt = t.base()
+        var tt = t.reflect().base()
         var ret = []
         var sentinel1 = createSentinel("sentinel one")
         var sentinel2 = createSentinel("sentinel two")
@@ -429,7 +438,7 @@ describe("core (reporters)", function () { // eslint-disable-line max-statements
     })
 
     it("called correctly with subtest run", function () {
-        var tt = t.base()
+        var tt = t.reflect().base()
         var ret = []
 
         tt.reporter(Util.push(ret))
@@ -446,7 +455,8 @@ describe("core (reporters)", function () { // eslint-disable-line max-statements
     })
 
     it("called correctly with complex sequence", function () {
-        var tt = t.base()
+        var AssertionError = t.reflect().AssertionError
+        var tt = t.reflect().base()
         var ret = []
         var sentinel = createSentinel("sentinel")
 
@@ -483,8 +493,8 @@ describe("core (reporters)", function () { // eslint-disable-line max-statements
             tt.test("expandos don't transfer").notHasKey(tt, "foo")
         })
 
-        var fail1 = new t.AssertionError("Expected 1 to not equal 1", 1, 1)
-        var fail2 = new t.AssertionError("Expected 1 to equal 2", 2, 1)
+        var fail1 = new AssertionError("Expected 1 to not equal 1", 1, 1)
+        var fail2 = new AssertionError("Expected 1 to equal 2", 2, 1)
 
         return tt.run().then(function () {
             t.match(ret, [
@@ -508,7 +518,7 @@ describe("core (reporters)", function () { // eslint-disable-line max-statements
     })
 
     it("can return a resolving thenable", function () {
-        var tt = t.base()
+        var tt = t.reflect().base()
         var ret = []
 
         tt.reporter(function (entry) {
@@ -534,7 +544,7 @@ describe("core (reporters)", function () { // eslint-disable-line max-statements
     })
 
     it("can return a rejecting thenable", function () {
-        var tt = t.base()
+        var tt = t.reflect().base()
         var sentinel = createSentinel("sentinel")
 
         tt.reporter(function () {
@@ -550,7 +560,7 @@ describe("core (reporters)", function () { // eslint-disable-line max-statements
     })
 
     it("reports reporter errors", function () {
-        var tt = t.base()
+        var tt = t.reflect().base()
         var sentinel = createSentinel("sentinel")
         var reported
 
@@ -571,9 +581,8 @@ describe("core (reporters)", function () { // eslint-disable-line max-statements
     // This is a bit too tightly coupled to the implementation than I'd normally
     // be comfortable with...
     it("reports internal errors", function () {
-        var tt = t.base()
+        var tt = t.reflect().base()
         var sentinel = createSentinel("sentinel")
-        var old = tt._.run
         var reported
 
         tt.reporter(function (ev, done) {
@@ -581,9 +590,9 @@ describe("core (reporters)", function () { // eslint-disable-line max-statements
             return done()
         })
 
-        tt._.run = function () {
-            return old.call(tt._).throw(sentinel)
-        }
+        var ttt = tt.test("test")
+
+        ttt._.state.init = function () { throw sentinel }
 
         return tt.run().then(
             function () { t.fail("Expected a rejection") },
@@ -591,5 +600,91 @@ describe("core (reporters)", function () { // eslint-disable-line max-statements
                 t.equal(rejected, sentinel)
                 t.equal(reported, sentinel)
             })
+    })
+
+    it("has repeatable output", function () {
+        var AssertionError = t.reflect().AssertionError
+        var tt = t.reflect().base()
+        var ret = []
+        var sentinel = createSentinel("sentinel")
+
+        tt.reporter(Util.push(ret))
+        tt.use(assertions)
+
+        tt.test("mod-one", function (tt) {
+            tt.test("1 === 1").equal(1, 1)
+
+            tt.test("foo()", function (tt) {
+                tt.foo = 1
+                tt.notEqual(1, 1)
+            })
+
+            tt.async("bar()", function (t, done) {
+                global.setTimeout(function () { done(new Error("fail")) }, 0)
+            })
+
+            tt.async("baz()", function () {
+                return {
+                    then: function (_, reject) {
+                        global.setTimeout(function () { reject(sentinel) }, 0)
+                    },
+                }
+            })
+
+            tt.test("nested", function (tt) {
+                tt.test("nested 2", function (tt) { tt.true(true) })
+            })
+        })
+
+        tt.test("mod-two", function (tt) {
+            tt.test("1 === 2").equal(1, 2)
+            tt.test("expandos don't transfer").notHasKey(tt, "foo")
+        })
+
+        var fail1 = new AssertionError("Expected 1 to not equal 1", 1, 1)
+        var fail2 = new AssertionError("Expected 1 to equal 2", 2, 1)
+
+        return tt.run().then(function () {
+            t.match(ret, [
+                n("start", []),
+                n("enter", [p("mod-one", 0)]),
+                n("pass", [p("mod-one", 0), p("1 === 1", 0)]),
+                n("fail", [p("mod-one", 0), p("foo()", 1)], fail1),
+                n("fail", [p("mod-one", 0), p("bar()", 2)], new Error("fail")),
+                n("fail", [p("mod-one", 0), p("baz()", 3)], sentinel),
+                n("enter", [p("mod-one", 0), p("nested", 4)]),
+                n("pass", [p("mod-one", 0), p("nested", 4), p("nested 2", 0)]),
+                n("leave", [p("mod-one", 0), p("nested", 4)]),
+                n("leave", [p("mod-one", 0)]),
+                n("enter", [p("mod-two", 1)]),
+                n("fail", [p("mod-two", 1), p("1 === 2", 0)], fail2),
+                n("pass", [p("mod-two", 1), p("expandos don't transfer", 1)]),
+                n("leave", [p("mod-two", 1)]),
+                n("end", []),
+            ])
+        })
+        .then(function () {
+            while (ret.length) ret.pop()
+            return tt.run()
+        })
+        .then(function () {
+            t.match(ret, [
+                n("start", []),
+                n("enter", [p("mod-one", 0)]),
+                n("pass", [p("mod-one", 0), p("1 === 1", 0)]),
+                n("fail", [p("mod-one", 0), p("foo()", 1)], fail1),
+                n("fail", [p("mod-one", 0), p("bar()", 2)], new Error("fail")),
+                n("fail", [p("mod-one", 0), p("baz()", 3)], sentinel),
+                n("enter", [p("mod-one", 0), p("nested", 4)]),
+                n("pass", [p("mod-one", 0), p("nested", 4), p("nested 2", 0)]),
+                n("leave", [p("mod-one", 0), p("nested", 4)]),
+                n("leave", [p("mod-one", 0)]),
+                n("enter", [p("mod-two", 1)]),
+                n("fail", [p("mod-two", 1), p("1 === 2", 0)], fail2),
+                n("pass", [p("mod-two", 1), p("expandos don't transfer", 1)]),
+                n("leave", [p("mod-two", 1)]),
+                n("end", []),
+            ])
+        })
     })
 })

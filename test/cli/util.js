@@ -22,31 +22,46 @@ describe("cli fs utils", function () {
     describe("load()", function () {
         it("works", function () {
             process.chdir(__dirname)
-            t.equal(Util.load(fixture("util/test-module.js")), "hi!")
+            return Util.load(fixture("util/test-module.js"))
+            .then(function (result) {
+                t.match(result, {exports: "hi!"})
+            })
         })
     })
 
-    describe("exists()", function () {
+    describe("stat()", function () {
         it("checks files", function () {
             process.chdir(__dirname)
-            t.true(Util.exists(fixture("util/test-module.js")))
+            return Util.stat(fixture("util/test-module.js"))
+            .then(function (stat) {
+                t.true(stat.isFile())
+                t.false(stat.isDirectory())
+            })
         })
 
         it("checks directories", function () {
             process.chdir(__dirname)
-            t.false(Util.exists(fixture("util")))
+            return Util.stat(fixture("util"))
+            .then(function (stat) {
+                t.false(stat.isFile())
+                t.true(stat.isDirectory())
+            })
         })
 
         it("checks things that don't exist", function () {
             process.chdir(__dirname)
-            t.false(Util.exists(fixture("util/nope.js")))
+            return Util.stat(fixture("util/nope.js"))
+            .then(function (stat) {
+                t.false(stat.isFile())
+                t.false(stat.isDirectory())
+            })
         })
     })
 
     describe("readGlob()", function () {
         it("works", function () {
             process.chdir(__dirname)
-            return Util.readGlob(fixture("util/test-glob/*.js"))
+            return Util.readGlob([fixture("util/test-glob/*.js")])
             .then(function () {
                 process.chdir(fixture("util/test-glob"))
                 t.equal(require.cache[path.resolve("foo.js")].exports, "foo")

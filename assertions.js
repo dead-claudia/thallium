@@ -5,7 +5,7 @@
  * there is *so* much repetition.
  */
 
-var Util = require("./lib/common.js")
+var Util = require("./lib/util.js")
 var deepEqualImpl = require("./lib/deep-equal.js")
 
 var toString = Object.prototype.toString
@@ -67,38 +67,38 @@ define("fail", function (message) {
  * These makes many of the common operators much easier to do.
  */
 function unary(name, func, messages) {
-    define(name, function (x) {
+    define(name, function (value) {
         return {
-            test: func(x),
-            actual: x,
+            test: func(value),
+            actual: value,
             message: messages[0],
         }
     })
 
-    define(negate(name), function (x) {
+    define(negate(name), function (value) {
         return {
-            test: !func(x),
-            actual: x,
+            test: !func(value),
+            actual: value,
             message: messages[1],
         }
     })
 }
 
 function binary(name, func, messages) {
-    define(name, function (a, b) {
+    define(name, function (actual, expected) {
         return {
-            test: func(a, b),
-            actual: a,
-            expected: b,
+            test: func(actual, expected),
+            actual: actual,
+            expected: expected,
             message: messages[0],
         }
     })
 
-    define(negate(name), function (a, b) {
+    define(negate(name), function (actual, expected) {
         return {
-            test: !func(a, b),
-            actual: a,
-            expected: b,
+            test: !func(actual, expected),
+            actual: actual,
+            expected: expected,
             message: messages[1],
         }
     })

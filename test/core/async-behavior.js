@@ -8,7 +8,7 @@ var p = Util.p
 
 describe("core (asynchronous behavior)", function () {
     it("with normal tests", function () {
-        var tt = t.base()
+        var tt = t.reflect().base()
         var called = false
 
         tt.test("test", function () { called = true })
@@ -20,7 +20,7 @@ describe("core (asynchronous behavior)", function () {
     })
 
     it("with shorthand tests", function () {
-        var tt = t.base()
+        var tt = t.reflect().base()
         var called = false
 
         tt.define("assert", function () {
@@ -37,7 +37,7 @@ describe("core (asynchronous behavior)", function () {
     })
 
     it("with async tests + sync done call", function () {
-        var tt = t.base()
+        var tt = t.reflect().base()
         var called = false
 
         tt.async("test", function (_, done) {
@@ -52,7 +52,7 @@ describe("core (asynchronous behavior)", function () {
     })
 
     it("with async tests + async done call", function () {
-        var tt = t.base()
+        var tt = t.reflect().base()
         var called = false
 
         tt.async("test", function (_, done) {
@@ -67,7 +67,7 @@ describe("core (asynchronous behavior)", function () {
     })
 
     it("with async tests + duplicate thenable resolution", function () {
-        var tt = t.base()
+        var tt = t.reflect().base()
         var called = false
 
         tt.async("test", function () {
@@ -88,7 +88,7 @@ describe("core (asynchronous behavior)", function () {
     })
 
     it("with async tests + duplicate thenable rejection", function () {
-        var tt = t.base()
+        var tt = t.reflect().base()
         var called = false
         var ret = []
         var sentinel = new Error("sentinel")
@@ -121,7 +121,7 @@ describe("core (asynchronous behavior)", function () {
     })
 
     it("with async tests + mixed thenable (resolve first)", function () {
-        var tt = t.base()
+        var tt = t.reflect().base()
         var called = false
         var ret = []
         var sentinel = new Error("sentinel")
@@ -155,7 +155,7 @@ describe("core (asynchronous behavior)", function () {
     })
 
     it("with async tests + mixed thenable (reject first)", function () {
-        var tt = t.base()
+        var tt = t.reflect().base()
         var called = false
         var ret = []
         var sentinel = new Error("sentinel")

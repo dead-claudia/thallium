@@ -3,6 +3,7 @@
 /* eslint-env mocha */
 
 var t = require("../index.js")
+var AssertionError = t.reflect().AssertionError
 
 exports.push = function (ret) {
     return function (arg, done) {
@@ -11,8 +12,8 @@ exports.push = function (ret) {
     }
 }
 
-exports.n = function (type, path, value, slow) {
-    return {type: type, path: path, value: value, slow: !!slow}
+exports.n = function (type, path, value/* , slow */) {
+    return {type: type, path: path, value: value/* , slow: !!slow */}
 }
 
 exports.p = function (name, index) {
@@ -30,13 +31,13 @@ exports.fail = function (name) {
     try {
         t[name].apply(t, args)
     } catch (e) {
-        if (e instanceof t.AssertionError) return
+        if (e instanceof AssertionError) return
         throw e
     }
 
-    throw new t.AssertionError(
+    throw new AssertionError(
         "Expected t." + name + " to throw an AssertionError",
-        t.AssertionError)
+        AssertionError)
 }
 
 exports.basic = function (desc, callback) {

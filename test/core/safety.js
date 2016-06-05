@@ -1,6 +1,6 @@
 "use strict"
 
-var m = require("../../lib/common.js").m
+var m = require("../../lib/messages.js")
 var t = require("../../index.js")
 var Util = require("../../helpers/base.js")
 var p = Util.p
@@ -23,7 +23,7 @@ describe("core (safety)", function () {
     }
 
     it("disallows non-nullish non-functions as `test` impls", function () {
-        var tt = t.base()
+        var tt = t.reflect().base()
 
         t.throws(function () { tt.test("test", 1) }, TypeError)
         t.throws(function () { tt.test("test", 0) }, TypeError)
@@ -54,7 +54,7 @@ describe("core (safety)", function () {
     })
 
     it("disallows non-functions as `async` impls", function () {
-        var tt = t.base()
+        var tt = t.reflect().base()
 
         t.throws(function () { tt.async("test", 1) }, TypeError)
         t.throws(function () { tt.async("test", 0) }, TypeError)
@@ -86,7 +86,7 @@ describe("core (safety)", function () {
     })
 
     it("catches unsafe access", function () {
-        var tt = t.base()
+        var tt = t.reflect().base()
         var ret = []
 
         tt.reporter(Util.push(ret))
@@ -136,7 +136,7 @@ describe("core (safety)", function () {
     })
 
     it("reports extraneous async done", function () {
-        var tt = t.base()
+        var tt = t.reflect().base()
         var ret = []
         var sentinel = createSentinel("sentinel")
 
@@ -162,7 +162,7 @@ describe("core (safety)", function () {
                 }
             }
 
-            t.includesDeepAny(
+            t.includesMatchAny(
                 [3, 4, 5, 6].map(function (i) {
                     var splice1 = n("extra",
                         [p("test", 0), p("inner", 0), p("fail", 0)],
@@ -191,7 +191,7 @@ describe("core (safety)", function () {
     })
 
     it("catches concurrent runs", function () {
-        var tt = t.base()
+        var tt = t.reflect().base()
 
         tt.reporter(noopReporter)
 
@@ -202,7 +202,7 @@ describe("core (safety)", function () {
     })
 
     it("catches concurrent runs when given a callback", function (done) {
-        var tt = t.base()
+        var tt = t.reflect().base()
 
         tt.reporter(noopReporter)
         tt.run(done)
@@ -210,7 +210,7 @@ describe("core (safety)", function () {
     })
 
     it("allows non-concurrent runs with reporter error", function () {
-        var tt = t.base()
+        var tt = t.reflect().base()
         var sentinel = createSentinel("fail")
 
         tt.reporter(function (_, done) { done(sentinel) })

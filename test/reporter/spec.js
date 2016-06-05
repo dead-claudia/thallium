@@ -4,7 +4,7 @@
 // correct, and it will *not* verify this.
 
 var Promise = require("bluebird")
-var resolveAny = require("../../lib/common.js").resolveAny
+var resolveAny = require("../../lib/core/common.js").resolveAny
 var t = require("../../index.js")
 var spec = require("../../r/spec.js")
 var R = require("../../lib/reporter/index.js")
@@ -163,7 +163,8 @@ describe("reporter spec", function () {
             ]),
         })
 
-        var assertion = new t.AssertionError("Expected 1 to equal 2", 1, 2)
+        var AssertionError = t.reflect().AssertionError
+        var assertion = new AssertionError("Expected 1 to equal 2", 1, 2)
 
         test("fail 2 with AssertionError", {
             input: [
@@ -873,7 +874,7 @@ describe("reporter spec", function () {
                 ]),
             })
 
-            var assertion = new t.AssertionError("Expected 1 to equal 2", 1, 2)
+            var assertion = new AssertionError("Expected 1 to equal 2", 1, 2)
 
             test("fail 2 with AssertionError", {
                 input: [

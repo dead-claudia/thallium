@@ -15,11 +15,14 @@ var fs = require("fs")
 
 function help(value) {
     var file = value === "detailed" ? "help-detailed.txt" : "help-simple.txt"
+    var text = fs.readFileSync(path.resolve(__dirname, file), "utf-8")
 
     // Pad the top by a line.
     console.log()
-    console.log(fs.readFileSync(
-        path.resolve(__dirname, "../lib", file), "utf-8"))
+    console.log(
+        process.platform === "win32"
+            ? text.replace(/\n/g, "\r\n")
+            : text)
 }
 
 var args = {
@@ -72,7 +75,8 @@ cp.spawn(process.argv[0], Array.prototype.concat.apply([], [
     [path.resolve(__dirname, "_thallium.js")],
     args.config == null ? [] : ["--config", args.config],
     args.cwd == null ? [] : ["--cwd", args.cwd],
-    args.require.map(function (arg) { return ["--require", arg] }),
+    Array.prototype.concat.apply([],
+        args.require.map(function (arg) { return ["--require", arg] })),
     ["--"],
     rest,
 ]), {
