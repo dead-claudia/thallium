@@ -1,7 +1,5 @@
 "use strict"
 
-var t = require("../../index.js")
-
 describe("cli common", function () {
     describe("isObjectLike()", function () {
         it("passes for objects and functions", function () {})

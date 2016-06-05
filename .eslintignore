@@ -3,3 +3,6 @@ node_modules
 # Thallium uses dot files for its configs, and these need tested.
 !fixtures/**/.*
 !playground/**/.*
+
+# Ignore everything here...none of it's executed, anyways.
+fixtures/glob-stream/**

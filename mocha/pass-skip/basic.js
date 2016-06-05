@@ -1,7 +1,5 @@
 "use strict"
 
-var t = require("../../index.js")
-
 describe("core (basic)", function () {
     it("has `base()`", function () {})
     it("has `test()`", function () {})

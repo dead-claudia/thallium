@@ -1,7 +1,5 @@
 "use strict"
 
-var t = require("../../index.js")
-
 describe("core (timeouts) (FLAKE)", function () {
     it("succeeds with own", function () {})
     it("fails with own", function () {})
