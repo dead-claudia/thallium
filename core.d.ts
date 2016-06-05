@@ -165,6 +165,32 @@ export interface Reflect<T extends Test> {
     add(methods: ObjectMap<AddImpl<T>>): void;
 
     /**
+     * Is this test runnable (i.e. running isn't a no-op).
+     */
+    runnable(): boolean;
+
+    /**
+     * Is this test specifically skipped (created with `t.testSkip()` or
+     * `t.asyncSkip()`).
+     */
+    skipped(): boolean;
+
+    /**
+     * Is this test the root, i.e. top level?
+     */
+    root(): boolean;
+
+    /**
+     * Is this an inline test?
+     */
+    inline(): boolean;
+
+    /**
+     * Is this an async test?
+     */
+    async(): boolean;
+
+    /**
      * Get the parent test.
      */
     parent(): T;

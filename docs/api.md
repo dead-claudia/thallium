@@ -299,7 +299,7 @@ When the method is called, the callback is called with the original function bou
 
 Note that this throws an error early if the method doesn't already exist, or if it's either `reflect` or `_`.
 
-### reflect.add("method", callback), reflect.wrap({method: callback})
+### reflect.add("method", callback), reflect.add({method: callback})
 
 Add one or more methods to this Thallium instance. It either accepts a string `name` and a callback or an object with various methods. Either style is equivalent.
 
@@ -331,9 +331,9 @@ Check if this is a runnable test (i.e. not blacklisted by `t.only()` or skipped)
 
 Check if this is a skipped test (i.e. defined by `t.testSkip("test")`, etc.).
 
-### reflect.skipped()
+### reflect.root()
 
-Check if this is a root test. This is true at the global scope and for any result of `reflect.base()`.
+Check if this is a root test. This is true at the global scope and for any result of `reflect.base()`, but false elsewhere.
 
 ### reflect.inline()
 
