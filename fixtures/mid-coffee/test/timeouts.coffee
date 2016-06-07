@@ -12,11 +12,19 @@ t = require 'thallium'
 # these have been tested against a slower machine, so it should hopefully not
 # be too bad.
 t.test 'core (timeouts) (FLAKE)', ->
+    @reflect().add push: (_, ret) -> (arg, done) =>
+        # Any equality tests on this are inherently flaky.
+        @hasOwn arg, 'speed'
+        @includesAny ['fast', 'medium', 'slow', null], arg.speed
+        arg.speed = null
+        ret.push(arg)
+        done()
+
     @async 'succeeds with own', ->
         tt = @reflect().base()
         ret = []
 
-        tt.reporter Util.push(ret)
+        tt.reporter @push(ret)
 
         tt.async 'test', (_, done) ->
             # It's highly unlikely the engine will take this long to finish.
@@ -34,7 +42,7 @@ t.test 'core (timeouts) (FLAKE)', ->
         tt = @reflect().base()
         ret = []
 
-        tt.reporter Util.push(ret)
+        tt.reporter @push(ret)
 
         tt.async 'test', (_, done) ->
             @timeout 50
@@ -52,7 +60,7 @@ t.test 'core (timeouts) (FLAKE)', ->
         tt = @reflect().base()
         ret = []
 
-        tt.reporter Util.push(ret)
+        tt.reporter @push(ret)
 
         tt.test 'test'
         .timeout 50
@@ -71,7 +79,7 @@ t.test 'core (timeouts) (FLAKE)', ->
         tt = @reflect().base()
         ret = []
 
-        tt.reporter Util.push(ret)
+        tt.reporter @push(ret)
 
         tt.test 'test'
         .timeout 50

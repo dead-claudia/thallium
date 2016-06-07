@@ -520,12 +520,12 @@ describe("core (reporters)", function () { // eslint-disable-line max-statements
     it("can return a resolving thenable", function () {
         var tt = t.reflect().base()
         var ret = []
+        var push = Util.push(ret)
 
-        tt.reporter(function (entry) {
+        tt.reporter(function (arg) {
             return {
                 then: function (resolve) {
-                    ret.push(entry)
-                    return resolve()
+                    push(arg, resolve)
                 },
             }
         })

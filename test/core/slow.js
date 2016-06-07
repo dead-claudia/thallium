@@ -7,15 +7,19 @@ var Util = require("../../helpers/base.js")
 var n = Util.n
 var p = Util.p
 
+function push(ret) {
+    return Util.push(ret, true)
+}
+
 // Note that this entire section may be flaky on slower machines. Thankfully,
 // these have been tested against a slower machine, so it should hopefully not
 // be too bad.
-describe.skip("core (slow) (FLAKE)", function () {
+describe("core (slow) (FLAKE)", function () {
     it("succeeds with own", function () {
         var tt = t.reflect().base()
         var ret = []
 
-        tt.reporter(Util.push(ret))
+        tt.reporter(push(ret))
 
         tt.async("test", function (tt, done) {
             // It's highly unlikely the engine will take this long to finish.
@@ -26,7 +30,28 @@ describe.skip("core (slow) (FLAKE)", function () {
         return tt.run().then(function () {
             t.match(ret, [
                 n("start", []),
-                n("pass", [p("test", 0)]),
+                n("pass", [p("test", 0)], undefined, "fast"),
+                n("end", []),
+            ])
+        })
+    })
+
+    it("hits middle with own", function () {
+        var tt = t.reflect().base()
+        var ret = []
+
+        tt.reporter(push(ret))
+
+        tt.async("test", function (tt, done) {
+            // It's highly unlikely the engine will take this long to finish.
+            tt.slow(100)
+            global.setTimeout(function () { done() }, 60)
+        })
+
+        return tt.run().then(function () {
+            t.match(ret, [
+                n("start", []),
+                n("pass", [p("test", 0)], undefined, "medium"),
                 n("end", []),
             ])
         })
@@ -36,7 +61,7 @@ describe.skip("core (slow) (FLAKE)", function () {
         var tt = t.reflect().base()
         var ret = []
 
-        tt.reporter(Util.push(ret))
+        tt.reporter(push(ret))
 
         tt.async("test", function (tt, done) {
             tt.slow(50)
@@ -47,7 +72,7 @@ describe.skip("core (slow) (FLAKE)", function () {
         return tt.run().then(function () {
             t.match(ret, [
                 n("start", []),
-                n("pass", [p("test", 0)], undefined, true),
+                n("pass", [p("test", 0)], undefined, "slow"),
                 n("end", []),
             ])
         })
@@ -57,7 +82,7 @@ describe.skip("core (slow) (FLAKE)", function () {
         var tt = t.reflect().base()
         var ret = []
 
-        tt.reporter(Util.push(ret))
+        tt.reporter(push(ret))
 
         tt.test("test")
         .slow(50)
@@ -66,8 +91,8 @@ describe.skip("core (slow) (FLAKE)", function () {
         return tt.run().then(function () {
             t.match(ret, [
                 n("start", []),
-                n("enter", [p("test", 0)]),
-                n("pass", [p("test", 0), p("inner", 0)]),
+                n("enter", [p("test", 0)], undefined, "fast"),
+                n("pass", [p("test", 0), p("inner", 0)], undefined, "fast"),
                 n("leave", [p("test", 0)]),
                 n("end", []),
             ])
@@ -78,20 +103,19 @@ describe.skip("core (slow) (FLAKE)", function () {
         var tt = t.reflect().base()
         var ret = []
 
-        tt.reporter(Util.push(ret))
+        tt.reporter(push(ret))
 
         tt.test("test")
         .slow(50)
         .async("inner", function (tt, done) {
-            // It's highly unlikely the engine will take this long to finish.
             global.setTimeout(function () { done() }, 200)
         })
 
         return tt.run().then(function () {
             t.match(ret, [
                 n("start", []),
-                n("enter", [p("test", 0)]),
-                n("pass", [p("test", 0), p("inner", 0)], undefined, true),
+                n("enter", [p("test", 0)], undefined, "fast"),
+                n("pass", [p("test", 0), p("inner", 0)], undefined, "slow"),
                 n("leave", [p("test", 0)]),
                 n("end", []),
             ])
@@ -159,7 +183,7 @@ describe.skip("core (slow) (FLAKE)", function () {
         })
 
         return tt.run().then(function () {
-            t.equal(active, 2000)
+            t.equal(active, 75)
             t.equal(raw, 0)
         })
     })

@@ -51,8 +51,8 @@ See the [documentation](http://github.com/isiahmeadows/thallium/blob/master/docs
 
 This list is in a very rough chronological order.
 
-1. Create basic reporters for ~~TAP,~~ ~~spec,~~ and dot.
-    - I plan on adding browser support + DOM support *after* I write a proper CommonJS loader for the browser. Due to the architecture, I can't load the tests correctly otherwise.
+1. ~~Create basic reporters for TAP, spec, and dot.~~ **Done!**
+    - I plan on adding browser support + DOM support *after* Karma 1.0 is released, because I need a [specific feature](https://github.com/karma-runner/karma/pull/1825) due to the library's architecture.
     - Note that these three are directly blocking 0.1.
 2. Finish documenting this project. This mainly includes the core assertions.
 3. Support flaky tests via first-class retries. This would be enormously useful for several.
