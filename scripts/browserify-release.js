@@ -20,6 +20,7 @@ var modules = {
     "thallium": ["../index.js", "../dist/index.js"],
     "thallium/r/tap": ["../r/tap.js", "../dist/r/tap.js"],
     "thallium/r/spec": ["../r/spec.js", "../dist/r/spec.js"],
+    "thallium/r/dot": ["../r/dot.js", "../dist/r/dot.js"],
 }
 
 Object.keys(modules).forEach(function (name) {
