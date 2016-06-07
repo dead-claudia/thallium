@@ -4,6 +4,7 @@ Thallium comes with a few built-in reporters, but currently, they are a work in 
 
 - `thallium/r/tap` - A [TAP-compatible](https://testanything.org) reporter, for you to use with various tools.
 - `thallium/r/spec` - A reporter modeled very closely to Mocha's default `spec` reporter.
+- `thallium/r/dot` - A reporter modeled very closely to Mocha's default `dot` reporter.
 
 Each built-in reporter must be called like so, and if you don't, you'll get reminded with an error:
 
