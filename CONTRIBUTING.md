@@ -54,8 +54,8 @@ I use [Bluebird](http://bluebirdjs.com) extensively for promises, as it makes co
 
 - `helpers` - This contains various test-related utilities, including the mocks. Here's a few in `helpers/base.js` you might appreciate knowing about:
 
-    - `push(array)` - A Thallium reporter that accepts an array destination to push its reports into.
-    - `n(type, path, value)` - Create a reporter node of a given type, path, and value.
+    - `push(array, keep = false)` - A Thallium reporter that accepts an array destination to push its reports into. Set `keep` to `true` if you want to retain the original `duration` and `slow` speeds.
+    - `n(type, path, value, {duration, slow})` - Create a reporter node of a given type, path, value, duration, and slow time. The latter is an object because they're almost always either not there or both there, treated as a pair.
     - `p(name, index)` - Create a path node with a given name and index
 
     These are most frequently used for testing reporter output for whatever reason.
@@ -63,10 +63,52 @@ I use [Bluebird](http://bluebirdjs.com) extensively for promises, as it makes co
 ## Code style
 
 - This is linted with ESLint, and uses my [`isiahmeadows/node` preset](https://npmjs.com/package/eslint-config-isiahmeadows) for the main code base and `isiahmeadows/es6` for the examples.
+
 - [CoffeeLint](http://www.coffeelint.org/) is used to lint the few CoffeeScript files littered around, mostly there for testing and examples.
-- Classes are used, but inheritance is limited. They are usually used for grouping functionality and unnesting functions, but functions are usually preferred for callbacks and one-off things that don't involve delaying execution.
+
+- Classes are used, but mostly as C-like structs. Inheritance is minimized. They are usually used for ADTs and grouping state, and functions are preferred for callbacks and one-off things that don't involve delaying execution.
+
 - File names are lower cased, and namespaces are capitalized like constructors, except for ones imported from Node builtins and ones treated as values.
-- `exports.foo = bar` is preferred over `module.exports.foo = bar`.
+
+- `exports.foo = bar` is preferred over `module.exports.foo = bar`, but default exports like `module.exports = foo` are okay, as long as nothing else is exported.
+
+- Named exports are also preferred to static members on default exports. For example:
+
+    ```js
+    // Good
+    exports.Test = Test
+    function Test(name, index) {
+        this.name = name
+        this.index = index
+    }
+
+    exports.timeout = function (test) {
+        var ctx = test
+
+        while (ctx.timeout === 0 && !(ctx.status & Flags.Root)) {
+            ctx = ctx.parent
+        }
+
+        return ctx.timeout || 2000 // ms - default timeout
+    }
+
+    // Not as good
+    module.exports = Test
+    function Test(name, index) {
+        this.name = name
+        this.index = index
+    }
+
+    Test.timeout = function (test) {
+        var ctx = test
+
+        while (ctx.timeout === 0 && !(ctx.status & Flags.Root)) {
+            ctx = ctx.parent
+        }
+
+        return ctx.timeout || 2000 // ms - default timeout
+    }
+    ```
 
 ## Tips and idioms
 
