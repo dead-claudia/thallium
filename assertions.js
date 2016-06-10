@@ -23,6 +23,70 @@ function deepEqualMatch(a, b) {
     return deepEqualImpl(a, b, "match")
 }
 
+var check = (function () {
+    function prefix(type) {
+        return (/^[aeiou]/.test(type) ? "an " : "a ") + type
+    }
+
+    function check(value, type) {
+        if (type === "array") return Array.isArray(value)
+        if (type === "regexp") return toString.call(value) === "[object RegExp]"
+        if (type === "object") return value != null && typeof value === "object"
+        if (type === "null") return value === null
+        if (type === "none") return value == null
+        return typeof value === type
+    }
+
+    function checkList(value, types) {
+        for (var i = 0; i < types.length; i++) {
+            if (check(value, types[i])) return true
+        }
+
+        return false
+    }
+
+    function checkSingle(value, name, type) {
+        if (!check(value, type)) {
+            throw new TypeError("`" + name + "` must be " + prefix(type))
+        }
+    }
+
+    function checkMany(value, name, types) {
+        if (!checkList(value, types)) {
+            var str = "`" + name + "` must be either"
+
+            if (types.length === 2) {
+                str += prefix(types[0]) + " or " + prefix(types[1])
+            } else {
+                str += prefix(types[0])
+
+                var end = types.length - 1
+
+                for (var i = 1; i < end; i++) {
+                    str += ", " + prefix(types[i])
+                }
+
+                str += ", or " + prefix(types[end])
+            }
+
+            throw new TypeError(str)
+        }
+    }
+
+    return function (value, name, type) {
+        if (!Array.isArray(type)) return checkSingle(value, name, type)
+        if (type.length === 1) return checkSingle(value, name, type[0])
+        return checkMany(value, name, type)
+    }
+})()
+
+function checkTypeOf(value, name) {
+    if (value === "boolean" || value === "function") return
+    if (value === "number" || value === "object" || value === "string") return
+    if (value === "symbol" || value === "undefined") return
+    throw new TypeError("`" + name + "` must be a valid `typeof` value")
+}
+
 // This holds everything to be added.
 var methods = []
 var aliases = []
@@ -37,15 +101,20 @@ module.exports = function (t) {
 
 // Little helpers so that these functions only need to be created once.
 function define(name, callback) {
+    check(name, "name", "string")
+    check(callback, "callback", "function")
     methods.push({name: name, callback: callback})
 }
 
 function alias(name, original) {
+    check(name, "name", "string")
+    check(original, "original", "string")
     aliases.push({name: name, original: original})
 }
 
 // Much easier to type
 function negate(name) {
+    check(name, "name", "string")
     return "not" + name[0].toUpperCase() + name.slice(1)
 }
 
@@ -137,6 +206,8 @@ unary("array", Array.isArray, [
 ])
 
 define("type", function (object, type) {
+    checkTypeOf(type, "type")
+
     return {
         test: typeof object === type,
         expected: type,
@@ -147,6 +218,8 @@ define("type", function (object, type) {
 })
 
 define("notType", function (object, type) {
+    checkTypeOf(type, "type")
+
     return {
         test: typeof object !== type,
         expected: type,
@@ -156,6 +229,8 @@ define("notType", function (object, type) {
 })
 
 define("instanceof", function (object, Type) {
+    check(Type, "Type", "function")
+
     return {
         test: object instanceof Type,
         expected: Type,
@@ -166,6 +241,8 @@ define("instanceof", function (object, Type) {
 })
 
 define("notInstanceof", function (object, Type) {
+    check(Type, "Type", "function")
+
     return {
         test: !(object instanceof Type),
         expected: Type,
@@ -185,11 +262,14 @@ binary("equalLoose", Util.looseIs, [
 ])
 
 function comp(name, compare, message) {
-    define(name, function (a, b) {
+    define(name, function (actual, expected) {
+        check(actual, "actual", "number")
+        check(expected, "expected", "number")
+
         return {
-            test: compare(a, b),
-            actual: a,
-            expected: b,
+            test: compare(actual, expected),
+            actual: actual,
+            expected: expected,
             message: message,
         }
     })
@@ -201,6 +281,20 @@ comp("atLeast", function (a, b) { return a >= b }, "Expected {actual} to be at l
 comp("atMost", function (a, b) { return a <= b }, "Expected {actual} to be at most {expected}")
 comp("above", function (a, b) { return a > b }, "Expected {actual} to be above {expected}")
 comp("below", function (a, b) { return a < b }, "Expected {actual} to be below {expected}")
+
+define("between", function (actual, lower, upper) {
+    check(actual, "actual", "number")
+    check(lower, "lower", "number")
+    check(upper, "upper", "number")
+
+    return {
+        test: actual >= lower && actual <= upper,
+        actual: actual,
+        lower: lower,
+        upper: upper,
+        message: "Expected {actual} to be between {lower} and {upper}",
+    }
+})
 
 /* eslint-enable max-len */
 
@@ -222,135 +316,151 @@ binary("match", deepEqualMatch, [
 alias("matchLoose", "deepEqualLoose")
 alias("notMatchLoose", "notDeepEqualLoose")
 
-function has(name, equals, check, get, messages) { // eslint-disable-line max-len, max-params
-    if (equals === Util.looseIs) {
+function has(name, _) { // eslint-disable-line max-len, max-params
+    if (_.equals === Util.looseIs) {
         define(name, function (object, key, value) {
             return {
-                test: check(object, key) && equals(get(object, key), value),
+                test: _.has(object, key) && _.is(_.get(object, key), value),
                 expected: value,
                 actual: object[key],
                 key: key,
                 object: object,
-                message: messages[0],
+                message: _.messages[0],
             }
         })
 
         define(negate(name), function (object, key, value) {
             return {
-                test: !check(object, key) || !equals(get(object, key), value),
+                test: !_.has(object, key) || !_.is(_.get(object, key), value),
                 actual: value,
                 key: key,
                 object: object,
-                message: messages[2],
+                message: _.messages[2],
             }
         })
     } else {
         define(name, function (object, key, value) {
-            var test = check(object, key)
+            var test = _.has(object, key)
 
             if (arguments.length >= 3) {
                 return {
-                    test: test && equals(get(object, key), value),
+                    test: test && _.is(_.get(object, key), value),
                     expected: value,
                     actual: object[key],
                     key: key,
                     object: object,
-                    message: messages[0],
+                    message: _.messages[0],
                 }
             } else {
                 return {
                     test: test,
                     expected: key,
                     actual: object,
-                    message: messages[1],
+                    message: _.messages[1],
                 }
             }
         })
 
         define(negate(name), function (object, key, value) {
-            var test = !check(object, key)
+            var test = !_.has(object, key)
 
             if (arguments.length >= 3) {
                 return {
-                    test: test || !equals(get(object, key), value),
+                    test: test || !_.is(_.get(object, key), value),
                     actual: value,
                     key: key,
                     object: object,
-                    message: messages[2],
+                    message: _.messages[2],
                 }
             } else {
                 return {
                     test: test,
                     expected: key,
                     actual: object,
-                    message: messages[3],
+                    message: _.messages[3],
                 }
             }
         })
     }
 }
 
-function hasOwnKey(object, key) {
-    return hasOwn.call(object, key)
-}
+function hasOwnKey(object, key) { return hasOwn.call(object, key) }
+function hasInKey(object, key) { return key in object }
+function hasInColl(object, key) { return object.has(key) }
+function hasObjectGet(object, key) { return object[key] }
+function hasCollGet(object, key) { return object.get(key) }
 
-function hasInKey(object, key) {
-    return key in object
-}
+has("hasOwn", {
+    is: Util.strictIs,
+    has: hasOwnKey,
+    get: hasObjectGet,
+    messages: [
+        "Expected {object} to have own key {key} equal to {expected}, but found {actual}", // eslint-disable-line max-len
+        "Expected {actual} to have own key {expected}",
+        "Expected {object} to not have own key {key} equal to {actual}",
+        "Expected {actual} to not have own key {expected}",
+    ],
+})
 
-function hasObjectGet(object, key) {
-    return object[key]
-}
+has("hasOwnLoose", {
+    is: Util.looseIs,
+    has: hasOwnKey,
+    get: hasObjectGet,
+    messages: [
+        "Expected {object} to have own key {key} loosely equal to {expected}, but found {actual}", // eslint-disable-line max-len
+        "Expected {actual} to have own key {expected}",
+        "Expected {object} to not have own key {key} loosely equal to {actual}",
+        "Expected {actual} to not have own key {expected}",
+    ],
+})
 
-function hasInColl(object, key) {
-    return object.has(key)
-}
+has("hasKey", {
+    is: Util.strictIs,
+    has: hasInKey,
+    get: hasObjectGet,
+    messages: [
+        "Expected {object} to have key {key} equal to {expected}, but found {actual}", // eslint-disable-line max-len
+        "Expected {actual} to have key {expected}",
+        "Expected {object} to not have key {key} equal to {actual}",
+        "Expected {actual} to not have key {expected}",
+    ],
+})
 
-function hasCollGet(object, key) {
-    return object.get(key)
-}
+has("hasKeyLoose", {
+    is: Util.looseIs,
+    has: hasInKey,
+    get: hasObjectGet,
+    messages: [
+        "Expected {object} to have key {key} loosely equal to {expected}, but found {actual}", // eslint-disable-line max-len
+        "Expected {actual} to have key {expected}",
+        "Expected {object} to not have key {key} loosely equal to {actual}",
+        "Expected {actual} to not have key {expected}",
+    ],
+})
 
-has("hasOwn", Util.strictIs, hasOwnKey, hasObjectGet, [
-    "Expected {object} to have own key {key} equal to {expected}, but found {actual}", // eslint-disable-line max-len
-    "Expected {actual} to have own key {expected}",
-    "Expected {object} to not have own key {key} equal to {actual}",
-    "Expected {actual} to not have own key {expected}",
-])
+has("has", {
+    is: Util.strictIs,
+    has: hasInColl,
+    get: hasCollGet,
+    messages: [
+        "Expected {object} to have key {key} equal to {expected}, but found {actual}", // eslint-disable-line max-len
+        "Expected {actual} to have key {expected}",
+        "Expected {object} to not have key {key} equal to {actual}",
+        "Expected {actual} to not have key {expected}",
+    ],
+})
 
-has("hasOwnLoose", Util.looseIs, hasOwnKey, hasObjectGet, [
-    "Expected {object} to have own key {key} loosely equal to {expected}, but found {actual}", // eslint-disable-line max-len
-    "Expected {actual} to have own key {expected}",
-    "Expected {object} to not have own key {key} loosely equal to {actual}",
-    "Expected {actual} to not have own key {expected}",
-])
-
-has("hasKey", Util.strictIs, hasInKey, hasObjectGet, [
-    "Expected {object} to have key {key} equal to {expected}, but found {actual}", // eslint-disable-line max-len
-    "Expected {actual} to have key {expected}",
-    "Expected {object} to not have key {key} equal to {actual}",
-    "Expected {actual} to not have key {expected}",
-])
-
-has("hasKeyLoose", Util.looseIs, hasInKey, hasObjectGet, [
-    "Expected {object} to have key {key} loosely equal to {expected}, but found {actual}", // eslint-disable-line max-len
-    "Expected {actual} to have key {expected}",
-    "Expected {object} to not have key {key} loosely equal to {actual}",
-    "Expected {actual} to not have key {expected}",
-])
-
-has("has", Util.strictIs, hasInColl, hasCollGet, [
-    "Expected {object} to have key {key} equal to {expected}, but found {actual}", // eslint-disable-line max-len
-    "Expected {actual} to have key {expected}",
-    "Expected {object} to not have key {key} equal to {actual}",
-    "Expected {actual} to not have key {expected}",
-])
-
-has("hasLoose", Util.looseIs, hasInColl, hasCollGet, [
-    "Expected {object} to have key {key} equal to {expected}, but found {actual}", // eslint-disable-line max-len
-    "Expected {actual} to have key {expected}",
-    "Expected {object} to not have key {key} equal to {actual}",
-    "Expected {actual} to not have key {expected}",
-])
+has("hasLoose", {
+    is: Util.looseIs,
+    has: hasInColl,
+    get: hasCollGet,
+    messages: [
+        "Expected {object} to have key {key} equal to {expected}, but found {actual}", // eslint-disable-line max-len
+        "Expected {actual} to have key {expected}",
+        "Expected {object} to not have key {key} equal to {actual}",
+        "Expected {actual} to not have key {expected}",
+    ],
+})
 
 function getName(func) {
     if (func.name != null) return func.name || "<anonymous>"
@@ -358,28 +468,31 @@ function getName(func) {
     return "<anonymous>"
 }
 
-function throws(name, methods) {
+function throws(name, _) {
     function run(invert) {
         return function (func, matcher) {
+            check(func, "func", "function")
+            _.check(matcher)
+
             var test = false
             var error
 
             try {
                 func()
             } catch (e) {
-                test = methods.check(matcher, error = e)
+                test = _.test(matcher, error = e)
 
                 // Rethrow unknown errors that don't match when a matcher was
                 // passed - it's easier to debug unexpected errors when you have
                 // a stack trace.
-                if (methods.rethrow(matcher, invert, test)) throw e
+                if (_.rethrow(matcher, invert, test)) throw e
             }
 
             return {
                 test: test ^ invert,
                 expected: matcher,
                 error: error,
-                message: methods.message(matcher, invert, test),
+                message: _.message(matcher, invert, test),
             }
         }
     }
@@ -389,9 +502,8 @@ function throws(name, methods) {
 }
 
 throws("throws", {
-    check: function (Type, e) {
-        return Type == null || e instanceof Type
-    },
+    test: function (Type, e) { return Type == null || e instanceof Type },
+    check: function (Type) { check(Type, "Type", ["none", "function"]) },
 
     rethrow: function (matcher, invert, test) {
         return matcher != null && !invert && !test
@@ -413,16 +525,15 @@ throws("throws", {
 })
 
 throws("throwsMatch", {
-    check: function (matcher, e) {
+    test: function (matcher, e) {
         if (typeof matcher === "string") return e.message === matcher
-        if (toString.call(matcher) === "[object RegExp]") {
-            return matcher.test(e.message)
-        }
+        if (typeof matcher === "function") return !!matcher(e)
+        return matcher.test(e.message)
+    },
+
+    check: function (matcher) {
         // Not accepting objects yet.
-        if (typeof matcher !== "function") {
-            throw new TypeError("Unexpected matcher type: " + typeof matcher)
-        }
-        return !!matcher(e)
+        check(matcher, "matcher", ["string", "regexp", "function"])
     },
 
     rethrow: function () { return false },
@@ -440,10 +551,15 @@ throws("throwsMatch", {
 
 function len(name, compare, message) {
     define(name, function (object, length) {
+        check(object, "object", "object")
+        check(length, "length", "number")
+
+        var len = object.length
+
         return {
-            test: object.length != null && compare(object.length, +length),
+            test: len != null && compare(len, +length),
             expected: length,
-            actual: object.length,
+            actual: len,
             object: object,
             message: message,
         }
@@ -464,6 +580,10 @@ len("lengthBelow", function (a, b) { return a < b }, "Expected {object} to have 
 
 // Note: these two always fail when dealing with NaNs.
 define("closeTo", function (actual, expected, delta) {
+    check(actual, "actual", "number")
+    check(expected, "expected", "number")
+    check(delta, "delta", "number")
+
     return {
         test: Math.abs(actual - expected) <= Math.abs(delta),
         actual: actual,
@@ -474,6 +594,10 @@ define("closeTo", function (actual, expected, delta) {
 })
 
 define("notCloseTo", function (actual, expected, delta) {
+    check(actual, "actual", "number")
+    check(expected, "expected", "number")
+    check(delta, "delta", "number")
+
     return {
         test: Math.abs(actual - expected) > Math.abs(delta),
         actual: actual,
@@ -522,7 +646,7 @@ define("notCloseTo", function (actual, expected, delta) {
 
 function makeIncludes(all, func) {
     return function (array, keys) {
-        function check(key) {
+        function test(key) {
             for (var i = 0; i < array.length; i++) {
                 if (func(key, array[i])) return true
             }
@@ -533,12 +657,12 @@ function makeIncludes(all, func) {
             if (array.length < keys.length) return false
 
             for (var i = 0; i < keys.length; i++) {
-                if (!check(keys[i])) return false
+                if (!test(keys[i])) return false
             }
             return true
         } else {
             for (var j = 0; j < keys.length; j++) {
-                if (check(keys[j])) return true
+                if (test(keys[j])) return true
             }
             return false
         }
@@ -554,6 +678,7 @@ function defineIncludes(name, func, invert, message) {
     }
 
     define(name, function (array, values) {
+        check(array, "array", "array")
         if (!Array.isArray(values)) values = [values]
 
         // exclusive or to invert the result if `invert` is true
@@ -630,6 +755,7 @@ function makeHasOverload(name, methods, invert, message) {
     }
 
     define(name, function (object, keys) {
+        check(object, "object", "object")
         return {
             // exclusive or to invert the result if `invert` is true
             test: isEmpty(keys) || invert ^ base(object, keys),
@@ -646,6 +772,7 @@ function makeHasKeys(name, func, invert, message) {
     }
 
     define(name, function (object, keys) {
+        check(object, "object", "object")
         return {
             // exclusive or to invert the result if `invert` is true
             test: isEmpty(keys) || invert ^ base(object, keys),

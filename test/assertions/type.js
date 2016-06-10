@@ -25,21 +25,51 @@ describe("assertions (type)", function () {
             if (typeof Symbol === "function") t.type(Symbol(), "symbol") // eslint-disable-line no-undef, max-len
         })
 
-        it("checks bad types", function () {
-            fail("type", true, "nope")
-            fail("type", false, "nope")
-            fail("type", 0, "nope")
-            fail("type", 1, "nope")
-            fail("type", NaN, "nope")
-            fail("type", Infinity, "nope")
-            fail("type", "foo", "nope")
-            fail("type", "", "nope")
-            fail("type", null, "nope")
-            fail("type", {}, "nope")
-            fail("type", [], "nope")
-            fail("type", function () {}, "nope")
-            fail("type", undefined, "nope")
-            if (typeof Symbol === "function") fail("type", Symbol(), "nope") // eslint-disable-line no-undef, max-len
+        it("checks bad types", function () { // eslint-disable-line max-statements, max-len
+            function typeFail(value) {
+                // Silently swallowing exceptions is bad, so we can't use
+                // traditional Thallium assertions to test.
+                try {
+                    t.type(value, "nope")
+                } catch (e) {
+                    if (e instanceof TypeError) return
+                    throw e
+                }
+
+                throw new (t.reflect()).AssertionError(
+                    "Expected t.type to throw an TypeError",
+                    TypeError)
+            }
+
+            typeFail(true)
+            typeFail(false)
+            typeFail(0)
+            typeFail(1)
+            typeFail(NaN)
+            typeFail(Infinity)
+            typeFail("foo")
+            typeFail("")
+            typeFail(null)
+            typeFail({})
+            typeFail([])
+            typeFail(function () {})
+            typeFail(undefined)
+            if (typeof Symbol === "function") typeFail(Symbol()) // eslint-disable-line no-undef, max-len
+
+            fail("type", true, "number")
+            fail("type", false, "number")
+            fail("type", 0, "boolean")
+            fail("type", 1, "boolean")
+            fail("type", NaN, "boolean")
+            fail("type", Infinity, "boolean")
+            fail("type", "foo", "object")
+            fail("type", "", "object")
+            fail("type", null, "string")
+            fail("type", {}, "string")
+            fail("type", [], "string")
+            fail("type", function () {}, "object")
+            fail("type", undefined, "string")
+            if (typeof Symbol === "function") fail("type", Symbol(), "number") // eslint-disable-line no-undef, max-len
         })
     })
 
@@ -61,21 +91,51 @@ describe("assertions (type)", function () {
             if (typeof Symbol === "function") fail("notType", Symbol(), "symbol") // eslint-disable-line no-undef, max-len
         })
 
-        it("checks bad types", function () {
-            t.notType(true, "nope")
-            t.notType(false, "nope")
-            t.notType(0, "nope")
-            t.notType(1, "nope")
-            t.notType(NaN, "nope")
-            t.notType(Infinity, "nope")
-            t.notType("foo", "nope")
-            t.notType("", "nope")
-            t.notType(null, "nope")
-            t.notType({}, "nope")
-            t.notType([], "nope")
-            t.notType(function () {}, "nope")
-            t.notType(undefined, "nope")
-            if (typeof Symbol === "function") t.notType(Symbol(), "nope") // eslint-disable-line no-undef, max-len
+        it("checks bad types", function () { // eslint-disable-line max-statements, max-len
+            function typeFail(value) {
+                // Silently swallowing exceptions is bad, so we can't use
+                // traditional Thallium assertions to test.
+                try {
+                    t.type(value, "nope")
+                } catch (e) {
+                    if (e instanceof TypeError) return
+                    throw e
+                }
+
+                throw new (t.reflect()).AssertionError(
+                    "Expected t.type to throw an TypeError",
+                    TypeError)
+            }
+
+            typeFail(true)
+            typeFail(false)
+            typeFail(0)
+            typeFail(1)
+            typeFail(NaN)
+            typeFail(Infinity)
+            typeFail("foo")
+            typeFail("")
+            typeFail(null)
+            typeFail({})
+            typeFail([])
+            typeFail(function () {})
+            typeFail(undefined)
+            if (typeof Symbol === "function") typeFail(Symbol()) // eslint-disable-line no-undef, max-len
+
+            t.notType(true, "number")
+            t.notType(false, "number")
+            t.notType(0, "boolean")
+            t.notType(1, "boolean")
+            t.notType(NaN, "boolean")
+            t.notType(Infinity, "boolean")
+            t.notType("foo", "object")
+            t.notType("", "object")
+            t.notType(null, "string")
+            t.notType({}, "string")
+            t.notType([], "string")
+            t.notType(function () {}, "object")
+            t.notType(undefined, "string")
+            if (typeof Symbol === "function") t.notType(Symbol(), "number") // eslint-disable-line no-undef, max-len
         })
     })
 
@@ -84,18 +144,14 @@ describe("assertions (type)", function () {
             return t[name].bind(t)
         }
 
-        function fail(name) {
-            return fail.bind(undefined, name)
-        }
-
         basic("t." + name + "()", function () {
-            callback(check(name), fail(name))
+            callback(check(name), fail.bind(undefined, name))
         })
 
         var negated = "not" + name[0].toUpperCase() + name.slice(1)
 
         basic("t." + negated + "()", function () {
-            callback(fail(negated), check(negated))
+            callback(fail.bind(undefined, negated), check(negated))
         })
     }
 

@@ -76,8 +76,9 @@ describe("assertions (computation)", function () {
         t.length([], 0)
         t.length([1, 2, 3, 4, 5], 5)
         t.length(new Array(5), 5)
+        t.length({length: 5}, 5)
 
-        fail("length", {})
+        t.throws(function () { t.length({}) }, TypeError)
         fail("length", {}, 0)
         fail("length", [], 1)
         fail("length", [], Infinity)
@@ -93,8 +94,9 @@ describe("assertions (computation)", function () {
         fail("notLength", [], 0)
         fail("notLength", [1, 2, 3, 4, 5], 5)
         fail("notLength", new Array(5), 5)
+        fail("notLength", {length: 5}, 5)
 
-        fail("notLength", {})
+        t.throws(function () { t.notLength({}) }, TypeError)
         fail("notLength", {}, 0)
 
         t.notLength([], 1)
@@ -382,6 +384,46 @@ describe("assertions (computation)", function () {
             fail("below", Infinity, NaN)
             fail("below", NaN, -Infinity)
             fail("below", -Infinity, NaN)
+        })
+    })
+
+    describe("t.between()", function () {
+        it("works", function () {
+            t.between(0, 0, 1)
+            t.between(1, 0, 1)
+            t.between(1, 1, 1)
+            t.between(0, -1, 1)
+            fail("between", 1, -1, 0)
+            t.between(1, -1, 1)
+            fail("between", 12398.4639, 1245.472398, 12345.12345)
+        })
+
+        it("works with Infinities", function () {
+            fail("between", 0, -Infinity, -1)
+            t.between(0, -Infinity, 0)
+            t.between(-Infinity, -Infinity, -Infinity)
+            t.between(-Infinity, -Infinity, 0)
+            fail("between", Infinity, -Infinity, 0)
+            fail("between", Infinity, 0, 0)
+            t.between(Infinity, 0, Infinity)
+            t.between(-Infinity, -Infinity, Infinity)
+        })
+
+        it("fails with NaNs", function () {
+            fail("between", NaN, 0, NaN)
+            fail("between", NaN, NaN, 0)
+            fail("between", 0, NaN, 0)
+            fail("between", 0, 0, NaN)
+            fail("between", NaN, NaN, NaN)
+            fail("between", NaN, 0, Infinity)
+            fail("between", NaN, -Infinity, 0)
+            fail("between", NaN, -Infinity, Infinity)
+            fail("between", Infinity, NaN, 0)
+            fail("between", Infinity, 0, NaN)
+            fail("between", Infinity, NaN, NaN)
+            fail("between", -Infinity, NaN, 0)
+            fail("between", -Infinity, 0, NaN)
+            fail("between", -Infinity, NaN, NaN)
         })
     })
 

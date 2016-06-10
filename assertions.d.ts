@@ -76,6 +76,7 @@ export interface Assertions {
     atMost(n: number, limit: number): this;
     above(n: number, limit: number): this;
     below(n: number, limit: number): this;
+    between(n: number, lower: number, upper: number): this;
 
     equalLoose(a: any, b: any): this;
     notEqualLoose(a: any, b: any): this;
