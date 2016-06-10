@@ -49,7 +49,7 @@ describe("core (timeouts) (FLAKE)", function () {
         return tt.run().then(function () {
             t.match(ret, [
                 n("start", []),
-                n("fail", [p("test", 0)], new Error("Timeout of 50 reached.")),
+                n("fail", [p("test", 0)], new Error("Timeout of 50 reached")),
                 n("end", []),
             ])
         })
@@ -94,7 +94,7 @@ describe("core (timeouts) (FLAKE)", function () {
                 n("start", []),
                 n("enter", [p("test", 0)]),
                 n("fail", [p("test", 0), p("inner", 0)],
-                    new Error("Timeout of 50 reached.")),
+                    new Error("Timeout of 50 reached")),
                 n("leave", [p("test", 0)]),
                 n("end", []),
             ])

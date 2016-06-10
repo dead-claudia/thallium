@@ -13,10 +13,13 @@ t = require 'thallium'
 # be too bad.
 t.test 'core (timeouts) (FLAKE)', ->
     @reflect().add push: (_, ret) -> (arg, done) =>
-        # Any equality tests on this are inherently flaky.
-        @hasOwn arg, 'speed'
-        @includesAny ['fast', 'medium', 'slow', null], arg.speed
-        arg.speed = null
+        # Any equality tests on either of these are inherently flaky.
+        @hasOwn arg, 'duration'
+        @number arg.duration
+        @hasOwn arg, 'slow'
+        @number arg.slow
+        arg.duration = -1
+        arg.slow = 0
         ret.push(arg)
         done()
 
@@ -52,7 +55,7 @@ t.test 'core (timeouts) (FLAKE)', ->
         tt.run().then =>
             @match ret, [
                 n 'start', []
-                n 'fail', [p('test', 0)], new Error 'Timeout of 50 reached.'
+                n 'fail', [p('test', 0)], new Error 'Timeout of 50 reached'
                 n 'end', []
             ]
 
@@ -92,7 +95,7 @@ t.test 'core (timeouts) (FLAKE)', ->
                 n 'start', []
                 n 'enter', [p('test', 0)]
                 n 'fail', [p('test', 0), p('inner', 0)],
-                    new Error 'Timeout of 50 reached.'
+                    new Error 'Timeout of 50 reached'
                 n 'leave', [p('test', 0)]
                 n 'end', []
             ]

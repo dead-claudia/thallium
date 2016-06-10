@@ -1,7 +1,5 @@
 "use strict"
 
-// TODO: implement this
-
 var t = require("../../index.js")
 var Util = require("../../helpers/base.js")
 var n = Util.n
@@ -15,6 +13,26 @@ function push(ret) {
 // these have been tested against a slower machine, so it should hopefully not
 // be too bad.
 describe("core (slow) (FLAKE)", function () {
+    function at(host, i) {
+        if (host == null) return undefined
+        if (host[i] == null) return undefined
+        return {slow: host[i].slow, duration: host[i].duration}
+    }
+
+    function speed(data, type) {
+        switch (type) {
+        case "fast": t.between(data.duration, 0, data.slow / 2); break
+        case "medium": t.between(data.duration, data.slow / 2, data.slow); break
+        case "slow": t.above(data.duration, data.slow); break
+        default: throw new RangeError("Unknown type: `" + type + "`")
+        }
+    }
+
+    function nontest(slow) {
+        if (slow == null) slow = 75
+        return {duration: -1, slow: slow}
+    }
+
     it("succeeds with own", function () {
         var tt = t.reflect().base()
         var ret = []
@@ -28,11 +46,15 @@ describe("core (slow) (FLAKE)", function () {
         })
 
         return tt.run().then(function () {
+            var data = at(ret, 1)
+
             t.match(ret, [
-                n("start", []),
-                n("pass", [p("test", 0)], undefined, "fast"),
-                n("end", []),
+                n("start", [], undefined, nontest()),
+                n("pass", [p("test", 0)], undefined, data),
+                n("end", [], undefined, nontest()),
             ])
+
+            speed(data, "fast")
         })
     })
 
@@ -49,11 +71,16 @@ describe("core (slow) (FLAKE)", function () {
         })
 
         return tt.run().then(function () {
+            var data = at(ret, 1)
+
             t.match(ret, [
-                n("start", []),
-                n("pass", [p("test", 0)], undefined, "medium"),
-                n("end", []),
+                n("start", [], undefined, nontest()),
+                n("pass", [p("test", 0)], undefined, data),
+                n("end", [], undefined, nontest()),
             ])
+
+            t.equal(data.slow, 100)
+            speed(data, "medium")
         })
     })
 
@@ -70,11 +97,16 @@ describe("core (slow) (FLAKE)", function () {
         })
 
         return tt.run().then(function () {
+            var data = at(ret, 1)
+
             t.match(ret, [
-                n("start", []),
-                n("pass", [p("test", 0)], undefined, "slow"),
-                n("end", []),
+                n("start", [], undefined, nontest()),
+                n("pass", [p("test", 0)], undefined, data),
+                n("end", [], undefined, nontest()),
             ])
+
+            t.equal(data.slow, 50)
+            speed(data, "slow")
         })
     })
 
@@ -89,13 +121,21 @@ describe("core (slow) (FLAKE)", function () {
         .async("inner", function (tt, done) { done() })
 
         return tt.run().then(function () {
+            var data1 = at(ret, 1)
+            var data2 = at(ret, 2)
+
             t.match(ret, [
-                n("start", []),
-                n("enter", [p("test", 0)], undefined, "fast"),
-                n("pass", [p("test", 0), p("inner", 0)], undefined, "fast"),
-                n("leave", [p("test", 0)]),
-                n("end", []),
+                n("start", [], undefined, nontest()),
+                n("enter", [p("test", 0)], undefined, data1),
+                n("pass", [p("test", 0), p("inner", 0)], undefined, data2),
+                n("leave", [p("test", 0)], undefined, nontest(50)),
+                n("end", [], undefined, nontest()),
             ])
+
+            t.equal(data1.slow, 50)
+            t.equal(data2.slow, 50)
+            speed(data1, "fast")
+            speed(data2, "fast")
         })
     })
 
@@ -112,13 +152,21 @@ describe("core (slow) (FLAKE)", function () {
         })
 
         return tt.run().then(function () {
+            var data1 = at(ret, 1)
+            var data2 = at(ret, 2)
+
             t.match(ret, [
-                n("start", []),
-                n("enter", [p("test", 0)], undefined, "fast"),
-                n("pass", [p("test", 0), p("inner", 0)], undefined, "slow"),
-                n("leave", [p("test", 0)]),
-                n("end", []),
+                n("start", [], undefined, nontest()),
+                n("enter", [p("test", 0)], undefined, data1),
+                n("pass", [p("test", 0), p("inner", 0)], undefined, data2),
+                n("leave", [p("test", 0)], undefined, nontest(50)),
+                n("end", [], undefined, nontest()),
             ])
+
+            t.equal(data1.slow, 50)
+            t.equal(data2.slow, 50)
+            speed(data1, "fast")
+            speed(data2, "slow")
         })
     })
 

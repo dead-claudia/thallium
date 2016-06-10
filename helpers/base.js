@@ -7,22 +7,26 @@ var AssertionError = t.reflect().AssertionError
 
 exports.push = function (ret, keep) {
     return function push(arg, done) {
-        // Any equality tests on this are inherently flaky.
-        t.hasOwn(arg, "speed")
-        t.includesAny(["fast", "medium", "slow", null], arg.speed)
-        if (!keep) arg.speed = null
+        // Any equality tests on either of these are inherently flaky.
+        t.hasOwn(arg, "duration")
+        t.hasOwn(arg, "slow")
+        t.number(arg.duration)
+        t.number(arg.slow)
+        if (!keep) arg.duration = -1
+        if (!keep) arg.slow = 0
         ret.push(arg)
         return done()
     }
 }
 
-exports.n = function (type, path, value, speed) {
-    if (speed == null) speed = null
+exports.n = function (type, path, value, extra) { // eslint-disable-line max-params, max-len
+    if (extra == null) extra = {duration: -1, slow: 0}
     return {
         type: type,
         path: path,
         value: value,
-        speed: speed,
+        duration: extra.duration,
+        slow: extra.slow|0,
     }
 }
 
