@@ -12,7 +12,7 @@ This tries to support the following platforms:
 
 - Browser support is planned with [Sauce Labs](https://saucelabs.com/), but it is currently untested.
 
-This is written in pure ES5, and there isn't much of an option to support ES6. Some features still need polyfilled for browsers, and the way this is written doesn't really need many ES6 features.
+This is written in pure ES5, and there isn't much of an option to support ES6. Some features still need polyfilled for browsers, and the way this is written doesn't really need many ES6 features. As an exception, the documentation uses ES6 exclusively, including modules.
 
 - There is a class-ish helper [here](http://github.com/isiahmeadows/thallium/blob/master/lib/methods.js) used throughout.
 
@@ -116,20 +116,20 @@ I use [Bluebird](http://bluebirdjs.com) extensively for promises, as it makes co
 
     There's only a few of them, but they are either testing an inherently time-dependent feature, or they're dealing with the file system, and the output is order-dependent.
 
-- If you're on Linux and have [`nvm`](https://github.com/creationix/nvm) installed, there's a little `test.sh` script you can run, which will test everything Travis sees on your local machine, installing them if necessary. Note that it doesn't actually update existing installations for you, though. It's not quite *that* magical.
+- If you're on Linux and have [`nvm`](https://github.com/creationix/nvm) installed, there's a little `test.sh` script in the root you can run, which will test everything Travis will on your local machine, installing versions that don't exist if necessary. Note that it doesn't actually update existing installations for you, though. It's not quite *that* magical, and I don't suspect you'd want that, either.
 
-- For the tests, feel free to use the framework's own plugin and reporter system to your advantage to simplify your testing. They are very well tested, and if any of the assertions or plugin/reporter APIs break, you'll know it immediately. For example, I used a combination of `t.reporter` and `t.match` to test the reporter output throughout the tests. Here's an example from one of the tests:
+- For the tests, feel free to use the framework's own plugin and reporter system to your advantage to simplify your testing. They are very well tested, and if any of the assertions or plugin/reporter APIs break, you'll know it immediately. For example, I used [`t.reporter`](./docs/reporter-api.md) with the `t.match` assertion to test the reporter output throughout the tests. Here's a modified example from one of the tests:
 
     ```js
-    const tt = t.base()
-    const ret = []
+    var tt = t.base()
+    var ret = []
 
     tt.reporter(Util.push(ret))
 
-    tt.test("test", () => {})
-    tt.test("test", () => {})
+    tt.test("test", function () {})
+    tt.test("test", function () {})
 
-    return tt.run().then(() => {
+    return tt.run().then(function () {
         t.match(ret, [
             n("start", [])
             n("start", [p("test", 0)])

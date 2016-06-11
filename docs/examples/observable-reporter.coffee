@@ -10,7 +10,7 @@
 # terminates the stream instead.
 
 module.exports = ->
-    @wrap 'reporter', (reporter, args...) ->
+    @reflect().wrap 'reporter', (reporter, args...) ->
         if args.length
             reporter args...
         else

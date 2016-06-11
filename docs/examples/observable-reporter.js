@@ -10,7 +10,7 @@
 // terminates the stream instead.
 
 export default function (t) {
-    t.wrap("reporter", (reporter, ...args) => {
+    t.reflect().wrap("reporter", (reporter, ...args) => {
         if (args.length) {
             return reporter(...args)
         } else {

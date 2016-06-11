@@ -12,9 +12,9 @@ A simple, unopinionated, modular test framework meant to simplify your tests. It
 npm install --save-dev thallium
 ```
 
-## Usage
+## Usage and API
 
-Check out the [CLI documentation](http://github.com/isiahmeadows/thallium/blob/master/docs/cli.md)
+Check out the [documentation](http://github.com/isiahmeadows/thallium/blob/master/docs/README.md)
 
 ```
 tl
@@ -43,10 +43,6 @@ Couple specific notes:
     t.notHasOwn(t, "foo")
     ```
 
-## API
-
-See the [documentation](http://github.com/isiahmeadows/thallium/blob/master/docs/README.md).
-
 ## Roadmap
 
 This list is in a very rough chronological order.
@@ -54,14 +50,15 @@ This list is in a very rough chronological order.
 1. ~~Create basic reporters for TAP, spec, and dot.~~ **Done!**
     - I plan on adding browser support + DOM support *after* Karma 1.0 is released, because I need a [specific feature](https://github.com/karma-runner/karma/pull/1825) due to the library's architecture.
     - Note that these three are directly blocking 0.1.
-2. Finish documenting this project. This mainly includes the core assertions.
+2. Finish documenting this project. This mostly includes the core assertions.
 3. Support flaky tests via first-class retries. This would be enormously useful for several.
 4. Allow reporters to be removed, with an on-remove hook for the reporter in case external resources need reclaimed.
-5. Create a nice REPL driver for Node, in addition to the CLI.\*
+5. Include lifecycle hooks for before/after tests, for resource management.
+6. Create a nice REPL driver for Node, in addition to the CLI.\*
     - This will just be a module + sugar binary, so you can use it with any language.
-6. Write a few plugins/utilities for `describe`/`it` (likely trivial), `before{,Each}`/`after{,Each}` hooks, etc.
+7. Write a few plugins/utilities for `describe`/`it` (likely trivial), `before{,Each}`/`after{,Each}` hooks, etc.
     - This will include more reporters as well.
-7. Write lots of blog posts.\*\* :smile:
+8. Write lots of blog posts.\*\* :smile:
     - Why `before{,Each}` and friends aren't in core
     - Why this uses code *for* configuration, unlike nearly every other test framework out there.
 
@@ -71,17 +68,16 @@ This list is in a very rough chronological order.
 
 Also, at some point, I'd like to do the following, in no particular order:
 
-- Set up [AppVeyor](https://www.appveyor.com/) to run tests on Windows. Currently, it's only actively tested on Linux ~~and in browsers~~.
-    - I'm planning on using [Sauce Labs](https://saucelabs.com/) and [Karma](https://karma-runner.github.io) after 1.0 is released, because I need the custom `context.html` config feature added in [this PR](https://github.com/karma-runner/karma/pull/1825). The reason is because I need a CommonJS loader and a [generator script](http://github.com/isiahmeadows/thallium/blob/master/scripts/generate-browser-entry.js) to load the tests.
-    - I also have to write a loader from scratch, because none of the other ones actually work like they should. This also means re-implementing Node's resolver.
+- Set up [AppVeyor](https://www.appveyor.com/) to run tests on Windows. Currently, it's only actively tested on Linux.
+    - I need to at some point hook up PhantomJS for this. It should work in its current state, but it's not tested.
+    - I'm planning on using [Sauce Labs](https://saucelabs.com/) and [Karma](https://karma-runner.github.io) after Karma 1.0 is released, because I need the custom `context.html` config feature added in [this PR](https://github.com/karma-runner/karma/pull/1825). The reason is because I'm using SystemJS and I need a [custom entry script](http://github.com/isiahmeadows/thallium/blob/master/scripts/generate-browser-entry.js) to load the tests.
 - Trim the stack traces on reported errors and offer that to others as well.
-- Profile and optimize this thing. Currently, the CLI runs slightly slower than Mocha, but I know I can do better.
-    - For one, the config search doesn't have to be synchronous.
+- Profile and optimize this thing. Currently, the CLI runs a bit slower than Mocha, but I know I can get faster.
 - Allow initial negative globs based on the config's list (or the default).
 - Reimplement [`util-inspect`](https://www.npmjs.com/package/util-inspect) for browsers based on Node's current [`util.inspect`](https://nodejs.org/api/util.html#util_util_inspect_object_options), since that ponyfill module is completely untested and is unaware of ES6. :worried:
 - Implement my own glob-based walker for this to eliminate order non-determinism and speed up resolution. To my knowledge, none of the more popular utilities are deterministic, and determinism is very helpful for testing. Plus, a specialized variant would load things much quicker. :smile:
 - Include the patience diff as a reporter option, since it deals with larger diffs a little more readably, a plus for data-heavy integration/end-to-end tests, but there doesn't appear to be a JS port yet, and algorithm documentation is scarce.
-- Implement something like `mocha --watch` for this.
+- Add watch support for this.
 
 ## Contributing
 
