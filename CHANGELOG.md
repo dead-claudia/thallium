@@ -1,5 +1,9 @@
 # Changelog
 
+## v0.1.1
+
+Fixed outdated `--help(-detailed)` output.
+
 ## v0.1.0
 
 Initial alpha release

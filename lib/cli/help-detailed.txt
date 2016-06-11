@@ -37,6 +37,14 @@ Options:
 --
     Stop parsing options past this point. Treat any further argument as a file.
 
+--color
+    Force-enable terminal colors for core reporters, regardless of the
+    applicable terminal/shell settings or support.
+
+--no-color
+    Force-disable terminal colors for core reporters, so that even if the
+    terminal does support colors, only raw Unicode is printed.
+
 All options are optional, and all unknown options are passed directly to Node.
 If no file globs are given, `test/**/*.{extname of config found}` is used as the
 default glob, with `test/.config.{extname}` being the default config, where the

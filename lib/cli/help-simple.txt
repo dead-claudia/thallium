@@ -24,6 +24,14 @@ Options:
 --
     Stop parsing options.
 
+--color
+    Force-enable terminal colors for core reporters, regardless of the
+    applicable terminal/shell settings or support.
+
+--no-color
+    Force-disable terminal colors for core reporters, so that even if the
+    terminal does support colors, only raw Unicode is printed.
+
 All unknown options are passed directly to Node. For more details on each
 option, run the following command:
 
