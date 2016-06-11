@@ -54,8 +54,17 @@ module.exports = R.on({
     },
 
     pass: printReport(function (r, ev) {
-        return c("checkmark", R.Symbols.Pass + " ") +
+        var str =
+            c("checkmark", R.Symbols.Pass + " ") +
             c("pass", getName(r.state.level, ev))
+
+        var speed = R.speed(ev)
+
+        if (speed !== "fast") {
+            str += c(speed, " (" + ev.duration + "ms)")
+        }
+
+        return str
     }),
 
     fail: printReport(function (r, ev) {

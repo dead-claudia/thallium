@@ -39,6 +39,10 @@ function printValue(r, key, value) {
     return printRaw(r, key, inspect(value))
 }
 
+function printLine(p, r, line) {
+    return p.then(function () { return r.print(line) })
+}
+
 function printError(r, ev) {
     var err = ev.value
 
@@ -108,19 +112,10 @@ module.exports = R.on({
         var p = r.print("1.." + r.state.counter)
         .then(function () { return r.print("# tests " + r.tests) })
 
-        if (r.pass) {
-            p = p.then(function () { return r.print("# pass " + r.pass) })
-        }
-
-        if (r.fail) {
-            p = p.then(function () { return r.print("# fail " + r.fail) })
-        }
-
-        if (r.skip) {
-            p = p.then(function () { return r.print("# skip " + r.skip) })
-        }
-
-        return p
+        if (r.pass) p = printLine(p, r, "# pass " + r.pass)
+        if (r.fail) p = printLine(p, r, "# fail " + r.fail)
+        if (r.skip) p = printLine(p, r, "# skip " + r.skip)
+        return printLine(p, r, "# duration " + R.formatTime(r.duration))
     },
 
     error: function (r, ev) {

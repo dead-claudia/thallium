@@ -15,15 +15,8 @@ var methods = require("../../lib/methods.js")
 var Symbols = R.Symbols
 var c = R.color
 var p = Util.p
+var n = Util.n
 var oldUseColors = Console.useColors()
-
-function n(type, path, value, data) {
-    if (type === "pass" || type === "enter") {
-        if (data == null) data = {duration: 1, slow: 75}
-    }
-
-    return Util.n(type, path, value, data)
-}
 
 describe("reporter dot", function () {
     it("is not itself a reporter", function () {
@@ -108,6 +101,10 @@ describe("reporter dot", function () {
         },
     })
 
+    function time(duration) {
+        return c("light", " (" + duration + ")")
+    }
+
     function test(name, opts) {
         it(name, function () {
             var list = []
@@ -138,7 +135,7 @@ describe("reporter dot", function () {
             ],
             output: [
                 "",
-                c("plain", "  0 tests"),
+                c("plain", "  0 tests") + time("0ms"),
                 "",
             ],
         })
@@ -154,7 +151,7 @@ describe("reporter dot", function () {
                 "",
                 "  " + pass + pass,
                 "",
-                c("bright pass", "  ") + c("green", "2 passing"),
+                c("bright pass", "  ") + c("green", "2 passing") + time("20ms"),
                 "",
             ],
         })
@@ -172,7 +169,7 @@ describe("reporter dot", function () {
                 "",
                 "  " + fail + fail,
                 "",
-                c("bright fail", "  ") + c("fail", "2 failing"),
+                c("bright fail", "  ") + c("fail", "2 failing") + time("20ms"),
                 "",
                 "  " + c("plain", "1) one:"),
             ], stack(sentinel), [
@@ -194,7 +191,7 @@ describe("reporter dot", function () {
                 "",
                 "  " + pass + fail,
                 "",
-                c("bright pass", "  ") + c("green", "1 passing"),
+                c("bright pass", "  ") + c("green", "1 passing") + time("20ms"),
                 c("bright fail", "  ") + c("fail", "1 failing"),
                 "",
                 "  " + c("plain", "1) two:"),
@@ -214,7 +211,7 @@ describe("reporter dot", function () {
                 "",
                 "  " + fail + pass,
                 "",
-                c("bright pass", "  ") + c("green", "1 passing"),
+                c("bright pass", "  ") + c("green", "1 passing") + time("20ms"),
                 c("bright fail", "  ") + c("fail", "1 failing"),
                 "",
                 "  " + c("plain", "1) one:"),
@@ -237,7 +234,7 @@ describe("reporter dot", function () {
                 "",
                 "  " + fail + fail,
                 "",
-                c("bright fail", "  ") + c("fail", "2 failing"),
+                c("bright fail", "  ") + c("fail", "2 failing") + time("20ms"),
                 "",
                 "  " + c("plain", "1) one:"),
             ], stack(assertion), [
@@ -259,7 +256,7 @@ describe("reporter dot", function () {
                 "",
                 "  " + pass + fail,
                 "",
-                c("bright pass", "  ") + c("green", "1 passing"),
+                c("bright pass", "  ") + c("green", "1 passing") + time("20ms"),
                 c("bright fail", "  ") + c("fail", "1 failing"),
                 "",
                 "  " + c("plain", "1) two:"),
@@ -279,7 +276,7 @@ describe("reporter dot", function () {
                 "",
                 "  " + fail + pass,
                 "",
-                c("bright pass", "  ") + c("green", "1 passing"),
+                c("bright pass", "  ") + c("green", "1 passing") + time("20ms"),
                 c("bright fail", "  ") + c("fail", "1 failing"),
                 "",
                 "  " + c("plain", "1) one:"),
@@ -299,7 +296,7 @@ describe("reporter dot", function () {
                 "",
                 "  " + skip + skip,
                 "",
-                c("skip", "  2 skipped"),
+                c("skip", "  2 skipped") + time("0ms"),
                 "",
             ],
         })
@@ -315,7 +312,7 @@ describe("reporter dot", function () {
                 "",
                 "  " + pass + skip,
                 "",
-                c("bright pass", "  ") + c("green", "1 passing"),
+                c("bright pass", "  ") + c("green", "1 passing") + time("10ms"),
                 c("skip", "  1 skipped"),
                 "",
             ],
@@ -332,7 +329,7 @@ describe("reporter dot", function () {
                 "",
                 "  " + skip + pass,
                 "",
-                c("bright pass", "  ") + c("green", "1 passing"),
+                c("bright pass", "  ") + c("green", "1 passing") + time("10ms"),
                 c("skip", "  1 skipped"),
                 "",
             ],
@@ -349,7 +346,7 @@ describe("reporter dot", function () {
                 "",
                 "  " + fail + skip,
                 "",
-                c("skip", "  1 skipped"),
+                c("skip", "  1 skipped") + time("10ms"),
                 c("bright fail", "  ") + c("fail", "1 failing"),
                 "",
                 "  " + c("plain", "1) one:"),
@@ -369,7 +366,7 @@ describe("reporter dot", function () {
                 "",
                 "  " + skip + fail,
                 "",
-                c("skip", "  1 skipped"),
+                c("skip", "  1 skipped") + time("10ms"),
                 c("bright fail", "  ") + c("fail", "1 failing"),
                 "",
                 "  " + c("plain", "1) two:"),
@@ -416,7 +413,7 @@ describe("reporter dot", function () {
                 "",
                 "  " + pass + pass + pass,
                 "",
-                c("bright pass", "  ") + c("green", "3 passing"),
+                c("bright pass", "  ") + c("green", "3 passing") + time("30ms"),
                 c("bright fail", "  ") + c("fail", "1 failing"),
                 "",
                 "  " + c("plain", "1) test inner fail: (extra)"),
@@ -450,7 +447,7 @@ describe("reporter dot", function () {
                 "",
                 "  " + pass + pass + fail,
                 "",
-                c("bright pass", "  ") + c("green", "2 passing"),
+                c("bright pass", "  ") + c("green", "2 passing") + time("30ms"),
                 c("bright fail", "  ") + c("fail", "1 failing"),
                 "",
                 "  " + c("plain", "1) test inner fail:"),
@@ -575,7 +572,7 @@ describe("reporter dot", function () {
                     pass +
                     pass + pass + pass + pass + pass + pass + pass + pass,
                 "",
-                c("bright pass", "  ") + c("green", "47 passing"),
+                c("bright pass", "  ") + c("green", "47 passing") + time("470ms"),
                 "",
             ],
 
@@ -677,7 +674,7 @@ describe("reporter dot", function () {
                     pass +
                     skip + pass + pass + pass + pass + fail + skip + pass,
                 "",
-                c("bright pass", "  ") + c("green", "39 passing"),
+                c("bright pass", "  ") + c("green", "39 passing") + time("430ms"),
                 c("skip", "  4 skipped"),
                 c("bright fail", "  ") + c("fail", "5 failing"),
                 "",
@@ -712,10 +709,10 @@ describe("reporter dot", function () {
                 ],
                 output: [
                     "",
-                    c("plain", "  0 tests"),
+                    c("plain", "  0 tests") + time("0ms"),
                     "",
                     "",
-                    c("plain", "  0 tests"),
+                    c("plain", "  0 tests") + time("0ms"),
                     "",
                 ],
             })
@@ -735,12 +732,14 @@ describe("reporter dot", function () {
                     "",
                     "  " + pass + pass,
                     "",
-                    c("bright pass", "  ") + c("green", "2 passing"),
+                    c("bright pass", "  ") + c("green", "2 passing") +
+                        time("20ms"),
                     "",
                     "",
                     "  " + pass + pass,
                     "",
-                    c("bright pass", "  ") + c("green", "2 passing"),
+                    c("bright pass", "  ") + c("green", "2 passing") +
+                        time("20ms"),
                     "",
                 ],
             })
@@ -762,7 +761,8 @@ describe("reporter dot", function () {
                     "",
                     "  " + fail + fail,
                     "",
-                    c("bright fail", "  ") + c("fail", "2 failing"),
+                    c("bright fail", "  ") + c("fail", "2 failing") +
+                        time("20ms"),
                     "",
                     "  " + c("plain", "1) one:"),
                 ], stack(sentinel), [
@@ -773,7 +773,8 @@ describe("reporter dot", function () {
                     "",
                     "  " + fail + fail,
                     "",
-                    c("bright fail", "  ") + c("fail", "2 failing"),
+                    c("bright fail", "  ") + c("fail", "2 failing") +
+                        time("20ms"),
                     "",
                     "  " + c("plain", "1) one:"),
                 ], stack(sentinel), [
@@ -799,7 +800,8 @@ describe("reporter dot", function () {
                     "",
                     "  " + pass + fail,
                     "",
-                    c("bright pass", "  ") + c("green", "1 passing"),
+                    c("bright pass", "  ") + c("green", "1 passing") +
+                        time("20ms"),
                     c("bright fail", "  ") + c("fail", "1 failing"),
                     "",
                     "  " + c("plain", "1) two:"),
@@ -808,7 +810,8 @@ describe("reporter dot", function () {
                     "",
                     "  " + pass + fail,
                     "",
-                    c("bright pass", "  ") + c("green", "1 passing"),
+                    c("bright pass", "  ") + c("green", "1 passing") +
+                        time("20ms"),
                     c("bright fail", "  ") + c("fail", "1 failing"),
                     "",
                     "  " + c("plain", "1) two:"),
@@ -832,7 +835,8 @@ describe("reporter dot", function () {
                     "",
                     "  " + fail + pass,
                     "",
-                    c("bright pass", "  ") + c("green", "1 passing"),
+                    c("bright pass", "  ") + c("green", "1 passing") +
+                        time("20ms"),
                     c("bright fail", "  ") + c("fail", "1 failing"),
                     "",
                     "  " + c("plain", "1) one:"),
@@ -841,7 +845,8 @@ describe("reporter dot", function () {
                     "",
                     "  " + fail + pass,
                     "",
-                    c("bright pass", "  ") + c("green", "1 passing"),
+                    c("bright pass", "  ") + c("green", "1 passing") +
+                        time("20ms"),
                     c("bright fail", "  ") + c("fail", "1 failing"),
                     "",
                     "  " + c("plain", "1) one:"),
@@ -867,7 +872,8 @@ describe("reporter dot", function () {
                     "",
                     "  " + fail + fail,
                     "",
-                    c("bright fail", "  ") + c("fail", "2 failing"),
+                    c("bright fail", "  ") + c("fail", "2 failing") +
+                        time("20ms"),
                     "",
                     "  " + c("plain", "1) one:"),
                 ], stack(assertion), [
@@ -878,7 +884,8 @@ describe("reporter dot", function () {
                     "",
                     "  " + fail + fail,
                     "",
-                    c("bright fail", "  ") + c("fail", "2 failing"),
+                    c("bright fail", "  ") + c("fail", "2 failing") +
+                        time("20ms"),
                     "",
                     "  " + c("plain", "1) one:"),
                 ], stack(assertion), [
@@ -904,7 +911,8 @@ describe("reporter dot", function () {
                     "",
                     "  " + pass + fail,
                     "",
-                    c("bright pass", "  ") + c("green", "1 passing"),
+                    c("bright pass", "  ") + c("green", "1 passing") +
+                        time("20ms"),
                     c("bright fail", "  ") + c("fail", "1 failing"),
                     "",
                     "  " + c("plain", "1) two:"),
@@ -913,7 +921,8 @@ describe("reporter dot", function () {
                     "",
                     "  " + pass + fail,
                     "",
-                    c("bright pass", "  ") + c("green", "1 passing"),
+                    c("bright pass", "  ") + c("green", "1 passing") +
+                        time("20ms"),
                     c("bright fail", "  ") + c("fail", "1 failing"),
                     "",
                     "  " + c("plain", "1) two:"),
@@ -937,7 +946,8 @@ describe("reporter dot", function () {
                     "",
                     "  " + fail + pass,
                     "",
-                    c("bright pass", "  ") + c("green", "1 passing"),
+                    c("bright pass", "  ") + c("green", "1 passing") +
+                        time("20ms"),
                     c("bright fail", "  ") + c("fail", "1 failing"),
                     "",
                     "  " + c("plain", "1) one:"),
@@ -946,7 +956,8 @@ describe("reporter dot", function () {
                     "",
                     "  " + fail + pass,
                     "",
-                    c("bright pass", "  ") + c("green", "1 passing"),
+                    c("bright pass", "  ") + c("green", "1 passing") +
+                        time("20ms"),
                     c("bright fail", "  ") + c("fail", "1 failing"),
                     "",
                     "  " + c("plain", "1) one:"),
@@ -1066,7 +1077,7 @@ describe("reporter dot", function () {
                     fast +
                     medium + medium + slow + slow + fast + fast + fast + medium,
                 "",
-                c("bright pass", "  ") + c("green", "47 passing"),
+                c("bright pass", "  ") + c("green", "47 passing") + time("1s"),
                 "",
             ],
 

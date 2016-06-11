@@ -5,6 +5,16 @@
 var t = require("../index.js")
 var AssertionError = t.reflect().AssertionError
 
+function fixArg(arg, type) {
+    if (type === "pass" || type === "fail" || type === "enter") {
+        arg.duration = 10
+        arg.slow = 75
+    } else {
+        arg.duration = -1
+        arg.slow = 0
+    }
+}
+
 exports.push = function (ret, keep) {
     return function push(arg, done) {
         // Any equality tests on either of these are inherently flaky.
@@ -12,15 +22,14 @@ exports.push = function (ret, keep) {
         t.hasOwn(arg, "slow")
         t.number(arg.duration)
         t.number(arg.slow)
-        if (!keep) arg.duration = -1
-        if (!keep) arg.slow = 0
+        if (!keep) fixArg(arg, arg.type)
         ret.push(arg)
         return done()
     }
 }
 
 exports.n = function (type, path, value, extra) { // eslint-disable-line max-params, max-len
-    if (extra == null) extra = {duration: -1, slow: 0}
+    if (extra == null) fixArg(extra = {}, type)
     return {
         type: type,
         path: path,

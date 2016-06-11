@@ -64,6 +64,7 @@ describe("reporter tap", function () { // eslint-disable-line max-statements
             "TAP version 13",
             "1..0",
             "# tests 0",
+            "# duration 0ms",
         ],
     })
 
@@ -81,6 +82,7 @@ describe("reporter tap", function () { // eslint-disable-line max-statements
             "1..2",
             "# tests 2",
             "# pass 2",
+            "# duration 20ms",
         ],
     })
 
@@ -106,6 +108,7 @@ describe("reporter tap", function () { // eslint-disable-line max-statements
             "1..2",
             "# tests 2",
             "# fail 2",
+            "# duration 20ms",
         ]),
     })
 
@@ -127,6 +130,7 @@ describe("reporter tap", function () { // eslint-disable-line max-statements
             "# tests 2",
             "# pass 1",
             "# fail 1",
+            "# duration 20ms",
         ]),
     })
 
@@ -148,6 +152,7 @@ describe("reporter tap", function () { // eslint-disable-line max-statements
             "# tests 2",
             "# pass 1",
             "# fail 1",
+            "# duration 20ms",
         ]),
     })
 
@@ -180,6 +185,7 @@ describe("reporter tap", function () { // eslint-disable-line max-statements
             "1..2",
             "# tests 2",
             "# fail 2",
+            "# duration 20ms",
         ]),
     })
 
@@ -204,6 +210,7 @@ describe("reporter tap", function () { // eslint-disable-line max-statements
             "# tests 2",
             "# pass 1",
             "# fail 1",
+            "# duration 20ms",
         ]),
     })
 
@@ -228,6 +235,7 @@ describe("reporter tap", function () { // eslint-disable-line max-statements
             "# tests 2",
             "# pass 1",
             "# fail 1",
+            "# duration 20ms",
         ]),
     })
 
@@ -245,6 +253,7 @@ describe("reporter tap", function () { // eslint-disable-line max-statements
             "1..2",
             "# tests 0",
             "# skip 2",
+            "# duration 0ms",
         ],
     })
 
@@ -263,6 +272,7 @@ describe("reporter tap", function () { // eslint-disable-line max-statements
             "# tests 1",
             "# pass 1",
             "# skip 1",
+            "# duration 10ms",
         ],
     })
 
@@ -281,6 +291,7 @@ describe("reporter tap", function () { // eslint-disable-line max-statements
             "# tests 1",
             "# pass 1",
             "# skip 1",
+            "# duration 10ms",
         ],
     })
 
@@ -302,6 +313,7 @@ describe("reporter tap", function () { // eslint-disable-line max-statements
             "# tests 1",
             "# fail 1",
             "# skip 1",
+            "# duration 10ms",
         ]),
     })
 
@@ -323,6 +335,7 @@ describe("reporter tap", function () { // eslint-disable-line max-statements
             "# tests 1",
             "# fail 1",
             "# skip 1",
+            "# duration 10ms",
         ]),
     })
 
@@ -368,6 +381,7 @@ describe("reporter tap", function () { // eslint-disable-line max-statements
             "# tests 3",
             "# pass 3",
             "# fail 1",
+            "# duration 30ms",
         ]),
     })
 
@@ -411,6 +425,7 @@ describe("reporter tap", function () { // eslint-disable-line max-statements
             "# tests 3",
             "# pass 2",
             "# fail 1",
+            "# duration 30ms",
         ]),
     })
 
@@ -561,6 +576,7 @@ describe("reporter tap", function () { // eslint-disable-line max-statements
             "1..47",
             "# tests 47",
             "# pass 47",
+            "# duration 470ms",
         ],
 
         /* eslint-enable max-len */
@@ -708,6 +724,7 @@ describe("reporter tap", function () { // eslint-disable-line max-statements
             "# pass 39",
             "# fail 5",
             "# skip 4",
+            "# duration 430ms",
         ]),
 
         /* eslint-enable max-len */
@@ -725,9 +742,11 @@ describe("reporter tap", function () { // eslint-disable-line max-statements
                 "TAP version 13",
                 "1..0",
                 "# tests 0",
+                "# duration 0ms",
                 "TAP version 13",
                 "1..0",
                 "# tests 0",
+                "# duration 0ms",
             ],
         })
 
@@ -749,12 +768,14 @@ describe("reporter tap", function () { // eslint-disable-line max-statements
                 "1..2",
                 "# tests 2",
                 "# pass 2",
+                "# duration 20ms",
                 "TAP version 13",
                 "ok 1 test",
                 "ok 2 test",
                 "1..2",
                 "# tests 2",
                 "# pass 2",
+                "# duration 20ms",
             ],
         })
 
@@ -784,6 +805,7 @@ describe("reporter tap", function () { // eslint-disable-line max-statements
                 "1..2",
                 "# tests 2",
                 "# fail 2",
+                "# duration 20ms",
                 "TAP version 13",
                 "not ok 1 one",
                 "  ---",
@@ -796,6 +818,7 @@ describe("reporter tap", function () { // eslint-disable-line max-statements
                 "1..2",
                 "# tests 2",
                 "# fail 2",
+                "# duration 20ms",
             ]),
         })
 
@@ -821,6 +844,7 @@ describe("reporter tap", function () { // eslint-disable-line max-statements
                 "# tests 2",
                 "# pass 1",
                 "# fail 1",
+                "# duration 20ms",
                 "TAP version 13",
                 "ok 1 one",
                 "not ok 2 two",
@@ -831,6 +855,7 @@ describe("reporter tap", function () { // eslint-disable-line max-statements
                 "# tests 2",
                 "# pass 1",
                 "# fail 1",
+                "# duration 20ms",
             ]),
         })
 
@@ -856,6 +881,7 @@ describe("reporter tap", function () { // eslint-disable-line max-statements
                 "# tests 2",
                 "# pass 1",
                 "# fail 1",
+                "# duration 20ms",
                 "TAP version 13",
                 "not ok 1 one",
                 "  ---",
@@ -866,6 +892,7 @@ describe("reporter tap", function () { // eslint-disable-line max-statements
                 "# tests 2",
                 "# pass 1",
                 "# fail 1",
+                "# duration 20ms",
             ]),
         })
 
@@ -901,6 +928,7 @@ describe("reporter tap", function () { // eslint-disable-line max-statements
                 "1..2",
                 "# tests 2",
                 "# fail 2",
+                "# duration 20ms",
                 "TAP version 13",
                 "not ok 1 one",
                 "  ---",
@@ -919,6 +947,7 @@ describe("reporter tap", function () { // eslint-disable-line max-statements
                 "1..2",
                 "# tests 2",
                 "# fail 2",
+                "# duration 20ms",
             ]),
         })
 
@@ -947,6 +976,7 @@ describe("reporter tap", function () { // eslint-disable-line max-statements
                 "# tests 2",
                 "# pass 1",
                 "# fail 1",
+                "# duration 20ms",
                 "TAP version 13",
                 "ok 1 one",
                 "not ok 2 two",
@@ -960,6 +990,7 @@ describe("reporter tap", function () { // eslint-disable-line max-statements
                 "# tests 2",
                 "# pass 1",
                 "# fail 1",
+                "# duration 20ms",
             ]),
         })
 
@@ -988,6 +1019,7 @@ describe("reporter tap", function () { // eslint-disable-line max-statements
                 "# tests 2",
                 "# pass 1",
                 "# fail 1",
+                "# duration 20ms",
                 "TAP version 13",
                 "not ok 1 one",
                 "  ---",
@@ -1001,6 +1033,7 @@ describe("reporter tap", function () { // eslint-disable-line max-statements
                 "# tests 2",
                 "# pass 1",
                 "# fail 1",
+                "# duration 20ms",
             ]),
         })
     })

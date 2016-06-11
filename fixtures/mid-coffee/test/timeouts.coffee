@@ -18,8 +18,12 @@ t.test 'core (timeouts) (FLAKE)', ->
         @number arg.duration
         @hasOwn arg, 'slow'
         @number arg.slow
-        arg.duration = -1
-        arg.slow = 0
+        if /^(pass|fail|enter)$/.test(arg.type)
+            arg.duration = 10
+            arg.slow = 75
+        else
+            arg.duration = -1
+            arg.slow = 0
         ret.push(arg)
         done()
 

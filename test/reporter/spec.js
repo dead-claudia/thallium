@@ -28,41 +28,45 @@ describe("reporter spec", function () {
         t.throws(function () { spec(n("end", [])) }, TypeError)
     })
 
+    function stack(err) {
+        var lines = ("    " + err.stack.replace(/^ +/gm, "      "))
+            .split(/\r?\n/g)
+
+        lines[0] = "    " + c("fail", lines[0].slice(4))
+
+        for (var i = 1; i < lines.length; i++) {
+            lines[i] = "      " + c("fail", lines[i].slice(6))
+        }
+
+        return lines
+    }
+
+    function pass(name) {
+        return c("checkmark", Symbols.Pass + " ") + c("pass", name)
+    }
+
+    function time(duration) {
+        return c("light", " (" + duration + ")")
+    }
+
+    function test(name, opts) {
+        it(name, function () {
+            var list = []
+            var reporter = spec({print: function (arg) { list.push(arg) }})
+
+            return Promise.each(opts.input, function (i) {
+                return resolveAny(reporter, undefined, i)
+            })
+            .then(function () {
+                t.match(list, opts.output)
+            })
+        })
+    }
+
     function run(useColors) { // eslint-disable-line max-statements
         Console.useColors(useColors)
         beforeEach(function () { Console.useColors(useColors) })
         afterEach(function () { Console.useColors(oldUseColors) })
-
-        function stack(err) {
-            var lines = ("    " + err.stack.replace(/^ +/gm, "      "))
-                .split(/\r?\n/g)
-
-            lines[0] = "    " + c("fail", lines[0].slice(4))
-
-            for (var i = 1; i < lines.length; i++) {
-                lines[i] = "      " + c("fail", lines[i].slice(6))
-            }
-
-            return lines
-        }
-
-        function pass(name) {
-            return c("checkmark", Symbols.Pass + " ") + c("pass", name)
-        }
-
-        function test(name, opts) {
-            it(name, function () {
-                var list = []
-                var reporter = spec({print: function (arg) { list.push(arg) }})
-
-                return Promise.each(opts.input, function (i) {
-                    return resolveAny(reporter, undefined, i)
-                })
-                .then(function () {
-                    t.match(list, opts.output)
-                })
-            })
-        }
 
         test("empty test", {
             input: [
@@ -71,7 +75,7 @@ describe("reporter spec", function () {
             ],
             output: [
                 "",
-                c("plain", "  0 tests"),
+                c("plain", "  0 tests") + time("0ms"),
                 "",
             ],
         })
@@ -88,7 +92,7 @@ describe("reporter spec", function () {
                 "  " + pass("test"),
                 "  " + pass("test"),
                 "",
-                c("bright pass", "  ") + c("green", "2 passing"),
+                c("bright pass", "  ") + c("green", "2 passing") + time("20ms"),
                 "",
             ],
         })
@@ -107,7 +111,7 @@ describe("reporter spec", function () {
                 "  " + c("fail", "1) one"),
                 "  " + c("fail", "2) two"),
                 "",
-                c("bright fail", "  ") + c("fail", "2 failing"),
+                c("bright fail", "  ") + c("fail", "2 failing") + time("20ms"),
                 "",
                 "  " + c("plain", "1) one:"),
             ], stack(sentinel), [
@@ -130,7 +134,7 @@ describe("reporter spec", function () {
                 "  " + pass("one"),
                 "  " + c("fail", "1) two"),
                 "",
-                c("bright pass", "  ") + c("green", "1 passing"),
+                c("bright pass", "  ") + c("green", "1 passing") + time("20ms"),
                 c("bright fail", "  ") + c("fail", "1 failing"),
                 "",
                 "  " + c("plain", "1) two:"),
@@ -151,7 +155,7 @@ describe("reporter spec", function () {
                 "  " + c("fail", "1) one"),
                 "  " + pass("two"),
                 "",
-                c("bright pass", "  ") + c("green", "1 passing"),
+                c("bright pass", "  ") + c("green", "1 passing") + time("20ms"),
                 c("bright fail", "  ") + c("fail", "1 failing"),
                 "",
                 "  " + c("plain", "1) one:"),
@@ -175,7 +179,7 @@ describe("reporter spec", function () {
                 "  " + c("fail", "1) one"),
                 "  " + c("fail", "2) two"),
                 "",
-                c("bright fail", "  ") + c("fail", "2 failing"),
+                c("bright fail", "  ") + c("fail", "2 failing") + time("20ms"),
                 "",
                 "  " + c("plain", "1) one:"),
             ], stack(assertion), [
@@ -198,7 +202,7 @@ describe("reporter spec", function () {
                 "  " + pass("one"),
                 "  " + c("fail", "1) two"),
                 "",
-                c("bright pass", "  ") + c("green", "1 passing"),
+                c("bright pass", "  ") + c("green", "1 passing") + time("20ms"),
                 c("bright fail", "  ") + c("fail", "1 failing"),
                 "",
                 "  " + c("plain", "1) two:"),
@@ -219,7 +223,7 @@ describe("reporter spec", function () {
                 "  " + c("fail", "1) one"),
                 "  " + pass("two"),
                 "",
-                c("bright pass", "  ") + c("green", "1 passing"),
+                c("bright pass", "  ") + c("green", "1 passing") + time("20ms"),
                 c("bright fail", "  ") + c("fail", "1 failing"),
                 "",
                 "  " + c("plain", "1) one:"),
@@ -240,7 +244,7 @@ describe("reporter spec", function () {
                 "  " + c("skip", "- one"),
                 "  " + c("skip", "- two"),
                 "",
-                c("skip", "  2 skipped"),
+                c("skip", "  2 skipped") + time("0ms"),
                 "",
             ],
         })
@@ -257,7 +261,7 @@ describe("reporter spec", function () {
                 "  " + pass("one"),
                 "  " + c("skip", "- two"),
                 "",
-                c("bright pass", "  ") + c("green", "1 passing"),
+                c("bright pass", "  ") + c("green", "1 passing") + time("10ms"),
                 c("skip", "  1 skipped"),
                 "",
             ],
@@ -275,7 +279,7 @@ describe("reporter spec", function () {
                 "  " + c("skip", "- one"),
                 "  " + pass("two"),
                 "",
-                c("bright pass", "  ") + c("green", "1 passing"),
+                c("bright pass", "  ") + c("green", "1 passing") + time("10ms"),
                 c("skip", "  1 skipped"),
                 "",
             ],
@@ -293,7 +297,7 @@ describe("reporter spec", function () {
                 "  " + c("fail", "1) one"),
                 "  " + c("skip", "- two"),
                 "",
-                c("skip", "  1 skipped"),
+                c("skip", "  1 skipped") + time("10ms"),
                 c("bright fail", "  ") + c("fail", "1 failing"),
                 "",
                 "  " + c("plain", "1) one:"),
@@ -314,7 +318,7 @@ describe("reporter spec", function () {
                 "  " + c("skip", "- one"),
                 "  " + c("fail", "1) two"),
                 "",
-                c("skip", "  1 skipped"),
+                c("skip", "  1 skipped") + time("10ms"),
                 c("bright fail", "  ") + c("fail", "1 failing"),
                 "",
                 "  " + c("plain", "1) two:"),
@@ -363,7 +367,7 @@ describe("reporter spec", function () {
                 "    inner",
                 "      " + pass("fail"),
                 "",
-                c("bright pass", "  ") + c("green", "3 passing"),
+                c("bright pass", "  ") + c("green", "3 passing") + time("30ms"),
                 c("bright fail", "  ") + c("fail", "1 failing"),
                 "",
                 "  " + c("plain", "1) test inner fail: (extra)"),
@@ -399,7 +403,7 @@ describe("reporter spec", function () {
                 "    inner",
                 "      " + c("fail", "1) fail"),
                 "",
-                c("bright pass", "  ") + c("green", "2 passing"),
+                c("bright pass", "  ") + c("green", "2 passing") + time("30ms"),
                 c("bright fail", "  ") + c("fail", "1 failing"),
                 "",
                 "  " + c("plain", "1) test inner fail:"),
@@ -547,7 +551,7 @@ describe("reporter spec", function () {
                 "    " + pass("gets own sync inner timeout"),
                 "    " + pass("gets default timeout"),
                 "",
-                c("bright pass", "  ") + c("green", "47 passing"),
+                c("bright pass", "  ") + c("green", "47 passing") + time("470ms"),
                 "",
             ],
 
@@ -670,7 +674,7 @@ describe("reporter spec", function () {
                 "    " + c("skip", "- gets own sync inner timeout"),
                 "    " + pass("gets default timeout"),
                 "",
-                c("bright pass", "  ") + c("green", "39 passing"),
+                c("bright pass", "  ") + c("green", "39 passing") + time("430ms"),
                 c("skip", "  4 skipped"),
                 c("bright fail", "  ") + c("fail", "5 failing"),
                 "",
@@ -705,10 +709,10 @@ describe("reporter spec", function () {
                 ],
                 output: [
                     "",
-                    c("plain", "  0 tests"),
+                    c("plain", "  0 tests") + time("0ms"),
                     "",
                     "",
-                    c("plain", "  0 tests"),
+                    c("plain", "  0 tests") + time("0ms"),
                     "",
                 ],
             })
@@ -729,13 +733,15 @@ describe("reporter spec", function () {
                     "  " + pass("test"),
                     "  " + pass("test"),
                     "",
-                    c("bright pass", "  ") + c("green", "2 passing"),
+                    c("bright pass", "  ") + c("green", "2 passing") +
+                        time("20ms"),
                     "",
                     "",
                     "  " + pass("test"),
                     "  " + pass("test"),
                     "",
-                    c("bright pass", "  ") + c("green", "2 passing"),
+                    c("bright pass", "  ") + c("green", "2 passing") +
+                        time("20ms"),
                     "",
                 ],
             })
@@ -758,7 +764,8 @@ describe("reporter spec", function () {
                     "  " + c("fail", "1) one"),
                     "  " + c("fail", "2) two"),
                     "",
-                    c("bright fail", "  ") + c("fail", "2 failing"),
+                    c("bright fail", "  ") + c("fail", "2 failing") +
+                        time("20ms"),
                     "",
                     "  " + c("plain", "1) one:"),
                 ], stack(sentinel), [
@@ -770,7 +777,8 @@ describe("reporter spec", function () {
                     "  " + c("fail", "1) one"),
                     "  " + c("fail", "2) two"),
                     "",
-                    c("bright fail", "  ") + c("fail", "2 failing"),
+                    c("bright fail", "  ") + c("fail", "2 failing") +
+                        time("20ms"),
                     "",
                     "  " + c("plain", "1) one:"),
                 ], stack(sentinel), [
@@ -797,7 +805,8 @@ describe("reporter spec", function () {
                     "  " + pass("one"),
                     "  " + c("fail", "1) two"),
                     "",
-                    c("bright pass", "  ") + c("green", "1 passing"),
+                    c("bright pass", "  ") + c("green", "1 passing") +
+                        time("20ms"),
                     c("bright fail", "  ") + c("fail", "1 failing"),
                     "",
                     "  " + c("plain", "1) two:"),
@@ -807,7 +816,8 @@ describe("reporter spec", function () {
                     "  " + pass("one"),
                     "  " + c("fail", "1) two"),
                     "",
-                    c("bright pass", "  ") + c("green", "1 passing"),
+                    c("bright pass", "  ") + c("green", "1 passing") +
+                        time("20ms"),
                     c("bright fail", "  ") + c("fail", "1 failing"),
                     "",
                     "  " + c("plain", "1) two:"),
@@ -832,7 +842,8 @@ describe("reporter spec", function () {
                     "  " + c("fail", "1) one"),
                     "  " + pass("two"),
                     "",
-                    c("bright pass", "  ") + c("green", "1 passing"),
+                    c("bright pass", "  ") + c("green", "1 passing") +
+                        time("20ms"),
                     c("bright fail", "  ") + c("fail", "1 failing"),
                     "",
                     "  " + c("plain", "1) one:"),
@@ -842,7 +853,8 @@ describe("reporter spec", function () {
                     "  " + c("fail", "1) one"),
                     "  " + pass("two"),
                     "",
-                    c("bright pass", "  ") + c("green", "1 passing"),
+                    c("bright pass", "  ") + c("green", "1 passing") +
+                        time("20ms"),
                     c("bright fail", "  ") + c("fail", "1 failing"),
                     "",
                     "  " + c("plain", "1) one:"),
@@ -869,7 +881,8 @@ describe("reporter spec", function () {
                     "  " + c("fail", "1) one"),
                     "  " + c("fail", "2) two"),
                     "",
-                    c("bright fail", "  ") + c("fail", "2 failing"),
+                    c("bright fail", "  ") + c("fail", "2 failing") +
+                        time("20ms"),
                     "",
                     "  " + c("plain", "1) one:"),
                 ], stack(assertion), [
@@ -881,7 +894,8 @@ describe("reporter spec", function () {
                     "  " + c("fail", "1) one"),
                     "  " + c("fail", "2) two"),
                     "",
-                    c("bright fail", "  ") + c("fail", "2 failing"),
+                    c("bright fail", "  ") + c("fail", "2 failing") +
+                        time("20ms"),
                     "",
                     "  " + c("plain", "1) one:"),
                 ], stack(assertion), [
@@ -908,7 +922,8 @@ describe("reporter spec", function () {
                     "  " + pass("one"),
                     "  " + c("fail", "1) two"),
                     "",
-                    c("bright pass", "  ") + c("green", "1 passing"),
+                    c("bright pass", "  ") + c("green", "1 passing") +
+                        time("20ms"),
                     c("bright fail", "  ") + c("fail", "1 failing"),
                     "",
                     "  " + c("plain", "1) two:"),
@@ -918,7 +933,8 @@ describe("reporter spec", function () {
                     "  " + pass("one"),
                     "  " + c("fail", "1) two"),
                     "",
-                    c("bright pass", "  ") + c("green", "1 passing"),
+                    c("bright pass", "  ") + c("green", "1 passing") +
+                        time("20ms"),
                     c("bright fail", "  ") + c("fail", "1 failing"),
                     "",
                     "  " + c("plain", "1) two:"),
@@ -943,7 +959,8 @@ describe("reporter spec", function () {
                     "  " + c("fail", "1) one"),
                     "  " + pass("two"),
                     "",
-                    c("bright pass", "  ") + c("green", "1 passing"),
+                    c("bright pass", "  ") + c("green", "1 passing") +
+                        time("20ms"),
                     c("bright fail", "  ") + c("fail", "1 failing"),
                     "",
                     "  " + c("plain", "1) one:"),
@@ -953,7 +970,8 @@ describe("reporter spec", function () {
                     "  " + c("fail", "1) one"),
                     "  " + pass("two"),
                     "",
-                    c("bright pass", "  ") + c("green", "1 passing"),
+                    c("bright pass", "  ") + c("green", "1 passing") +
+                        time("20ms"),
                     c("bright fail", "  ") + c("fail", "1 failing"),
                     "",
                     "  " + c("plain", "1) one:"),
@@ -966,4 +984,138 @@ describe("reporter spec", function () {
 
     context("no color", function () { run(false) })
     context("with color", function () { run(true) })
+
+    context("speed", function () {
+        // Speed affects `"pass"` and `"enter"` events only.
+        var medium = c("medium", " (40ms)")
+        var slow = c("slow", " (80ms)")
+
+        function at(speed) {
+            if (speed === "slow") return {duration: 80, slow: 75}
+            if (speed === "medium") return {duration: 40, slow: 75}
+            if (speed === "fast") return {duration: 20, slow: 75}
+            throw new RangeError("Unknown speed: `" + speed + "`")
+        }
+
+        test("is marked with color", {
+            /* eslint-disable max-len */
+
+            input: [
+                n("start", []),
+                n("enter", [p("core (basic)", 0)], undefined, at("fast")),
+                n("pass", [p("core (basic)", 0), p("has `base()`", 0)], undefined, at("fast")),
+                n("pass", [p("core (basic)", 0), p("has `test()`", 1)], undefined, at("fast")),
+                n("pass", [p("core (basic)", 0), p("has `parent()`", 2)], undefined, at("fast")),
+                n("pass", [p("core (basic)", 0), p("can accept a string + function", 3)], undefined, at("fast")),
+                n("pass", [p("core (basic)", 0), p("can accept a string", 4)], undefined, at("fast")),
+                n("pass", [p("core (basic)", 0), p("returns the current instance when given a callback", 5)], undefined, at("medium")),
+                n("pass", [p("core (basic)", 0), p("returns a prototypal clone when not given a callback", 6)], undefined, at("medium")),
+                n("pass", [p("core (basic)", 0), p("runs block tests within tests", 7)], undefined, at("fast")),
+                n("pass", [p("core (basic)", 0), p("runs successful inline tests within tests", 8)], undefined, at("fast")),
+                n("pass", [p("core (basic)", 0), p("accepts a callback with `t.run()`", 9)], undefined, at("fast")),
+                n("leave", [p("core (basic)", 0)]),
+                n("enter", [p("cli normalize glob", 1)], undefined, at("fast")),
+                n("enter", [p("cli normalize glob", 1), p("current directory", 0)], undefined, at("fast")),
+                n("pass", [p("cli normalize glob", 1), p("current directory", 0), p("normalizes a file", 0)], undefined, at("fast")),
+                n("pass", [p("cli normalize glob", 1), p("current directory", 0), p("normalizes a glob", 1)], undefined, at("fast")),
+                n("pass", [p("cli normalize glob", 1), p("current directory", 0), p("retains trailing slashes", 2)], undefined, at("fast")),
+                n("pass", [p("cli normalize glob", 1), p("current directory", 0), p("retains negative", 3)], undefined, at("fast")),
+                n("pass", [p("cli normalize glob", 1), p("current directory", 0), p("retains negative + trailing slashes", 4)], undefined, at("fast")),
+                n("leave", [p("cli normalize glob", 1), p("current directory", 0)]),
+                n("enter", [p("cli normalize glob", 1), p("absolute directory", 1)], undefined, at("fast")),
+                n("pass", [p("cli normalize glob", 1), p("absolute directory", 1), p("normalizes a file", 0)], undefined, at("fast")),
+                n("pass", [p("cli normalize glob", 1), p("absolute directory", 1), p("normalizes a glob", 1)], undefined, at("fast")),
+                n("pass", [p("cli normalize glob", 1), p("absolute directory", 1), p("retains trailing slashes", 2)], undefined, at("fast")),
+                n("pass", [p("cli normalize glob", 1), p("absolute directory", 1), p("retains negative", 3)], undefined, at("fast")),
+                n("pass", [p("cli normalize glob", 1), p("absolute directory", 1), p("retains negative + trailing slashes", 4)], undefined, at("fast")),
+                n("leave", [p("cli normalize glob", 1), p("absolute directory", 1)]),
+                n("enter", [p("cli normalize glob", 1), p("relative directory", 2)], undefined, at("fast")),
+                n("pass", [p("cli normalize glob", 1), p("relative directory", 2), p("normalizes a file", 0)], undefined, at("fast")),
+                n("pass", [p("cli normalize glob", 1), p("relative directory", 2), p("normalizes a glob", 1)], undefined, at("fast")),
+                n("pass", [p("cli normalize glob", 1), p("relative directory", 2), p("retains trailing slashes", 2)], undefined, at("fast")),
+                n("pass", [p("cli normalize glob", 1), p("relative directory", 2), p("retains negative", 3)], undefined, at("fast")),
+                n("pass", [p("cli normalize glob", 1), p("relative directory", 2), p("retains negative + trailing slashes", 4)], undefined, at("fast")),
+                n("leave", [p("cli normalize glob", 1), p("relative directory", 2)]),
+                n("enter", [p("cli normalize glob", 1), p("edge cases", 3)], undefined, at("fast")),
+                n("pass", [p("cli normalize glob", 1), p("edge cases", 3), p("normalizes `.` with a cwd of `.`", 0)], undefined, at("fast")),
+                n("pass", [p("cli normalize glob", 1), p("edge cases", 3), p("normalizes `..` with a cwd of `.`", 1)], undefined, at("fast")),
+                n("pass", [p("cli normalize glob", 1), p("edge cases", 3), p("normalizes `.` with a cwd of `..`", 2)], undefined, at("fast")),
+                n("pass", [p("cli normalize glob", 1), p("edge cases", 3), p("normalizes directories with a cwd of `..`", 3)], undefined, at("fast")),
+                n("pass", [p("cli normalize glob", 1), p("edge cases", 3), p("removes excess `.`", 4)], undefined, at("fast")),
+                n("pass", [p("cli normalize glob", 1), p("edge cases", 3), p("removes excess `..`", 5)], undefined, at("fast")),
+                n("pass", [p("cli normalize glob", 1), p("edge cases", 3), p("removes excess combined junk", 6)], undefined, at("fast")),
+                n("leave", [p("cli normalize glob", 1), p("edge cases", 3)]),
+                n("leave", [p("cli normalize glob", 1)]),
+                n("enter", [p("core (timeouts)", 2)], undefined, at("fast")),
+                n("pass", [p("core (timeouts)", 2), p("succeeds with own", 0)], undefined, at("medium")),
+                n("pass", [p("core (timeouts)", 2), p("fails with own", 1)], undefined, at("medium")),
+                n("pass", [p("core (timeouts)", 2), p("succeeds with inherited", 2)], undefined, at("slow")),
+                n("pass", [p("core (timeouts)", 2), p("fails with inherited", 3)], undefined, at("slow")),
+                n("pass", [p("core (timeouts)", 2), p("gets own set timeout", 4)], undefined, at("fast")),
+                n("pass", [p("core (timeouts)", 2), p("gets own inline set timeout", 5)], undefined, at("fast")),
+                n("pass", [p("core (timeouts)", 2), p("gets own sync inner timeout", 6)], undefined, at("fast")),
+                n("pass", [p("core (timeouts)", 2), p("gets default timeout", 7)], undefined, at("medium")),
+                n("leave", [p("core (timeouts)", 2)]),
+                n("end", []),
+            ],
+
+            output: [
+                "",
+                "  core (basic)",
+                "    " + pass("has `base()`"),
+                "    " + pass("has `test()`"),
+                "    " + pass("has `parent()`"),
+                "    " + pass("can accept a string + function"),
+                "    " + pass("can accept a string"),
+                "    " + pass("returns the current instance when given a callback") + medium,
+                "    " + pass("returns a prototypal clone when not given a callback") + medium,
+                "    " + pass("runs block tests within tests"),
+                "    " + pass("runs successful inline tests within tests"),
+                "    " + pass("accepts a callback with `t.run()`"),
+                "",
+                "  cli normalize glob",
+                "    current directory",
+                "      " + pass("normalizes a file"),
+                "      " + pass("normalizes a glob"),
+                "      " + pass("retains trailing slashes"),
+                "      " + pass("retains negative"),
+                "      " + pass("retains negative + trailing slashes"),
+                "    absolute directory",
+                "      " + pass("normalizes a file"),
+                "      " + pass("normalizes a glob"),
+                "      " + pass("retains trailing slashes"),
+                "      " + pass("retains negative"),
+                "      " + pass("retains negative + trailing slashes"),
+                "    relative directory",
+                "      " + pass("normalizes a file"),
+                "      " + pass("normalizes a glob"),
+                "      " + pass("retains trailing slashes"),
+                "      " + pass("retains negative"),
+                "      " + pass("retains negative + trailing slashes"),
+                "    edge cases",
+                "      " + pass("normalizes `.` with a cwd of `.`"),
+                "      " + pass("normalizes `..` with a cwd of `.`"),
+                "      " + pass("normalizes `.` with a cwd of `..`"),
+                "      " + pass("normalizes directories with a cwd of `..`"),
+                "      " + pass("removes excess `.`"),
+                "      " + pass("removes excess `..`"),
+                "      " + pass("removes excess combined junk"),
+                "",
+                "  core (timeouts)",
+                "    " + pass("succeeds with own") + medium,
+                "    " + pass("fails with own") + medium,
+                "    " + pass("succeeds with inherited") + slow,
+                "    " + pass("fails with inherited") + slow,
+                "    " + pass("gets own set timeout"),
+                "    " + pass("gets own inline set timeout"),
+                "    " + pass("gets own sync inner timeout"),
+                "    " + pass("gets default timeout") + medium,
+                "",
+                c("bright pass", "  ") + c("green", "47 passing") + time("1s"),
+                "",
+            ],
+
+            /* eslint-enable max-len */
+        })
+    })
 })
