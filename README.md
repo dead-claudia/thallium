@@ -4,7 +4,7 @@
 
 A simple, unopinionated, modular test framework meant to simplify your tests. It supports Node 0.10 and later, and browser support is also planned.
 
-*Note that this is a huge work in progress.*
+*Note that this is a huge work in progress, and is probably not suited for production projects.*
 
 ## Installation
 
@@ -43,13 +43,21 @@ Couple specific notes:
     t.notHasOwn(t, "foo")
     ```
 
+## Versioning
+
+As soon as it's 1.0, I'll stick to [SemVer](https://semver.org). Until then, here's how I'll aim for new versions:
+
+- Minor versions (`0.*`) represent larger breaking changes or larger new features. This includes much of the primary roadmap below.
+- Patch versions (`0.1.*`, etc.) represent bug fixes and smaller breaking changes/new features. This includes some of the nice-to-haves I've listed below the roadmap.
+
+I will try to avoid breaking changes on patch updates, but it's not guaranteed, particularly if it's because a bug fix.
+
 ## Roadmap
 
 This list is in a very rough chronological order.
 
 1. ~~Create basic reporters for TAP, spec, and dot.~~ **Done!**
     - I plan on adding browser support + DOM support *after* Karma 1.0 is released, because I need a [specific feature](https://github.com/karma-runner/karma/pull/1825) due to the library's architecture.
-    - Note that these three are directly blocking 0.1.
 2. Finish documenting this project. This mostly includes the core assertions.
 3. Support flaky tests via first-class retries. This would be enormously useful for several.
 4. Allow reporters to be removed, with an on-remove hook for the reporter in case external resources need reclaimed.
