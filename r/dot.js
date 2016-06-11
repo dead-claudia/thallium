@@ -17,10 +17,10 @@ function printDot(r, color) {
 module.exports = R.on({
     init: function (state) { state.counter = 0 },
     start: function () {},
-    enter: function (r) { return printDot(r, "fast") },
+    enter: function (r, ev) { return printDot(r, R.speed(ev)) },
     // This is meaningless for the output.
     leave: function () {},
-    pass: function (r) { return printDot(r, "fast") },
+    pass: function (r, ev) { return printDot(r, R.speed(ev)) },
 
     fail: function (r, ev) {
         r.pushError(ev, false)

@@ -15,8 +15,15 @@ var methods = require("../../lib/methods.js")
 var Symbols = R.Symbols
 var c = R.color
 var p = Util.p
-var n = Util.n
 var oldUseColors = Console.useColors()
+
+function n(type, path, value, data) {
+    if (type === "pass" || type === "enter") {
+        if (data == null) data = {duration: 1, slow: 75}
+    }
+
+    return Util.n(type, path, value, data)
+}
 
 describe("reporter dot", function () {
     it("is not itself a reporter", function () {
@@ -29,100 +36,100 @@ describe("reporter dot", function () {
         t.throws(function () { dot(n("end", [])) }, TypeError)
     })
 
+    function stack(err) {
+        var lines = ("    " + err.stack.replace(/^ +/gm, "      "))
+            .split(/\r?\n/g)
+
+        lines[0] = "    " + c("fail", lines[0].slice(4))
+
+        for (var i = 1; i < lines.length; i++) {
+            lines[i] = "      " + c("fail", lines[i].slice(6))
+        }
+
+        return lines
+    }
+
+    function Options(list) {
+        this.list = list
+        this.acc = ""
+    }
+
+    methods(Options, {
+        print: function (line) {
+            var self = this
+
+            return Promise.fromCallback(function (callback) {
+                if (self.acc !== "") {
+                    line += self.acc
+                    self.acc = ""
+                }
+
+                var lines = line.split("\n")
+
+                // So lines are printed consistently.
+                for (var i = 0; i < lines.length; i++) {
+                    self.list.push(lines[i])
+                }
+
+                return callback()
+            })
+        },
+
+        write: function (str) {
+            var self = this
+
+            return Promise.fromCallback(function (callback) {
+                var index = str.indexOf("\n")
+
+                if (index < 0) {
+                    self.acc += str
+                    return callback()
+                }
+
+                self.list.push(self.acc + str.slice(0, index))
+
+                var lines = str.slice(index + 1).split("\n")
+
+                self.acc = lines.pop()
+
+                for (var i = 0; i < lines.length; i++) {
+                    self.list.push(lines[i])
+                }
+
+                return callback()
+            })
+        },
+
+        reset: function () {
+            if (this.acc !== "") {
+                this.list.push(this.acc)
+                this.acc = ""
+            }
+        },
+    })
+
+    function test(name, opts) {
+        it(name, function () {
+            var list = []
+            var reporter = dot(new Options(list))
+
+            return Promise.each(opts.input, function (i) {
+                return resolveAny(reporter, undefined, i)
+            })
+            .then(function () {
+                t.match(list, opts.output)
+            })
+        })
+    }
+
     function run(useColors) { // eslint-disable-line max-statements
         Console.useColors(useColors)
         beforeEach(function () { Console.useColors(useColors) })
         afterEach(function () { Console.useColors(oldUseColors) })
 
-        function stack(err) {
-            var lines = ("    " + err.stack.replace(/^ +/gm, "      "))
-                .split(/\r?\n/g)
-
-            lines[0] = "    " + c("fail", lines[0].slice(4))
-
-            for (var i = 1; i < lines.length; i++) {
-                lines[i] = "      " + c("fail", lines[i].slice(6))
-            }
-
-            return lines
-        }
-
-        function Options(list) {
-            this.list = list
-            this.acc = ""
-        }
-
-        methods(Options, {
-            print: function (line) {
-                var self = this
-
-                return Promise.fromCallback(function (callback) {
-                    if (self.acc !== "") {
-                        line += self.acc
-                        self.acc = ""
-                    }
-
-                    var lines = line.split("\n")
-
-                    // So lines are printed consistently.
-                    for (var i = 0; i < lines.length; i++) {
-                        self.list.push(lines[i])
-                    }
-
-                    return callback()
-                })
-            },
-
-            write: function (str) {
-                var self = this
-
-                return Promise.fromCallback(function (callback) {
-                    var index = str.indexOf("\n")
-
-                    if (index < 0) {
-                        self.acc += str
-                        return callback()
-                    }
-
-                    self.list.push(self.acc + str.slice(0, index))
-
-                    var lines = str.slice(index + 1).split("\n")
-
-                    self.acc = lines.pop()
-
-                    for (var i = 0; i < lines.length; i++) {
-                        self.list.push(lines[i])
-                    }
-
-                    return callback()
-                })
-            },
-
-            reset: function () {
-                if (this.acc !== "") {
-                    this.list.push(this.acc)
-                    this.acc = ""
-                }
-            },
-        })
-
         var pass = c("fast", Symbols.Dot)
         var fail = c("fail", Symbols.Dot)
         var skip = c("skip", Symbols.Dot)
-
-        function test(name, opts) {
-            it(name, function () {
-                var list = []
-                var reporter = dot(new Options(list))
-
-                return Promise.each(opts.input, function (i) {
-                    return resolveAny(reporter, undefined, i)
-                })
-                .then(function () {
-                    t.match(list, opts.output)
-                })
-            })
-        }
 
         test("empty test", {
             input: [
@@ -952,4 +959,118 @@ describe("reporter dot", function () {
 
     context("no color", function () { run(false) })
     context("with color", function () { run(true) })
+
+    context("speed", function () {
+        // Speed affects `"pass"` and `"enter"` events only.
+        var fast = c("fast", Symbols.Dot)
+        var medium = c("medium", Symbols.Dot)
+        var slow = c("slow", Symbols.Dot)
+
+        function at(speed) {
+            if (speed === "slow") return {duration: 80, slow: 75}
+            if (speed === "medium") return {duration: 40, slow: 75}
+            if (speed === "fast") return {duration: 20, slow: 75}
+            throw new RangeError("Unknown speed: `" + speed + "`")
+        }
+
+        test("is marked with color", {
+            /* eslint-disable max-len */
+
+            input: [
+                n("start", []),
+                n("enter", [p("core (basic)", 0)], undefined, at("fast")),
+                n("pass", [p("core (basic)", 0), p("has `base()`", 0)], undefined, at("fast")),
+                n("pass", [p("core (basic)", 0), p("has `test()`", 1)], undefined, at("fast")),
+                n("pass", [p("core (basic)", 0), p("has `parent()`", 2)], undefined, at("fast")),
+                n("pass", [p("core (basic)", 0), p("can accept a string + function", 3)], undefined, at("fast")),
+                n("pass", [p("core (basic)", 0), p("can accept a string", 4)], undefined, at("fast")),
+                n("pass", [p("core (basic)", 0), p("returns the current instance when given a callback", 5)], undefined, at("medium")),
+                n("pass", [p("core (basic)", 0), p("returns a prototypal clone when not given a callback", 6)], undefined, at("medium")),
+                n("pass", [p("core (basic)", 0), p("runs block tests within tests", 7)], undefined, at("fast")),
+                n("pass", [p("core (basic)", 0), p("runs successful inline tests within tests", 8)], undefined, at("fast")),
+                n("pass", [p("core (basic)", 0), p("accepts a callback with `t.run()`", 9)], undefined, at("fast")),
+                n("leave", [p("core (basic)", 0)]),
+                n("enter", [p("cli normalize glob", 1)], undefined, at("fast")),
+                n("enter", [p("cli normalize glob", 1), p("current directory", 0)], undefined, at("fast")),
+                n("pass", [p("cli normalize glob", 1), p("current directory", 0), p("normalizes a file", 0)], undefined, at("fast")),
+                n("pass", [p("cli normalize glob", 1), p("current directory", 0), p("normalizes a glob", 1)], undefined, at("fast")),
+                n("pass", [p("cli normalize glob", 1), p("current directory", 0), p("retains trailing slashes", 2)], undefined, at("fast")),
+                n("pass", [p("cli normalize glob", 1), p("current directory", 0), p("retains negative", 3)], undefined, at("fast")),
+                n("pass", [p("cli normalize glob", 1), p("current directory", 0), p("retains negative + trailing slashes", 4)], undefined, at("fast")),
+                n("leave", [p("cli normalize glob", 1), p("current directory", 0)]),
+                n("enter", [p("cli normalize glob", 1), p("absolute directory", 1)], undefined, at("fast")),
+                n("pass", [p("cli normalize glob", 1), p("absolute directory", 1), p("normalizes a file", 0)], undefined, at("fast")),
+                n("pass", [p("cli normalize glob", 1), p("absolute directory", 1), p("normalizes a glob", 1)], undefined, at("fast")),
+                n("pass", [p("cli normalize glob", 1), p("absolute directory", 1), p("retains trailing slashes", 2)], undefined, at("fast")),
+                n("pass", [p("cli normalize glob", 1), p("absolute directory", 1), p("retains negative", 3)], undefined, at("fast")),
+                n("pass", [p("cli normalize glob", 1), p("absolute directory", 1), p("retains negative + trailing slashes", 4)], undefined, at("fast")),
+                n("leave", [p("cli normalize glob", 1), p("absolute directory", 1)]),
+                n("enter", [p("cli normalize glob", 1), p("relative directory", 2)], undefined, at("fast")),
+                n("pass", [p("cli normalize glob", 1), p("relative directory", 2), p("normalizes a file", 0)], undefined, at("fast")),
+                n("pass", [p("cli normalize glob", 1), p("relative directory", 2), p("normalizes a glob", 1)], undefined, at("fast")),
+                n("pass", [p("cli normalize glob", 1), p("relative directory", 2), p("retains trailing slashes", 2)], undefined, at("fast")),
+                n("pass", [p("cli normalize glob", 1), p("relative directory", 2), p("retains negative", 3)], undefined, at("fast")),
+                n("pass", [p("cli normalize glob", 1), p("relative directory", 2), p("retains negative + trailing slashes", 4)], undefined, at("fast")),
+                n("leave", [p("cli normalize glob", 1), p("relative directory", 2)]),
+                n("enter", [p("cli normalize glob", 1), p("edge cases", 3)], undefined, at("fast")),
+                n("pass", [p("cli normalize glob", 1), p("edge cases", 3), p("normalizes `.` with a cwd of `.`", 0)], undefined, at("fast")),
+                n("pass", [p("cli normalize glob", 1), p("edge cases", 3), p("normalizes `..` with a cwd of `.`", 1)], undefined, at("fast")),
+                n("pass", [p("cli normalize glob", 1), p("edge cases", 3), p("normalizes `.` with a cwd of `..`", 2)], undefined, at("fast")),
+                n("pass", [p("cli normalize glob", 1), p("edge cases", 3), p("normalizes directories with a cwd of `..`", 3)], undefined, at("fast")),
+                n("pass", [p("cli normalize glob", 1), p("edge cases", 3), p("removes excess `.`", 4)], undefined, at("fast")),
+                n("pass", [p("cli normalize glob", 1), p("edge cases", 3), p("removes excess `..`", 5)], undefined, at("fast")),
+                n("pass", [p("cli normalize glob", 1), p("edge cases", 3), p("removes excess combined junk", 6)], undefined, at("fast")),
+                n("leave", [p("cli normalize glob", 1), p("edge cases", 3)]),
+                n("leave", [p("cli normalize glob", 1)]),
+                n("enter", [p("core (timeouts)", 2)], undefined, at("fast")),
+                n("pass", [p("core (timeouts)", 2), p("succeeds with own", 0)], undefined, at("medium")),
+                n("pass", [p("core (timeouts)", 2), p("fails with own", 1)], undefined, at("medium")),
+                n("pass", [p("core (timeouts)", 2), p("succeeds with inherited", 2)], undefined, at("slow")),
+                n("pass", [p("core (timeouts)", 2), p("fails with inherited", 3)], undefined, at("slow")),
+                n("pass", [p("core (timeouts)", 2), p("gets own set timeout", 4)], undefined, at("fast")),
+                n("pass", [p("core (timeouts)", 2), p("gets own inline set timeout", 5)], undefined, at("fast")),
+                n("pass", [p("core (timeouts)", 2), p("gets own sync inner timeout", 6)], undefined, at("fast")),
+                n("pass", [p("core (timeouts)", 2), p("gets default timeout", 7)], undefined, at("medium")),
+                n("leave", [p("core (timeouts)", 2)]),
+                n("end", []),
+            ],
+
+            output: [
+                "",
+                "  " +
+                // core (basic)
+                    fast +
+                    fast + fast + fast + fast + fast + medium + medium + fast +
+                    fast + fast +
+
+                // cli normalize glob
+                    fast +
+
+                // cli normalize glob current directory
+                    fast +
+                    fast + fast + fast + fast + fast +
+
+                // cli normalize glob absolute directory
+                    fast +
+                    fast + fast + fast + fast + fast +
+
+                // cli normalize glob relative directory
+                    fast +
+                    fast + fast + fast + fast + fast +
+
+                // cli normalize glob edge cases
+                    fast +
+                    fast + fast + fast + fast + fast + fast + fast +
+
+                // core (timeouts)
+                    fast +
+                    medium + medium + slow + slow + fast + fast + fast + medium,
+                "",
+                c("bright pass", "  ") + c("green", "47 passing"),
+                "",
+            ],
+
+            /* eslint-enable max-len */
+        })
+    })
 })
