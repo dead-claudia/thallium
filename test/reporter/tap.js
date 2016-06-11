@@ -5,7 +5,7 @@
 
 var inspect = require("util").inspect
 var Promise = require("bluebird")
-var resolveAny = require("../../lib/core/common.js").resolveAny
+var Resolver = require("../../lib/resolver.js")
 var t = require("../../index.js")
 var tap = require("../../r/tap.js")
 var Util = require("../../helpers/base.js")
@@ -44,10 +44,13 @@ describe("reporter tap", function () { // eslint-disable-line max-statements
     function test(name, opts) {
         (opts.skip ? it.skip : it)(name, function () {
             var list = []
-            var reporter = tap({print: function (arg) { list.push(arg) }})
+            var reporter = tap({print: function (arg) {
+                list.push(arg)
+                return Promise.resolve()
+            }})
 
             return Promise.each(opts.input, function (i) {
-                return resolveAny(reporter, undefined, i)
+                return Resolver.resolve1(reporter, undefined, i)
             })
             .then(function () {
                 t.match(list, opts.output)

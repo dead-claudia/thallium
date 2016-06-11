@@ -7,8 +7,7 @@ var R = require("../lib/reporter/index.js")
 var inspect = require("../lib/inspect.js")
 
 function shouldBreak(minLength, str) {
-    return str.length > R.windowWidth - minLength ||
-        /\r?\n|[:?-]/.test(str)
+    return str.length > R.windowWidth - minLength || /\r?\n|[:?-]/.test(str)
 }
 
 function template(r, ev, tmpl, skip) {
@@ -71,10 +70,8 @@ function printError(r, ev) {
 
 module.exports = R.on({
     init: function (state) { state.counter = 0 },
-
-    start: function (r) {
-        return r.print("TAP version 13")
-    },
+    accepts: ["print", "reset"],
+    start: function (r) { return r.print("TAP version 13") },
 
     enter: function (r, ev) {
         // Print a leading comment, to make some TAP formatters prettier.
@@ -84,10 +81,7 @@ module.exports = R.on({
 
     // This is meaningless for the output.
     leave: function () {},
-
-    pass: function (r, ev) {
-        return template(r, ev, "ok %c %p")
-    },
+    pass: function (r, ev) { return template(r, ev, "ok %c %p") },
 
     fail: function (r, ev) {
         return template(r, ev, "not ok %c %p")
@@ -96,9 +90,7 @@ module.exports = R.on({
         .then(function () { return r.print("  ...") })
     },
 
-    skip: function (r, ev) {
-        return template(r, ev, "ok %c # skip %p")
-    },
+    skip: function (r, ev) { return template(r, ev, "ok %c # skip %p") },
 
     extra: function (r, ev) {
         return template(r, ev, "not ok %c %p # extra")

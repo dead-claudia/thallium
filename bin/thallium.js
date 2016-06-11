@@ -31,6 +31,7 @@ var args = {
     cwd: null,
 }
 
+var color
 var node = []
 var rest = []
 var last, i
@@ -48,6 +49,8 @@ for (i = 2; i < process.argv.length; i++) {
     } else if (/^(-hh|--help-detailed)$/.test(arg)) {
         help(true)
         process.exit()
+    } else if (/^--(no-)?color$/.test(arg)) {
+        color = arg
     } else if (/^(-c|--config)$/.test(arg)) {
         last = "config"
     } else if (/^(-r|--require)$/.test(arg)) {
@@ -73,6 +76,7 @@ function exit(code) {
 cp.spawn(process.argv[0], Array.prototype.concat.apply([], [
     node,
     [path.resolve(__dirname, "_thallium.js")],
+    color || [],
     args.config == null ? [] : ["--config", args.config],
     args.cwd == null ? [] : ["--cwd", args.cwd],
     Array.prototype.concat.apply([],

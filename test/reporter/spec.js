@@ -4,18 +4,17 @@
 // correct, and it will *not* verify this.
 
 var Promise = require("bluebird")
-var resolveAny = require("../../lib/core/common.js").resolveAny
+var Resolver = require("../../lib/resolver.js")
 var t = require("../../index.js")
 var spec = require("../../r/spec.js")
 var R = require("../../lib/reporter/index.js")
 var Util = require("../../helpers/base.js")
-var Console = require("../../lib/reporter/console.js")
+var SupportsColor = require("../../lib/reporter/console.js").SupportsColor
 
 var Symbols = R.Symbols
 var c = R.color
 var p = Util.p
 var n = Util.n
-var oldUseColors = Console.useColors()
 
 describe("reporter spec", function () {
     it("is not itself a reporter", function () {
@@ -49,36 +48,58 @@ describe("reporter spec", function () {
         return c("light", " (" + duration + ")")
     }
 
-    function test(name, opts) {
-        it(name, function () {
-            var list = []
-            var reporter = spec({print: function (arg) { list.push(arg) }})
+    function run(envColors, reporterColors) { // eslint-disable-line max-statements, max-len
+        SupportsColor.set(envColors)
+        SupportsColor.forced = false
+        beforeEach(function () { SupportsColor.set(envColors) })
+        afterEach(function () { SupportsColor.reset() })
 
-            return Promise.each(opts.input, function (i) {
-                return resolveAny(reporter, undefined, i)
+        function test(name, opts) {
+            it(name, function () {
+                var list = []
+                var reporter = spec({
+                    colors: reporterColors,
+                    print: function (arg) {
+                        list.push(arg)
+                        return Promise.resolve()
+                    },
+                })
+
+                return Promise.each(opts.input, function (i) {
+                    return Resolver.resolve1(reporter, undefined, i)
+                })
+                .then(function () {
+                    t.match(list, opts.output)
+                })
             })
-            .then(function () {
-                t.match(list, opts.output)
+        }
+
+        // So I can verify colors are enabled.
+        if (envColors || reporterColors) {
+            test("empty test", {
+                input: [
+                    n("start", []),
+                    n("end", []),
+                ],
+                output: [
+                    "",
+                    c("plain", "  0 tests") + time("0ms"),
+                    "",
+                ],
             })
-        })
-    }
-
-    function run(useColors) { // eslint-disable-line max-statements
-        Console.useColors(useColors)
-        beforeEach(function () { Console.useColors(useColors) })
-        afterEach(function () { Console.useColors(oldUseColors) })
-
-        test("empty test", {
-            input: [
-                n("start", []),
-                n("end", []),
-            ],
-            output: [
-                "",
-                c("plain", "  0 tests") + time("0ms"),
-                "",
-            ],
-        })
+        } else {
+            test("empty test", {
+                input: [
+                    n("start", []),
+                    n("end", []),
+                ],
+                output: [
+                    "",
+                    "  0 tests (0ms)",
+                    "",
+                ],
+            })
+        }
 
         test("passing 2", {
             input: [
@@ -980,12 +1001,36 @@ describe("reporter spec", function () {
                 ]),
             })
         })
+
+        SupportsColor.reset()
     }
 
-    context("no color", function () { run(false) })
-    context("with color", function () { run(true) })
+    context("no env color + no color opt", function () { run(false, false) })
+    context("with env color + no color opt", function () { run(true, false) })
+    context("no env color + with color opt", function () { run(false, true) })
+    context("with env color + with color opt", function () { run(true, true) })
 
     context("speed", function () {
+        function test(name, opts) {
+            it(name, function () {
+                var list = []
+                var reporter = spec({
+                    colors: true,
+                    print: function (arg) {
+                        list.push(arg)
+                        return Promise.resolve()
+                    },
+                })
+
+                return Promise.each(opts.input, function (i) {
+                    return Resolver.resolve1(reporter, undefined, i)
+                })
+                .then(function () {
+                    t.match(list, opts.output)
+                })
+            })
+        }
+
         // Speed affects `"pass"` and `"enter"` events only.
         var medium = c("medium", " (40ms)")
         var slow = c("slow", " (80ms)")

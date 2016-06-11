@@ -3,7 +3,7 @@
 var Promise = require("bluebird")
 var t = require("../../index.js")
 var assertions = require("../../assertions.js")
-var resolveAny = require("../../lib/core/common.js").resolveAny
+var Resolver = require("../../lib/resolver.js")
 var Run = require("../../lib/cli/run.js")
 var Cli = require("../../helpers/cli.js")
 var Base = require("../../helpers/base.js")
@@ -20,7 +20,7 @@ describe("cli runner", function () {
 
         function execute(reporter, type) {
             return function () {
-                return resolveAny(reporter, undefined, {
+                return Resolver.resolve1(reporter, undefined, {
                     type: type,
                     value: map[type],
                     path: {name: "test", index: 0},

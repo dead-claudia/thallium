@@ -4,19 +4,18 @@
 // correct, and it will *not* verify this.
 
 var Promise = require("bluebird")
-var resolveAny = require("../../lib/core/common.js").resolveAny
+var Resolver = require("../../lib/resolver.js")
 var t = require("../../index.js")
 var dot = require("../../r/dot.js")
 var R = require("../../lib/reporter/index.js")
 var Util = require("../../helpers/base.js")
-var Console = require("../../lib/reporter/console.js")
+var SupportsColor = require("../../lib/reporter/console.js").SupportsColor
 var methods = require("../../lib/methods.js")
 
 var Symbols = R.Symbols
 var c = R.color
 var p = Util.p
 var n = Util.n
-var oldUseColors = Console.useColors()
 
 describe("reporter dot", function () {
     it("is not itself a reporter", function () {
@@ -42,62 +41,57 @@ describe("reporter dot", function () {
         return lines
     }
 
-    function Options(list) {
-        this.list = list
-        this.acc = ""
+    function Options(list, colors) {
+        this._list = list
+        this._acc = ""
+        this.colors = colors
     }
 
     methods(Options, {
         print: function (line) {
-            var self = this
+            if (this._acc !== "") {
+                line += this._acc
+                this._acc = ""
+            }
 
-            return Promise.fromCallback(function (callback) {
-                if (self.acc !== "") {
-                    line += self.acc
-                    self.acc = ""
-                }
+            var lines = line.split("\n")
 
-                var lines = line.split("\n")
+            // So lines are printed consistently.
+            for (var i = 0; i < lines.length; i++) {
+                this._list.push(lines[i])
+            }
 
-                // So lines are printed consistently.
-                for (var i = 0; i < lines.length; i++) {
-                    self.list.push(lines[i])
-                }
-
-                return callback()
-            })
+            return Promise.resolve()
         },
 
         write: function (str) {
-            var self = this
+            var index = str.indexOf("\n")
 
-            return Promise.fromCallback(function (callback) {
-                var index = str.indexOf("\n")
+            if (index < 0) {
+                this._acc += str
+                return Promise.resolve()
+            }
 
-                if (index < 0) {
-                    self.acc += str
-                    return callback()
-                }
+            this._list.push(this._acc + str.slice(0, index))
 
-                self.list.push(self.acc + str.slice(0, index))
+            var lines = str.slice(index + 1).split("\n")
 
-                var lines = str.slice(index + 1).split("\n")
+            this._acc = lines.pop()
 
-                self.acc = lines.pop()
+            for (var i = 0; i < lines.length; i++) {
+                this._list.push(lines[i])
+            }
 
-                for (var i = 0; i < lines.length; i++) {
-                    self.list.push(lines[i])
-                }
-
-                return callback()
-            })
+            return Promise.resolve()
         },
 
         reset: function () {
-            if (this.acc !== "") {
-                this.list.push(this.acc)
-                this.acc = ""
+            if (this._acc !== "") {
+                this._list.push(this._acc)
+                this._acc = ""
             }
+
+            return Promise.resolve()
         },
     })
 
@@ -105,40 +99,56 @@ describe("reporter dot", function () {
         return c("light", " (" + duration + ")")
     }
 
-    function test(name, opts) {
-        it(name, function () {
-            var list = []
-            var reporter = dot(new Options(list))
-
-            return Promise.each(opts.input, function (i) {
-                return resolveAny(reporter, undefined, i)
-            })
-            .then(function () {
-                t.match(list, opts.output)
-            })
-        })
-    }
-
-    function run(useColors) { // eslint-disable-line max-statements
-        Console.useColors(useColors)
-        beforeEach(function () { Console.useColors(useColors) })
-        afterEach(function () { Console.useColors(oldUseColors) })
+    function run(envColors, reporterColors) { // eslint-disable-line max-statements, max-len
+        SupportsColor.set(envColors)
+        SupportsColor.forced = false
+        beforeEach(function () { SupportsColor.set(envColors) })
+        afterEach(function () { SupportsColor.reset() })
 
         var pass = c("fast", Symbols.Dot)
         var fail = c("fail", Symbols.Dot)
         var skip = c("skip", Symbols.Dot)
 
-        test("empty test", {
-            input: [
-                n("start", []),
-                n("end", []),
-            ],
-            output: [
-                "",
-                c("plain", "  0 tests") + time("0ms"),
-                "",
-            ],
-        })
+        function test(name, opts) {
+            it(name, function () {
+                var list = []
+                var reporter = dot(new Options(list, reporterColors))
+
+                return Promise.each(opts.input, function (i) {
+                    return Resolver.resolve1(reporter, undefined, i)
+                })
+                .then(function () {
+                    t.match(list, opts.output)
+                })
+            })
+        }
+
+        // So I can verify colors are enabled.
+        if (envColors || reporterColors) {
+            test("empty test", {
+                input: [
+                    n("start", []),
+                    n("end", []),
+                ],
+                output: [
+                    "",
+                    c("plain", "  0 tests") + time("0ms"),
+                    "",
+                ],
+            })
+        } else {
+            test("empty test", {
+                input: [
+                    n("start", []),
+                    n("end", []),
+                ],
+                output: [
+                    "",
+                    "  0 tests (0ms)",
+                    "",
+                ],
+            })
+        }
 
         test("passing 2", {
             input: [
@@ -965,13 +975,31 @@ describe("reporter dot", function () {
                     "",
                 ]),
             })
+
+            SupportsColor.reset()
         })
     }
 
-    context("no color", function () { run(false) })
-    context("with color", function () { run(true) })
+    context("no env color + no color opt", function () { run(false, false) })
+    context("with env color + no color opt", function () { run(true, false) })
+    context("no env color + with color opt", function () { run(false, true) })
+    context("with env color + with color opt", function () { run(true, true) })
 
     context("speed", function () {
+        function test(name, opts) {
+            it(name, function () {
+                var list = []
+                var reporter = dot(new Options(list, true))
+
+                return Promise.each(opts.input, function (i) {
+                    return Resolver.resolve1(reporter, undefined, i)
+                })
+                .then(function () {
+                    t.match(list, opts.output)
+                })
+            })
+        }
+
         // Speed affects `"pass"` and `"enter"` events only.
         var fast = c("fast", Symbols.Dot)
         var medium = c("medium", Symbols.Dot)

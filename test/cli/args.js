@@ -23,9 +23,13 @@ describe("cli arguments", function () {
         var it = alias
 
         it("works with defaults", "", {})
+        it("works with --color", "--color", {color: true})
+        it("works with --no-color", "--no-color", {color: false})
+        it("works with --color --no-color", "--color --no-color", {color: false}) // eslint-disable-line max-len
+        it("works with --no-color --color", "--no-color --color", {color: true})
         it("works with --help", "--help", {help: "simple"})
         it("works with -h", "-h", {help: "simple"})
-        it("works with --help-detailed", "--help-detailed", {help: "detailed"}) // eslint-disable-line max-len
+        it("works with --help-detailed", "--help-detailed", {help: "detailed"})
         it("works with -H", "-H", {help: "detailed"})
         it("works with --cwd", "--cwd foo", {cwd: "foo"})
         it("works with --config", "--config foo", {config: "foo"})

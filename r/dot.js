@@ -16,6 +16,7 @@ function printDot(r, color) {
 
 module.exports = R.on({
     init: function (state) { state.counter = 0 },
+    accepts: ["print", "write", "reset", "colors"],
     start: function () {},
     enter: function (r, ev) { return printDot(r, R.speed(ev)) },
     // This is meaningless for the output.

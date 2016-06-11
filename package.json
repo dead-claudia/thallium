@@ -55,13 +55,10 @@
   "dependencies": {
     "bluebird": "^3.3.4",
     "diff": "^2.2.2",
-    "from2": "^2.1.1",
     "glob": "^7.0.3",
-    "glob-stream": "^5.3.2",
     "interpret": "^1.0.0",
     "minimatch": "^3.0.0",
     "resolve": "^1.1.7",
-    "supports-color": "^3.1.2",
     "through2": "^2.0.1",
     "util-inspect": "^0.1.8"
   },

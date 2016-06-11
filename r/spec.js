@@ -36,6 +36,8 @@ module.exports = R.on({
         state.lastIsNested = false
     },
 
+    accepts: ["print", "reset", "colors"],
+
     start: function (r, ev) {
         if (ev.path.length === 0) return r.print()
 
