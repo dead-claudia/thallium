@@ -1,5 +1,9 @@
 # Changelog
 
+## v0.1.2
+
+Fix type-related bug regarding skipped tests.
+
 ## v0.1.1
 
 Fixed outdated `--help(-detailed)` output.
