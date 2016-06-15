@@ -1,5 +1,9 @@
 # Changelog
 
+## v0.1.3
+
+Infinite loop fix (caught shortly after last publish)
+
 ## v0.1.2
 
 Fix type-related bug regarding skipped tests.
