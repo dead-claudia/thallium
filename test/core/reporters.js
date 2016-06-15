@@ -592,7 +592,7 @@ describe("core (reporters)", function () { // eslint-disable-line max-statements
 
         var ttt = tt.test("test")
 
-        ttt._.state.init = function () { throw sentinel }
+        ttt._.data.state.init = function () { throw sentinel }
 
         return tt.run().then(
             function () { t.fail("Expected a rejection") },
