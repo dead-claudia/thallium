@@ -13,8 +13,7 @@
   },
   "browser": {
     "./lib/is-buffer.js": "is-buffer",
-    "./lib/inspect.js": "util-inspect",
-    "./lib/reporter/console.js": "./lib/reporter/browser.js"
+    "./lib/inspect.js": "util-inspect"
   },
   "files": [
     "assertions.d.ts",
@@ -48,6 +47,8 @@
     "coffeelint": "^1.15.7",
     "eslint": "^2.6.0",
     "eslint-config-isiahmeadows": "^0.1.6",
+    "jsdom": "^9.4.0",
+    "jsdom-global": "^2.0.0",
     "karma": "^1.1.0",
     "karma-browserify": "^5.0.5",
     "karma-chrome-launcher": "^1.0.1",

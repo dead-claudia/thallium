@@ -37,6 +37,27 @@ var Util = global.Util = {
 // re-suppressed.
 Util.silenceEmptyInlineWarnings()
 
+// Inject a no-op into browsers (so the relevant tests actually run), but not
+// into older Node versions unsupported by jsdom.
+if (!global.process) {
+    Util.jsdom = function () {}
+} else {
+    var exec = /^v(\d+)/.exec(global.process.version)
+
+    // Update this version number whenever jsdom increases their minimum
+    // supported Node version.
+    if (exec != null && exec[1] >= 4) {
+        var jsdom = require("jsdom-global") // eslint-disable-line global-require, max-len
+
+        Util.jsdom = function (opts) {
+            var cleanup
+
+            beforeEach(function () { cleanup = jsdom(undefined, opts) })
+            afterEach(function () { cleanup() })
+        }
+    }
+}
+
 var AssertionError = t.reflect().AssertionError
 
 function fixArg(arg, type) {
