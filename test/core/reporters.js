@@ -1,13 +1,9 @@
 "use strict"
 
-var t = require("../../index.js")
-var Util = require("../../helpers/base.js")
-var assertions = require("../../assertions.js")
-
-var n = Util.n
-var p = Util.p
-
 describe("core (reporters)", function () { // eslint-disable-line max-statements
+    var n = Util.n
+    var p = Util.p
+
     // Use thenables, not actual Promises.
     function resolve(value) {
         return {then: function (resolve) { resolve(value) }}
@@ -461,7 +457,7 @@ describe("core (reporters)", function () { // eslint-disable-line max-statements
         var sentinel = createSentinel("sentinel")
 
         tt.reporter(Util.push(ret))
-        tt.use(assertions)
+        tt.use(Util.assertions)
 
         tt.test("mod-one", function (tt) {
             tt.test("1 === 1").equal(1, 1)
@@ -472,13 +468,13 @@ describe("core (reporters)", function () { // eslint-disable-line max-statements
             })
 
             tt.async("bar()", function (t, done) {
-                global.setTimeout(function () { done(new Error("fail")) }, 0)
+                Util.setTimeout(function () { done(new Error("fail")) }, 0)
             })
 
             tt.async("baz()", function () {
                 return {
                     then: function (_, reject) {
-                        global.setTimeout(function () { reject(sentinel) }, 0)
+                        Util.setTimeout(function () { reject(sentinel) }, 0)
                     },
                 }
             })
@@ -609,7 +605,7 @@ describe("core (reporters)", function () { // eslint-disable-line max-statements
         var sentinel = createSentinel("sentinel")
 
         tt.reporter(Util.push(ret))
-        tt.use(assertions)
+        tt.use(Util.assertions)
 
         tt.test("mod-one", function (tt) {
             tt.test("1 === 1").equal(1, 1)
@@ -620,13 +616,13 @@ describe("core (reporters)", function () { // eslint-disable-line max-statements
             })
 
             tt.async("bar()", function (t, done) {
-                global.setTimeout(function () { done(new Error("fail")) }, 0)
+                Util.setTimeout(function () { done(new Error("fail")) }, 0)
             })
 
             tt.async("baz()", function () {
                 return {
                     then: function (_, reject) {
-                        global.setTimeout(function () { reject(sentinel) }, 0)
+                        Util.setTimeout(function () { reject(sentinel) }, 0)
                     },
                 }
             })

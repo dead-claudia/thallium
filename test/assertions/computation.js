@@ -1,11 +1,9 @@
 "use strict"
 
-var t = require("../../index.js")
-var Util = require("../../helpers/base.js")
-var fail = Util.fail
-var basic = Util.basic
-
 describe("assertions (computation)", function () {
+    var fail = Util.fail
+    var basic = Util.basic
+
     basic("t.throws()", function () {
         t.throws(function () { throw new Error("fail") })
         t.throws(function () { throw new TypeError("fail") }, TypeError)

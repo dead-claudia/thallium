@@ -29,7 +29,7 @@ Each event has the following properties:
 - `slow` - The active slow duration for the test. This is positive for `"pass"`, `"fail"`, and `"enter"` events, and 0 for all others.
 - `duration` - The time it took for this test to complete. This is either 0 or positive for `"pass"`, `"fail"`, and `"enter"` events, and -1 for all others.
 
-Additionally, there is an `"error"` event that handles errors either internally or from the reporter itself. At this point, it's recommended to close the reporter, as it's no longer safe to continue. As an exception, errors from handling `"extra"` reports are silently ignored for practical reasons (it's an exceptionally complex problem, where I'd have to roll my own async abstraction), and errors from handling `"error"` reports are fatal. If you would prefer to just propagate those errors, you can simply rethrow the event's `value`.
+The `"error"` event is for handling errors either thrown from Thallium or the reporter itself. At this point, it's recommended to close the reporter, as it's no longer safe to continue. As an exception, errors from handling `"extra"` reports are silently ignored for practical reasons (it's an exceptionally complex problem, where I'd have to roll my own async abstraction), and errors from handling `"error"` reports are fatal. If you would prefer to just propagate those errors, you can simply rethrow the event's `value`.
 
 ## Event Order
 

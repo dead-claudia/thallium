@@ -1,10 +1,6 @@
 "use strict"
 
-var t = require("../../index.js")
-var methods = require("../../lib/methods.js")
-var Util = require("../../helpers/base.js")
-var fail = Util.fail
-var basic = Util.basic
+/* global Symbol */
 
 describe("assertions (type)", function () {
     describe("t.type()", function () {
@@ -22,7 +18,7 @@ describe("assertions (type)", function () {
             t.type([], "object")
             t.type(function () {}, "function")
             t.type(undefined, "undefined")
-            if (typeof Symbol === "function") t.type(Symbol(), "symbol") // eslint-disable-line no-undef, max-len
+            if (typeof Symbol === "function") t.type(Symbol(), "symbol")
         })
 
         it("checks bad types", function () { // eslint-disable-line max-statements, max-len
@@ -54,41 +50,47 @@ describe("assertions (type)", function () {
             typeFail([])
             typeFail(function () {})
             typeFail(undefined)
-            if (typeof Symbol === "function") typeFail(Symbol()) // eslint-disable-line no-undef, max-len
+            if (typeof Symbol === "function") typeFail(Symbol())
 
-            fail("type", true, "number")
-            fail("type", false, "number")
-            fail("type", 0, "boolean")
-            fail("type", 1, "boolean")
-            fail("type", NaN, "boolean")
-            fail("type", Infinity, "boolean")
-            fail("type", "foo", "object")
-            fail("type", "", "object")
-            fail("type", null, "string")
-            fail("type", {}, "string")
-            fail("type", [], "string")
-            fail("type", function () {}, "object")
-            fail("type", undefined, "string")
-            if (typeof Symbol === "function") fail("type", Symbol(), "number") // eslint-disable-line no-undef, max-len
+            Util.fail("type", true, "number")
+            Util.fail("type", false, "number")
+            Util.fail("type", 0, "boolean")
+            Util.fail("type", 1, "boolean")
+            Util.fail("type", NaN, "boolean")
+            Util.fail("type", Infinity, "boolean")
+            Util.fail("type", "foo", "object")
+            Util.fail("type", "", "object")
+            Util.fail("type", null, "string")
+            Util.fail("type", {}, "string")
+            Util.fail("type", [], "string")
+            Util.fail("type", function () {}, "object")
+            Util.fail("type", undefined, "string")
+
+            if (typeof Symbol === "function") {
+                Util.fail("type", Symbol(), "number")
+            }
         })
     })
 
     describe("t.notType()", function () {
         it("checks good types", function () {
-            fail("notType", true, "boolean")
-            fail("notType", false, "boolean")
-            fail("notType", 0, "number")
-            fail("notType", 1, "number")
-            fail("notType", NaN, "number")
-            fail("notType", Infinity, "number")
-            fail("notType", "foo", "string")
-            fail("notType", "", "string")
-            fail("notType", null, "object")
-            fail("notType", {}, "object")
-            fail("notType", [], "object")
-            fail("notType", function () {}, "function")
-            fail("notType", undefined, "undefined")
-            if (typeof Symbol === "function") fail("notType", Symbol(), "symbol") // eslint-disable-line no-undef, max-len
+            Util.fail("notType", true, "boolean")
+            Util.fail("notType", false, "boolean")
+            Util.fail("notType", 0, "number")
+            Util.fail("notType", 1, "number")
+            Util.fail("notType", NaN, "number")
+            Util.fail("notType", Infinity, "number")
+            Util.fail("notType", "foo", "string")
+            Util.fail("notType", "", "string")
+            Util.fail("notType", null, "object")
+            Util.fail("notType", {}, "object")
+            Util.fail("notType", [], "object")
+            Util.fail("notType", function () {}, "function")
+            Util.fail("notType", undefined, "undefined")
+
+            if (typeof Symbol === "function") {
+                Util.fail("notType", Symbol(), "symbol")
+            }
         })
 
         it("checks bad types", function () { // eslint-disable-line max-statements, max-len
@@ -120,7 +122,7 @@ describe("assertions (type)", function () {
             typeFail([])
             typeFail(function () {})
             typeFail(undefined)
-            if (typeof Symbol === "function") typeFail(Symbol()) // eslint-disable-line no-undef, max-len
+            if (typeof Symbol === "function") typeFail(Symbol())
 
             t.notType(true, "number")
             t.notType(false, "number")
@@ -135,7 +137,7 @@ describe("assertions (type)", function () {
             t.notType([], "string")
             t.notType(function () {}, "object")
             t.notType(undefined, "string")
-            if (typeof Symbol === "function") t.notType(Symbol(), "number") // eslint-disable-line no-undef, max-len
+            if (typeof Symbol === "function") t.notType(Symbol(), "number")
         })
     })
 
@@ -144,14 +146,14 @@ describe("assertions (type)", function () {
             return t[name].bind(t)
         }
 
-        basic("t." + name + "()", function () {
-            callback(check(name), fail.bind(undefined, name))
+        Util.basic("t." + name + "()", function () {
+            callback(check(name), Util.fail.bind(undefined, name))
         })
 
         var negated = "not" + name[0].toUpperCase() + name.slice(1)
 
-        basic("t." + negated + "()", function () {
-            callback(fail.bind(undefined, negated), check(negated))
+        Util.basic("t." + negated + "()", function () {
+            callback(Util.fail.bind(undefined, negated), check(negated))
         })
     }
 
@@ -170,7 +172,7 @@ describe("assertions (type)", function () {
         not(function () {})
         not(undefined)
         not()
-        if (typeof Symbol === "function") not(Symbol()) // eslint-disable-line no-undef, max-len
+        if (typeof Symbol === "function") not(Symbol())
     })
 
     testType("number", function (is, not) {
@@ -188,7 +190,7 @@ describe("assertions (type)", function () {
         not(function () {})
         not(undefined)
         not()
-        if (typeof Symbol === "function") not(Symbol()) // eslint-disable-line no-undef, max-len
+        if (typeof Symbol === "function") not(Symbol())
     })
 
     testType("function", function (is, not) {
@@ -206,7 +208,7 @@ describe("assertions (type)", function () {
         is(function () {})
         not(undefined)
         not()
-        if (typeof Symbol === "function") not(Symbol()) // eslint-disable-line no-undef, max-len
+        if (typeof Symbol === "function") not(Symbol())
     })
 
     testType("object", function (is, not) {
@@ -224,7 +226,7 @@ describe("assertions (type)", function () {
         not(function () {})
         not(undefined)
         not()
-        if (typeof Symbol === "function") not(Symbol()) // eslint-disable-line no-undef, max-len
+        if (typeof Symbol === "function") not(Symbol())
     })
 
     testType("string", function (is, not) {
@@ -242,7 +244,7 @@ describe("assertions (type)", function () {
         not(function () {})
         not(undefined)
         not()
-        if (typeof Symbol === "function") not(Symbol()) // eslint-disable-line no-undef, max-len
+        if (typeof Symbol === "function") not(Symbol())
     })
 
     testType("symbol", function (is, not) {
@@ -260,7 +262,7 @@ describe("assertions (type)", function () {
         not(function () {})
         not(undefined)
         not()
-        if (typeof Symbol === "function") is(Symbol()) // eslint-disable-line no-undef, max-len
+        if (typeof Symbol === "function") is(Symbol())
     })
 
     testType("undefined", function (is, not) {
@@ -278,7 +280,7 @@ describe("assertions (type)", function () {
         not(function () {})
         is(undefined)
         is()
-        if (typeof Symbol === "function") not(Symbol()) // eslint-disable-line no-undef, max-len
+        if (typeof Symbol === "function") not(Symbol())
     })
 
     testType("true", function (is, not) {
@@ -296,7 +298,7 @@ describe("assertions (type)", function () {
         not(function () {})
         not(undefined)
         not()
-        if (typeof Symbol === "function") not(Symbol()) // eslint-disable-line no-undef, max-len
+        if (typeof Symbol === "function") not(Symbol())
     })
 
     testType("false", function (is, not) {
@@ -314,7 +316,7 @@ describe("assertions (type)", function () {
         not(function () {})
         not(undefined)
         not()
-        if (typeof Symbol === "function") not(Symbol()) // eslint-disable-line no-undef, max-len
+        if (typeof Symbol === "function") not(Symbol())
     })
 
     testType("null", function (is, not) {
@@ -332,7 +334,7 @@ describe("assertions (type)", function () {
         not(function () {})
         not(undefined)
         not()
-        if (typeof Symbol === "function") not(Symbol()) // eslint-disable-line no-undef, max-len
+        if (typeof Symbol === "function") not(Symbol())
     })
 
     testType("exists", function (is, not) {
@@ -350,7 +352,7 @@ describe("assertions (type)", function () {
         is(function () {})
         not(undefined)
         not()
-        if (typeof Symbol === "function") is(Symbol()) // eslint-disable-line no-undef, max-len
+        if (typeof Symbol === "function") is(Symbol())
     })
 
     testType("array", function (is, not) {
@@ -368,34 +370,34 @@ describe("assertions (type)", function () {
         not(function () {})
         not(undefined)
         not()
-        if (typeof Symbol === "function") not(Symbol()) // eslint-disable-line no-undef, max-len
+        if (typeof Symbol === "function") not(Symbol())
     })
 
-    basic("t.instanceof()", function () {
+    Util.basic("t.instanceof()", function () {
         function A() {}
         t.instanceof(new A(), A)
         t.instanceof(new A(), Object)
 
         function B() {}
-        methods(B, A)
+        Util.methods(B, A)
 
         t.instanceof(new B(), B)
         t.instanceof(new B(), A)
 
-        fail("instanceof", new A(), B)
-        fail("instanceof", [], RegExp)
+        Util.fail("instanceof", new A(), B)
+        Util.fail("instanceof", [], RegExp)
     })
 
-    basic("t.notInstanceof()", function () {
+    Util.basic("t.notInstanceof()", function () {
         function A() {}
-        fail("notInstanceof", new A(), A)
-        fail("notInstanceof", new A(), Object)
+        Util.fail("notInstanceof", new A(), A)
+        Util.fail("notInstanceof", new A(), Object)
 
         function B() {}
-        methods(B, A)
+        Util.methods(B, A)
 
-        fail("notInstanceof", new B(), B)
-        fail("notInstanceof", new B(), A)
+        Util.fail("notInstanceof", new B(), B)
+        Util.fail("notInstanceof", new B(), A)
 
         t.notInstanceof(new A(), B)
         t.notInstanceof([], RegExp)

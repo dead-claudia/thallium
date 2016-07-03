@@ -1,18 +1,16 @@
 "use strict"
 
-var t = require("../../index.js")
-var Util = require("../../helpers/base.js")
-var n = Util.n
-var p = Util.p
-
-function push(ret) {
-    return Util.push(ret, true)
-}
-
 // Note that this entire section may be flaky on slower machines. Thankfully,
 // these have been tested against a slower machine, so it should hopefully not
 // be too bad.
 describe("core (slow) (FLAKE)", function () {
+    var n = Util.n
+    var p = Util.p
+
+    function push(ret) {
+        return Util.push(ret, true)
+    }
+
     function at(host, i) {
         if (host == null) return undefined
         if (host[i] == null) return undefined
@@ -67,7 +65,7 @@ describe("core (slow) (FLAKE)", function () {
         tt.async("test", function (tt, done) {
             // It's highly unlikely the engine will take this long to finish.
             tt.slow(100)
-            global.setTimeout(function () { done() }, 60)
+            Util.setTimeout(function () { done() }, 60)
         })
 
         return tt.run().then(function () {
@@ -93,7 +91,7 @@ describe("core (slow) (FLAKE)", function () {
         tt.async("test", function (tt, done) {
             tt.slow(50)
             // It's highly unlikely the engine will take this long to finish
-            global.setTimeout(function () { done() }, 200)
+            Util.setTimeout(function () { done() }, 200)
         })
 
         return tt.run().then(function () {
@@ -148,7 +146,7 @@ describe("core (slow) (FLAKE)", function () {
         tt.test("test")
         .slow(50)
         .async("inner", function (tt, done) {
-            global.setTimeout(function () { done() }, 200)
+            Util.setTimeout(function () { done() }, 200)
         })
 
         return tt.run().then(function () {

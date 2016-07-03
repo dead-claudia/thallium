@@ -1,3 +1,3 @@
 "use strict"
 
-require("../../../index.js").test("test 2")
+require("../../../index.js").test("test 2", function () {})

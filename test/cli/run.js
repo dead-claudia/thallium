@@ -1,17 +1,12 @@
 "use strict"
 
-var Promise = require("bluebird")
-var t = require("../../index.js")
-var assertions = require("../../assertions.js")
-var Resolver = require("../../lib/resolver.js")
 var Run = require("../../lib/cli/run.js")
-var Cli = require("../../helpers/cli.js")
-var Base = require("../../helpers/base.js")
-var n = Base.n
-var p = Base.p
-var push = Base.push
+var Cli = require("../../scripts/cli.js")
 
 describe("cli runner", function () {
+    var n = Util.n
+    var p = Util.p
+
     describe("exitReporter()", function () {
         var map = {
             fail: new Error("fail"),
@@ -20,7 +15,7 @@ describe("cli runner", function () {
 
         function execute(reporter, type) {
             return function () {
-                return Resolver.resolve1(reporter, undefined, {
+                return Util.Resolver.resolve1(reporter, undefined, {
                     type: type,
                     value: map[type],
                     path: {name: "test", index: 0},
@@ -153,8 +148,12 @@ describe("cli runner", function () {
          * Most of these are integration tests.
          */
 
+        // When Mocha reloads this module, the module defining the tests also
+        // gets reloaded, so the warnings need re-suppressed.
+        Util.silenceEmptyInlineWarnings()
+
         function run(opts) {
-            var tt = t.reflect().base().use(assertions)
+            var tt = t.reflect().base().use(Util.assertions)
             var tree = opts.tree(tt)
 
             tree["node_modules"] = {thallium: function () { return tt }}
@@ -180,7 +179,7 @@ describe("cli runner", function () {
                     return {
                         test: {
                             ".tl.js": function () {
-                                t.reporter(push(ret))
+                                t.reporter(Util.push(ret))
                             },
 
                             "one.js": function () {
@@ -213,7 +212,7 @@ describe("cli runner", function () {
                     return {
                         test: {
                             ".tl.js": function () {
-                                t.reporter(push(ret))
+                                t.reporter(Util.push(ret))
                             },
 
                             "one": function () {
@@ -245,7 +244,7 @@ describe("cli runner", function () {
                     return {
                         test: {
                             ".tl.coffee": function () {
-                                t.reporter(push(ret))
+                                t.reporter(Util.push(ret))
                             },
 
                             "one.js": function () {
@@ -278,7 +277,7 @@ describe("cli runner", function () {
                     return {
                         test: {
                             ".tl.js": function () {
-                                t.reporter(push(ret))
+                                t.reporter(Util.push(ret))
                             },
 
                             "one.js": function () {
@@ -336,7 +335,7 @@ describe("cli runner", function () {
                     })
 
                     t.async("baz()", function () {
-                        return Promise.reject(sentinel)
+                        return Util.Promise.reject(sentinel)
                     })
 
                     t.test("nested", function (t) {
@@ -384,7 +383,7 @@ describe("cli runner", function () {
                     return {
                         test: {
                             ".tl.js": function () {
-                                t.reporter(push(ret))
+                                t.reporter(Util.push(ret))
                                 t.define("isNope", isNope)
                             },
 

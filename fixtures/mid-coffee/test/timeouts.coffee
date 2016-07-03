@@ -6,7 +6,19 @@ is trying to represent more real-world usage.
 ###
 
 t = require 'thallium'
-{n, p} = Util = require '../../../helpers/base.js'
+
+n = (type, path, value, extra) ->
+    unless extra?
+        extra = if type in ['pass', 'fail', 'enter']
+            duration: 10
+            slow: 75
+        else
+            duration: -1
+            slow: 0
+
+    {type, path, value, duration: extra.duration, slow: extra.slow|0}
+
+p = (name, index) -> {name, index}
 
 # Note that this entire section may be flaky on slower machines. Thankfully,
 # these have been tested against a slower machine, so it should hopefully not

@@ -7,6 +7,9 @@ if (require.main !== module) {
     throw new Error("This is not a module!")
 }
 
+// Uncomment to log all FS calls.
+// require("../scripts/log-fs.js")
+
 require("../lib/cli/run.js").run({
     cwd: process.cwd(),
     argv: process.argv.slice(2),

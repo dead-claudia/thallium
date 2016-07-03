@@ -51,8 +51,9 @@ function printError(r, ev) {
 
     // Let's *not* depend on the constructor being Thallium's...
     if (err.name !== "AssertionError") {
-        return r.print("  stack: |-")
-        .then(function () { return printLines(r, err.stack, false) })
+        return r.print("  stack: |-").then(function () {
+            return printLines(r, R.getStack(err), false)
+        })
     }
 
     return printValue(r, "expected", err.expected)
@@ -63,7 +64,7 @@ function printError(r, ev) {
         var message = err.message
 
         err.message = ""
-        return printLines(r, err.stack, true)
+        return printLines(r, R.getStack(err), true)
         .then(function () { err.message = message })
     })
 }

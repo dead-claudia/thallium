@@ -1,12 +1,9 @@
 "use strict"
 
-var t = require("../../index.js")
-var Util = require("../../helpers/base.js")
-
-var n = Util.n
-var p = Util.p
-
 describe("core (iterators)", function () {
+    var n = Util.n
+    var p = Util.p
+
     function createSentinel(name) {
         var e = new Error(name)
 

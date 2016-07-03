@@ -1,9 +1,8 @@
 "use strict"
 
 var path = require("path")
-var t = require("../../index.js")
-var Util = require("../../lib/cli/util.js")
-var fixture = require("../../helpers/cli.js").fixture
+var FSUtil = require("../../lib/cli/util.js")
+var fixture = require("../../scripts/cli.js").fixture
 
 // Mostly sanity tests.
 describe("cli fs utils", function () {
@@ -14,7 +13,7 @@ describe("cli fs utils", function () {
 
     describe("chdir()", function () {
         it("works", function () {
-            Util.chdir(__dirname)
+            FSUtil.chdir(__dirname)
             t.equal(process.cwd(), __dirname)
         })
     })
@@ -22,7 +21,7 @@ describe("cli fs utils", function () {
     describe("load()", function () {
         it("works", function () {
             process.chdir(__dirname)
-            return Util.load(fixture("util/test-module.js"))
+            return FSUtil.load(fixture("util/test-module.js"))
             .then(function (result) {
                 t.match(result, {exports: "hi!"})
             })
@@ -32,7 +31,7 @@ describe("cli fs utils", function () {
     describe("stat()", function () {
         it("checks files", function () {
             process.chdir(__dirname)
-            return Util.stat(fixture("util/test-module.js"))
+            return FSUtil.stat(fixture("util/test-module.js"))
             .then(function (stat) {
                 t.true(stat.isFile())
                 t.false(stat.isDirectory())
@@ -41,7 +40,7 @@ describe("cli fs utils", function () {
 
         it("checks directories", function () {
             process.chdir(__dirname)
-            return Util.stat(fixture("util"))
+            return FSUtil.stat(fixture("util"))
             .then(function (stat) {
                 t.false(stat.isFile())
                 t.true(stat.isDirectory())
@@ -50,7 +49,7 @@ describe("cli fs utils", function () {
 
         it("checks things that don't exist", function () {
             process.chdir(__dirname)
-            return Util.stat(fixture("util/nope.js"))
+            return FSUtil.stat(fixture("util/nope.js"))
             .then(function (stat) {
                 t.false(stat.isFile())
                 t.false(stat.isDirectory())
@@ -61,7 +60,7 @@ describe("cli fs utils", function () {
     describe("readGlob()", function () {
         it("works", function () {
             process.chdir(__dirname)
-            return Util.readGlob([fixture("util/test-glob/*.js")])
+            return FSUtil.readGlob([fixture("util/test-glob/*.js")])
             .then(function () {
                 process.chdir(fixture("util/test-glob"))
                 t.equal(require.cache[path.resolve("foo.js")].exports, "foo")

@@ -3,17 +3,13 @@
 // Note: the reports *must* be well formed. The reporter assumes the reports are
 // correct, and it will *not* verify this.
 
-var inspect = require("util").inspect
-var Promise = require("bluebird")
-var Resolver = require("../../lib/resolver.js")
-var t = require("../../index.js")
-var tap = require("../../r/tap.js")
-var Util = require("../../helpers/base.js")
-var p = Util.p
-var n = Util.n
-
 describe("reporter tap", function () { // eslint-disable-line max-statements
+    var p = Util.p
+    var n = Util.n
+
     it("is not itself a reporter", function () {
+        var tap = Util.r.tap
+
         t.throws(function () { tap(n("start", [])) }, TypeError)
         t.throws(function () { tap(n("enter", [p("test", 0)])) }, TypeError)
         t.throws(function () { tap(n("leave", [p("test", 0)])) }, TypeError)
@@ -28,29 +24,29 @@ describe("reporter tap", function () { // eslint-disable-line max-statements
     }
 
     function stack(err) {
-        var stack = err.stack
+        var stack = Util.R.getStack(err)
 
         if (err.name === "AssertionError") {
-            stack = err.stack.replace(/^.*?\r?\n/, "")
+            stack = Util.R.getStack(err).replace(/^.*?\r?\n/, "")
         }
 
         return printLines("  stack: |-", stack)
     }
 
     function printError(err) {
-        return printLines("  value: |-", inspect(err))
+        return printLines("  value: |-", Util.inspect(err))
     }
 
     function test(name, opts) {
         (opts.skip ? it.skip : it)(name, function () {
             var list = []
-            var reporter = tap({print: function (arg) {
+            var reporter = Util.r.tap({print: function (arg) {
                 list.push(arg)
-                return Promise.resolve()
+                return Util.Promise.resolve()
             }})
 
-            return Promise.each(opts.input, function (i) {
-                return Resolver.resolve1(reporter, undefined, i)
+            return Util.Promise.each(opts.input, function (i) {
+                return Util.Resolver.resolve1(reporter, undefined, i)
             })
             .then(function () {
                 t.match(list, opts.output)
@@ -346,7 +342,7 @@ describe("reporter tap", function () { // eslint-disable-line max-statements
         var e = new Error()
 
         e.name = ""
-        return e.stack.replace(/^\s*?\r?\n/, "")
+        return Util.R.getStack(e).replace(/^\s+/gm, "")
     })()
 
     test("extra pass", {

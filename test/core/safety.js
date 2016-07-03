@@ -1,12 +1,9 @@
 "use strict"
 
-var m = require("../../lib/messages.js")
-var t = require("../../index.js")
-var Util = require("../../helpers/base.js")
-var p = Util.p
-var n = Util.n
-
 describe("core (safety)", function () {
+    var p = Util.p
+    var n = Util.n
+
     function valueOf(value) {
         return {valueOf: function () { return value }}
     }
@@ -91,7 +88,7 @@ describe("core (safety)", function () {
 
         tt.reporter(Util.push(ret))
 
-        var error = new ReferenceError(m("fail.checkInit"))
+        var error = new ReferenceError(Util.m("fail.checkInit"))
 
         function plugin() {}
 
@@ -157,7 +154,7 @@ describe("core (safety)", function () {
                 var entry = ret[i]
 
                 if (entry.type === "extra") {
-                    t.string(entry.value.stack)
+                    t.string(Util.getStack(entry.value))
                     delete entry.value.stack
                 }
             }

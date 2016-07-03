@@ -5,16 +5,14 @@
 // it's trying to represent more real-world usage. The rest don't need ported
 // over.
 
-var Promise = require("bluebird")
-var t = require("../../index.js")
 var path = require("path")
 var Common = require("../../lib/cli/common.js")
 
-function p(str) {
-    return str.replace(/[\\\/]/g, path.sep)
-}
-
 describe("cli common", function () {
+    function p(str) {
+        return str.replace(/[\\\/]/g, path.sep)
+    }
+
     describe("isObjectLike()", function () {
         var isObjectLike = Common.isObjectLike
 
@@ -341,7 +339,7 @@ describe("cli common", function () {
         function load(opts) {
             return function (name) {
                 t.equal(name, "thallium")
-                return Promise.resolve({exports: opts.thallium || {}})
+                return Util.Promise.resolve({exports: opts.thallium || {}})
             }
         }
 
