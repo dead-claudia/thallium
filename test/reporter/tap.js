@@ -38,7 +38,7 @@ describe("reporter tap", function () { // eslint-disable-line max-statements
     }
 
     function test(name, opts) {
-        (opts.skip ? it.skip : it)(name, function () {
+        it(name, function () {
             var list = []
             var reporter = Util.r.tap({print: function (arg) {
                 list.push(arg)
