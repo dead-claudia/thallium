@@ -1,7 +1,7 @@
-node_modules
+/node_modules
 
-# Thallium uses dot files for its configs, and these need tested.
-!fixtures/**/.*
+# Thallium itself uses dot files for its configs, and these need tested.
+!**/.tl.*
 
 # Ignore everything here...none of it's executed, anyways.
-fixtures/glob-stream/**
+/fixtures/glob-stream/**
