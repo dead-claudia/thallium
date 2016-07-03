@@ -2,4 +2,5 @@
 --reporter dot
 --check-leaks
 --recursive
---require ./helpers/init.js
+--require ./scripts/globals.js
+--globals Util,t,require

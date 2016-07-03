@@ -3,22 +3,14 @@
 // Note: the reports *must* be well formed. The reporter assumes the reports are
 // correct, and it will *not* verify this.
 
-var Promise = require("bluebird")
-var Resolver = require("../../lib/resolver.js")
-var t = require("../../index.js")
-var dot = require("../../r/dot.js")
-var R = require("../../lib/reporter/index.js")
-var Util = require("../../helpers/base.js")
-var SupportsColor = require("../../lib/reporter/console.js").SupportsColor
-var methods = require("../../lib/methods.js")
-
-var Symbols = R.Symbols
-var c = R.color
-var p = Util.p
-var n = Util.n
-
 describe("reporter dot", function () {
+    var p = Util.p
+    var n = Util.n
+    var c = Util.R.color
+
     it("is not itself a reporter", function () {
+        var dot = Util.r.dot
+
         t.throws(function () { dot(n("start", [])) }, TypeError)
         t.throws(function () { dot(n("enter", [p("test", 0)])) }, TypeError)
         t.throws(function () { dot(n("leave", [p("test", 0)])) }, TypeError)
@@ -28,14 +20,13 @@ describe("reporter dot", function () {
         t.throws(function () { dot(n("end", [])) }, TypeError)
     })
 
-    function stack(err) {
-        var lines = ("    " + err.stack.replace(/^ +/gm, "      "))
-            .split(/\r?\n/g)
+    function stack(e) {
+        var lines = Util.R.getStack(e).split(/\r?\n/g)
 
-        lines[0] = "    " + c("fail", lines[0].slice(4))
+        lines[0] = "    " + c("fail", lines[0])
 
         for (var i = 1; i < lines.length; i++) {
-            lines[i] = "      " + c("fail", lines[i].slice(6))
+            lines[i] = "      " + c("fail", lines[i])
         }
 
         return lines
@@ -47,7 +38,7 @@ describe("reporter dot", function () {
         this.colors = colors
     }
 
-    methods(Options, {
+    Util.methods(Options, {
         print: function (line) {
             if (this._acc !== "") {
                 line += this._acc
@@ -61,7 +52,7 @@ describe("reporter dot", function () {
                 this._list.push(lines[i])
             }
 
-            return Promise.resolve()
+            return Util.Promise.resolve()
         },
 
         write: function (str) {
@@ -69,7 +60,7 @@ describe("reporter dot", function () {
 
             if (index < 0) {
                 this._acc += str
-                return Promise.resolve()
+                return Util.Promise.resolve()
             }
 
             this._list.push(this._acc + str.slice(0, index))
@@ -82,7 +73,7 @@ describe("reporter dot", function () {
                 this._list.push(lines[i])
             }
 
-            return Promise.resolve()
+            return Util.Promise.resolve()
         },
 
         reset: function () {
@@ -91,7 +82,7 @@ describe("reporter dot", function () {
                 this._acc = ""
             }
 
-            return Promise.resolve()
+            return Util.Promise.resolve()
         },
     })
 
@@ -100,22 +91,21 @@ describe("reporter dot", function () {
     }
 
     function run(envColors, reporterColors) { // eslint-disable-line max-statements, max-len
-        SupportsColor.set(envColors)
-        SupportsColor.forced = false
-        beforeEach(function () { SupportsColor.set(envColors) })
-        afterEach(function () { SupportsColor.reset() })
+        Util.R.Colors.forceSet(envColors)
+        beforeEach(function () { Util.R.Colors.forceSet(envColors) })
+        afterEach(function () { Util.R.Colors.forceRestore() })
 
-        var pass = c("fast", Symbols.Dot)
-        var fail = c("fail", Symbols.Dot)
-        var skip = c("skip", Symbols.Dot)
+        var pass = c("fast", Util.R.Symbols.Dot)
+        var fail = c("fail", Util.R.Symbols.Dot)
+        var skip = c("skip", Util.R.Symbols.Dot)
 
         function test(name, opts) {
             it(name, function () {
                 var list = []
-                var reporter = dot(new Options(list, reporterColors))
+                var reporter = Util.r.dot(new Options(list, reporterColors))
 
-                return Promise.each(opts.input, function (i) {
-                    return Resolver.resolve1(reporter, undefined, i)
+                return Util.Promise.each(opts.input, function (i) {
+                    return Util.Resolver.resolve1(reporter, undefined, i)
                 })
                 .then(function () {
                     t.match(list, opts.output)
@@ -386,12 +376,12 @@ describe("reporter dot", function () {
         })
 
         var extra = (function () {
-            var e = new Error()
+            var e = new Error("extra")
             var parts = []
             var stack
 
             e.name = ""
-            stack = e.stack.split(/\r?\n/g).slice(1)
+            stack = Util.R.getStack(e).split(/\r?\n/g).slice(1)
 
             parts.push("    " + c("fail", "- " + stack[0].trim()))
 
@@ -486,7 +476,7 @@ describe("reporter dot", function () {
                 "",
                 "  " + pass + pass + fail,
                 "",
-            ], badType.stack.split(/\r?\n/g)),
+            ], Util.R.getStack(badType).split(/\r?\n/g)),
         })
 
         test("long passing sequence", {
@@ -976,7 +966,7 @@ describe("reporter dot", function () {
                 ]),
             })
 
-            SupportsColor.reset()
+            Util.R.Colors.forceRestore()
         })
     }
 
@@ -989,10 +979,10 @@ describe("reporter dot", function () {
         function test(name, opts) {
             it(name, function () {
                 var list = []
-                var reporter = dot(new Options(list, true))
+                var reporter = Util.r.dot(new Options(list, true))
 
-                return Promise.each(opts.input, function (i) {
-                    return Resolver.resolve1(reporter, undefined, i)
+                return Util.Promise.each(opts.input, function (i) {
+                    return Util.Resolver.resolve1(reporter, undefined, i)
                 })
                 .then(function () {
                     t.match(list, opts.output)
@@ -1001,9 +991,9 @@ describe("reporter dot", function () {
         }
 
         // Speed affects `"pass"` and `"enter"` events only.
-        var fast = c("fast", Symbols.Dot)
-        var medium = c("medium", Symbols.Dot)
-        var slow = c("slow", Symbols.Dot)
+        var fast = c("fast", Util.R.Symbols.Dot)
+        var medium = c("medium", Util.R.Symbols.Dot)
+        var slow = c("slow", Util.R.Symbols.Dot)
 
         function at(speed) {
             if (speed === "slow") return {duration: 80, slow: 75}

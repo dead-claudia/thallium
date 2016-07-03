@@ -2,12 +2,10 @@
 
 /* eslint max-nested-callbacks: [2, 5] */
 
-var t = require("../../index.js")
-var Util = require("../../helpers/base.js")
-var n = Util.n
-var p = Util.p
-
 describe("core (reflect)", function () {
+    var n = Util.n
+    var p = Util.p
+
     describe("methods()", function () {
         it("exists", function () {
             t.function(t.reflect().methods)

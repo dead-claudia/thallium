@@ -1,1 +1,1 @@
-**Note:** All tests that target more than Node *must* be listed in `helpers/load-tests.js`
+**Note:** All tests that target more than Node *must* be listed in `scripts/load-tests.js`

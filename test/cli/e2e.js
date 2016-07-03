@@ -6,17 +6,15 @@
 // 2. The order the files are read are non-deterministic, but they are rarely
 //    read in non-alphabetical order.
 
-var Promise = require("bluebird")
 var path = require("path")
-var t = require("../../index.js")
 var cp = require("child_process")
-var fixture = require("../../helpers/cli.js").fixture
-
-function formatList(msgs) {
-    return msgs.replace(/\r?\n/g, "\n").replace(/\n{2,}/g, "\n").trim()
-}
+var fixture = require("../../scripts/cli.js").fixture
 
 describe("cli end-to-end (FLAKE)", function () {
+    function formatList(msgs) {
+        return msgs.replace(/\r?\n/g, "\n").replace(/\n{2,}/g, "\n").trim()
+    }
+
     var binary = path.resolve(__dirname, "../../bin/thallium.js")
 
     function test(name, opts) {
@@ -41,20 +39,20 @@ describe("cli end-to-end (FLAKE)", function () {
             child.stdout.setEncoding("utf-8")
             child.stdout.on("data", function (data) { output += data })
 
-            return Promise.all([
-                new Promise(function (resolve, reject) {
+            return Util.Promise.all([
+                new Util.Promise(function (resolve, reject) {
                     child.on("error", reject)
                     child.stdout.on("error", reject)
                     child.stdout.on("end", resolve)
                 }),
-                new Promise(function (resolve, reject) {
+                new Util.Promise(function (resolve, reject) {
                     child.on("close", function (code, signal) {
                         if (signal == null) return resolve(code)
                         return reject(
                             new Error("terminated with signal " + signal))
                     })
                 }),
-                new Promise(function (resolve, reject) {
+                new Util.Promise(function (resolve, reject) {
                     child.on("exit", function (code, signal) {
                         if (signal == null) return resolve(code)
                         return reject(

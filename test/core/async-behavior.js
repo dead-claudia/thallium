@@ -1,12 +1,9 @@
 "use strict"
 
-var t = require("../../index.js")
-var Util = require("../../helpers/base.js")
-
-var n = Util.n
-var p = Util.p
-
 describe("core (asynchronous behavior)", function () {
+    var n = Util.n
+    var p = Util.p
+
     it("with normal tests", function () {
         var tt = t.reflect().base()
         var called = false
@@ -57,7 +54,7 @@ describe("core (asynchronous behavior)", function () {
 
         tt.async("test", function (_, done) {
             called = true
-            global.setTimeout(function () { done() }, 0)
+            Util.setTimeout(function () { done() }, 0)
         })
 
         var ret = tt.run().then(function () { t.true(called) })

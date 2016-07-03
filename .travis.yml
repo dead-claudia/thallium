@@ -1,12 +1,46 @@
 language: node_js
 
-node_js:
-    - "0.10"
-    - "0.12"
-    - "1"
-    - "2"
-    - "3"
-    - "4"
-    - "5"
-    - "6"
-    - stable
+before_install:
+  - export DISPLAY=:99.0
+  - sh -e /etc/init.d/xvfb start
+  - nvm install stable
+
+script: bash -e ./scripts/travis.sh
+
+matrix:
+  include:
+    - node_js: "0.10"
+      env: ENV=node
+    - node_js: "0.12"
+      env: ENV=node
+    - node_js: "1"
+      env: ENV=node
+    - node_js: "2"
+      env: ENV=node
+    - node_js: "3"
+      env: ENV=node
+    - node_js: "4"
+      env: ENV=node
+    - node_js: "5"
+      env: ENV=node
+    - node_js: "6"
+      env: ENV=node
+
+    # Browser tests
+    # TODO: set up Chrome - it's a little more involved.
+    - node_js: stable
+      env: ENV=chrome
+      sudo: required
+      dist: trusty
+    - node_js: stable
+      env: ENV=firefox
+      addons:
+        firefox: latest
+    - node_js: stable
+      env: ENV=firefox-beta
+      addons:
+        firefox: latest-beta
+    - node_js: stable
+      env: ENV=firefox-esr
+      addons:
+        firefox: latest-esr

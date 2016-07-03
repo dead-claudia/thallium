@@ -1,18 +1,16 @@
 "use strict"
 
 // Note: updates to this should also be reflected in
-// fixtures/mid-coffee/timeouts.coffee, as it's trying to
+// fixtures/mid-coffee/test/timeouts.coffee, as it's trying to
 // represent more real-world usage.
-
-var t = require("../../index.js")
-var Util = require("../../helpers/base.js")
-var n = Util.n
-var p = Util.p
 
 // Note that this entire section may be flaky on slower machines. Thankfully,
 // these have been tested against a slower machine, so it should hopefully not
 // be too bad.
 describe("core (timeouts) (FLAKE)", function () {
+    var n = Util.n
+    var p = Util.p
+
     it("succeeds with own", function () {
         var tt = t.reflect().base()
         var ret = []
@@ -43,7 +41,7 @@ describe("core (timeouts) (FLAKE)", function () {
         tt.async("test", function (tt, done) {
             tt.timeout(50)
             // It's highly unlikely the engine will take this long to finish
-            global.setTimeout(function () { done() }, 200)
+            Util.setTimeout(function () { done() }, 200)
         })
 
         return tt.run().then(function () {
@@ -86,7 +84,7 @@ describe("core (timeouts) (FLAKE)", function () {
         .timeout(50)
         .async("inner", function (tt, done) {
             // It's highly unlikely the engine will take this long to finish.
-            global.setTimeout(function () { done() }, 200)
+            Util.setTimeout(function () { done() }, 200)
         })
 
         return tt.run().then(function () {

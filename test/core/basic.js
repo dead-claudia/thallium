@@ -2,13 +2,13 @@
 
 /* eslint max-nested-callbacks: [2, 5] */
 
-// Note: updates to this should also be reflected in fixtures/basic.coffee, as
-// it's trying to represent more real-world usage.
-
-var Promise = require("bluebird")
-var t = require("../../index.js")
+// Note: updates to this should also be reflected in
+// fixtures/mid-coffee/test/basic.coffee, as it's trying to represent more
+// real-world usage.
 
 describe("core (basic)", function () {
+    var Promise = Util.Promise
+
     describe("reflect()", function () {
         it("exists", function () {
             t.function(t.reflect)

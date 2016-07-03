@@ -1,8 +1,13 @@
 "use strict"
 
-// Helper script for logging FS calls.
-
 /* eslint-env node */
+
+/**
+ * Helper script for logging FS calls. It logs calls in the form of this:
+ *
+ * file descriptor:  [2016-01-01T01:23:45.678Z]: access fd 9 (12.345 µs)
+ * file name/buffer: [2016-01-01T01:23:45.678Z]: access ./file.txt 9 (12.345 µs)
+ */
 
 var fs = require("fs")
 
@@ -105,7 +110,7 @@ function simple(name) {
 
 function move(name) {
     return function (src, dest) {
-        return logPath(name, src) + "\n" + logPath(name, dest)
+        return logPath(name, src) + logPath("", dest)
     }
 }
 

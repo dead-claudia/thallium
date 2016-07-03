@@ -1,8 +1,6 @@
 "use strict"
 
 var path = require("path")
-
-var t = require("../../index.js")
 var Args = require("../../lib/cli/args.js")
 
 describe("cli arguments", function () {

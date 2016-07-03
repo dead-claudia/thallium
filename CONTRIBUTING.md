@@ -52,13 +52,13 @@ I use [Bluebird](http://bluebirdjs.com) extensively for promises, as it makes co
 - `fixtures` - This contains the fixtures for the various tests.
     - Some of the `test` files are mirrored in [CoffeeScript](http://coffeescript.org/) within `fixtures/large-coffee` to help aid in more real-world usage. These are very explicitly and clearly labeled, so it should be very hard to miss.
 
-- `helpers` - This contains various test-related utilities, including the mocks. Here's a few in `helpers/base.js` you might appreciate knowing about:
+- `scripts` - This contains various development/test-related utilities, including the mocks. Here's a few globals exported from `scripts/globals.js` you might appreciate knowing about:
 
-    - `push(array, keep = false)` - A Thallium reporter that accepts an array destination to push its reports into. Set `keep` to `true` if you want to retain the original `duration` and `slow` speeds.
-    - `n(type, path, value, {duration, slow})` - Create a reporter node of a given type, path, value, duration, and slow time. The latter is an object because they're almost always either not there or both there, treated as a pair.
-    - `p(name, index)` - Create a path node with a given name and index
+    - `Util.push(array, keep = false)` - A Thallium reporter that accepts an array destination to push its reports into. Set `keep` to `true` if you want to retain the original `duration` and `slow` speeds.
+    - `Util.n(type, path, value, {duration, slow})` - Create a reporter node of a given type, path, value, duration, and slow time. The latter is an object because they're almost always either not there or both there, treated as a pair.
+    - `Util.p(name, index)` - Create a path node with a given name and index.
 
-    These are most frequently used for testing reporter output for whatever reason.
+    These are most frequently used for testing reporter output for whatever reason, and the latter two are usually locally aliased.
 
 ## Code style
 

@@ -2,8 +2,6 @@
 
 /* global Map, Set, Buffer */
 
-var t = require("../../index.js")
-
 describe("assertions (deep equal)", function () { // eslint-disable-line max-statements, max-len
     function check(name, a, b, opts) {
         function m(key) {
@@ -258,7 +256,7 @@ describe("assertions (deep equal)", function () { // eslint-disable-line max-sta
 
     function bar() {}
 
-    if (typeof Map === "function") {
+    if (typeof Map === "function" && typeof Set === "function") {
         check("empty maps", new Map(), new Map(), {
             deepEqual: true,
             deepEqualLoose: true,
@@ -351,9 +349,7 @@ describe("assertions (deep equal)", function () { // eslint-disable-line max-sta
             new Map([[{foo: "bar", bar: bar}, {foo: "bar", bar: bar}]]),
             new Map([[{foo: "bar", bar: bar}, {foo: "bar", bar: bar}]]),
             {deepEqual: true, deepEqualLoose: true, match: true})
-    }
 
-    if (typeof Set === "function") {
         check("empty sets", new Set(), new Set(), {
             deepEqual: true,
             deepEqualLoose: true,
@@ -411,7 +407,7 @@ describe("assertions (deep equal)", function () { // eslint-disable-line max-sta
             return {
                 ext: ext,
                 value: value,
-                require: require,
+                require: load,
                 use: use,
                 loaded: false,
                 original: false,

@@ -1,8 +1,5 @@
 "use strict"
 
-var t = require("../../index.js")
-var fail = require("../../helpers/base.js").fail
-
 describe("assertions (has keys)", function () {
     it("correct aliases", function () {
         t.equal(t.hasMatchLooseKeys, t.hasDeepLooseKeys)
@@ -23,7 +20,7 @@ describe("assertions (has keys)", function () {
             if (succeed) {
                 return t[name].apply(t, args)
             } else {
-                return fail.apply(undefined, [name].concat(args))
+                return Util.fail.apply(undefined, [name].concat(args))
             }
         }
 
@@ -140,7 +137,7 @@ describe("assertions (has keys)", function () {
             if (succeed) {
                 return t[name].apply(t, args)
             } else {
-                return fail.apply(undefined, [name].concat(args))
+                return Util.fail.apply(undefined, [name].concat(args))
             }
         }
 

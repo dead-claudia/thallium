@@ -1,9 +1,8 @@
-node_modules
-!fixtures/**/node_modules
+/node_modules
 
+# Tooling stuff
 npm-debug.log
 .eslintcache
-dist/**
 
-# This must remain last
-!**/.gitkeep
+# Browserified bundle
+/thallium.js

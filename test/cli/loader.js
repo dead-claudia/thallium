@@ -2,14 +2,12 @@
 
 var path = require("path")
 var interpret = require("interpret")
-var Promise = require("bluebird")
-var t = require("../../index.js")
 var Loader = require("../../lib/cli/loader.js")
-var Util = require("../../helpers/cli.js")
-
-var hasOwn = Object.prototype.hasOwnProperty
+var Cli = require("../../scripts/cli.js")
 
 describe("cli loader", function () {
+    var hasOwn = Object.prototype.hasOwnProperty
+
     describe("keysToRegExp()", function () { // eslint-disable-line max-statements, max-len
         it("exists", function () {
             t.function(Loader.keysToRegExp)
@@ -150,7 +148,7 @@ describe("cli loader", function () {
 
         it("loads a normal module", function () {
             var spy = makeSpy()
-            var util = Util.mock({
+            var util = Cli.mock({
                 test: {
                     "config.js": spy,
                 },
@@ -168,7 +166,7 @@ describe("cli loader", function () {
         it("loads a thenable-exporting module", function () {
             var spy1 = makeSpy(function (resolve) { return resolve() })
             var spy2 = makeSpy(function () { return {then: spy1} })
-            var util = Util.mock({
+            var util = Cli.mock({
                 test: {
                     "config.js": spy2,
                 },
@@ -187,7 +185,7 @@ describe("cli loader", function () {
 
         it("loads a default-exporting module", function () {
             var spy = makeSpy(function () { return {default: {}} })
-            var util = Util.mock({
+            var util = Cli.mock({
                 test: {
                     "config.js": spy,
                 },
@@ -205,7 +203,7 @@ describe("cli loader", function () {
         it("loads a default-exporting, thenable-exporting module", function () {
             var spy1 = makeSpy(function (resolve) { return resolve() })
             var spy2 = makeSpy(function () { return {default: {then: spy1}} })
-            var util = Util.mock({
+            var util = Cli.mock({
                 test: {
                     "config.js": spy2,
                 },
@@ -228,7 +226,7 @@ describe("cli loader", function () {
                 return resolve({default: spy1})
             })
             var spy3 = makeSpy(function () { return {then: spy2} })
-            var util = Util.mock({
+            var util = Cli.mock({
                 test: {
                     "config.js": spy3,
                 },
@@ -252,7 +250,7 @@ describe("cli loader", function () {
                 return resolve({default: spy1})
             })
             var spy3 = makeSpy(function () { return {default: {then: spy2}} })
-            var util = Util.mock({
+            var util = Cli.mock({
                 test: {
                     "config.js": spy3,
                 },
@@ -308,7 +306,7 @@ describe("cli loader", function () {
         it("loads a module string", function () {
             interpret.jsVariants[".js"] = "module"
 
-            var spy = makeSpy(Promise.method(function () {}))
+            var spy = makeSpy(Util.Promise.method(function () {}))
             var loader = new Interpret({util: {load: spy}}, "base", ".js")
 
             return loader.load().then(function () {
@@ -325,7 +323,7 @@ describe("cli loader", function () {
                 module: "module",
                 register: registerSpy,
             }
-            var loaderSpy = makeSpy(Promise.method(function () {
+            var loaderSpy = makeSpy(Util.Promise.method(function () {
                 return {exports: sentinel}
             }))
             var loader = new Interpret({util: {load: loaderSpy}}, "base", ".js")
@@ -341,7 +339,7 @@ describe("cli loader", function () {
 
         it("loads first module in string array", function () {
             interpret.jsVariants[".js"] = ["foo", "bar"]
-            var loaderSpy = makeSpy(Promise.method(function () {}))
+            var loaderSpy = makeSpy(Util.Promise.method(function () {}))
             var loader = new Interpret({util: {load: loaderSpy}}, "base", ".js")
 
             return loader.load().then(function () {
@@ -352,7 +350,7 @@ describe("cli loader", function () {
 
         it("loads second module in string array", function () {
             interpret.jsVariants[".js"] = ["foo", "bar"]
-            var loaderSpy = makeSpy(Promise.method(function (mod) {
+            var loaderSpy = makeSpy(Util.Promise.method(function (mod) {
                 if (mod === "foo") throwMissing()
             }))
             var loader = new Interpret({util: {load: loaderSpy}}, "base", ".js")
@@ -368,8 +366,8 @@ describe("cli loader", function () {
             function sentinel1() {}
             function sentinel2() {}
 
-            var registerSpy1 = makeSpy(Promise.method(function () {}))
-            var registerSpy2 = makeSpy(Promise.method(function () {}))
+            var registerSpy1 = makeSpy(Util.Promise.method(function () {}))
+            var registerSpy2 = makeSpy(Util.Promise.method(function () {}))
 
             interpret.jsVariants[".js"] = [{
                 module: "foo",
@@ -379,7 +377,7 @@ describe("cli loader", function () {
                 register: registerSpy2,
             }]
 
-            var loaderSpy = makeSpy(Promise.method(function (mod) {
+            var loaderSpy = makeSpy(Util.Promise.method(function (mod) {
                 if (mod === "foo") return {exports: sentinel1}
                 if (mod === "bar") return {exports: sentinel2}
                 return {exports: undefined}
@@ -395,8 +393,8 @@ describe("cli loader", function () {
         it("loads second module in object array", function () {
             function sentinel() {}
 
-            var registerSpy1 = makeSpy(Promise.method(function () {}))
-            var registerSpy2 = makeSpy(Promise.method(function () {}))
+            var registerSpy1 = makeSpy(Util.Promise.method(function () {}))
+            var registerSpy2 = makeSpy(Util.Promise.method(function () {}))
 
             var mock = interpret.jsVariants[".js"] = [{
                 module: "foo",
@@ -406,7 +404,7 @@ describe("cli loader", function () {
                 register: registerSpy2,
             }]
 
-            var loaderSpy = makeSpy(Promise.method(function (mod) {
+            var loaderSpy = makeSpy(Util.Promise.method(function (mod) {
                 if (mod === "foo") return throwMissing()
                 if (mod === "bar") return {exports: sentinel}
                 return {exports: undefined}
@@ -428,14 +426,14 @@ describe("cli loader", function () {
             function sentinel1() {}
             function sentinel2() {}
 
-            var registerSpy = makeSpy(Promise.method(function () {}))
+            var registerSpy = makeSpy(Util.Promise.method(function () {}))
 
             interpret.jsVariants[".js"] = ["foo", {
                 module: "bar",
                 register: registerSpy,
             }]
 
-            var loaderSpy = makeSpy(Promise.method(function (mod) {
+            var loaderSpy = makeSpy(Util.Promise.method(function (mod) {
                 if (mod === "foo") return {exports: sentinel1}
                 if (mod === "bar") return {exports: sentinel2}
                 return {exports: undefined}
@@ -452,14 +450,14 @@ describe("cli loader", function () {
         it("loads second module in string + object array", function () {
             function sentinel() {}
 
-            var registerSpy = makeSpy(Promise.method(function () {}))
+            var registerSpy = makeSpy(Util.Promise.method(function () {}))
 
             var mock = interpret.jsVariants[".js"] = ["foo", {
                 module: "bar",
                 register: registerSpy,
             }]
 
-            var loaderSpy = makeSpy(Promise.method(function (mod) {
+            var loaderSpy = makeSpy(Util.Promise.method(function (mod) {
                 if (mod === "foo") return throwMissing()
                 if (mod === "bar") return {exports: sentinel}
                 return {exports: undefined}
@@ -480,14 +478,14 @@ describe("cli loader", function () {
             function sentinel1() {}
             function sentinel2() {}
 
-            var registerSpy = makeSpy(Promise.method(function () {}))
+            var registerSpy = makeSpy(Util.Promise.method(function () {}))
 
             var mock = interpret.jsVariants[".js"] = [{
                 module: "foo",
                 register: registerSpy,
             }, "bar"]
 
-            var loaderSpy = makeSpy(Promise.method(function (mod) {
+            var loaderSpy = makeSpy(Util.Promise.method(function (mod) {
                 if (mod === "foo") return {exports: sentinel1}
                 if (mod === "bar") return {exports: sentinel2}
                 return {exports: undefined}
@@ -506,14 +504,14 @@ describe("cli loader", function () {
         it("loads second module in object + string array", function () {
             function sentinel() {}
 
-            var registerSpy = makeSpy(Promise.method(function () {}))
+            var registerSpy = makeSpy(Util.Promise.method(function () {}))
 
             interpret.jsVariants[".js"] = [{
                 module: "foo",
                 register: registerSpy,
             }, "bar"]
 
-            var loaderSpy = makeSpy(Promise.method(function (mod) {
+            var loaderSpy = makeSpy(Util.Promise.method(function (mod) {
                 if (mod === "foo") return throwMissing()
                 if (mod === "bar") return {exports: sentinel}
                 return {exports: undefined}
@@ -560,8 +558,8 @@ describe("cli loader", function () {
                     throw new TypeError("opts.modules is required")
                 }
 
-                var mock = Util.mock(opts.tree)
-                var loader = new Util.Loader(opts.args, mock)
+                var mock = Cli.mock(opts.tree)
+                var loader = new Cli.Loader(opts.args, mock)
 
                 if (opts.config != null) {
                     opts.config = loader.state.util.resolve(opts.config)
@@ -939,8 +937,8 @@ describe("cli loader", function () {
                     },
                     ".tl.js": "contents",
                 },
-                args: "test/util/helpers/**",
-                globs: ["test/util/helpers/**/*.js"],
+                args: "test/util/scripts/**",
+                globs: ["test/util/scripts/**/*.js"],
                 modules: [new S(".tl.js")],
             })
 
@@ -951,8 +949,8 @@ describe("cli loader", function () {
                         ".tl.js": "contents",
                     },
                 },
-                args: "test/helpers/**",
-                globs: ["test/helpers/**/*.js"],
+                args: "test/scripts/**",
+                globs: ["test/scripts/**/*.js"],
                 modules: [new S("test/.tl.js")],
             })
 
@@ -965,8 +963,8 @@ describe("cli loader", function () {
                         ".tl.js": "contents",
                     },
                 },
-                args: "test/util/helpers/**",
-                globs: ["test/util/helpers/**/*.js"],
+                args: "test/util/scripts/**",
+                globs: ["test/util/scripts/**/*.js"],
                 modules: [new S("test/.tl.js")],
             })
         })

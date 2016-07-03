@@ -2,12 +2,10 @@
 
 /* eslint max-nested-callbacks: [2, 5] */
 
-var t = require("../../index.js")
-var Util = require("../../helpers/base.js")
-var p = Util.p
-var n = Util.n
-
 describe("core (selection)", function () {
+    var p = Util.p
+    var n = Util.n
+
     function fail(t) {
         t.define("fail", function () {
             return {test: false, message: "fail"}

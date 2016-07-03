@@ -7,8 +7,7 @@
 # convenience.
 
 # PRs are welcome if you'd like to contribute a Windows batch equivalent for
-# nodist/nvm-windows/nvmw/etc., or if you want to add support for FreeBSD, which
-# won't likely gain support anytime soon.
+# nodist/nvm-windows/nvmw/etc., or if you want to add support for another OS.
 
 eslint $(dirname $0) --cache || exit $?
 coffeelint $(dirname $0) --cache || exit $?

@@ -3,21 +3,14 @@
 // Note: the reports *must* be well formed. The reporter assumes the reports are
 // correct, and it will *not* verify this.
 
-var Promise = require("bluebird")
-var Resolver = require("../../lib/resolver.js")
-var t = require("../../index.js")
-var spec = require("../../r/spec.js")
-var R = require("../../lib/reporter/index.js")
-var Util = require("../../helpers/base.js")
-var SupportsColor = require("../../lib/reporter/console.js").SupportsColor
-
-var Symbols = R.Symbols
-var c = R.color
-var p = Util.p
-var n = Util.n
-
 describe("reporter spec", function () {
+    var c = Util.R.color
+    var p = Util.p
+    var n = Util.n
+
     it("is not itself a reporter", function () {
+        var spec = Util.r.spec
+
         t.throws(function () { spec(n("start", [])) }, TypeError)
         t.throws(function () { spec(n("enter", [p("test", 0)])) }, TypeError)
         t.throws(function () { spec(n("leave", [p("test", 0)])) }, TypeError)
@@ -27,21 +20,20 @@ describe("reporter spec", function () {
         t.throws(function () { spec(n("end", [])) }, TypeError)
     })
 
-    function stack(err) {
-        var lines = ("    " + err.stack.replace(/^ +/gm, "      "))
-            .split(/\r?\n/g)
+    function stack(e) {
+        var lines = Util.R.getStack(e).split(/\r?\n/g)
 
-        lines[0] = "    " + c("fail", lines[0].slice(4))
+        lines[0] = "    " + c("fail", lines[0])
 
         for (var i = 1; i < lines.length; i++) {
-            lines[i] = "      " + c("fail", lines[i].slice(6))
+            lines[i] = "      " + c("fail", lines[i])
         }
 
         return lines
     }
 
     function pass(name) {
-        return c("checkmark", Symbols.Pass + " ") + c("pass", name)
+        return c("checkmark", Util.R.Symbols.Pass + " ") + c("pass", name)
     }
 
     function time(duration) {
@@ -49,24 +41,23 @@ describe("reporter spec", function () {
     }
 
     function run(envColors, reporterColors) { // eslint-disable-line max-statements, max-len
-        SupportsColor.set(envColors)
-        SupportsColor.forced = false
-        beforeEach(function () { SupportsColor.set(envColors) })
-        afterEach(function () { SupportsColor.reset() })
+        Util.R.Colors.forceSet(envColors)
+        beforeEach(function () { Util.R.Colors.forceSet(envColors) })
+        afterEach(function () { Util.R.Colors.forceRestore() })
 
         function test(name, opts) {
             it(name, function () {
                 var list = []
-                var reporter = spec({
+                var reporter = Util.r.spec({
                     colors: reporterColors,
                     print: function (arg) {
                         list.push(arg)
-                        return Promise.resolve()
+                        return Util.Promise.resolve()
                     },
                 })
 
-                return Promise.each(opts.input, function (i) {
-                    return Resolver.resolve1(reporter, undefined, i)
+                return Util.Promise.each(opts.input, function (i) {
+                    return Util.Resolver.resolve1(reporter, undefined, i)
                 })
                 .then(function () {
                     t.match(list, opts.output)
@@ -349,12 +340,12 @@ describe("reporter spec", function () {
         })
 
         var extra = (function () {
-            var e = new Error()
+            var e = new Error("extra")
             var parts = []
             var stack
 
             e.name = ""
-            stack = e.stack.split(/\r?\n/g).slice(1)
+            stack = Util.getStack(e).split(/\r?\n/g).slice(1)
 
             parts.push("    " + c("fail", "- " + stack[0].trim()))
 
@@ -376,9 +367,9 @@ describe("reporter spec", function () {
                 n("pass", [p("test", 0), p("inner", 0), p("fail", 0)]),
                 n("leave", [p("test", 0), p("inner", 0)]),
                 n("extra", [p("test", 0), p("inner", 0), p("fail", 0)],
-                    {count: 2, value: undefined, stack: extra.stack}),
+                    {count: 2, value: undefined, stack: Util.getStack(extra)}),
                 n("extra", [p("test", 0), p("inner", 0), p("fail", 0)],
-                    {count: 3, value: sentinel, stack: extra.stack}),
+                    {count: 3, value: sentinel, stack: Util.getStack(extra)}),
                 n("leave", [p("test", 0)]),
                 n("end", []),
             ],
@@ -412,9 +403,9 @@ describe("reporter spec", function () {
                 n("fail", [p("test", 0), p("inner", 0), p("fail", 0)], badType),
                 n("leave", [p("test", 0), p("inner", 0)]),
                 n("extra", [p("test", 0), p("inner", 0), p("fail", 0)],
-                    {count: 2, value: undefined, stack: extra.stack}),
+                    {count: 2, value: undefined, stack: Util.getStack(extra)}),
                 n("extra", [p("test", 0), p("inner", 0), p("fail", 0)],
-                    {count: 3, value: sentinel, stack: extra.stack}),
+                    {count: 3, value: sentinel, stack: Util.getStack(extra)}),
                 n("leave", [p("test", 0)]),
                 n("end", []),
             ],
@@ -455,7 +446,7 @@ describe("reporter spec", function () {
                 "    inner",
                 "      " + c("fail", "1) fail"),
                 "",
-            ], badType.stack.split(/\r?\n/g)),
+            ], Util.R.getStack(badType).split(/\r?\n/g)),
         })
 
         test("long passing sequence", {
@@ -635,7 +626,7 @@ describe("reporter spec", function () {
                 n("pass", [p("core (timeouts)", 2), p("fails with inherited", 3)]),
                 n("pass", [p("core (timeouts)", 2), p("gets own set timeout", 4)]),
                 n("extra", [p("core (timeouts)", 2), p("fails with own", 1)],
-                    {count: 2, value: badType, stack: extra.stack}),
+                    {count: 2, value: badType, stack: Util.getStack(extra)}),
                 n("fail", [p("core (timeouts)", 2), p("gets own inline set timeout", 5)], sentinel),
                 n("skip", [p("core (timeouts)", 2), p("gets own sync inner timeout", 6)]),
                 n("pass", [p("core (timeouts)", 2), p("gets default timeout", 7)]),
@@ -1002,7 +993,7 @@ describe("reporter spec", function () {
             })
         })
 
-        SupportsColor.reset()
+        Util.R.Colors.forceRestore()
     }
 
     context("no env color + no color opt", function () { run(false, false) })
@@ -1014,16 +1005,16 @@ describe("reporter spec", function () {
         function test(name, opts) {
             it(name, function () {
                 var list = []
-                var reporter = spec({
+                var reporter = Util.r.spec({
                     colors: true,
                     print: function (arg) {
                         list.push(arg)
-                        return Promise.resolve()
+                        return Util.Promise.resolve()
                     },
                 })
 
-                return Promise.each(opts.input, function (i) {
-                    return Resolver.resolve1(reporter, undefined, i)
+                return Util.Promise.each(opts.input, function (i) {
+                    return Util.Resolver.resolve1(reporter, undefined, i)
                 })
                 .then(function () {
                     t.match(list, opts.output)
