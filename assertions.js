@@ -474,8 +474,7 @@ function throws(name, _) {
             check(func, "func", "function")
             _.check(matcher)
 
-            var test = false
-            var error
+            var test, error
 
             try {
                 func()
@@ -484,12 +483,14 @@ function throws(name, _) {
 
                 // Rethrow unknown errors that don't match when a matcher was
                 // passed - it's easier to debug unexpected errors when you have
-                // a stack trace.
-                if (_.rethrow(matcher, invert, test)) throw e
+                // a stack trace. Don't rethrow non-errors, though.
+                if (_.rethrow(matcher, invert, test, e)) {
+                    throw e
+                }
             }
 
             return {
-                test: test ^ invert,
+                test: !!test ^ invert,
                 expected: matcher,
                 error: error,
                 message: _.message(matcher, invert, test),
@@ -505,8 +506,8 @@ throws("throws", {
     test: function (Type, e) { return Type == null || e instanceof Type },
     check: function (Type) { check(Type, "Type", ["none", "function"]) },
 
-    rethrow: function (matcher, invert, test) {
-        return matcher != null && !invert && !test
+    rethrow: function (matcher, invert, test, e) {
+        return matcher != null && !invert && !test && e instanceof Error
     },
 
     message: function (Type, invert, test) {

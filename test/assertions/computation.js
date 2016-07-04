@@ -4,36 +4,100 @@ describe("assertions (computation)", function () {
     var fail = Util.fail
     var basic = Util.basic
 
-    basic("t.throws()", function () {
-        t.throws(function () { throw new Error("fail") })
-        t.throws(function () { throw new TypeError("fail") }, TypeError)
-        t.throws(function () { throw new TypeError("fail") }, Error)
+    describe("t.throws()", function () {
+        it("works", function () {
+            t.throws(function () { throw new Error("fail") })
+            t.throws(function () { throw new TypeError("fail") }, TypeError)
+            t.throws(function () { throw new TypeError("fail") }, Error)
+            fail("throws", function () {}, Error)
+            fail("throws", function () {})
+        })
 
-        var thrown = false
+        it("rethrows non-matching errors", function () {
+            var err = new Error("fail")
 
-        try {
-            t.throws(function () { throw new Error("fail") }, TypeError)
-        } catch (e) {
-            t.equal(Object.getPrototypeOf(e), Error.prototype)
-            thrown = true
-        }
+            try {
+                t.throws(function () { throw err }, TypeError)
+            } catch (e) {
+                t.equal(e, err)
+                return
+            }
 
-        t.assert(thrown, "Expected an error to be thrown")
-        fail("throws", function () {}, Error)
-        fail("throws", function () {})
+            t.fail("Expected an error to be thrown")
+        })
+
+        it("doesn't rethrow non-errors", function () {
+            /* eslint-disable no-throw-literal */
+
+            t.throws(function () { throw undefined })
+            t.throws(function () { throw null })
+            t.throws(function () { throw 1 })
+            t.throws(function () { throw "why" })
+            t.throws(function () { throw true })
+            t.throws(function () { throw [] })
+            t.throws(function () { throw {} })
+
+            fail("throws", function () { throw undefined }, Error)
+            fail("throws", function () { throw null }, Error)
+            fail("throws", function () { throw 1 }, Error)
+            fail("throws", function () { throw "why" }, Error)
+            fail("throws", function () { throw true }, Error)
+            fail("throws", function () { throw [] }, Error)
+            fail("throws", function () { throw {} }, Error)
+
+            /* eslint-disable no-undef */
+
+            if (typeof Symbol === "function") {
+                t.throws(function () { throw Symbol() })
+                fail("throws", function () { throw Symbol() }, Error)
+            }
+
+            /* eslint-enable no-undef, no-throw-literal */
+        })
     })
 
-    basic("t.notThrows()", function () {
-        fail("notThrows", function () { throw new Error("fail") })
+    describe("t.notThrows()", function () {
+        /* eslint-disable max-len */
 
-        fail("notThrows", function () {
-            throw new TypeError("fail")
-        }, TypeError)
+        it("works", function () {
+            fail("notThrows", function () { throw new Error("fail") })
+            fail("notThrows", function () { throw new TypeError("fail") }, TypeError)
+            fail("notThrows", function () { throw new TypeError("fail") }, Error)
+            t.notThrows(function () { throw new Error("fail") }, TypeError)
+            t.notThrows(function () {}, Error)
+            t.notThrows(function () {})
+        })
 
-        fail("notThrows", function () { throw new TypeError("fail") }, Error)
-        t.notThrows(function () { throw new Error("fail") }, TypeError)
-        t.notThrows(function () {}, Error)
-        t.notThrows(function () {})
+        it("doesn't rethrow non-errors", function () {
+            /* eslint-disable no-throw-literal */
+
+            fail("notThrows", function () { throw undefined })
+            fail("notThrows", function () { throw null })
+            fail("notThrows", function () { throw 1 })
+            fail("notThrows", function () { throw "why" })
+            fail("notThrows", function () { throw true })
+            fail("notThrows", function () { throw [] })
+            fail("notThrows", function () { throw {} })
+
+            t.notThrows(function () { throw undefined }, Error)
+            t.notThrows(function () { throw null }, Error)
+            t.notThrows(function () { throw 1 }, Error)
+            t.notThrows(function () { throw "why" }, Error)
+            t.notThrows(function () { throw true }, Error)
+            t.notThrows(function () { throw [] }, Error)
+            t.notThrows(function () { throw {} }, Error)
+
+            /* eslint-disable no-undef */
+
+            if (typeof Symbol === "function") {
+                fail("notThrows", function () { throw Symbol() })
+                t.notThrows(function () { throw Symbol() }, Error)
+            }
+
+            /* eslint-enable no-undef, no-throw-literal */
+        })
+
+        /* eslint-enable max-len */
     })
 
     basic("t.throwsMatch()", function () {
