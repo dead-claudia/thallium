@@ -38,25 +38,98 @@ var Util = global.Util = {
 Util.silenceEmptyInlineWarnings()
 
 // Inject a no-op into browsers (so the relevant tests actually run), but not
-// into older Node versions unsupported by jsdom.
-if (!global.process) {
-    Util.jsdom = function () {}
-} else {
-    var exec = /^v(\d+)/.exec(global.process.version)
+// into older Node versions unsupported by jsdom and JS environments that don't
+// support the DOM nor CommonJS APIs.
+Util.jsdom = (function () {
+    if (!global.process) {
+        if (!global.window || !global.console) return undefined
 
-    // Update this version number whenever jsdom increases their minimum
-    // supported Node version.
-    if (exec != null && exec[1] >= 4) {
-        var jsdom = require("jsdom-global") // eslint-disable-line global-require, max-len
+        var EventEmitter = require("events").EventEmitter // eslint-disable-line global-require, max-len
 
-        Util.jsdom = function (opts) {
-            var cleanup
+        return function () {
+            var console = global.console
+            var keys = Object.keys(console)
+            var emitter
 
-            beforeEach(function () { cleanup = jsdom(undefined, opts) })
-            afterEach(function () { cleanup() })
+            // Adapted from jsdom's own adapter
+            function wrapConsoleMethod(method) {
+                return function () {
+                    var args = [method]
+
+                    for (var i = 0; i < arguments.length; i++) {
+                        args.push(arguments[i])
+                    }
+
+                    emitter.emit.apply(emitter, args)
+                }
+            }
+
+            function ConsoleMock() {
+                for (var i = 0; i < keys.length; i++) {
+                    this[keys[i]] = wrapConsoleMethod(keys[i])
+                }
+            }
+
+            beforeEach("jsdom injection", function () {
+                emitter = new EventEmitter()
+                emitter.on("error", function () {
+                    // Don't throw an exception if the emitter doesn't have any
+                    // "error" event listeners.
+                })
+                global.console = new ConsoleMock()
+            })
+
+            afterEach("jsdom injection", function () {
+                global.console = console
+                emitter = undefined
+            })
+
+            return {
+                window: function () { return global.window },
+                console: function () { return emitter },
+            }
+        }
+    } else {
+        var exec = /^v(\d+)/.exec(global.process.version)
+
+        // Update this version number whenever jsdom increases their minimum
+        // supported Node version.
+        if (exec == null || exec[1] < 4) return undefined
+
+        var jsdom = require("jsdom") // eslint-disable-line global-require
+        var html = '<!doctype html><meta charset="utf-8">'
+
+        return function (opts) {
+            var document
+
+            beforeEach("jsdom injection", function () {
+                if (opts == null) opts = {}
+                if (opts.features == null) opts.features = {}
+                if (opts.features.FetchExternalResources == null) {
+                    opts.features.FetchExternalResources = false
+                }
+                if (opts.features.ProcessExternalResources == null) {
+                    opts.features.ProcessExternalResources = false
+                }
+
+                document = jsdom.jsdom(html, opts)
+            })
+
+            afterEach("jsdom injection", function () {
+                document = undefined
+            })
+
+            return {
+                window: function () {
+                    return document.defaultView
+                },
+                console: function () {
+                    return jsdom.getVirtualConsole(document.defaultView)
+                },
+            }
         }
     }
-}
+})()
 
 var AssertionError = t.reflect().AssertionError
 
