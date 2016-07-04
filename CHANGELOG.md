@@ -1,5 +1,12 @@
 # Changelog
 
+## v0.1.4
+
+- Add browser support
+- Add browser bundle (works in Node as well)
+- Clean up several implementation details
+- Don't set the timeout if an async test fails synchronously
+
 ## v0.1.3
 
 Infinite loop fix (caught shortly after last publish)
