@@ -651,4 +651,324 @@ describe("core (reflect)", function () {
             })
         })
     })
+
+    describe("report()", function () {
+        var Types = Util.Report.Types
+        var Report = Util.Report.Report
+
+        it("correctly creates `start` reports", function () {
+            var report = t.reflect().report("start", [], {value: "hello"})
+            var expected = new Report(Types.Start, [], undefined, -1, 0)
+
+            t.match(report, expected)
+        })
+
+        it("correctly creates `enter` reports", function () {
+            var report = t.reflect().report("enter", [], {value: "hello"})
+            var expected = new Report(Types.Enter, [], undefined, 10, 75)
+
+            t.match(report, expected)
+        })
+
+        it("correctly creates `enter` reports with duration", function () {
+            var report = t.reflect().report("enter", [], {value: "hello"}, 20)
+            var expected = new Report(Types.Enter, [], undefined, 20, 75)
+
+            t.match(report, expected)
+        })
+
+        it("correctly creates `enter` reports with slow", function () {
+            var report = t.reflect().report("enter", [], {value: "hello"}, null, 10) // eslint-disable-line max-len
+            var expected = new Report(Types.Enter, [], undefined, 10, 10)
+
+            t.match(report, expected)
+        })
+
+        it("correctly creates `enter` reports with duration + slow", function () { // eslint-disable-line max-len
+            var report = t.reflect().report("enter", [], {value: "hello"}, null, 10) // eslint-disable-line max-len
+            var expected = new Report(Types.Enter, [], undefined, 10, 10)
+
+            t.match(report, expected)
+        })
+
+        it("correctly creates `leave` reports", function () {
+            var report = t.reflect().report("leave", [], {value: "hello"})
+            var expected = new Report(Types.Leave, [], undefined, -1, 0)
+
+            t.match(report, expected)
+        })
+
+        it("correctly creates `pass` reports", function () {
+            var report = t.reflect().report("pass", [], {value: "hello"})
+            var expected = new Report(Types.Pass, [], undefined, 10, 75)
+
+            t.match(report, expected)
+        })
+
+        it("correctly creates `pass` reports with duration", function () {
+            var report = t.reflect().report("pass", [], {value: "hello"}, 20)
+            var expected = new Report(Types.Pass, [], undefined, 20, 75)
+
+            t.match(report, expected)
+        })
+
+        it("correctly creates `pass` reports with slow", function () {
+            var report = t.reflect().report("pass", [], {value: "hello"}, null, 10) // eslint-disable-line max-len
+            var expected = new Report(Types.Pass, [], undefined, 10, 10)
+
+            t.match(report, expected)
+        })
+
+        it("correctly creates `pass` reports with duration + slow", function () { // eslint-disable-line max-len
+            var report = t.reflect().report("pass", [], {value: "hello"}, null, 10) // eslint-disable-line max-len
+            var expected = new Report(Types.Pass, [], undefined, 10, 10)
+
+            t.match(report, expected)
+        })
+
+        it("correctly creates `fail` reports", function () {
+            var report = t.reflect().report("fail", [], {value: "hello"})
+            var expected = new Report(Types.Fail, [], {value: "hello"}, 10, 75)
+
+            t.match(report, expected)
+        })
+
+        it("correctly creates `fail` reports with duration", function () {
+            var report = t.reflect().report("fail", [], {value: "hello"}, 20)
+            var expected = new Report(Types.Fail, [], {value: "hello"}, 20, 75)
+
+            t.match(report, expected)
+        })
+
+        it("correctly creates `fail` reports with slow", function () {
+            var report = t.reflect().report("fail", [], {value: "hello"}, null, 10) // eslint-disable-line max-len
+            var expected = new Report(Types.Fail, [], {value: "hello"}, 10, 10)
+
+            t.match(report, expected)
+        })
+
+        it("correctly creates `fail` reports with duration + slow", function () { // eslint-disable-line max-len
+            var report = t.reflect().report("fail", [], {value: "hello"}, null, 10) // eslint-disable-line max-len
+            var expected = new Report(Types.Fail, [], {value: "hello"}, 10, 10)
+
+            t.match(report, expected)
+        })
+
+        it("correctly creates `skip` reports", function () {
+            var report = t.reflect().report("skip", [], {value: "hello"})
+            var expected = new Report(Types.Skip, [], undefined, -1, 0)
+
+            t.match(report, expected)
+        })
+
+        it("correctly creates `end` reports", function () {
+            var report = t.reflect().report("end", [], {value: "hello"})
+            var expected = new Report(Types.End, [], undefined, -1, 0)
+
+            t.match(report, expected)
+        })
+
+        it("correctly creates `error` reports", function () {
+            var report = t.reflect().report("error", [], {value: "hello"})
+            var expected = new Report(Types.Error, [], {value: "hello"}, -1, 0)
+
+            t.match(report, expected)
+        })
+
+        it("correctly creates `extra` reports", function () {
+            var extra = t.reflect().extra(2, null, "")
+            var report = t.reflect().report("extra", [], extra)
+            var expected = new Report(Types.Extra, [], extra, -1, 0)
+
+            t.match(report, expected)
+        })
+
+        context("type checkers", function () {
+            it("correctly identifies `start` reports", function () {
+                var report = t.reflect().report("start", [])
+
+                t.true(report.start())
+                t.false(report.enter())
+                t.false(report.leave())
+                t.false(report.pass())
+                t.false(report.fail())
+                t.false(report.skip())
+                t.false(report.end())
+                t.false(report.error())
+                t.false(report.extra())
+            })
+
+            it("correctly identifies `enter` reports", function () {
+                var report = t.reflect().report("enter", [])
+
+                t.false(report.start())
+                t.true(report.enter())
+                t.false(report.leave())
+                t.false(report.pass())
+                t.false(report.fail())
+                t.false(report.skip())
+                t.false(report.end())
+                t.false(report.error())
+                t.false(report.extra())
+            })
+
+            it("correctly identifies `leave` reports", function () {
+                var report = t.reflect().report("leave", [])
+
+                t.false(report.start())
+                t.false(report.enter())
+                t.true(report.leave())
+                t.false(report.pass())
+                t.false(report.fail())
+                t.false(report.skip())
+                t.false(report.end())
+                t.false(report.error())
+                t.false(report.extra())
+            })
+
+            it("correctly identifies `pass` reports", function () {
+                var report = t.reflect().report("pass", [])
+
+                t.false(report.start())
+                t.false(report.enter())
+                t.false(report.leave())
+                t.true(report.pass())
+                t.false(report.fail())
+                t.false(report.skip())
+                t.false(report.end())
+                t.false(report.error())
+                t.false(report.extra())
+            })
+
+            it("correctly identifies `fail` reports", function () {
+                var report = t.reflect().report("fail", [])
+
+                t.false(report.start())
+                t.false(report.enter())
+                t.false(report.leave())
+                t.false(report.pass())
+                t.true(report.fail())
+                t.false(report.skip())
+                t.false(report.end())
+                t.false(report.error())
+                t.false(report.extra())
+            })
+
+            it("correctly identifies `skip` reports", function () {
+                var report = t.reflect().report("skip", [])
+
+                t.false(report.start())
+                t.false(report.enter())
+                t.false(report.leave())
+                t.false(report.pass())
+                t.false(report.fail())
+                t.true(report.skip())
+                t.false(report.end())
+                t.false(report.error())
+                t.false(report.extra())
+            })
+
+            it("correctly identifies `end` reports", function () {
+                var report = t.reflect().report("end", [])
+
+                t.false(report.start())
+                t.false(report.enter())
+                t.false(report.leave())
+                t.false(report.pass())
+                t.false(report.fail())
+                t.false(report.skip())
+                t.true(report.end())
+                t.false(report.error())
+                t.false(report.extra())
+            })
+
+            it("correctly identifies `error` reports", function () {
+                var report = t.reflect().report("error", [])
+
+                t.false(report.start())
+                t.false(report.enter())
+                t.false(report.leave())
+                t.false(report.pass())
+                t.false(report.fail())
+                t.false(report.skip())
+                t.false(report.end())
+                t.true(report.error())
+                t.false(report.extra())
+            })
+
+            it("correctly identifies `extra` reports", function () {
+                var reflect = t.reflect()
+                var report = reflect.report("extra", [],
+                    reflect.extra(2, null, ""))
+
+                t.false(report.start())
+                t.false(report.enter())
+                t.false(report.leave())
+                t.false(report.pass())
+                t.false(report.fail())
+                t.false(report.skip())
+                t.false(report.end())
+                t.false(report.error())
+                t.true(report.extra())
+            })
+        })
+
+        context("type()", function () {
+            it("returns correct value for `start` reports", function () {
+                var report = t.reflect().report("start", [])
+
+                t.match(report.type(), "start")
+            })
+
+            it("returns correct value for `enter` reports", function () {
+                var report = t.reflect().report("enter", [])
+
+                t.match(report.type(), "enter")
+            })
+
+            it("returns correct value for `leave` reports", function () {
+                var report = t.reflect().report("leave", [])
+
+                t.match(report.type(), "leave")
+            })
+
+            it("returns correct value for `pass` reports", function () {
+                var report = t.reflect().report("pass", [])
+
+                t.match(report.type(), "pass")
+            })
+
+            it("returns correct value for `fail` reports", function () {
+                var report = t.reflect().report("fail", [])
+
+                t.match(report.type(), "fail")
+            })
+
+            it("returns correct value for `skip` reports", function () {
+                var report = t.reflect().report("skip", [])
+
+                t.match(report.type(), "skip")
+            })
+
+            it("returns correct value for `end` reports", function () {
+                var report = t.reflect().report("end", [])
+
+                t.match(report.type(), "end")
+            })
+
+            it("returns correct value for `error` reports", function () {
+                var report = t.reflect().report("error", [])
+
+                t.match(report.type(), "error")
+            })
+
+            it("returns correct value for `extra` reports", function () {
+                var reflect = t.reflect()
+                var report = reflect.report("extra", [],
+                    reflect.extra(2, null, ""))
+
+                t.match(report.type(), "extra")
+            })
+        })
+    })
 })

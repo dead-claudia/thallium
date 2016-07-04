@@ -14,8 +14,19 @@ export default function (t) {
         return reporter(...args.map(reporter => {
             if (typeof reporter === "object" && reporter != null) {
                 return (ev, done) => {
-                    reporter.emit(ev.type, ev.value, ev.path)
-                    return done()
+                    switch (true) {
+                    case ev.start(): reporter.emit("start", ev); break
+                    case ev.enter(): reporter.emit("enter", ev); break
+                    case ev.leave(): reporter.emit("leave", ev); break
+                    case ev.pass(): reporter.emit("pass", ev); break
+                    case ev.fail(): reporter.emit("fail", ev); break
+                    case ev.skip(): reporter.emit("skip", ev); break
+                    case ev.end(): reporter.emit("end", ev); break
+                    case ev.error(): reporter.emit("error", ev); break
+                    case ev.extra(): reporter.emit("extra", ev); break
+                    default: throw new Error("unreachable")
+                    }
+                    done()
                 }
             } else {
                 // Don't fix reporter

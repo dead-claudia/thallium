@@ -81,70 +81,52 @@ function printError({value: err}) {
     }
 }
 
-export default function tap(ev, done) {
-    switch (ev.type) {
-    case "start":
+export default function tap(ev, done) { // eslint-disable-line max-statements
+    if (ev.start()) {
         console.log("TAP version 13")
-        break
-
-    case "enter":
+    } else if (ev.enter()) {
         tests++
         pass++
         // Print a leading comment, to make some TAP formatters prettier.
         template(ev, "# %p", true)
         template(ev, "ok %c")
-        break
-
-    // This is meaningless for the output.
-    case "leave": break
-
-    case "pass":
+    } else if (ev.leave()) {
+        // This is meaningless for the output.
+    } else if (ev.pass()) {
         tests++
         pass++
         template(ev, "ok %c %p")
-        break
-
-    case "fail":
+    } else if (ev.fail()) {
         tests++
         fail++
         template(ev, "not ok %c %p")
         console.log("  ---")
         printError(ev)
         console.log("  ...")
-        break
-
-    case "skip":
+    } else if (ev.skip()) {
         skip++
         template(ev, "ok %c # skip %p")
-        break
-
-    case "extra":
+    } else if (ev.extra()) {
         template(ev, "not ok %c %p # extra")
         console.log("  ---")
         printRaw("count", inspect(ev.value.count))
         printRaw("value", inspect(ev.value.value))
         console.log("  ...")
-        break
-
-    case "end":
+    } else if (ev.end()) {
         console.log(`1..${counter}`)
         console.log(`# tests ${tests}`)
         if (pass) console.log(`# pass ${pass}`)
         if (fail) console.log(`# fail ${fail}`)
         if (skip) console.log(`# skip ${skip}`)
         reset()
-        break
-
-    case "error":
+    } else if (ev.error()) {
         console.log("Bail out!")
         console.log("  ---")
         printError(ev)
         console.log("  ...")
         reset()
-        break
-
-    default:
-        throw new RangeError(`Unexpected type: ${ev.type}`)
+    } else {
+        throw new Error("unreachable")
     }
 
     return done()

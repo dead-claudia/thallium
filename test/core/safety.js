@@ -3,6 +3,7 @@
 describe("core (safety)", function () {
     var p = Util.p
     var n = Util.n
+    var extra = Util.extra
 
     function valueOf(value) {
         return {valueOf: function () { return value }}
@@ -153,9 +154,9 @@ describe("core (safety)", function () {
             for (var i = 0; i < ret.length; i++) {
                 var entry = ret[i]
 
-                if (entry.type === "extra") {
+                if (entry.extra()) {
                     t.string(Util.getStack(entry.value))
-                    delete entry.value.stack
+                    entry.value.stack = ""
                 }
             }
 
@@ -163,11 +164,11 @@ describe("core (safety)", function () {
                 [3, 4, 5, 6].map(function (i) {
                     var splice1 = n("extra",
                         [p("test", 0), p("inner", 0), p("fail", 0)],
-                        {count: 2, value: undefined})
+                        extra(2, undefined, ""))
 
                     var splice2 = n("extra",
                         [p("test", 0), p("inner", 0), p("fail", 0)],
-                        {count: 3, value: sentinel})
+                        extra(3, sentinel, ""))
 
                     var node = [
                         n("start", []),

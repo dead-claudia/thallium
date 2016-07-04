@@ -69,11 +69,11 @@ printError = ({value: err}) ->
         err.message = message
 
 module.exports = (ev, done) ->
-    switch ev.type
-        when 'start'
+    switch
+        when ev.start()
             console.log 'TAP version 13'
 
-        when 'enter'
+        when ev.enter()
             tests++
             pass++
             # Print a leading comment, to make some TAP formatters prettier.
@@ -81,14 +81,14 @@ module.exports = (ev, done) ->
             template ev, 'ok %c'
 
         # This is meaningless for the output.
-        when 'leave' then
+        when ev.leave() then
 
-        when 'pass'
+        when ev.pass()
             tests++
             pass++
             template ev, 'ok %c %p'
 
-        when 'fail'
+        when ev.fail()
             tests++
             fail++
             template ev, 'not ok %c %p'
@@ -96,18 +96,18 @@ module.exports = (ev, done) ->
             printError ev
             console.log '  ...'
 
-        when 'skip'
+        when ev.skip()
             skip++
             template ev, 'ok %c # skip %p'
 
-        when 'extra'
+        when ev.extra()
             template ev, 'not ok %c %p # extra'
             console.log '  ---'
             printRaw 'count', inspect(ev.value.count)
             printRaw 'value', inspect(ev.value.value)
             console.log '  ...'
 
-        when 'end'
+        when ev.end()
             console.log "1..#{counter}"
             console.log "# tests #{tests}"
             console.log "# pass #{pass}" if pass
@@ -115,13 +115,13 @@ module.exports = (ev, done) ->
             console.log "# skip #{skip}" if skip
             reset()
 
-        when 'error'
+        when ev.error()
             console.log 'Bail out!'
             console.log '  ---'
             printError ev
             console.log '  ...'
             reset()
 
-        else throw new RangeError("Unexpected type: #{ev.type}")
+        else throw new Error 'unreachable'
 
     done()

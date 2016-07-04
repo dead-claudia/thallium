@@ -7,16 +7,6 @@ describe("core (slow) (FLAKE)", function () {
     var n = Util.n
     var p = Util.p
 
-    function push(ret) {
-        return Util.push(ret, true)
-    }
-
-    function at(host, i) {
-        if (host == null) return undefined
-        if (host[i] == null) return undefined
-        return {slow: host[i].slow, duration: host[i].duration}
-    }
-
     function speed(data, type) {
         switch (type) {
         case "fast": t.between(data.duration, 0, data.slow / 2); break
@@ -26,16 +16,11 @@ describe("core (slow) (FLAKE)", function () {
         }
     }
 
-    function nontest(slow) {
-        if (slow == null) slow = 75
-        return {duration: -1, slow: slow}
-    }
-
     it("succeeds with own", function () {
         var tt = t.reflect().base()
         var ret = []
 
-        tt.reporter(push(ret))
+        tt.reporter(Util.push(ret, true))
 
         tt.async("test", function (tt, done) {
             // It's highly unlikely the engine will take this long to finish.
@@ -44,15 +29,13 @@ describe("core (slow) (FLAKE)", function () {
         })
 
         return tt.run().then(function () {
-            var data = at(ret, 1)
-
             t.match(ret, [
-                n("start", [], undefined, nontest()),
-                n("pass", [p("test", 0)], undefined, data),
-                n("end", [], undefined, nontest()),
+                n("start", [], undefined, -1, 75),
+                n("pass", [p("test", 0)], undefined, ret[1].duration, ret[1].slow), // eslint-disable-line max-len
+                n("end", [], undefined, -1, 75),
             ])
 
-            speed(data, "fast")
+            speed(ret[1], "fast")
         })
     })
 
@@ -60,7 +43,7 @@ describe("core (slow) (FLAKE)", function () {
         var tt = t.reflect().base()
         var ret = []
 
-        tt.reporter(push(ret))
+        tt.reporter(Util.push(ret, true))
 
         tt.async("test", function (tt, done) {
             // It's highly unlikely the engine will take this long to finish.
@@ -69,16 +52,14 @@ describe("core (slow) (FLAKE)", function () {
         })
 
         return tt.run().then(function () {
-            var data = at(ret, 1)
-
             t.match(ret, [
-                n("start", [], undefined, nontest()),
-                n("pass", [p("test", 0)], undefined, data),
-                n("end", [], undefined, nontest()),
+                n("start", [], undefined, -1, 75),
+                n("pass", [p("test", 0)], undefined, ret[1].duration, ret[1].slow), // eslint-disable-line max-len
+                n("end", [], undefined, -1, 75),
             ])
 
-            t.equal(data.slow, 100)
-            speed(data, "medium")
+            t.equal(ret[1].slow, 100)
+            speed(ret[1], "medium")
         })
     })
 
@@ -86,7 +67,7 @@ describe("core (slow) (FLAKE)", function () {
         var tt = t.reflect().base()
         var ret = []
 
-        tt.reporter(push(ret))
+        tt.reporter(Util.push(ret, true))
 
         tt.async("test", function (tt, done) {
             tt.slow(50)
@@ -95,16 +76,14 @@ describe("core (slow) (FLAKE)", function () {
         })
 
         return tt.run().then(function () {
-            var data = at(ret, 1)
-
             t.match(ret, [
-                n("start", [], undefined, nontest()),
-                n("pass", [p("test", 0)], undefined, data),
-                n("end", [], undefined, nontest()),
+                n("start", [], undefined, -1, 75),
+                n("pass", [p("test", 0)], undefined, ret[1].duration, ret[1].slow), // eslint-disable-line max-len
+                n("end", [], undefined, -1, 75),
             ])
 
-            t.equal(data.slow, 50)
-            speed(data, "slow")
+            t.equal(ret[1].slow, 50)
+            speed(ret[1], "slow")
         })
     })
 
@@ -112,28 +91,25 @@ describe("core (slow) (FLAKE)", function () {
         var tt = t.reflect().base()
         var ret = []
 
-        tt.reporter(push(ret))
+        tt.reporter(Util.push(ret, true))
 
         tt.test("test")
         .slow(50)
         .async("inner", function (tt, done) { done() })
 
         return tt.run().then(function () {
-            var data1 = at(ret, 1)
-            var data2 = at(ret, 2)
-
             t.match(ret, [
-                n("start", [], undefined, nontest()),
-                n("enter", [p("test", 0)], undefined, data1),
-                n("pass", [p("test", 0), p("inner", 0)], undefined, data2),
-                n("leave", [p("test", 0)], undefined, nontest(50)),
-                n("end", [], undefined, nontest()),
+                n("start", [], undefined, -1, 75),
+                n("enter", [p("test", 0)], undefined, ret[1].duration, ret[1].slow), // eslint-disable-line max-len
+                n("pass", [p("test", 0), p("inner", 0)], undefined, ret[2].duration, ret[2].slow), // eslint-disable-line max-len
+                n("leave", [p("test", 0)], undefined, -1, 50),
+                n("end", [], undefined, -1, 75),
             ])
 
-            t.equal(data1.slow, 50)
-            t.equal(data2.slow, 50)
-            speed(data1, "fast")
-            speed(data2, "fast")
+            t.equal(ret[1].slow, 50)
+            t.equal(ret[2].slow, 50)
+            speed(ret[1], "fast")
+            speed(ret[2], "fast")
         })
     })
 
@@ -141,7 +117,7 @@ describe("core (slow) (FLAKE)", function () {
         var tt = t.reflect().base()
         var ret = []
 
-        tt.reporter(push(ret))
+        tt.reporter(Util.push(ret, true))
 
         tt.test("test")
         .slow(50)
@@ -150,21 +126,18 @@ describe("core (slow) (FLAKE)", function () {
         })
 
         return tt.run().then(function () {
-            var data1 = at(ret, 1)
-            var data2 = at(ret, 2)
-
             t.match(ret, [
-                n("start", [], undefined, nontest()),
-                n("enter", [p("test", 0)], undefined, data1),
-                n("pass", [p("test", 0), p("inner", 0)], undefined, data2),
-                n("leave", [p("test", 0)], undefined, nontest(50)),
-                n("end", [], undefined, nontest()),
+                n("start", [], undefined, -1, 75),
+                n("enter", [p("test", 0)], undefined, ret[1].duration, ret[1].slow), // eslint-disable-line max-len
+                n("pass", [p("test", 0), p("inner", 0)], undefined, ret[2].duration, ret[2].slow), // eslint-disable-line max-len
+                n("leave", [p("test", 0)], undefined, -1, 50),
+                n("end", [], undefined, -1, 75),
             ])
 
-            t.equal(data1.slow, 50)
-            t.equal(data2.slow, 50)
-            speed(data1, "fast")
-            speed(data2, "slow")
+            t.equal(ret[1].slow, 50)
+            t.equal(ret[2].slow, 50)
+            speed(ret[1], "fast")
+            speed(ret[2], "slow")
         })
     })
 

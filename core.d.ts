@@ -4,27 +4,54 @@ export interface Callback<T> {
     (err?: Error): T;
 }
 
-export type ReportType =
-    "start" | "enter" | "leave" | "pass" | "fail" | "skip" | "end" | "extra";
-
 export interface Location {
     name: string;
     index: number;
 }
 
-export type Report =
-    StartReport | EnterReport | LeaveReport | PassReport | FailReport |
-    SkipReport | EndReport | ExtraReport;
+export type ReportType =
+    "start" |
+    "enter" |
+    "leave" |
+    "pass" |
+    "fail" |
+    "skip" |
+    "end" |
+    "error" |
+    "extra";
 
-export interface TestReport<T extends ReportType, U> {
-    type: T;
-    value: U;
+export type Report =
+    StartReport |
+    EnterReport |
+    LeaveReport |
+    PassReport |
+    FailReport |
+    SkipReport |
+    EndReport |
+    ExtraReport<any>;
+
+interface TestReport<T extends ReportType, U> {
+    type(): T;
     path: Location[];
+    value: U;
+    duration: number;
+    slow: number;
+
+    start(): this is StartReport;
+    enter(): this is EnterReport;
+    leave(): this is LeaveReport;
+    pass(): this is PassReport;
+    fail(): this is FailReport;
+    skip(): this is SkipReport;
+    end(): this is EndReport;
+    error(): this is ErrorReport;
+    extra(): this is ExtraReport<any>;
 }
 
-export interface ExtraCall {
+export interface ExtraCall<T> {
     count: number;
-    value: any;
+    value: T;
+    stack: string;
 }
 
 export interface StartReport extends TestReport<"start", void> {}
@@ -34,7 +61,9 @@ export interface PassReport extends TestReport<"pass", void> {}
 export interface FailReport extends TestReport<"fail", any> {}
 export interface SkipReport extends TestReport<"skip", void> {}
 export interface EndReport extends TestReport<"end", void> {}
-export interface ExtraReport extends TestReport<"extra", ExtraCall> {}
+export interface ExtraReport<T> extends TestReport<"extra", ExtraCall<T>> {
+    extra(): this is ExtraReport<T>;
+}
 
 export interface Plugin<T extends Test> {
     (t: T): any;
@@ -73,13 +102,13 @@ export interface AssertionResult {
     expected?: any;
 }
 
-export class AssertionError extends Error {
+export class AssertionError<T, U> extends Error {
     name: "AssertionError";
     message: string;
-    expected: any;
-    found: any;
+    expected: T;
+    found: U;
 
-    constructor(message: string, expected: any, actual: any);
+    constructor(message: string, expected: T, actual: U);
 }
 
 export interface IteratorResult<T> {
@@ -112,7 +141,7 @@ export interface Reflect<T extends Test> {
      *
      * @internal
      */
-    _: void;
+    _: Object;
 
     /**
      * A reference to the AssertionError constructor.
@@ -238,6 +267,69 @@ export interface Reflect<T extends Test> {
      * It's useful if you need these guarantees.
      */
     do(func: () => any): void;
+
+    /**
+     * Create a `start` report. Mostly useful for testing reporters. Note that
+     * the `value`, `duration`, and `slow` arguments are ignored.
+     */
+    report(type: "start", path: Location[], valueIgnored?: any, durationIgnored?: number, slowIgnored?: number): StartReport;
+
+    /**
+     * Create a `enter` report. Mostly useful for testing reporters. Note that
+     * the `value` argument is ignored.
+     */
+    report(type: "enter", path: Location[], valueIgnored?: any, duration?: number, slow?: number): EnterReport;
+
+    /**
+     * Create a `leave` report. Mostly useful for testing reporters. Note that
+     * the `value`, `duration`, and `slow` arguments are ignored.
+     */
+    report(type: "leave", path: Location[], valueIgnored?: any, durationIgnored?: number, slowIgnored?: number): LeaveReport;
+
+    /**
+     * Create a `pass` report. Mostly useful for testing reporters. Note that
+     * the `value` argument is ignored.
+     */
+    report(type: "pass", path: Location[], valueIgnored?: any, duration?: number, slow?: number): PassReport;
+
+    /**
+     * Create a `fail` report. Mostly useful for testing reporters.
+     */
+    report(type: "fail", path: Location[], value?: any, duration?: number, slow?: number): FailReport;
+
+    /**
+     * Create a `skip` report. Mostly useful for testing reporters. Note that
+     * the `value`, `duration`, and `slow` arguments are ignored.
+     */
+    report(type: "skip", path: Location[], valueIgnored?: any, durationIgnored?: number, slowIgnored?: number): SkipReport;
+
+    /**
+     * Create a `end` report. Mostly useful for testing reporters. Note that the
+     * `value`, `duration`, and `slow` arguments are ignored.
+     */
+    report(type: "end", path: Location[], valueIgnored?: any, durationIgnored?: number, slowIgnored?: number): EndReport;
+
+    /**
+     * Create a `extra` report. Mostly useful for testing reporters. Note that
+     * the `duration` and `slow` arguments are ignored, but unlike any other
+     * call, the `value` argument is required.
+     */
+    report<T>(type: "extra", path: Location[], value: ExtraCall<T>, durationIgnored?: number, slowIgnored?: number): ExtraReport<T>;
+
+    /**
+     * Create a report. Mostly useful for testing reporters.
+     */
+    report(type: ReportType, path: Location[], value: any, duration?: number, slow?: number): Report;
+
+    /**
+     * Create a location data object. Mostly useful for testing reporters.
+     */
+    location(name: string, index: number): Location;
+
+    /**
+     * Create an extra call data object. Mostly useful for testing reporters.
+     */
+    extra<T>(count: number, value: T, stack: string): ExtraCall<T>;
 }
 
 export interface Test {

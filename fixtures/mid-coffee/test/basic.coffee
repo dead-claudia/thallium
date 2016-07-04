@@ -59,7 +59,7 @@ t.test 'core (basic)', ->
             err = undefined
 
             tt.reporter (res, done) ->
-                if res.type is 'fail'
+                if res.fail()
                     err = res.value
                 done()
 
@@ -73,7 +73,7 @@ t.test 'core (basic)', ->
             err = undefined
 
             tt.reporter (res, done) ->
-                if res.type is 'fail'
+                if res.fail()
                     err = res.value
                 done()
 

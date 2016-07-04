@@ -80,10 +80,7 @@ describe("core (basic)", function () {
             var err
 
             tt.reporter(function (res, done) {
-                if (res.type === "fail") {
-                    err = res.value
-                }
-
+                if (res.fail()) err = res.value
                 done()
             })
 
@@ -99,10 +96,7 @@ describe("core (basic)", function () {
             var err
 
             tt.reporter(function (res, done) {
-                if (res.type === "fail") {
-                    err = res.value
-                }
-
+                if (res.fail()) err = res.value
                 done()
             })
 

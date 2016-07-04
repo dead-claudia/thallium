@@ -6,31 +6,22 @@ is trying to represent more real-world usage.
 ###
 
 t = require 'thallium'
-
-n = (type, path, value, extra) ->
-    unless extra?
-        extra = if type in ['pass', 'fail', 'enter']
-            duration: 10
-            slow: 75
-        else
-            duration: -1
-            slow: 0
-
-    {type, path, value, duration: extra.duration, slow: extra.slow|0}
-
-p = (name, index) -> {name, index}
+{Report, Location, toReportType} = require '../../../lib/core/report.js'
 
 # Note that this entire section may be flaky on slower machines. Thankfully,
 # these have been tested against a slower machine, so it should hopefully not
 # be too bad.
 t.test 'core (timeouts) (FLAKE)', ->
+    n = @reflect().report
+    p = @reflect().location
+
     @reflect().add push: (_, ret) -> (arg, done) =>
         # Any equality tests on either of these are inherently flaky.
         @hasOwn arg, 'duration'
         @number arg.duration
         @hasOwn arg, 'slow'
         @number arg.slow
-        if /^(pass|fail|enter)$/.test(arg.type)
+        if arg.pass() or arg.fail() or arg.enter()
             arg.duration = 10
             arg.slow = 75
         else

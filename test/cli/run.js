@@ -10,20 +10,18 @@ describe("cli runner", function () {
     describe("exitReporter()", function () {
         var map = {
             fail: new Error("fail"),
-            extra: new Error("fail"),
+            error: new Error("fail"),
+            extra: Util.extra(2, new Error("fail"), ""),
         }
 
         function execute(reporter, type) {
             return function () {
-                return Util.Resolver.resolve1(reporter, undefined, {
-                    type: type,
-                    value: map[type],
-                    path: {name: "test", index: 0},
-                })
+                return Util.Resolver.resolve1(reporter, undefined,
+                    n(type, [p("test", 0)], map[type]))
             }
         }
 
-        ["start", "pass", "skip", "end"]
+        ["start", "enter", "leave", "pass", "skip", "end"]
         .forEach(function (type) {
             it("doesn't trigger for \"" + type + "\" events", function () {
                 var state = {fail: false}
@@ -35,7 +33,7 @@ describe("cli runner", function () {
             })
         })
 
-        ;["fail", "extra"].forEach(function (type) {
+        ;["fail", "extra", "error"].forEach(function (type) {
             it("does trigger for \"" + type + "\" events", function () {
                 var state = {fail: false}
                 var reporter = Run.exitReporter(state)

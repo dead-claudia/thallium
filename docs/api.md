@@ -14,9 +14,9 @@ I would also like to note a few things, so you won't trip yourself up:
 
 - `t.define()` and similar can accept symbols as well as strings for method names. The property is passed through unmodified. This allows for private assertions and methods that would otherwise be awkward to create.
 
-- `t._` is reserved for internal use, so please leave that alone.
+- `t._` is reserved for internal (ab)use, so please leave that alone, and don't rely on anything other than its existence.
 
-- Don't change `t.reflect()`, because it's very important for plugin developers to get the right things.
+- Don't change `t.reflect()`, because it's very important for plugin developers to get the right things. Several reflection APIs will complain violently if you try, just to make sure.
 
 This also catches some of the simpler dumb mistakes like forgetting to include the `t` argument in a child test, by reporting an error instead of going into an invalid state. All the state-dependent API methods check this, both in the primary and reflection APIs.
 

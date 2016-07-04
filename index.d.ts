@@ -8,7 +8,6 @@ export {
     ReportType,
     Location,
     Report,
-    TestReport,
     ExtraCall,
     StartReport,
     EnterReport,

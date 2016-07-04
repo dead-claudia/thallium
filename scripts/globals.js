@@ -6,10 +6,16 @@
  * This exports everything as globals, and it is Browserified as well.
  */
 var Thallium = require("../lib/browser-bundle.js")
+var Report = require("../lib/core/report.js")
 var t = global.t = Thallium.t
+var reflect = t.reflect()
 var Util = global.Util = {
     assertions: Thallium.assertions,
     r: Thallium.r,
+    n: reflect.report,
+    p: reflect.location,
+    extra: reflect.extra,
+    Report: Report,
 
     /* eslint-disable global-require */
 
@@ -131,17 +137,7 @@ Util.jsdom = (function () {
     }
 })()
 
-var AssertionError = t.reflect().AssertionError
-
-function fixArg(arg, type) {
-    if (type === "pass" || type === "fail" || type === "enter") {
-        arg.duration = 10
-        arg.slow = 75
-    } else {
-        arg.duration = -1
-        arg.slow = 0
-    }
-}
+var AssertionError = reflect.AssertionError
 
 Util.push = function (ret, keep) {
     return function push(arg, done) {
@@ -150,25 +146,18 @@ Util.push = function (ret, keep) {
         t.hasOwn(arg, "slow")
         t.number(arg.duration)
         t.number(arg.slow)
-        if (!keep) fixArg(arg, arg.type)
+        if (!keep) {
+            if (arg.pass() || arg.fail() || arg.enter()) {
+                arg.duration = 10
+                arg.slow = 75
+            } else {
+                arg.duration = -1
+                arg.slow = 0
+            }
+        }
         ret.push(arg)
         return done()
     }
-}
-
-Util.n = function (type, path, value, extra) {
-    if (extra == null) fixArg(extra = {}, type)
-    return {
-        type: type,
-        path: path,
-        value: value,
-        duration: extra.duration,
-        slow: extra.slow|0,
-    }
-}
-
-Util.p = function (name, index) {
-    return {name: name, index: index}
 }
 
 Util.fail = function (name) {

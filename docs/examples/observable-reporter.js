@@ -19,7 +19,7 @@ export default function (t) {
 
                 reporter((ev, done) => {
                     if (subscribed) {
-                        if (ev.type === "exit") observer.complete()
+                        if (ev.end()) observer.complete()
                         else observer.next(ev)
                     }
 

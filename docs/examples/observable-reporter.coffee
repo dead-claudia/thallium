@@ -19,7 +19,7 @@ module.exports = ->
 
                 reporter (ev, done) ->
                     if subscribed
-                        if ev.type is 'exit'
+                        if ev.end()
                             observer.complete()
                         else
                             observer.next(ev)
