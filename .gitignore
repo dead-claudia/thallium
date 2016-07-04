@@ -3,6 +3,3 @@
 # Tooling stuff
 npm-debug.log
 .eslintcache
-
-# Browserified bundle
-/thallium.js
