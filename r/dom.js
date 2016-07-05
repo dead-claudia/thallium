@@ -198,8 +198,12 @@ module.exports = R.on({
             methods)
     },
 
-    // Clear the div first.
     init: function (state, opts) {
+        // Clear the element first.
+        while (opts.root.firstChild) {
+            opts.root.removeChild(opts.root.firstChild)
+        }
+
         var document = opts.window.document
 
         state.error = document.createElement("div")
