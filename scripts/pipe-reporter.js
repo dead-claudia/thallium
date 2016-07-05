@@ -31,27 +31,12 @@ function fix(value) {
     return value
 }
 
-function getTypeString(ev) {
-    if (ev.start()) return "start"
-    if (ev.enter()) return "enter"
-    if (ev.leave()) return "leave"
-    if (ev.pass()) return "pass"
-    if (ev.fail()) return "fail"
-    if (ev.skip()) return "skip"
-    if (ev.end()) return "end"
-    if (ev.error()) return "error"
-    if (ev.extra()) return "extra"
-    throw new Error("unreachable")
-}
-
 module.exports = function (ev, done) {
     var path = ev.path
     .map(function (x) { return "[" + x.index + ": " + x.name + "]" })
     .join(" > ")
 
-    console.log(getTypeString(ev) + " " +
-        (path ? path + " = " : "= ") +
-        fix(ev.value))
+    console.log(ev.type() + " " + (path ? path + " = " : "= ") + fix(ev.value))
 
     return done()
 }
