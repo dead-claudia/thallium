@@ -1,6 +1,33 @@
 "use strict"
 
 // TODO: make a stylesheet for this
+var styles = [
+    // Each entry is either a string or array of strings.
+]
+
+function injectStyle(document) {
+    // Just injecting a good old <style> element.
+    var style = document.createElement("style")
+    var css = ""
+
+    for (var i = 0; i < styles.length; i++) {
+        if (Array.isArray(styles[i])) {
+            css += styles[i].join("\n")
+        } else {
+            css += styles[i]
+        }
+    }
+
+    style.type = "text/css"
+
+    if (style.styleSheet) {
+        style.styleSheet.cssText = css
+    } else {
+        style.appendChild(document.createTextNode(css))
+    }
+
+    document.head.appendChild(style)
+}
 
 /**
  * Note: do *not* assume the DOM is ready, or even that one even exists, because
@@ -125,7 +152,41 @@ function onNextRepaint(r, callback) {
     }
 }
 
-function initRoot(r, ev) {
+function initIframe(state, opts) {
+    // Build the initial tree in a detached iframe, so the browser isn't
+    // queuing repaints, etc.
+    var iframe = opts.window.document.createElement("iframe")
+    var document = iframe.contentWindow.document
+
+    iframe.style.width = "100%"
+    iframe.style.height = "100%"
+    iframe.style.border = "0"
+    iframe.style.padding = "0"
+    iframe.style.margin = "0"
+
+    state.window = iframe.contentWindow
+    injectStyle(document)
+
+    state.error = document.createElement("div")
+    state.error.className = "error hidden"
+
+    state.report = document.createElement("ul")
+    state.report.className = "report"
+
+    state.base = document.createElement("ul")
+    state.base.className = "base"
+
+    state.passes = addToggle(state, "passes:", true)
+    state.failures = addToggle(state, "failures:", false)
+    state.duration = addDuration(state)
+
+    document.body.appendChild(state.base)
+    document.body.appendChild(state.report)
+
+    return iframe
+}
+
+function initFirstTest(r, ev) {
     var document = r.state.window.document
 
     if (!ev.path.length) {
@@ -185,16 +246,14 @@ function showTestResult(r, ev) {
 }
 
 module.exports = R.on({
-    accepts: ["root", "style", "window", "reset"],
+    accepts: ["root", "window", "reset"],
     create: function (args, methods) {
-        // This is the default style and window
-        var style = "./node_modules/thallium/thallium.css"
+        // This is the default window
         var window = global.window
         var root = getRoot(args, window)
         var reset = function () {} // eslint-disable-line func-style
 
         if (root == null && typeof args === "object" && args !== null) {
-            if (args.style != null) style = args.style
             if (args.window != null) window = args.window
             if (args.reset != null) reset = args.reset
             root = getRoot(args.root, window)
@@ -205,50 +264,17 @@ module.exports = R.on({
         }
 
         return new R.Reporter(Tree,
-            {window: window, root: root, style: style, reset: reset},
+            {window: window, root: root, reset: reset},
             methods)
     },
 
-    init: function (state, opts) { // eslint-disable-line max-statements
+    init: function (state, opts) {
         // Clear the element first.
         while (opts.root.firstChild) {
             opts.root.removeChild(opts.root.firstChild)
         }
 
-        // Build the initial tree in a detached iframe, so the browser isn't
-        // queuing repaints or numerous other calculations.
-        var iframe = opts.window.document.createElement("iframe")
-        var document = iframe.contentWindow.document
-        var style = document.createElement("style")
-
-        state.window = iframe.contentWindow
-        style.rel = "stylesheet"
-        style.src = opts.style
-        document.head.appendChild(style)
-
-        state.error = document.createElement("div")
-        state.error.className = "error hidden"
-
-        state.report = document.createElement("ul")
-        state.report.className = "report"
-
-        state.base = document.createElement("ul")
-        state.base.className = "base"
-
-        state.passes = addToggle(state, "passes:", true)
-        state.failures = addToggle(state, "failures:", false)
-        state.duration = addDuration(state)
-
-        iframe.style.width = "100%"
-        iframe.style.height = "100%"
-        iframe.style.border = "0"
-        iframe.style.padding = "0"
-        iframe.style.margin = "0"
-        document.body.appendChild(state.base)
-        document.body.appendChild(state.report)
-
-        // Lastly, append the iframe to the root.
-        opts.root.appendChild(iframe)
+        opts.root.appendChild(initIframe(state, opts))
     },
 
     // Give the browser a chance to repaint before continuing (microtasks
@@ -259,7 +285,7 @@ module.exports = R.on({
 
     report: function (r, ev) {
         if (ev.start()) {
-            initRoot(r, ev)
+            initFirstTest(r, ev)
         } else if (ev.enter() || ev.pass() || ev.fail() || ev.skip()) {
             showTestResult(r, ev)
             updateStats(r)
