@@ -15,31 +15,32 @@ function printDot(r, color) {
 }
 
 module.exports = R.on({
-    init: function (state) { state.counter = 0 },
     accepts: ["print", "write", "reset", "colors"],
-    start: function () {},
-    enter: function (r, ev) { return printDot(r, R.speed(ev)) },
-    // This is meaningless for the output.
-    leave: function () {},
-    pass: function (r, ev) { return printDot(r, R.speed(ev)) },
+    create: R.consoleReporter,
+    before: R.setColor,
+    after: R.unsetColor,
+    init: function (state) { state.counter = 0 },
 
-    fail: function (r, ev) {
-        r.pushError(ev, false)
-        return printDot(r, "fail")
-    },
-
-    skip: function (r) { return printDot(r, "skip") },
-    extra: function (r, ev) { r.pushError(ev, true) },
-
-    end: function (r) {
-        return r.print().then(function () { return r.printResults() })
-    },
-
-    error: function (r, ev) {
-        if (r.state.counter) {
-            return r.print().then(function () { return r.printError(ev) })
+    report: function (r, ev) {
+        if (ev.enter() || ev.pass()) {
+            return printDot(r, R.speed(ev))
+        } else if (ev.fail()) {
+            r.pushError(ev, false)
+            return printDot(r, "fail")
+        } else if (ev.skip()) {
+            return printDot(r, "skip")
+        } else if (ev.extra()) {
+            return r.pushError(ev, true)
+        } else if (ev.end()) {
+            return r.print().then(function () { return r.printResults() })
+        } else if (ev.error()) {
+            if (r.state.counter) {
+                return r.print().then(function () { return r.printError(ev) })
+            } else {
+                return r.printError(ev)
+            }
         } else {
-            return r.printError(ev)
+            return undefined
         }
     },
 })

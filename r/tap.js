@@ -70,51 +70,47 @@ function printError(r, ev) {
 }
 
 module.exports = R.on({
-    init: function (state) { state.counter = 0 },
     accepts: ["print", "reset"],
-    start: function (r) { return r.print("TAP version 13") },
+    create: R.consoleReporter,
+    init: function (state) { state.counter = 0 },
 
-    enter: function (r, ev) {
-        // Print a leading comment, to make some TAP formatters prettier.
-        return template(r, ev, "# %p", true)
-        .then(function () { return template(r, ev, "ok %c") })
-    },
+    report: function (r, ev) {
+        if (ev.start()) {
+            return r.print("TAP version 13")
+        } else if (ev.enter()) {
+            // Print a leading comment, to make some TAP formatters prettier.
+            return template(r, ev, "# %p", true)
+            .then(function () { return template(r, ev, "ok %c") })
+        } else if (ev.pass()) {
+            return template(r, ev, "ok %c %p")
+        } else if (ev.fail()) {
+            return template(r, ev, "not ok %c %p")
+            .then(function () { return r.print("  ---") })
+            .then(function () { return printError(r, ev) })
+            .then(function () { return r.print("  ...") })
+        } else if (ev.skip()) {
+            return template(r, ev, "ok %c # skip %p")
+        } else if (ev.extra()) {
+            return template(r, ev, "not ok %c %p # extra")
+            .then(function () { return r.print("  ---") })
+            .then(function () { return printValue(r, "count", ev.value.count) })
+            .then(function () { return printValue(r, "value", ev.value.value) })
+            .then(function () { return r.print("  ...") })
+        } else if (ev.end()) {
+            var p = r.print("1.." + r.state.counter)
+            .then(function () { return r.print("# tests " + r.tests) })
 
-    // This is meaningless for the output.
-    leave: function () {},
-    pass: function (r, ev) { return template(r, ev, "ok %c %p") },
-
-    fail: function (r, ev) {
-        return template(r, ev, "not ok %c %p")
-        .then(function () { return r.print("  ---") })
-        .then(function () { return printError(r, ev) })
-        .then(function () { return r.print("  ...") })
-    },
-
-    skip: function (r, ev) { return template(r, ev, "ok %c # skip %p") },
-
-    extra: function (r, ev) {
-        return template(r, ev, "not ok %c %p # extra")
-        .then(function () { return r.print("  ---") })
-        .then(function () { return printValue(r, "count", ev.value.count) })
-        .then(function () { return printValue(r, "value", ev.value.value) })
-        .then(function () { return r.print("  ...") })
-    },
-
-    end: function (r) {
-        var p = r.print("1.." + r.state.counter)
-        .then(function () { return r.print("# tests " + r.tests) })
-
-        if (r.pass) p = printLine(p, r, "# pass " + r.pass)
-        if (r.fail) p = printLine(p, r, "# fail " + r.fail)
-        if (r.skip) p = printLine(p, r, "# skip " + r.skip)
-        return printLine(p, r, "# duration " + R.formatTime(r.duration))
-    },
-
-    error: function (r, ev) {
-        return r.print("Bail out!")
-        .then(function () { return r.print("  ---") })
-        .then(function () { return printError(r, ev) })
-        .then(function () { return r.print("  ...") })
+            if (r.pass) p = printLine(p, r, "# pass " + r.pass)
+            if (r.fail) p = printLine(p, r, "# fail " + r.fail)
+            if (r.skip) p = printLine(p, r, "# skip " + r.skip)
+            return printLine(p, r, "# duration " + R.formatTime(r.duration))
+        } else if (ev.error()) {
+            return r.print("Bail out!")
+            .then(function () { return r.print("  ---") })
+            .then(function () { return printError(r, ev) })
+            .then(function () { return r.print("  ...") })
+        } else {
+            return undefined
+        }
     },
 })

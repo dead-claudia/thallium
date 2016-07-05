@@ -6,15 +6,15 @@
  * reporter. You may only rely on the `window` object from the options.
  */
 
-// TODO: add before/after hooks for better integration (e.g. with `only`).
-
 var Promise = require("bluebird")
 var m = require("../lib/messages.js")
 var R = require("../lib/reporter/index.js")
 var getType = require("../lib/util.js").getType
 
 function forEach(list, func, inst) {
-    for (var i = 0; i < list.length; i++) func.call(inst, list[i])
+    for (var i = 0; i < list.length; i++) {
+        func.call(inst, list[i])
+    }
 }
 
 function forOwn(object, func) {
@@ -108,15 +108,15 @@ function addDuration(state, opts) {
     return counter
 }
 
-function getRoot(opts) {
-    if (opts.root == null) {
-        return opts.window.document.getElementById("tl")
-    } else if (typeof opts.root === "string") {
-        return opts.window.document.getElementById(opts.root)
-    } else if (opts.root instanceof opts.window.Element) {
-        return opts.root
+function getRoot(root, window) {
+    if (root == null) {
+        return window.document.getElementById("tl")
+    } else if (typeof root === "string") {
+        return window.document.getElementById(root)
+    } else if (root instanceof window.Element) {
+        return root
     } else {
-        throw new TypeError(m("type.reporter.dom.element", getType(opts.root)))
+        return null
     }
 }
 
@@ -136,26 +136,25 @@ function onNextRepaint(r, callback) {
     }
 }
 
-function waitForRepaint(r) {
-    return new Promise(function (resolve) { onNextRepaint(r, resolve) })
-}
+module.exports = R.on({
+    accepts: ["root", "window", "reset"],
+    create: function (args, methods) {
+        var root = getRoot(args, global.window)
+        var window = global.window
 
-var reporter = R.on({
-    accepts: ["root", "inst", "window", "reset"],
-    Reporter: function (args, methods) {
-        var opts = args.opts != null ? args.opts : {}
+        if (root == null) {
+            if (args.window != null) window = args.window
+            root = getRoot(args.root, window)
 
-        if (typeof opts === "string" ||
-                global.window && global.window.Element &&
-                    opts instanceof global.window.Element) {
-            opts = {root: opts}
+            if (root == null) {
+                throw new TypeError(m("type.reporter.dom.element",
+                    getType(root)))
+            }
         }
 
-        opts.root = getRoot(opts)
-        opts.inst = args.inst
-        opts.window = args.window != null ? args.window : global.window
-
-        return new R.Reporter(Tree, opts, methods)
+        return new R.Reporter(Tree,
+            {window: window, root: root, reset: args.reset},
+            methods)
     },
 
     // Clear the div first.
@@ -183,88 +182,70 @@ var reporter = R.on({
     },
 
     // Override the default which sets console colors (not applicable to DOM).
-    before: function () { return Promise.resolve() },
+    before: function () {},
 
     // Give the browser a chance to repaint before continuing (microtasks
     // normally block rendering).
-    after: function () { return waitForRepaint() },
+    after: function (r) {
+        return new Promise(function (resolve) { onNextRepaint(r, resolve) })
+    },
 
-    start: function (r, ev) {
-        if (ev.path.length) {
-            var stack = []
+    report: function (r, ev) {
+        if (ev.start()) {
+            if (ev.path.length) {
+                var stack = []
 
-            forEach(ev.path, function (entry) {
-                var children = r.get(stack).node = n(r.opts, "ul")
+                forEach(ev.path, function (entry) {
+                    var children = r.get(stack).node = n(r.opts, "ul")
 
-                stack.push(entry)
-                r.get(stack).node.appendChild(n(r.opts, "li", {
-                    className: "suite",
-                }, [
-                    n(r.opts, "h1", {}, [t(r.opts, entry.name)]),
-                    children,
+                    stack.push(entry)
+                    r.get(stack).node.appendChild(n(r.opts, "li", {
+                        className: "suite",
+                    }, [
+                        n(r.opts, "h1", {}, [t(r.opts, entry.name)]),
+                        children,
+                    ]))
+                })
+            } else {
+                r.state.report.appendChild(r.get([]).node = n(r.opts, "ul"))
+            }
+        } else if (ev.enter() || ev.pass() || ev.fail() || ev.skip()) {
+            var enteredChildren = ev.enter()
+                ? r.get(ev.path).node = n(r.opts, "ul")
+                : undefined
+
+            var className = ev.enter() ? "" : "test pass " + R.speed(ev)
+            var name = ev.path.pop().name
+            var innerChildren = [t(r.opts, name)]
+
+            if (!ev.skip()) {
+                innerChildren.push(n(r.opts, "span", {}, [
+                    t(r.opts, R.formatTime(ev.duration)),
                 ]))
-            })
-        } else {
-            r.state.report.appendChild(r.get([]).node = n(r.opts, "ul"))
-        }
-    },
+            }
 
-    enter: function (r, ev) {
-        var children = r.get(ev.path).node = n(r.opts, "ul")
-        var name = ev.path.pop().name
+            var outerChildren = [
+                n(r.opts, ev.enter() ? "h1" : "h2", {}, innerChildren),
+            ]
 
-        r.get(ev.path).node.appendChild(n(r.opts, "li", {}, [
-            n(r.opts, "h1", {}, [t(r.opts, name)]),
-            children,
-        ]))
-    },
+            if (ev.enter()) outerChildren.push(enteredChildren)
 
-    // Nothing to do
-    leave: function () {},
+            r.get(ev.path).node.appendChild(
+                n(r.opts, "li", {className: className}, outerChildren))
 
-    pass: function (r, ev) {
-        var name = ev.path.pop().name
-        var className = "test pass " + R.speed(ev)
+            updateStats(r)
+        } else if (ev.extra()) {
+            // TODO
+        } else if (ev.error()) {
+            if (r.opts.window.console) {
+                var console = r.opts.window.conosle
 
-        r.get(ev.path).node.appendChild(n(r.opts, "li", {
-            className: className,
-        }, [
-            n(r.opts, "h2", {}, [
-                t(r.opts, name),
-                n(r.opts, "span", {}, [t(r.opts, R.formatTime(ev.duration))]),
-            ]),
-        ]))
-
-        updateStats(r)
-    },
-
-    fail: function () {},
-    skip: function () {},
-
-    extra: function () {},
-
-    end: function () { return waitForRepaint() },
-    error: function (r, ev) {
-        if (r.opts.window.console) {
-            var console = r.opts.window.conosle
-
-            if (console.error) console.error(ev.value)
-            else if (console.log) console.log(ev.value)
-            else onNextRepaint(r, function () { throw ev.value })
-        } else {
-            onNextRepaint(r, function () { throw ev.value })
+                if (console.error) console.error(ev.value)
+                else if (console.log) console.log(ev.value)
+                else onNextRepaint(r, function () { throw ev.value })
+            } else {
+                onNextRepaint(r, function () { throw ev.value })
+            }
         }
     },
 })
-
-module.exports = function (opts) {
-    if (R.isReport(opts)) {
-        throw new TypeError(m("type.reporter.argument"))
-    }
-
-    return function (t) {
-        t.reporter(reporter({inst: t, opts: opts}))
-    }
-}
-
-module.exports.reporter = reporter
