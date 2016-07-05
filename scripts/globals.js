@@ -6,7 +6,7 @@
  * This exports everything as globals, and it is Browserified as well.
  */
 var Thallium = require("../lib/browser-bundle.js")
-var Report = require("../lib/core/report.js")
+var Tests = require("../lib/tests.js")
 var t = global.t = Thallium.t
 var reflect = t.reflect()
 var Util = global.Util = {
@@ -15,7 +15,7 @@ var Util = global.Util = {
     n: reflect.report,
     p: reflect.location,
     extra: reflect.extra,
-    Report: Report,
+    Tests: Tests,
 
     /* eslint-disable global-require */
 
@@ -27,11 +27,11 @@ var Util = global.Util = {
     getStack: require("../lib/util.js").getStack,
     m: require("../lib/messages.js"),
     methods: require("../lib/methods.js"),
-    R: require("../lib/reporter/index.js"),
+    R: require("../lib/reporter.js"),
     Resolver: require("../lib/resolver.js"),
-    inspect: require("../lib/inspect.js"),
+    inspect: require("../lib/replaced/inspect.js"),
     silenceEmptyInlineWarnings: function () {
-        require("../lib/core/tests.js").silenceEmptyInlineWarnings()
+        require("../lib/tests.js").silenceEmptyInlineWarnings()
     },
 
     /* eslint-enable global-require */

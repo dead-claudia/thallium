@@ -31,6 +31,8 @@ Note that this will never output terminal color escapes.
 
     This is called at the end of the stream, after all events are processed, and must either call the callback when done or return a thenable that resolves when done. If you can support multiple runs, this is where you reset the state so it can run everything again with a clean slate.
 
+    If `print` is passed, this is also required.
+
 ### `thallium/r/spec`
 
 - `print(line, callback?)`
@@ -40,6 +42,8 @@ Note that this will never output terminal color escapes.
 - `reset(callback?)`
 
     This is called at the end of the stream, after all events are processed, and must either call the callback when done or return a thenable that resolves when done. If you can support multiple runs, this is where you reset the state so it can run everything again with a clean slate.
+
+    If `print` is passed, this is also required.
 
 - `color`
 
@@ -62,6 +66,8 @@ Note that if you provide `print` or `write`, you *must* provide both, or you won
 - `reset(callback?)`
 
     This is called at the end of the stream, after all events are processed, and must either call the callback when done or return a thenable that resolves when done. If you can support multiple runs, this is where you reset the state so it can run everything again with a clean slate.
+
+    If `print` and `write` are passed, this is also required.
 
 - `color`
 

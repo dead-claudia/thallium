@@ -90,19 +90,11 @@ describe("reporter dot", function () {
         return c("light", " (" + duration + ")")
     }
 
-    function run(envColors, reporterColors) { // eslint-disable-line max-statements, max-len
-        Util.R.Colors.forceSet(envColors)
-        beforeEach(function () { Util.R.Colors.forceSet(envColors) })
-        afterEach(function () { Util.R.Colors.forceRestore() })
-
-        var pass = c("fast", Util.R.Symbols.Dot)
-        var fail = c("fail", Util.R.Symbols.Dot)
-        var skip = c("skip", Util.R.Symbols.Dot)
-
-        function test(name, opts) {
+    function makeTest(colors) {
+        return function (name, opts) {
             it(name, function () {
                 var list = []
-                var reporter = Util.r.dot(new Options(list, reporterColors))
+                var reporter = Util.r.dot(new Options(list, colors))
 
                 return Util.Promise.each(opts.input, function (i) {
                     return Util.Resolver.resolve1(reporter, undefined, i)
@@ -112,6 +104,17 @@ describe("reporter dot", function () {
                 })
             })
         }
+    }
+
+    function run(envColors, reporterColors) { // eslint-disable-line max-statements, max-len
+        Util.R.Colors.forceSet(envColors)
+        beforeEach(function () { Util.R.Colors.forceSet(envColors) })
+        afterEach(function () { Util.R.Colors.forceRestore() })
+
+        var pass = c("fast", Util.R.Symbols.Dot)
+        var fail = c("fail", Util.R.Symbols.Dot)
+        var skip = c("skip", Util.R.Symbols.Dot)
+        var test = makeTest(reporterColors)
 
         // So I can verify colors are enabled.
         if (envColors || reporterColors) {
@@ -976,19 +979,7 @@ describe("reporter dot", function () {
     context("with env color + with color opt", function () { run(true, true) })
 
     context("speed", function () {
-        function test(name, opts) {
-            it(name, function () {
-                var list = []
-                var reporter = Util.r.dot(new Options(list, true))
-
-                return Util.Promise.each(opts.input, function (i) {
-                    return Util.Resolver.resolve1(reporter, undefined, i)
-                })
-                .then(function () {
-                    t.match(list, opts.output)
-                })
-            })
-        }
+        var test = makeTest(true)
 
         // Speed affects `"pass"` and `"enter"` events only.
         var fast = c("fast", Util.R.Symbols.Dot)

@@ -40,19 +40,18 @@ describe("reporter spec", function () {
         return c("light", " (" + duration + ")")
     }
 
-    function run(envColors, reporterColors) { // eslint-disable-line max-statements, max-len
-        Util.R.Colors.forceSet(envColors)
-        beforeEach(function () { Util.R.Colors.forceSet(envColors) })
-        afterEach(function () { Util.R.Colors.forceRestore() })
-
-        function test(name, opts) {
+    function makeTest(colors) {
+        return function (name, opts) {
             it(name, function () {
                 var list = []
                 var reporter = Util.r.spec({
-                    colors: reporterColors,
-                    print: function (arg) {
+                    colors: colors,
+                    print: function (arg, callback) {
                         list.push(arg)
-                        return Util.Promise.resolve()
+                        return callback()
+                    },
+                    reset: function (callback) {
+                        return callback()
                     },
                 })
 
@@ -64,6 +63,14 @@ describe("reporter spec", function () {
                 })
             })
         }
+    }
+
+    function run(envColors, reporterColors) { // eslint-disable-line max-statements, max-len
+        Util.R.Colors.forceSet(envColors)
+        beforeEach(function () { Util.R.Colors.forceSet(envColors) })
+        afterEach(function () { Util.R.Colors.forceRestore() })
+
+        var test = makeTest(reporterColors)
 
         // So I can verify colors are enabled.
         if (envColors || reporterColors) {
@@ -1002,25 +1009,7 @@ describe("reporter spec", function () {
     context("with env color + with color opt", function () { run(true, true) })
 
     context("speed", function () {
-        function test(name, opts) {
-            it(name, function () {
-                var list = []
-                var reporter = Util.r.spec({
-                    colors: true,
-                    print: function (arg) {
-                        list.push(arg)
-                        return Util.Promise.resolve()
-                    },
-                })
-
-                return Util.Promise.each(opts.input, function (i) {
-                    return Util.Resolver.resolve1(reporter, undefined, i)
-                })
-                .then(function () {
-                    t.match(list, opts.output)
-                })
-            })
-        }
+        var test = makeTest(true)
 
         // Speed affects `"pass"` and `"enter"` events only.
         var medium = c("medium", " (40ms)")

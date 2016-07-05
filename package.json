@@ -12,8 +12,9 @@
     "watch": "chokidar --initial -i \"**/test-bundle.js\" \"{bin,fixtures,helpers,lib,r,scripts,test}/**/{.,}*.{js,coffee}\" \"{index,core,assertions}.js\" -c \"npm run test\""
   },
   "browser": {
-    "./lib/is-buffer.js": "is-buffer",
-    "./lib/inspect.js": "util-inspect",
+    "./lib/replaced/is-buffer.js": "is-buffer",
+    "./lib/replaced/inspect.js": "util-inspect",
+    "./lib/replaced/console.js": "./lib/replaced/console-browser.js",
     "jsdom": "empty/object"
   },
   "files": [

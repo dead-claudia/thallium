@@ -653,124 +653,124 @@ describe("core (reflect)", function () {
     })
 
     describe("report()", function () {
-        var Types = Util.Report.Types
-        var Report = Util.Report.Report
+        var Report = Util.Tests.Report
+        var r = Util.Tests.toReportType
 
         it("correctly creates `start` reports", function () {
             var report = t.reflect().report("start", [], {value: "hello"})
-            var expected = new Report(Types.Start, [], undefined, -1, 0)
+            var expected = new Report(r("start"), [], undefined, -1, 0)
 
             t.match(report, expected)
         })
 
         it("correctly creates `enter` reports", function () {
             var report = t.reflect().report("enter", [], {value: "hello"})
-            var expected = new Report(Types.Enter, [], undefined, 10, 75)
+            var expected = new Report(r("enter"), [], undefined, 10, 75)
 
             t.match(report, expected)
         })
 
         it("correctly creates `enter` reports with duration", function () {
             var report = t.reflect().report("enter", [], {value: "hello"}, 20)
-            var expected = new Report(Types.Enter, [], undefined, 20, 75)
+            var expected = new Report(r("enter"), [], undefined, 20, 75)
 
             t.match(report, expected)
         })
 
         it("correctly creates `enter` reports with slow", function () {
             var report = t.reflect().report("enter", [], {value: "hello"}, null, 10) // eslint-disable-line max-len
-            var expected = new Report(Types.Enter, [], undefined, 10, 10)
+            var expected = new Report(r("enter"), [], undefined, 10, 10)
 
             t.match(report, expected)
         })
 
         it("correctly creates `enter` reports with duration + slow", function () { // eslint-disable-line max-len
             var report = t.reflect().report("enter", [], {value: "hello"}, null, 10) // eslint-disable-line max-len
-            var expected = new Report(Types.Enter, [], undefined, 10, 10)
+            var expected = new Report(r("enter"), [], undefined, 10, 10)
 
             t.match(report, expected)
         })
 
         it("correctly creates `leave` reports", function () {
             var report = t.reflect().report("leave", [], {value: "hello"})
-            var expected = new Report(Types.Leave, [], undefined, -1, 0)
+            var expected = new Report(r("leave"), [], undefined, -1, 0)
 
             t.match(report, expected)
         })
 
         it("correctly creates `pass` reports", function () {
             var report = t.reflect().report("pass", [], {value: "hello"})
-            var expected = new Report(Types.Pass, [], undefined, 10, 75)
+            var expected = new Report(r("pass"), [], undefined, 10, 75)
 
             t.match(report, expected)
         })
 
         it("correctly creates `pass` reports with duration", function () {
             var report = t.reflect().report("pass", [], {value: "hello"}, 20)
-            var expected = new Report(Types.Pass, [], undefined, 20, 75)
+            var expected = new Report(r("pass"), [], undefined, 20, 75)
 
             t.match(report, expected)
         })
 
         it("correctly creates `pass` reports with slow", function () {
             var report = t.reflect().report("pass", [], {value: "hello"}, null, 10) // eslint-disable-line max-len
-            var expected = new Report(Types.Pass, [], undefined, 10, 10)
+            var expected = new Report(r("pass"), [], undefined, 10, 10)
 
             t.match(report, expected)
         })
 
         it("correctly creates `pass` reports with duration + slow", function () { // eslint-disable-line max-len
             var report = t.reflect().report("pass", [], {value: "hello"}, null, 10) // eslint-disable-line max-len
-            var expected = new Report(Types.Pass, [], undefined, 10, 10)
+            var expected = new Report(r("pass"), [], undefined, 10, 10)
 
             t.match(report, expected)
         })
 
         it("correctly creates `fail` reports", function () {
             var report = t.reflect().report("fail", [], {value: "hello"})
-            var expected = new Report(Types.Fail, [], {value: "hello"}, 10, 75)
+            var expected = new Report(r("fail"), [], {value: "hello"}, 10, 75)
 
             t.match(report, expected)
         })
 
         it("correctly creates `fail` reports with duration", function () {
             var report = t.reflect().report("fail", [], {value: "hello"}, 20)
-            var expected = new Report(Types.Fail, [], {value: "hello"}, 20, 75)
+            var expected = new Report(r("fail"), [], {value: "hello"}, 20, 75)
 
             t.match(report, expected)
         })
 
         it("correctly creates `fail` reports with slow", function () {
             var report = t.reflect().report("fail", [], {value: "hello"}, null, 10) // eslint-disable-line max-len
-            var expected = new Report(Types.Fail, [], {value: "hello"}, 10, 10)
+            var expected = new Report(r("fail"), [], {value: "hello"}, 10, 10)
 
             t.match(report, expected)
         })
 
         it("correctly creates `fail` reports with duration + slow", function () { // eslint-disable-line max-len
             var report = t.reflect().report("fail", [], {value: "hello"}, null, 10) // eslint-disable-line max-len
-            var expected = new Report(Types.Fail, [], {value: "hello"}, 10, 10)
+            var expected = new Report(r("fail"), [], {value: "hello"}, 10, 10)
 
             t.match(report, expected)
         })
 
         it("correctly creates `skip` reports", function () {
             var report = t.reflect().report("skip", [], {value: "hello"})
-            var expected = new Report(Types.Skip, [], undefined, -1, 0)
+            var expected = new Report(r("skip"), [], undefined, -1, 0)
 
             t.match(report, expected)
         })
 
         it("correctly creates `end` reports", function () {
             var report = t.reflect().report("end", [], {value: "hello"})
-            var expected = new Report(Types.End, [], undefined, -1, 0)
+            var expected = new Report(r("end"), [], undefined, -1, 0)
 
             t.match(report, expected)
         })
 
         it("correctly creates `error` reports", function () {
             var report = t.reflect().report("error", [], {value: "hello"})
-            var expected = new Report(Types.Error, [], {value: "hello"}, -1, 0)
+            var expected = new Report(r("error"), [], {value: "hello"}, -1, 0)
 
             t.match(report, expected)
         })
@@ -778,7 +778,7 @@ describe("core (reflect)", function () {
         it("correctly creates `extra` reports", function () {
             var extra = t.reflect().extra(2, null, "")
             var report = t.reflect().report("extra", [], extra)
-            var expected = new Report(Types.Extra, [], extra, -1, 0)
+            var expected = new Report(r("extra"), [], extra, -1, 0)
 
             t.match(report, expected)
         })

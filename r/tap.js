@@ -3,8 +3,8 @@
 // This is a basic TAP-generating reporter.
 
 var Promise = require("bluebird")
-var R = require("../lib/reporter/index.js")
-var inspect = require("../lib/inspect.js")
+var R = require("../lib/reporter.js")
+var inspect = require("../lib/replaced/inspect.js")
 
 function shouldBreak(minLength, str) {
     return str.length > R.windowWidth - minLength || /\r?\n|[:?-]/.test(str)

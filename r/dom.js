@@ -8,22 +8,8 @@
 
 var Promise = require("bluebird")
 var m = require("../lib/messages.js")
-var R = require("../lib/reporter/index.js")
+var R = require("../lib/reporter.js")
 var getType = require("../lib/util.js").getType
-
-function forEach(list, func, inst) {
-    for (var i = 0; i < list.length; i++) {
-        func.call(inst, list[i])
-    }
-}
-
-function forOwn(object, func) {
-    var keys = Object.keys(object)
-
-    for (var i = 0; i < keys.length; i++) {
-        func(object[keys[i]], keys[i])
-    }
-}
 
 function Tree(name) {
     this.name = name
@@ -32,41 +18,28 @@ function Tree(name) {
     this.children = Object.create(null)
 }
 
-function t(opts, text) {
-    return opts.window.document.createTextNode(text)
-}
-
-function n(opts, type, attrs, children) {
-    var node = opts.window.document.createElement(type)
-
-    forOwn(attrs.style, function (value, key) { node.style[key] = value })
-    forOwn(attrs, function (value, key) {
-        if (key !== "style") {
-            if (key in node) node[key] = value
-            else node.setAttribute(key, value)
-        }
-    })
-    forEach(children, node.appendChild, node)
-
-    return node
-}
-
 function unhide(root) {
-    forEach(root.getElementsByClassName("suite hidden"), function (suite) {
-        suite.className = suite.className
+    var suites = root.getElementsByClassName("suite hidden")
+
+    for (var i = 0; i < suites.length; i++) {
+        suites[i].className = suites[i].className
             .replace(/\bhidden\b/g, "")
             .replace(/\s+/g, " ")
             .trim()
-    })
+    }
 }
 
 function hideSuitesWithout(root, className) {
-    forEach(root.getElementsByClassName("suite"), function (suite) {
+    var suites = root.getElementsByClassName("suite")
+
+    for (var i = 0; i < suites.length; i++) {
+        var suite = suites[i]
+
         if (!suite.getElementsByClassName(className).length &&
                 !/\bhidden\b/.test(suite)) {
             suite.className += " hidden"
         }
-    })
+    }
 }
 
 function setText(element, contents) {
@@ -75,36 +48,45 @@ function setText(element, contents) {
 }
 
 function addToggle(state, opts, name, pass) {
-    var label = n(opts, "em", {}, [t(opts, "0")])
+    var document = opts.window.document
+    var entry = document.createElement("li")
+    var label = document.createElement("em")
+    var link = document.createElement("a")
 
-    state.base.appendChild(n(opts, "li", {}, [
-        n(opts, "a", {
-            href: "javascript:void 0", // eslint-disable-line no-script-url
-            onclick: function (e) {
-                e.preventDefault()
-                unhide(opts.root)
-                if (pass) {
-                    state.report.className = state.report.className
-                        .replace(/\bfail\b/g, " pass")
-                        .replace(/\s+/g, " ").trim()
-                    if (state.report.className) hideSuitesWithout("test pass")
-                } else {
-                    state.report.className = state.report.className
-                        .replace(/\bpass\b/g, " fail")
-                        .replace(/\s+/g, " ").trim()
-                    if (state.report.className) hideSuitesWithout("test fail")
-                }
-            },
-        }, [name]),
-        t(opts, " "), label,
-    ]))
+    entry.appendChild(link)
+    link.href = "javascript:void 0" // eslint-disable-line no-script-url
+    link.addEventListener("click", function (e) {
+        e.preventDefault()
+        unhide(opts.root)
+        if (pass) {
+            state.report.className = state.report.className
+                .replace(/\bfail\b/g, " pass")
+                .replace(/\s+/g, " ").trim()
+            if (state.report.className) hideSuitesWithout("test pass")
+        } else {
+            state.report.className = state.report.className
+                .replace(/\bpass\b/g, " fail")
+                .replace(/\s+/g, " ").trim()
+            if (state.report.className) hideSuitesWithout("test fail")
+        }
+    }, false)
+    link.appendChild(document.createTextNode(name))
+
+    entry.appendChild(document.createTextNode(" "))
+    entry.appendChild(label)
+    label.appendChild(document.createTextNode("0"))
+    state.base.appendChild(entry)
     return label
 }
 
 function addDuration(state, opts) {
-    var counter = n(opts, "em", {}, [t(opts, "0")])
+    var document = opts.window.document
+    var entry = document.createElement("li")
+    var counter = document.createElement("em")
 
-    state.base.appendChild(n(opts, "li", {}, [t(opts, "duration: "), counter]))
+    entry.appendChild(document.createTextNode("duration: "))
+    entry.appendChild(counter)
+    counter.appendChild(document.createTextNode("0"))
     return counter
 }
 
@@ -136,6 +118,65 @@ function onNextRepaint(r, callback) {
     }
 }
 
+function initRoot(r, ev) {
+    var document = r.opts.window.document
+
+    if (!ev.path.length) {
+        r.get([]).node = document.createElement("ul")
+        r.state.report.appendChild(r.get([]).node)
+        return
+    }
+
+    var stack = []
+
+    for (var i = 0; i < ev.path.length; i++) {
+        var entry = ev.path[i]
+        var children = document.createElement("ul")
+
+        r.get(stack).node = children
+        stack.push(entry)
+
+        var suite = document.createElement("li")
+        var header = document.createElement("h1")
+
+        suite.className = "suite"
+        suite.appendChild(header)
+        header.appendChild(document.createTextNode(entry.name))
+        header.appendChild(children)
+
+        r.get(stack).node.appendChild(suite)
+    }
+}
+
+function showTestResult(r, ev) {
+    var document = r.opts.window.document
+    var className = ev.enter() ? "" : "test " + ev.type()
+    var name = ev.path[ev.path.length - 1].name
+    var outer = document.createElement("li")
+    var inner = document.createElement(ev.enter() ? "h1" : "h2")
+
+    inner.appendChild(document.createTextNode(name))
+
+    if (!ev.skip()) {
+        className += " " + R.speed(ev)
+        var duration = document.createElement("span")
+
+        duration.appendChild(document.createTextNode(R.formatTime(ev.duration)))
+        inner.appendChild(duration)
+    }
+
+    outer.className = className
+    outer.appendChild(inner)
+
+    if (ev.enter()) {
+        r.get(ev.path).node = document.createElement("ul")
+        outer.appendChild(r.get(ev.path).node)
+    }
+
+    ev.path.pop()
+    r.get(ev.path).node.appendChild(outer)
+}
+
 module.exports = R.on({
     accepts: ["root", "window", "reset"],
     create: function (args, methods) {
@@ -159,30 +200,33 @@ module.exports = R.on({
 
     // Clear the div first.
     init: function (state, opts) {
-        state.error = n(opts, "div", {className: "error hidden"}, [])
-        state.report = n(opts, "ul", {className: "report"}, [])
-        state.base = n(opts, "ul", {className: "base"}, [])
+        var document = opts.window.document
+
+        state.error = document.createElement("div")
+        state.error.className = "error hidden"
+
+        state.report = document.createElement("ul")
+        state.report.className = "report"
+
+        state.base = document.createElement("ul")
+        state.base.className = "base"
 
         state.passes = addToggle(state, opts, "passes:", true)
         state.failures = addToggle(state, opts, "failures:", false)
         state.duration = addDuration(state, opts)
 
-        opts.root.appendChild(n(opts, "iframe", {
-            style: {
-                width: "100%",
-                height: "100%",
-                border: "0",
-                padding: "0",
-                margin: "0",
-            },
-        }, [
-            state.base,
-            state.report,
-        ]))
-    },
+        var iframe = document.createElement("iframe")
 
-    // Override the default which sets console colors (not applicable to DOM).
-    before: function () {},
+        iframe.style.width = "100%"
+        iframe.style.height = "100%"
+        iframe.style.border = "0"
+        iframe.style.padding = "0"
+        iframe.style.margin = "0"
+        iframe.appendChild(state.base)
+        iframe.appendChild(state.report)
+
+        opts.root.appendChild(iframe)
+    },
 
     // Give the browser a chance to repaint before continuing (microtasks
     // normally block rendering).
@@ -192,50 +236,18 @@ module.exports = R.on({
 
     report: function (r, ev) {
         if (ev.start()) {
-            if (ev.path.length) {
-                var stack = []
-
-                forEach(ev.path, function (entry) {
-                    var children = r.get(stack).node = n(r.opts, "ul")
-
-                    stack.push(entry)
-                    r.get(stack).node.appendChild(n(r.opts, "li", {
-                        className: "suite",
-                    }, [
-                        n(r.opts, "h1", {}, [t(r.opts, entry.name)]),
-                        children,
-                    ]))
-                })
-            } else {
-                r.state.report.appendChild(r.get([]).node = n(r.opts, "ul"))
-            }
+            initRoot(r, ev)
         } else if (ev.enter() || ev.pass() || ev.fail() || ev.skip()) {
-            var enteredChildren = ev.enter()
-                ? r.get(ev.path).node = n(r.opts, "ul")
-                : undefined
-
-            var className = ev.enter() ? "" : "test pass " + R.speed(ev)
-            var name = ev.path.pop().name
-            var innerChildren = [t(r.opts, name)]
-
-            if (!ev.skip()) {
-                innerChildren.push(n(r.opts, "span", {}, [
-                    t(r.opts, R.formatTime(ev.duration)),
-                ]))
-            }
-
-            var outerChildren = [
-                n(r.opts, ev.enter() ? "h1" : "h2", {}, innerChildren),
-            ]
-
-            if (ev.enter()) outerChildren.push(enteredChildren)
-
-            r.get(ev.path).node.appendChild(
-                n(r.opts, "li", {className: className}, outerChildren))
-
+            showTestResult(r, ev)
             updateStats(r)
         } else if (ev.extra()) {
             // TODO
+            // r.get(ev.path).status = R.Status.Failing
+            //
+            // var child = r.get(ev.path).node
+            // var parent = r.get(ev.path.slice(0, -1)).node
+            //
+            // child.className = child.className.replace(/\bpass\b/g, "fail")
         } else if (ev.error()) {
             if (r.opts.window.console) {
                 var console = r.opts.window.conosle

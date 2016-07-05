@@ -111,7 +111,7 @@ If you use `reflect.define()`/`t.define()` or `reflect.add()`, this is already d
 
 - Try to minimize state within your plugins, especially that which is tied to the Thallium instance. It's often awkward to manage in general.
 
-- If you need per-test state, wrap `t.test` and `t.async` to initialize your test, and use Symbols (a polyfill is acceptable) or a WeakMap if you're okay with limiting yourself to ES6. Also note that tests prototypically inherit from their parent test by design.
+- If you need per-test state, wrap `t.test` and `t.async` to initialize your test, and use symbols (a polyfill is acceptable) or a WeakMap if you're okay with limiting yourself to ES6. Also note that tests prototypically inherit from their parent test by design.
 
 - Try to keep as much of your mutable global state within the plugin closure as you can, so if a user needs to load the plugin separately in multiple places, your plugin will be initialized as many times as they need.
 

@@ -2,7 +2,7 @@
 
 // This is a reporter that mimics Mocha's `dot` reporter
 
-var R = require("../lib/reporter/index.js")
+var R = require("../lib/reporter.js")
 var width = R.windowWidth * 0.75 | 0
 
 function printDot(r, color) {
