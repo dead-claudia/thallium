@@ -1,5 +1,7 @@
 "use strict"
 
+// TODO: make a stylesheet for this
+
 /**
  * Note: do *not* assume the DOM is ready, or even that one even exists, because
  * both the tests and users may need to load mocks before initializing this
@@ -18,8 +20,8 @@ function Tree(name) {
     this.children = Object.create(null)
 }
 
-function unhide(root) {
-    var suites = root.getElementsByClassName("suite hidden")
+function unhide(document) {
+    var suites = document.getElementsByClassName("suite hidden")
 
     for (var i = 0; i < suites.length; i++) {
         suites[i].className = suites[i].className
@@ -29,8 +31,8 @@ function unhide(root) {
     }
 }
 
-function hideSuitesWithout(root, className) {
-    var suites = root.getElementsByClassName("suite")
+function hideSuitesWithout(document, className) {
+    var suites = document.getElementsByClassName("suite")
 
     for (var i = 0; i < suites.length; i++) {
         var suite = suites[i]
@@ -47,8 +49,8 @@ function setText(element, contents) {
     else element.innerText = contents
 }
 
-function addToggle(state, opts, name, pass) {
-    var document = opts.window.document
+function addToggle(state, name, pass) {
+    var document = state.window.document
     var entry = document.createElement("li")
     var label = document.createElement("em")
     var link = document.createElement("a")
@@ -57,17 +59,22 @@ function addToggle(state, opts, name, pass) {
     link.href = "javascript:void 0" // eslint-disable-line no-script-url
     link.addEventListener("click", function (e) {
         e.preventDefault()
-        unhide(opts.root)
+        unhide(state.window.document)
+
         if (pass) {
             state.report.className = state.report.className
                 .replace(/\bfail\b/g, " pass")
                 .replace(/\s+/g, " ").trim()
-            if (state.report.className) hideSuitesWithout("test pass")
+            if (state.report.className) {
+                hideSuitesWithout(state.window.document, "test pass")
+            }
         } else {
             state.report.className = state.report.className
                 .replace(/\bpass\b/g, " fail")
                 .replace(/\s+/g, " ").trim()
-            if (state.report.className) hideSuitesWithout("test fail")
+            if (state.report.className) {
+                hideSuitesWithout(state.window.document, "test fail")
+            }
         }
     }, false)
     link.appendChild(document.createTextNode(name))
@@ -79,8 +86,8 @@ function addToggle(state, opts, name, pass) {
     return label
 }
 
-function addDuration(state, opts) {
-    var document = opts.window.document
+function addDuration(state) {
+    var document = state.window.document
     var entry = document.createElement("li")
     var counter = document.createElement("em")
 
@@ -119,7 +126,7 @@ function onNextRepaint(r, callback) {
 }
 
 function initRoot(r, ev) {
-    var document = r.opts.window.document
+    var document = r.state.window.document
 
     if (!ev.path.length) {
         r.get([]).node = document.createElement("ul")
@@ -149,7 +156,7 @@ function initRoot(r, ev) {
 }
 
 function showTestResult(r, ev) {
-    var document = r.opts.window.document
+    var document = r.state.window.document
     var className = ev.enter() ? "" : "test " + ev.type()
     var name = ev.path[ev.path.length - 1].name
     var outer = document.createElement("li")
@@ -178,33 +185,46 @@ function showTestResult(r, ev) {
 }
 
 module.exports = R.on({
-    accepts: ["root", "window", "reset"],
+    accepts: ["root", "style", "window", "reset"],
     create: function (args, methods) {
-        var root = getRoot(args, global.window)
+        // This is the default style and window
+        var style = "./node_modules/thallium/thallium.css"
         var window = global.window
+        var root = getRoot(args, window)
+        var reset = function () {} // eslint-disable-line func-style
+
+        if (root == null && typeof args === "object" && args !== null) {
+            if (args.style != null) style = args.style
+            if (args.window != null) window = args.window
+            if (args.reset != null) reset = args.reset
+            root = getRoot(args.root, window)
+        }
 
         if (root == null) {
-            if (args.window != null) window = args.window
-            root = getRoot(args.root, window)
-
-            if (root == null) {
-                throw new TypeError(m("type.reporter.dom.element",
-                    getType(root)))
-            }
+            throw new TypeError(m("type.reporter.dom.element", getType(root)))
         }
 
         return new R.Reporter(Tree,
-            {window: window, root: root, reset: args.reset},
+            {window: window, root: root, style: style, reset: reset},
             methods)
     },
 
-    init: function (state, opts) {
+    init: function (state, opts) { // eslint-disable-line max-statements
         // Clear the element first.
         while (opts.root.firstChild) {
             opts.root.removeChild(opts.root.firstChild)
         }
 
-        var document = opts.window.document
+        // Build the initial tree in a detached iframe, so the browser isn't
+        // queuing repaints or numerous other calculations.
+        var iframe = opts.window.document.createElement("iframe")
+        var document = iframe.contentWindow.document
+        var style = document.createElement("style")
+
+        state.window = iframe.contentWindow
+        style.rel = "stylesheet"
+        style.src = opts.style
+        document.head.appendChild(style)
 
         state.error = document.createElement("div")
         state.error.className = "error hidden"
@@ -215,20 +235,19 @@ module.exports = R.on({
         state.base = document.createElement("ul")
         state.base.className = "base"
 
-        state.passes = addToggle(state, opts, "passes:", true)
-        state.failures = addToggle(state, opts, "failures:", false)
-        state.duration = addDuration(state, opts)
-
-        var iframe = document.createElement("iframe")
+        state.passes = addToggle(state, "passes:", true)
+        state.failures = addToggle(state, "failures:", false)
+        state.duration = addDuration(state)
 
         iframe.style.width = "100%"
         iframe.style.height = "100%"
         iframe.style.border = "0"
         iframe.style.padding = "0"
         iframe.style.margin = "0"
-        iframe.appendChild(state.base)
-        iframe.appendChild(state.report)
+        document.body.appendChild(state.base)
+        document.body.appendChild(state.report)
 
+        // Lastly, append the iframe to the root.
         opts.root.appendChild(iframe)
     },
 
