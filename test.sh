@@ -16,3 +16,6 @@ for i in 0.10 0.12 1 2 3 4 5 6; do
     nvm which $i > /dev/null 2>&1 || nvm install $i || exit $?
     nvm exec $i mocha $@ || exit $?
 done
+
+export CHROME_BIN=$(which google-chrome)
+karma start --browsers Chrome,Firefox --single-run || exit $?
