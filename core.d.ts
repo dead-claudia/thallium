@@ -28,6 +28,7 @@ export type Report =
     FailReport |
     SkipReport |
     EndReport |
+    ErrorReport |
     ExtraReport<any>;
 
 interface TestReport<T extends ReportType, U> {
@@ -46,6 +47,11 @@ interface TestReport<T extends ReportType, U> {
     end(): this is EndReport;
     error(): this is ErrorReport;
     extra(): this is ExtraReport<any>;
+
+    /**
+     * So util.inspect provides more sensible output for testing.
+     */
+    inspect(): ReportInspection;
 }
 
 export interface ExtraCall<T> {
@@ -54,15 +60,77 @@ export interface ExtraCall<T> {
     stack: string;
 }
 
-export interface StartReport extends TestReport<"start", void> {}
-export interface EnterReport extends TestReport<"enter", void> {}
-export interface LeaveReport extends TestReport<"leave", void> {}
-export interface PassReport extends TestReport<"pass", void> {}
-export interface FailReport extends TestReport<"fail", any> {}
-export interface SkipReport extends TestReport<"skip", void> {}
-export interface EndReport extends TestReport<"end", void> {}
+export interface StartReport extends TestReport<"start", void> {
+    inspect(): {
+        type: "start";
+        path: Location[];
+    };
+}
+
+export interface EnterReport extends TestReport<"enter", void> {
+    inspect(): {
+        type: "enter";
+        path: Location[];
+        duration: number;
+        slow: number;
+    };
+}
+
+export interface LeaveReport extends TestReport<"leave", void> {
+    inspect(): {
+        type: "leave";
+        path: Location[];
+    };
+}
+
+export interface PassReport extends TestReport<"pass", void> {
+    inspect(): {
+        type: "pass";
+        path: Location[];
+        duration: number;
+        slow: number;
+    };
+}
+
+export interface FailReport extends TestReport<"fail", any> {
+    inspect(): {
+        type: "fail";
+        path: Location[];
+        value: any;
+        duration: number;
+        slow: number;
+    };
+}
+
+export interface SkipReport extends TestReport<"skip", void> {
+    inspect(): {
+        type: "skip";
+        path: Location[];
+    };
+}
+
+export interface EndReport extends TestReport<"end", void> {
+    inspect(): {
+        type: "end";
+        path: Location[];
+    };
+}
+
+export interface ErrorReport extends TestReport<"error", void> {
+    inspect(): {
+        type: "error";
+        path: Location[];
+        value: any;
+    };
+}
+
 export interface ExtraReport<T> extends TestReport<"extra", ExtraCall<T>> {
     extra(): this is ExtraReport<T>;
+    inspect(): {
+        type: "error";
+        path: Location[];
+        value: any;
+    };
 }
 
 export interface Plugin<T extends Test> {
