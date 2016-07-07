@@ -1,5 +1,9 @@
 # Changelog
 
+## v0.2.1
+
+Forgot to update package.json...
+
 ## v0.2.0
 
 - Make `t.throws` errors make more sense.

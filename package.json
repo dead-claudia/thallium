@@ -1,6 +1,6 @@
 {
   "name": "thallium",
-  "version": "0.1.4",
+  "version": "0.2.1",
   "description": "A simple, unopinionated, modular test framework",
   "main": "index.js",
   "scripts": {
