@@ -52,6 +52,10 @@ As soon as it's 1.0, I'll stick to [SemVer](https://semver.org). Until then, her
 
 I will try to avoid breaking changes on patch updates, but it's not guaranteed, particularly if it's because a bug fix.
 
+## Recent Updates
+
+See the [changelog](https://github.com/isiahmeadows/thallium/blob/master/CHANGELOG.md) for the most recent changes. It also contains some useful migration information for dealing with breaking changes.
+
 ## Roadmap
 
 This list is in a very rough chronological order.

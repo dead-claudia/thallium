@@ -1514,8 +1514,8 @@ var messages = Object.freeze({
     "type.extra.stack": "Expected `stack` to be a string",
     "type.iterate.next": "Iterator next() must return an object",
     "type.iterate.throw": "Iterator throw() must return an object",
-    "type.location.name": "Expected `name` to be a string",
-    "type.location.index": "Expected `index` to be a number",
+    "type.loc.name": "Expected `name` to be a string",
+    "type.loc.index": "Expected `index` to be a number",
     "type.only.index": "Expected argument {0} to be an array",
     "type.only.selector": "Expected `only` path to be an array of strings or regular expressions",
     "type.plugin": "Expected plugin to be a function",
@@ -3724,13 +3724,13 @@ methods(Reflect, {
     /**
      * Creates a new location, mainly for testing reporters.
      */
-    location: function (name, index) {
+    loc: function (name, index) {
         if (typeof name !== "string") {
-            throw new TypeError(m("type.location.name"))
+            throw new TypeError(m("type.loc.name"))
         }
 
         if (typeof index !== "number") {
-            throw new TypeError(m("type.location.index"))
+            throw new TypeError(m("type.loc.index"))
         }
 
         return new Tests.Location(name, index|0)
@@ -4056,7 +4056,7 @@ module.exports = function (xs, f, acc) {
     var hasAcc = arguments.length >= 3;
     if (hasAcc && xs.reduce) return xs.reduce(f, acc);
     if (xs.reduce) return xs.reduce(f);
-    
+
     for (var i = 0; i < xs.length; i++) {
         if (!hasOwn.call(xs, i)) continue;
         if (!hasAcc) {
@@ -4073,19 +4073,19 @@ module.exports = function (xs, f, acc) {
 (function (process,global){
 /* @preserve
  * The MIT License (MIT)
- * 
+ *
  * Copyright (c) 2013-2015 Petka Antonov
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL THE
@@ -4093,7 +4093,7 @@ module.exports = function (xs, f, acc) {
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
- * 
+ *
  */
 /**
  * bluebird build version 3.4.1
@@ -7454,28 +7454,28 @@ _dereq_('./some.js')(Promise, PromiseArray, apiRejection);
 _dereq_('./filter.js')(Promise, INTERNAL);
 _dereq_('./each.js')(Promise, INTERNAL);
 _dereq_('./any.js')(Promise);
-                                                         
-    util.toFastProperties(Promise);                                          
-    util.toFastProperties(Promise.prototype);                                
-    function fillTypes(value) {                                              
-        var p = new Promise(INTERNAL);                                       
-        p._fulfillmentHandler0 = value;                                      
-        p._rejectionHandler0 = value;                                        
-        p._promise0 = value;                                                 
-        p._receiver0 = value;                                                
-    }                                                                        
-    // Complete slack tracking, opt out of field-type tracking and           
-    // stabilize map                                                         
-    fillTypes({a: 1});                                                       
-    fillTypes({b: 2});                                                       
-    fillTypes({c: 3});                                                       
-    fillTypes(1);                                                            
-    fillTypes(function(){});                                                 
-    fillTypes(undefined);                                                    
-    fillTypes(false);                                                        
-    fillTypes(new Promise(INTERNAL));                                        
-    debug.setBounds(Async.firstLineError, util.lastLineError);               
-    return Promise;                                                          
+
+    util.toFastProperties(Promise);
+    util.toFastProperties(Promise.prototype);
+    function fillTypes(value) {
+        var p = new Promise(INTERNAL);
+        p._fulfillmentHandler0 = value;
+        p._rejectionHandler0 = value;
+        p._promise0 = value;
+        p._receiver0 = value;
+    }
+    // Complete slack tracking, opt out of field-type tracking and
+    // stabilize map
+    fillTypes({a: 1});
+    fillTypes({b: 2});
+    fillTypes({c: 3});
+    fillTypes(1);
+    fillTypes(function(){});
+    fillTypes(undefined);
+    fillTypes(false);
+    fillTypes(new Promise(INTERNAL));
+    debug.setBounds(Async.firstLineError, util.lastLineError);
+    return Promise;
 
 };
 

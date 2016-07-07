@@ -13,7 +13,7 @@ var Util = global.Util = {
     assertions: Thallium.assertions,
     r: Thallium.r,
     n: reflect.report,
-    p: reflect.location,
+    p: reflect.loc,
     extra: reflect.extra,
     Tests: Tests,
 

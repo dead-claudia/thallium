@@ -13,7 +13,7 @@ You can use `t.reflect()` to get a Reflect instance for access into the various 
 - [`reflect.AssertionError` Class](./reflect/assertion-error.md)
 - [`reflect.do`](./reflect/do.md)
 - [`reflect.report`](./reflect/report.md)
-- [`reflect.location`](./reflect/location.md)
+- [`reflect.loc`](./reflect/loc.md)
 - [`reflect.extra`](./reflect/extra.md)
 - [`reflect.parent`](./reflect/parent.md)
 - [`reflect.methods`](./reflect/methods.md)

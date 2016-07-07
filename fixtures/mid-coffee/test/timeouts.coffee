@@ -13,7 +13,7 @@ t = require 'thallium'
 # be too bad.
 t.test 'core (timeouts) (FLAKE)', ->
     n = @reflect().report
-    p = @reflect().location
+    p = @reflect().loc
 
     @reflect().add push: (_, ret) -> (arg, done) =>
         # Any equality tests on either of these are inherently flaky.

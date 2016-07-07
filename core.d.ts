@@ -324,7 +324,7 @@ export interface Reflect<T extends Test> {
     /**
      * Create a location data object. Mostly useful for testing reporters.
      */
-    location(name: string, index: number): Location;
+    loc(name: string, index: number): Location;
 
     /**
      * Create an extra call data object. Mostly useful for testing reporters.
