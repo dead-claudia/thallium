@@ -1,5 +1,9 @@
 # Changelog
 
+## v0.2.2
+
+Fixing more npm mistakes... :-(
+
 ## v0.2.1
 
 Forgot to update package.json...
