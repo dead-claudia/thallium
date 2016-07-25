@@ -1,5 +1,9 @@
 # Changelog
 
+## v0.2.3
+
+Bug fixes in the built-in reporters
+
 ## v0.2.2
 
 Fixing more npm mistakes... :-(
