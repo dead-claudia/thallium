@@ -7,6 +7,7 @@
     "bundle": "browserify -dr ./lib/browser-bundle.js:thallium -o thallium.js",
     "release": "npm run test && npm run bundle",
     "preversion": "npm run release",
+    "postversion": "git push && git push --tags",
     "version": "git add thallium.js",
     "lint": "eslint . --cache && coffeelint . --cache",
     "karma": "karma start --single-run --browsers Chrome",
