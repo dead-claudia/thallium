@@ -22,7 +22,7 @@ var Util = global.Util = {
     // Various dependencies used throughout the tests, minus the CLI tests. It's
     // easier to inject them into this bundle rather than to try to implement a
     // module loader.
-    Promise: require("bluebird"),
+    Promise: require("../lib/bluebird.js"),
     setTimeout: global.setTimeout.bind(global),
     getStack: require("../lib/util.js").getStack,
     m: require("../lib/messages.js"),

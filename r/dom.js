@@ -1,5 +1,10 @@
 "use strict"
 
+var Promise = require("../lib/bluebird.js")
+var m = require("../lib/messages.js")
+var R = require("../lib/reporter.js")
+var getType = require("../lib/util.js").getType
+
 // TODO: make a stylesheet for this
 var styles = [
     // Each entry is either a string or array of strings.
@@ -34,11 +39,6 @@ function injectStyle(document) {
  * both the tests and users may need to load mocks before initializing this
  * reporter. You may only rely on the `window` object from the options.
  */
-
-var Promise = require("bluebird")
-var m = require("../lib/messages.js")
-var R = require("../lib/reporter.js")
-var getType = require("../lib/util.js").getType
 
 function Tree(name) {
     this.name = name

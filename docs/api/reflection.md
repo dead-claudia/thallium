@@ -26,4 +26,5 @@ You can use `t.reflect()` to get a Reflect instance for access into the various 
 - [`reflect.inline`](./reflect/inline.md)
 - [`reflect.root`](./reflect/root.md)
 - [`reflect.runnable`](./reflect/runnable.md)
+- [`reflect.scheduler`](./reflect/scheduler.md)
 - [`reflect.skipped`](./reflect/skipped.md)

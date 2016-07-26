@@ -2,10 +2,10 @@
 
 /* eslint-env node */
 
-var Promise = require("bluebird")
 var path = require("path")
 var minimatch = require("minimatch")
 var interpret = require("interpret")
+var Promise = require("../lib/bluebird.js")
 var State = require("../lib/cli/run.js").State
 var methods = require("../lib/methods.js")
 

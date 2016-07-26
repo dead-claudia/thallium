@@ -2,7 +2,7 @@
 
 // This is a reporter that mimics Mocha's `spec` reporter.
 
-var Promise = require("bluebird")
+var Promise = require("../lib/bluebird.js")
 var R = require("../lib/reporter.js")
 var c = R.color
 
