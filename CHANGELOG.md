@@ -1,5 +1,12 @@
 # Changelog
 
+## v0.2.5
+
+- Don't warn about inline tests containing just child tests.
+- Use fresh Bluebird copy
+- Don't depend on `diff` (for now)
+- Optimize dependencies a little.
+
 ## v0.2.3
 
 Bug fixes in the built-in reporters
