@@ -65,7 +65,6 @@
   },
   "dependencies": {
     "bluebird": "^3.4.1",
-    "diff": "^2.2.2",
     "glob": "^7.0.3",
     "interpret": "^1.0.0",
     "is-buffer": "^1.1.3",
