@@ -20,17 +20,6 @@ describe("cli loader", function () {
             return Loader.keysToRegExp(object)
         }
 
-        function testCreates(desc, items) {
-            it("creates a RegExp for " + desc, function () {
-                t.instanceof(makeRegExp(items), RegExp)
-            })
-        }
-
-        testCreates("nothing", [])
-        testCreates("one thing", [".js"])
-        testCreates("two things", [".js", ".node"])
-        testCreates("many things", [".js", ".node", ".coffee", ".babel.js"])
-
         function makeFor(items) {
             return items.length
                 ? " for " + items
@@ -584,9 +573,19 @@ describe("cli loader", function () {
                 var modules = []
 
                 return Loader.serialize(loader.state, function (mod) {
-                    if (mod instanceof Loader.Simple) mod = new S(mod.mod)
-                    if (mod instanceof Loader.Interpret) mod = new I(mod.ext)
-                    modules.push(mod)
+                    if (mod instanceof Loader.Simple) {
+                        modules.push(new S(mod.mod))
+                    } else if (mod instanceof Loader.Interpret) {
+                        modules.push(new I(mod.ext))
+                    } else {
+                        throw new TypeError("Unknown module spec: " + mod)
+                    }
+
+                    if (opts.load != null && opts.load.indexOf(mod) !== -1) {
+                        return mod.load()
+                    } else {
+                        return undefined
+                    }
                 })
                 .then(function (globs) {
                     t.match(globs, opts.globs)
@@ -1356,6 +1355,10 @@ describe("cli loader", function () {
                     new S("module/other/.tl.js"),
                 ],
             })
+        })
+
+        context.skip("with `files` option", function () {
+            // TODO
         })
 
         /* eslint-enable max-len */

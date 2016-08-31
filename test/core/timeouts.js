@@ -1,7 +1,7 @@
 "use strict"
 
 // Note: updates to this should also be reflected in
-// fixtures/mid-coffee/test/timeouts.coffee, as it's trying to
+// fixtures/mid-coffee/spec/timeouts.coffee, as it's trying to
 // represent more real-world usage.
 
 // Note that this entire section may be flaky on slower machines. Thankfully,

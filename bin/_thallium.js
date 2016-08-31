@@ -11,7 +11,6 @@ if (require.main !== module) {
 // require("../scripts/log-fs.js")
 
 require("../lib/cli/run.js").run({
-    cwd: process.cwd(),
     argv: process.argv.slice(2),
     util: require("../lib/cli/util.js"), // eslint-disable-line global-require
 })

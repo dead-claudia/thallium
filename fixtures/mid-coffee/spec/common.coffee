@@ -194,35 +194,33 @@ t.test 'cli common', ->
             @equal gp('path/**/*'), 'path'
             @equal gp('path/**/subdir/foo.*'), 'path'
 
-        @test 'returns parent dirname from non-glob paths', ->
-            @equal gp('path/foo/bar.js'), 'path/foo'
+        @test 'returns glob itself from non-glob paths', ->
+            @equal gp('path/foo/bar.js'), 'path/foo/bar.js'
             @equal gp('path/foo/'), 'path/foo'
-            @equal gp('path/foo'), 'path'
+            @equal gp('path/foo'), 'path/foo'
 
         @test 'gets a base name', ->
-            @equal gp('js/*.js') + '/', 'js/'
+            @equal gp('js/*.js'), 'js'
 
         @test 'gets a base name from a nested glob', ->
-            @equal gp('js/**/test/*.js') + '/', 'js/'
+            @equal gp('js/**/test/*.js'), 'js'
 
         @test 'gets a base name from a flat file', ->
-            @equal gp('js/test/wow.js') + '/', 'js/test/'
+            @equal gp('js/test/wow.js'), 'js/test/wow.js'
 
         @test 'gets a base name from character class pattern', ->
-            @equal gp('js/t[a-z]st}/*.js') + '/', 'js/'
+            @equal gp('js/t[a-z]st}/*.js'), 'js'
 
         @test 'gets a base name from brace , expansion', ->
-            @equal gp('js/{src,test}/*.js') + '/', 'js/'
+            @equal gp('js/{src,test}/*.js'), 'js'
 
         @test 'gets a base name from brace .. expansion', ->
-            @equal gp('js/test{0..9}/*.js') + '/', 'js/'
+            @equal gp('js/test{0..9}/*.js'), 'js'
 
         @test 'gets a base name from extglob', ->
-            @equal gp('js/t+(wo|est)/*.js') + '/', 'js/'
+            @equal gp('js/t+(wo|est)/*.js'), 'js'
 
         @test 'gets a base name from a complex brace glob', ->
-            @equal gp('lib/{components,pages}/**/{test,another}/*.txt') + '/',
-                'lib/'
-            @equal gp('js/test/**/{images,components}/*.js') + '/', 'js/test/'
-            @equal gp('ooga/{booga,sooga}/**/dooga/{eooga,fooga}') + '/',
-                'ooga/'
+            @equal gp('lib/{components,pages}/**/{test,another}/*.txt'), 'lib'
+            @equal gp('js/test/**/{images,components}/*.js'), 'js/test'
+            @equal gp('ooga/{booga,sooga}/**/dooga/{eooga,fooga}'), 'ooga'
