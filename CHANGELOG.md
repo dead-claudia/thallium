@@ -1,5 +1,13 @@
 # Changelog
 
+## v0.2.6
+
+- Fix config resolution bug when custom `config.files` is used.
+- Fix errors when `util.inspect`ing reports.
+- Globs won't bork over directories.
+- Things like `--require mod.foo:foo/register-module --require foo:foo/register` will now work as expected.
+- Some internal refactoring.
+
 ## v0.2.5
 
 - Don't warn about inline tests containing just child tests.

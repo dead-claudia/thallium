@@ -48,7 +48,7 @@ Couple specific notes:
 As soon as it's 1.0, I'll stick to [SemVer](https://semver.org). Until then, here's how I'll aim for new versions:
 
 - Minor versions (`0.*`) represent larger breaking changes or larger new features. This includes much of the primary roadmap below.
-- Patch versions (`0.m.*`, etc.) represent bug fixes and smaller breaking changes/new features. This includes some of the nice-to-haves I've listed below the roadmap.
+- Patch versions (`0.1.*`, etc.) represent bug fixes and smaller breaking changes/new features. This includes some of the nice-to-haves I've listed below the roadmap.
 
 I will try to avoid breaking changes on patch updates, but it's not guaranteed, particularly if it's because a bug fix.
 
@@ -58,23 +58,30 @@ See the [changelog](https://github.com/isiahmeadows/thallium/blob/master/CHANGEL
 
 ## Roadmap
 
-This list is in a very rough chronological order.
+This list is in a very rough chronological order. If you want to complete any of these yourself, feel free to send me a PR! :smile:
 
 1. ~~Create basic reporters for TAP, spec, and dot.~~ **Done!**
     - ~~Browser support~~ and a DOM reporter is planned as well.
+
 2. Finish documenting this project. This mostly includes the core assertions.
+
 3. Support flaky tests via first-class retries. This would be enormously useful for several.
+
 4. Allow reporters to be removed, with an on-remove hook for the reporter in case external resources need reclaimed.
+
 5. Include lifecycle hooks for before/after tests, for resource management.
+
 6. Create a nice REPL driver for Node, in addition to the CLI.\*
     - This will just be a module + sugar binary, so you can use it with any language.
+
 7. Write a few plugins/utilities for `describe`/`it` (likely trivial), `before{,Each}`/`after{,Each}` hooks, etc.
     - This will include more reporters as well.
+
 8. Write lots of blog posts.\*\* :smile:
     - Why `before{,Each}` and friends aren't in core
     - Why this uses code *for* configuration, unlike nearly every other test framework out there.
 
-\* *That's something from Lisp-land I really wish was here...*
+\* *That's something from Clojure-land I really wish was here...*
 
 \*\* *And maybe port this to Python, if/when I can find time.*
 
@@ -83,13 +90,18 @@ Also, at some point, I'd like to do the following, in no particular order:
 - Set up [AppVeyor](https://www.appveyor.com/) to run tests on Windows. Currently, it's only actively tested on Linux.
     - I need to at some point hook up PhantomJS for this. It should work in its current state, but it's not tested.
     - I'm planning on using [Sauce Labs](https://saucelabs.com/) and [Karma](https://karma-runner.github.io) after Karma 1.0 is released, because I need the custom `context.html` config feature added in [this PR](https://github.com/karma-runner/karma/pull/1825). The reason is because I'm using SystemJS and I need a [custom entry script](http://github.com/isiahmeadows/thallium/blob/master/scripts/generate-browser-entry.js) to load the tests.
+
 - Trim the stack traces on reported errors and offer that to others as well.
-- Profile and optimize this thing. Currently, the CLI runs a bit slower than Mocha, but I know I can get faster.
-- Allow initial negative globs based on the config's list (or the default).
+
+- Profile and optimize this thing. Currently, the CLI runs about 25-35% slower than Mocha because of unnecessary FS work, but I know there's room for optimization.
+
 - Reimplement [`util-inspect`](https://www.npmjs.com/package/util-inspect) for browsers based on Node's current [`util.inspect`](https://nodejs.org/api/util.html#util_util_inspect_object_options), since that ponyfill module is completely untested and is unaware of ES6. :worried:
-- Implement my own glob-based walker for this to eliminate order non-determinism and speed up resolution. To my knowledge, none of the more popular utilities are deterministic, and determinism is very helpful for testing. Plus, a specialized variant would load things much quicker. :smile:
-- Include the patience diff as a reporter option, since it deals with larger diffs a little more readably, a plus for data-heavy integration/end-to-end tests, but there doesn't appear to be a JS port yet, and algorithm documentation is scarce.
-- Add watch support for this.
+
+    - This'll end up out of core.
+
+- Use the patience diff for larger data sets, since it deals with those a little more readably, a plus for data-heavy integration/end-to-end tests (this repo has some of those), but there doesn't appear to be a JS port yet, and algorithm documentation is scarce.
+
+- Add file watching support for this.
 
 ## Contributing
 
