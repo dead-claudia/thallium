@@ -185,7 +185,7 @@ describe("cli end-to-end (FLAKE)", function () {
         "leave [1: cli common] > [2: normalizeGlob()] = undefined",
         "enter [1: cli common] > [3: globParent()] = undefined",
         "pass [1: cli common] > [3: globParent()] > [0: strips glob magic to return parent path] = undefined",
-        "pass [1: cli common] > [3: globParent()] > [1: returns parent dirname from non-glob paths] = undefined",
+        "pass [1: cli common] > [3: globParent()] > [1: returns glob itself from non-glob paths] = undefined",
         "pass [1: cli common] > [3: globParent()] > [2: gets a base name] = undefined",
         "pass [1: cli common] > [3: globParent()] > [3: gets a base name from a nested glob] = undefined",
         "pass [1: cli common] > [3: globParent()] > [4: gets a base name from a flat file] = undefined",
@@ -216,7 +216,7 @@ describe("cli end-to-end (FLAKE)", function () {
         args: [
             "--cwd", fixture("mid-coffee"),
             "--require", "coffee:coffee-script/register",
-            "test/**/*.coffee",
+            "spec/**/*.coffee",
         ],
         code: 0,
         timeout: 7500,
@@ -232,7 +232,7 @@ describe("cli end-to-end (FLAKE)", function () {
 
     var relative = path.relative(
         process.cwd(),
-        fixture("mid-coffee/test/**/*.coffee"))
+        fixture("mid-coffee/spec/**/*.coffee"))
 
     test("runs moderately sized test suites + relative path", {
         args: [relative],
@@ -243,6 +243,24 @@ describe("cli end-to-end (FLAKE)", function () {
 
     test("runs larger test suites with --cwd and relative path", {
         args: ["--cwd", process.cwd(), relative],
+        code: 0,
+        timeout: 7500,
+        messages: midCoffeeMessages,
+    })
+
+    var inexact = path.relative(
+        process.cwd(),
+        fixture("mid-coffee/spec/**"))
+
+    test("runs moderately sized test suites + inferred ext", {
+        args: [inexact],
+        code: 0,
+        timeout: 7500,
+        messages: midCoffeeMessages,
+    })
+
+    test("runs larger test suites with --cwd and inferred ext", {
+        args: ["--cwd", process.cwd(), inexact],
         code: 0,
         timeout: 7500,
         messages: midCoffeeMessages,

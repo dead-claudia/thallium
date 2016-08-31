@@ -35,20 +35,20 @@ describe("cli glob stream", function () {
 
             combined.on("end", function () {
                 t.match(results, [
-                    {path: "stream 1"},
-                    {path: "stream 2"},
-                    {path: "stream 3"},
+                    "stream 1",
+                    "stream 2",
+                    "stream 3",
                 ])
                 done()
             })
 
-            s1.write({path: "stream 1"})
+            s1.write("stream 1")
             s1.end()
 
-            s2.write({path: "stream 2"})
+            s2.write("stream 2")
             s2.end()
 
-            s3.write({path: "stream 3"})
+            s3.write("stream 3")
             s3.end()
         })
 
@@ -65,16 +65,16 @@ describe("cli glob stream", function () {
 
             combined.on("end", function () {
                 t.match(results, [
-                    {path: "data1"},
-                    {path: "data2"},
-                    {path: "data3"},
+                    "data1",
+                    "data2",
+                    "data3",
                 ])
                 done()
             })
 
-            s.write({path: "data1"})
-            s.write({path: "data2"})
-            s.write({path: "data3"})
+            s.write("data1")
+            s.write("data2")
+            s.write("data3")
             s.end()
         })
 
@@ -105,20 +105,20 @@ describe("cli glob stream", function () {
             })
             combined.on("end", function () {
                 t.match(results, [
-                    {path: "stream 1"},
-                    {path: "stream 2"},
-                    {path: "stream 3"},
+                    "stream 1",
+                    "stream 2",
+                    "stream 3",
                 ])
                 done()
             })
 
-            s1.write({path: "stream 1"})
+            s1.write("stream 1")
             s1.end()
 
-            s2.write({path: "stream 2"})
+            s2.write("stream 2")
             s2.end()
 
-            s3.write({path: "stream 3"})
+            s3.write("stream 3")
             s3.end()
         })
 
@@ -145,13 +145,13 @@ describe("cli glob stream", function () {
             })
             combined.on("end", function () {
                 t.hasOwn(error, "message", "stop")
-                t.match(streamData, [{path: "okay"}])
+                t.match(streamData, ["okay"])
                 done()
             })
 
-            s1.write({path: "go"})
+            s1.write("go")
             s1.end()
-            s2.write({path: "okay"})
+            s2.write("okay")
             s2.end()
         })
     })
@@ -167,263 +167,142 @@ describe("cli glob stream", function () {
             process.chdir(oldCwd)
         })
 
-        it("returns a folder name stream from a glob", function (done) {
-            var stream = GS.create([fixture("glob-stream/whatsgoingon")])
+        function read(globs) {
+            return new Util.Promise(function (resolve, reject) {
+                var stream = GS.create(globs)
+                var list = []
 
-            stream.on("error", done)
-            stream.on("data", function (file) {
-                t.match(file, {
-                    cwd: __dirname,
-                    base: fixture("glob-stream/"),
-                    path: fixture("glob-stream/whatsgoingon"),
+                stream.on("error", reject)
+                stream.on("data", function (file) {
+                    list.push(file)
                 })
-                done()
-            })
-        })
-
-        it("returns only folder name stream from a glob", function (done) {
-            var folderCount = 0
-            var stream = GS.create([fixture("glob-stream/whatsgoingon/*/")])
-
-            stream.on("error", done)
-            stream.on("data", function (file) {
-                t.hasOwn(file, "path", fixture("glob-stream/whatsgoingon/hey/"))
-                folderCount++
-            })
-            stream.on("end", function () {
-                t.equal(folderCount, 1)
-                done()
-            })
-        })
-
-        it("returns a file name stream from a glob", function (done) {
-            var stream = GS.create([fixture("glob-stream/*.coffee")])
-
-            stream.on("error", done)
-            stream.on("data", function (file) {
-                t.match(file, {
-                    cwd: __dirname,
-                    base: fixture("glob-stream/"),
-                    path: fixture("glob-stream/test.coffee"),
+                stream.on("end", function () {
+                    resolve(list)
                 })
-                done()
+            })
+        }
+
+        it("doesn't emit single folders", function () {
+            return read([fixture("glob-stream/whatsgoingon")])
+            .then(function (list) {
+                t.match(list, [])
             })
         })
 
-        it("returns a file name stream from a glob and respect state", function (done) { // eslint-disable-line max-len
-            /** @this */
-            function transform(data, enc, cb) {
-                var self = this
-
-                this.pause()
-                setTimeout(function () {
-                    self.push(data)
-                    self.resume()
-                    return cb()
-                }, 500)
-            }
-
-            var stream = GS.create([fixture("glob-stream/stuff/*.dmc")])
-            var wrapper = stream.pipe(through2.obj(transform))
-            var count = 0
-
-            stream.on("error", done)
-            wrapper.on("data", function () {
-                count++
-            })
-            wrapper.on("end", function () {
-                t.equal(count, 2)
-                done()
+        it("doesn't emit glob folders", function () {
+            return read([fixture("glob-stream/whatsgoingon/*/")])
+            .then(function (list) {
+                t.match(list, [])
             })
         })
 
-        it("returns a file name stream that does not duplicate", function (done) { // eslint-disable-line max-len
-            var stream = GS.create([
+        it("returns a file name stream from a glob", function () {
+            return read([fixture("glob-stream/*.coffee")])
+            .then(function (list) {
+                t.match(list, [fixture("glob-stream/test.coffee")])
+            })
+        })
+
+        it("returns a file name stream that does not duplicate", function () {
+            return read([
                 fixture("glob-stream/test.coffee"),
                 fixture("glob-stream/test.coffee"),
-            ])
-
-            stream.on("error", function (err) {
-                done(err)
-            })
-            stream.on("data", function (file) {
-                t.match(file, {
-                    cwd: __dirname,
-                    base: fixture("glob-stream/"),
-                    path: fixture("glob-stream/test.coffee"),
-                })
-                done()
+            ]).then(function (list) {
+                t.match(list, [fixture("glob-stream/test.coffee")])
             })
         })
 
-        it("returns a file name stream from a direct path", function (done) {
-            var stream = GS.create([fixture("glob-stream/test.coffee")])
-
-            stream.on("error", done)
-            stream.on("data", function (file) {
-                t.match(file, {
-                    cwd: __dirname,
-                    base: fixture("glob-stream/"),
-                    path: fixture("glob-stream/test.coffee"),
-                })
-                done()
+        it("returns a file name stream from a direct path", function () {
+            return read([fixture("glob-stream/test.coffee")])
+            .then(function (list) {
+                t.match(list, [fixture("glob-stream/test.coffee")])
             })
         })
 
-        it("returns no files with dotfiles", function (done) {
-            var stream = GS.create([fixture("glob-stream/*swag")])
-
-            stream.on("error", done)
-            stream.once("data", function () {
-                t.fail("No match was expected")
+        it("returns no files with dotfiles", function () {
+            return read([fixture("glob-stream/*swag")]).then(function (list) {
+                t.match(list, [])
             })
-            stream.once("end", done)
         })
 
-        it("returns a correctly ordered file name stream for three globs + globstars", function (done) { // eslint-disable-line max-len
-            var globArray = [
+        it("returns a correctly ordered file name stream for three globs + globstars", function () { // eslint-disable-line max-len
+            return read([
                 fixture("glob-stream/**/test.txt"),
                 fixture("glob-stream/**/test.coffee"),
                 fixture("glob-stream/**/test.js"),
-            ]
-            var stream = GS.create(globArray)
-            var files = []
-
-            stream.on("error", done)
-            stream.on("data", function (file) {
-                t.hasOwn(file, "path")
-                files.push(file.path)
-            })
-            stream.on("end", function () {
-                t.match(files, [
+            ]).then(function (list) {
+                t.match(list, [
                     fixture("glob-stream/whatsgoingon/hey/isaidhey/whatsgoingon/test.txt"), // eslint-disable-line max-len
                     fixture("glob-stream/test.coffee"),
                     fixture("glob-stream/whatsgoingon/test.js"),
                 ])
-                done()
             })
         })
 
-        it("returns a correctly ordered file name stream for two globs", function (done) { // eslint-disable-line max-len
+        it("returns a correctly ordered file name stream for two globs", function () { // eslint-disable-line max-len
             var globArray = [
                 fixture("glob-stream/whatsgoingon/hey/isaidhey/whatsgoingon/test.txt"), // eslint-disable-line max-len
                 fixture("glob-stream/test.coffee"),
                 fixture("glob-stream/whatsgoingon/test.js"),
             ]
-            var stream = GS.create(globArray)
-            var files = []
 
-            stream.on("error", done)
-            stream.on("data", function (file) {
-                t.hasOwn(file, "path")
-                files.push(file.path)
-            })
-            stream.on("end", function () {
-                t.match(files, globArray)
-                done()
+            return read(globArray).then(function (list) {
+                t.match(list, globArray)
             })
         })
 
-        it("returns a input stream for multiple globs + negation (globbing)", function (done) { // eslint-disable-line max-len
-            var expectedPath = fixture("glob-stream/stuff/run.dmc")
-            var stream = GS.create([
+        it("returns a input stream for multiple globs + negation (globbing)", function () { // eslint-disable-line max-len
+            return read([
                 fixture("glob-stream/stuff/*.dmc"),
                 "!" + fixture("glob-stream/stuff/test.dmc"),
-            ])
-            var files = []
-
-            stream.on("error", done)
-            stream.on("data", function (file) {
-                t.hasOwn(file, "path")
-                files.push(file.path)
-            })
-            stream.on("end", function () {
-                t.match(files, [expectedPath])
-                done()
+            ]).then(function (list) {
+                t.match(list, [fixture("glob-stream/stuff/run.dmc")])
             })
         })
 
-        it("returns a input stream for multiple globs + negation (direct)", function (done) { // eslint-disable-line max-len
-            var expectedPath = fixture("glob-stream/stuff/run.dmc")
-            var stream = GS.create([
+        it("returns a input stream for multiple globs + negation (direct)", function () { // eslint-disable-line max-len
+            return read([
                 fixture("glob-stream/stuff/run.dmc"),
                 "!" + fixture("glob-stream/stuff/test.dmc"),
-            ])
-            var files = []
-
-            stream.on("error", done)
-            stream.on("data", function (file) {
-                t.hasOwn(file, "path")
-                files.push(file.path)
-            })
-            stream.on("end", function () {
-                t.match(files, [expectedPath])
-                done()
+            ]).then(function (list) {
+                t.match(list, [fixture("glob-stream/stuff/run.dmc")])
             })
         })
 
-        it("returns a file name stream with negation from a glob", function (done) { // eslint-disable-line max-len
-            var stream = GS.create([
+        it("returns a file name stream with negation from a glob", function () {
+            return read([
                 fixture("glob-stream/**/*.js"),
                 "!" + fixture("**/test.js"),
-            ])
-
-            stream.on("error", done)
-            stream.on("data", function (file) {
-                t.fail("Unexpected file matched: " + file.path)
+            ]).then(function (list) {
+                t.match(list, [])
             })
-            stream.on("end", done)
         })
 
-        it("returns a file name stream from two globs and a negative", function (done) { // eslint-disable-line max-len
-            var stream = GS.create([
+        it("returns a file name stream from two globs and a negative", function () { // eslint-disable-line max-len
+            return read([
                 fixture("glob-stream/*.coffee"),
                 fixture("glob-stream/whatsgoingon/*.coffee"),
-            ])
-
-            stream.on("error", done)
-            stream.on("data", function (file) {
-                t.match(file, {
-                    cwd: __dirname,
-                    base: fixture("glob-stream/"),
-                    path: fixture("glob-stream/test.coffee"),
-                })
-                done()
+            ]).then(function (list) {
+                t.match(list, [fixture("glob-stream/test.coffee")])
             })
         })
 
-        it("respects the globs array order", function (done) {
-            var stream = GS.create([
+        it("respects the globs array order", function () {
+            return read([
                 fixture("glob-stream/stuff/*"),
                 "!" + fixture("glob-stream/stuff/*.dmc"),
                 fixture("glob-stream/stuff/run.dmc"),
-            ])
-
-            stream.on("error", done)
-            stream.on("data", function (file) {
-                t.match(file, {
-                    cwd: __dirname,
-                    base: fixture("glob-stream/stuff/"),
-                    path: fixture("glob-stream/stuff/run.dmc"),
-                })
-                done()
+            ]).then(function (list) {
+                t.match(list, [fixture("glob-stream/stuff/run.dmc")])
             })
         })
 
-        it("ignores leading negative globs", function (done) {
-            var stream = GS.create([
+        it("ignores leading negative globs", function () {
+            return read([
                 "!" + fixture("glob-stream/stuff/*.dmc"),
                 fixture("glob-stream/stuff/run.dmc"),
-            ])
-
-            stream.on("error", done)
-            stream.on("data", function (file) {
-                t.match(file, {
-                    cwd: __dirname,
-                    base: fixture("glob-stream/stuff/"),
-                    path: fixture("glob-stream/stuff/run.dmc"),
-                })
-                done()
+            ]).then(function (list) {
+                t.match(list, [fixture("glob-stream/stuff/run.dmc")])
             })
         })
 
@@ -498,13 +377,10 @@ describe("cli glob stream", function () {
             })
         })
 
-        it("emits no error on glob containing {} when not found", function (done) { // eslint-disable-line max-len
-            var stream = GS.create(["notfound{a,b}"])
-
-            stream.on("error", done)
-
-            stream.resume()
-            stream.once("end", done)
+        it("emits no error on glob containing {} when not found", function () {
+            return read(["notfound{a,b}"]).then(function (list) {
+                t.match(list, [])
+            })
         })
     })
 })

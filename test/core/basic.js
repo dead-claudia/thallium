@@ -3,7 +3,7 @@
 /* eslint max-nested-callbacks: [2, 5] */
 
 // Note: updates to this should also be reflected in
-// fixtures/mid-coffee/test/basic.coffee, as it's trying to represent more
+// fixtures/mid-coffee/spec/basic.coffee, as it's trying to represent more
 // real-world usage.
 
 describe("core (basic)", function () {

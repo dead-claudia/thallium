@@ -154,7 +154,8 @@ describe("cli runner", function () {
             var tt = t.reflect().base().use(Util.assertions)
             var tree = opts.tree(tt)
 
-            tree["node_modules"] = {thallium: function () { return tt }}
+            if (tree["node_modules"] == null) tree["node_modules"] = {}
+            tree["node_modules"].thallium = function () { return tt }
 
             var util = Cli.mock(tree)
             var cwd = opts.cwd != null ? opts.cwd : util.cwd()
@@ -393,6 +394,56 @@ describe("cli runner", function () {
             }).then(function (code) {
                 t.equal(code, 1)
                 t.match(ret, expected)
+            })
+        })
+
+        it("adheres to the config correctly", function () {
+            var ret = []
+            var mt = t.reflect().base()
+
+            return run({
+                args: "",
+                tree: function () {
+                    return {
+                        "node_modules": {
+                            "coffee-script": function () {},
+                        },
+
+                        ".tl.js": function () {
+                            mt.reporter(Util.push(ret))
+                            mt.define("assert", function () {
+                                return {test: true, message: "assert"}
+                            })
+
+                            return {
+                                thallium: mt,
+                                files: [
+                                    "totally-not-a-test/**/*.coffee",
+                                    "whatever/**/*.js",
+                                ],
+                            }
+                        },
+
+                        "totally-not-a-test": {
+                            "test.coffee": function () {
+                                mt.test("test").assert()
+                            },
+                        },
+
+                        "whatever": {
+                            "other.js": function () {
+                                mt.test("other").assert()
+                            },
+                        },
+                    }
+                },
+            }).then(function () {
+                t.match(ret, [
+                    n("start", []),
+                    n("pass", [p("test", 0)]),
+                    n("pass", [p("other", 1)]),
+                    n("end", []),
+                ])
             })
         })
     })

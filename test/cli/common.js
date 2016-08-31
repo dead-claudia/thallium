@@ -1,7 +1,7 @@
 "use strict"
 
 // Note: updates to isObjectLike(), resolveDefault(), normalizeGlob(), and
-// globParent() must be reflected in fixtures/mid-coffee/test/common.coffee, as
+// globParent() must be reflected in fixtures/mid-coffee/spec/common.coffee, as
 // it's trying to represent more real-world usage. The rest don't need ported
 // over.
 
@@ -250,45 +250,43 @@ describe("cli common", function () {
         })
 
         it("returns parent dirname from non-glob paths", function () {
-            t.equal(gp("path/foo/bar.js"), "path/foo")
+            t.equal(gp("path/foo/bar.js"), "path/foo/bar.js")
             t.equal(gp("path/foo/"), "path/foo")
-            t.equal(gp("path/foo"), "path")
+            t.equal(gp("path/foo"), "path/foo")
         })
 
         it("gets a base name", function () {
-            t.equal(gp("js/*.js") + "/", "js/")
+            t.equal(gp("js/*.js"), "js")
         })
 
         it("gets a base name from a nested glob", function () {
-            t.equal(gp("js/**/test/*.js") + "/", "js/")
+            t.equal(gp("js/**/test/*.js"), "js")
         })
 
         it("gets a base name from a flat file", function () {
-            t.equal(gp("js/test/wow.js") + "/", "js/test/")
+            t.equal(gp("js/test/wow.js"), "js/test/wow.js")
         })
 
         it("gets a base name from character class pattern", function () {
-            t.equal(gp("js/t[a-z]st}/*.js") + "/", "js/")
+            t.equal(gp("js/t[a-z]st}/*.js"), "js")
         })
 
         it("gets a base name from brace , expansion", function () {
-            t.equal(gp("js/{src,test}/*.js") + "/", "js/")
+            t.equal(gp("js/{src,test}/*.js"), "js")
         })
 
         it("gets a base name from brace .. expansion", function () {
-            t.equal(gp("js/test{0..9}/*.js") + "/", "js/")
+            t.equal(gp("js/test{0..9}/*.js"), "js")
         })
 
         it("gets a base name from extglob", function () {
-            t.equal(gp("js/t+(wo|est)/*.js") + "/", "js/")
+            t.equal(gp("js/t+(wo|est)/*.js"), "js")
         })
 
         it("gets a base name from a complex brace glob", function () {
-            t.equal(gp("lib/{components,pages}/**/{test,another}/*.txt") + "/",
-                "lib/")
-            t.equal(gp("js/test/**/{images,components}/*.js") + "/", "js/test/")
-            t.equal(gp("ooga/{booga,sooga}/**/dooga/{eooga,fooga}") + "/",
-                "ooga/")
+            t.equal(gp("lib/{components,pages}/**/{test,another}/*.txt"), "lib")
+            t.equal(gp("js/test/**/{images,components}/*.js"), "js/test")
+            t.equal(gp("ooga/{booga,sooga}/**/dooga/{eooga,fooga}"), "ooga")
         })
     })
 
@@ -343,53 +341,120 @@ describe("cli common", function () {
             }
         }
 
-        function merge(files, config, load) {
-            return Common.merge(files, config, load, ".")
+        function merge(files, config, load, isDefault) {
+            return Common.merge({
+                files: files,
+                config: config,
+                load: load,
+                baseDir: ".",
+                isDefault: isDefault,
+            })
         }
 
-        it("merges an empty object", function () {
-            var thallium = {thallium: true}
-            var files = ["test/**"]
+        context("default", function () {
+            it("merges an empty object", function () {
+                var thallium = {thallium: true}
+                var files = ["custom/**"]
 
-            return merge(files, {}, load({thallium: thallium}))
-            .then(function (config) {
-                t.match(config, {thallium: thallium, files: files})
-                t.equal(config.thallium, thallium)
+                return merge(files, {}, load({thallium: thallium}), true)
+                .then(function (config) {
+                    t.match(config, {thallium: thallium, files: files})
+                    t.equal(config.thallium, thallium)
+                })
+            })
+
+            it("merges `thallium`", function () {
+                var thallium = {thallium: true}
+                var files = ["custom/**"]
+
+                return merge(files, {thallium: thallium}, load({}), true)
+                .then(function (config) {
+                    t.match(config, {thallium: thallium, files: files})
+                    t.equal(config.thallium, thallium)
+                })
+            })
+
+            it("merges `files`", function () {
+                var thallium = {thallium: true}
+                var files = ["custom/**"]
+                var extra = ["other/**"]
+
+                return merge(
+                    files,
+                    {files: extra},
+                    load({thallium: thallium}),
+                    true)
+                .then(function (config) {
+                    t.match(config, {thallium: thallium, files: extra})
+                    t.equal(config.thallium, thallium)
+                })
+            })
+
+            it("merges everything", function () {
+                var thallium = {thallium: true}
+                var files = ["custom/**"]
+                var extra = ["other/**"]
+
+                return merge(
+                    files,
+                    {thallium: thallium, files: extra},
+                    load({}),
+                    true)
+                .then(function (config) {
+                    t.match(config, {thallium: thallium, files: extra})
+                    t.equal(config.thallium, thallium)
+                })
             })
         })
 
-        it("merges `thallium`", function () {
-            var thallium = {thallium: true}
-            var files = ["test/**"]
+        context("with args", function () {
+            it("merges an empty object", function () {
+                var thallium = {thallium: true}
+                var files = ["custom/**"]
 
-            return merge(files, {thallium: thallium}, load({}))
-            .then(function (config) {
-                t.match(config, {thallium: thallium, files: files})
-                t.equal(config.thallium, thallium)
+                return merge(files, {}, load({thallium: thallium}))
+                .then(function (config) {
+                    t.match(config, {thallium: thallium, files: files})
+                    t.equal(config.thallium, thallium)
+                })
             })
-        })
 
-        it("merges `files`", function () {
-            var thallium = {thallium: true}
-            var files = ["test/**"]
-            var extra = ["other/**"]
+            it("merges `thallium`", function () {
+                var thallium = {thallium: true}
+                var files = ["custom/**"]
 
-            return merge(files, {files: extra}, load({thallium: thallium}))
-            .then(function (config) {
-                t.match(config, {thallium: thallium, files: files})
-                t.equal(config.thallium, thallium)
+                return merge(files, {thallium: thallium}, load({}))
+                .then(function (config) {
+                    t.match(config, {thallium: thallium, files: files})
+                    t.equal(config.thallium, thallium)
+                })
             })
-        })
 
-        it("merges everything", function () {
-            var thallium = {thallium: true}
-            var files = ["test/**"]
-            var extra = ["other/**"]
+            it("merges `files`", function () {
+                var thallium = {thallium: true}
+                var files = ["custom/**"]
+                var extra = ["other/**"]
 
-            return merge(files, {thallium: thallium, files: extra}, load({}))
-            .then(function (config) {
-                t.match(config, {thallium: thallium, files: files})
-                t.equal(config.thallium, thallium)
+                return merge(files, {files: extra}, load({thallium: thallium}))
+                .then(function (config) {
+                    t.match(config, {thallium: thallium, files: files})
+                    t.equal(config.thallium, thallium)
+                })
+            })
+
+            it("merges everything", function () {
+                var thallium = {thallium: true}
+                var files = ["custom/**"]
+                var extra = ["other/**"]
+
+                return merge(
+                    files,
+                    {thallium: thallium, files: extra},
+                    load({}))
+                .then(function (config) {
+                    t.match(config, {thallium: thallium, files: files})
+                    t.equal(config.thallium, thallium)
+                })
             })
         })
     })
