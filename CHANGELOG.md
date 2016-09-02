@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.2.7
+
+- Cycles are now detected in the deep equality assertions
+- RegExps are now checked in the deep equality assertions
+- Deep equality algorithm cleaned up
+
 ## v0.2.6
 
 - Fix config resolution bug when custom `config.files` is used.
