@@ -599,4 +599,48 @@ describe("assertions (deep equal)", function () { // eslint-disable-line max-sta
         deepEqualLoose: false,
         match: false,
     })
+
+    var circular1 = {foo: 1}
+    var circular2 = {foo: 1}
+    var circular3 = {foo: 1}
+
+    circular1.a = circular1
+    circular2.a = circular2
+    circular3.b = circular3
+
+    check("circular reference match", circular1, circular2, {
+        deepEqual: true,
+        deepEqualLoose: true,
+        match: true,
+    })
+
+    check("circular references don't match", circular1, circular3, {
+        deepEqual: false,
+        deepEqualLoose: false,
+        match: false,
+    })
+
+    check("one circular", circular1, {foo: 1, a: {}}, {
+        deepEqual: false,
+        deepEqualLoose: false,
+        match: false,
+    })
+
+    check("regexps match", /foo/gim, /foo/mig, {
+        deepEqual: true,
+        deepEqualLoose: true,
+        match: true,
+    })
+
+    check("regexp source doesn't match", /foo/gim, /bar/mig, {
+        deepEqual: false,
+        deepEqualLoose: false,
+        match: false,
+    })
+
+    check("regexp flags don't match", /foo/gi, /foo/gim, {
+        deepEqual: false,
+        deepEqualLoose: false,
+        match: false,
+    })
 })
