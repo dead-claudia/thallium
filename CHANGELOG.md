@@ -1,5 +1,9 @@
 # Changelog
 
+## v0.2.8
+
+- Deep equality algorithm now checks correct set of keys for thrown vs unthrown errors.
+
 ## v0.2.7
 
 - Cycles are now detected in the deep equality assertions
