@@ -82,14 +82,14 @@ export interface Assertions {
     notEqualLoose(a: any, b: any): this;
 
     // Strict deep equal, taking into account types
-    deepEqual<T>(a: T, b: T): this;
+    matchStrict<T>(a: T, b: T): this;
     notDeepEqual<T>(a: T, b: T): this;
 
     // Loose deep equal, ignoring types
-    deepEqualLoose(a: Object, b: Object): this;
+    matchLoose(a: Object, b: Object): this;
     notDeepEqualLoose(a: Object, b: Object): this;
 
-    // deepEqual, but ignoring types
+    // matchStrict, but ignoring types
     match<T>(a: T, b: T): this;
     notMatch<T>(a: T, b: T): this;
 

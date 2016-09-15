@@ -6,7 +6,7 @@
  */
 
 var Util = require("./lib/util.js")
-var deepEqual = require("./lib/deep-equal.js")
+var match = require("./lib/match.js")
 
 var toString = Object.prototype.toString
 var hasOwn = Object.prototype.hasOwnProperty
@@ -286,22 +286,22 @@ define("between", function (actual, lower, upper) {
 
 /* eslint-enable max-len */
 
-binary("deepEqual", deepEqual.strict, [
+binary("matchStrict", match.strict, [
     "Expected {actual} to deeply equal {expected}",
     "Expected {actual} to not deeply equal {expected}",
 ])
 
-binary("deepEqualLoose", deepEqual.loose, [
+binary("matchLoose", match.loose, [
     "Expected {actual} to loosely match {expected}",
     "Expected {actual} to not loosely match {expected}",
 ])
 
-binary("match", deepEqual.match, [
+binary("match", match.match, [
     "Expected {actual} to match {expected}",
     "Expected {actual} to not match {expected}",
 ])
 
-alias("matchLoose", "deepEqualLoose")
+alias("matchLoose", "matchLoose")
 alias("notMatchLoose", "notDeepEqualLoose")
 
 function has(name, _) { // eslint-disable-line max-len, max-params
@@ -698,24 +698,24 @@ defineIncludes("notIncludesLooseAll", includesLooseAll, true, "Expected {actual}
 defineIncludes("includesLooseAny", includesLooseAny, false, "Expected {actual} to loosely have any value in {values}")
 defineIncludes("notIncludesLoose", includesLooseAny, true, "Expected {actual} to not loosely have any value in {values}")
 
-var includesDeepAll = makeIncludes(true, deepEqual.strict)
-var includesDeepAny = makeIncludes(false, deepEqual.strict)
+var includesDeepAll = makeIncludes(true, match.strict)
+var includesDeepAny = makeIncludes(false, match.strict)
 
 defineIncludes("includesDeep", includesDeepAll, false, "Expected {actual} to match all values in {values}")
 defineIncludes("notIncludesDeepAll", includesDeepAll, true, "Expected {actual} to not match all values in {values}")
 defineIncludes("includesDeepAny", includesDeepAny, false, "Expected {actual} to match any value in {values}")
 defineIncludes("notIncludesDeep", includesDeepAny, true, "Expected {actual} to not match any value in {values}")
 
-var includesDeepLooseAll = makeIncludes(true, deepEqual.loose)
-var includesDeepLooseAny = makeIncludes(false, deepEqual.loose)
+var includesDeepLooseAll = makeIncludes(true, match.loose)
+var includesDeepLooseAny = makeIncludes(false, match.loose)
 
 defineIncludes("includesDeepLoose", includesDeepLooseAll, false, "Expected {actual} to loosely match all values in {values}")
 defineIncludes("notIncludesDeepLooseAll", includesDeepLooseAll, true, "Expected {actual} to not loosely match all values in {values}")
 defineIncludes("includesDeepLooseAny", includesDeepLooseAny, false, "Expected {actual} to loosely match any value in {values}")
 defineIncludes("notIncludesDeepLoose", includesDeepLooseAny, true, "Expected {actual} to not loosely match any value in {values}")
 
-var includesMatchDeepAll = makeIncludes(true, deepEqual.match)
-var includesMatchDeepAny = makeIncludes(false, deepEqual.match)
+var includesMatchDeepAll = makeIncludes(true, match.match)
+var includesMatchDeepAny = makeIncludes(false, match.match)
 
 defineIncludes("includesMatch", includesMatchDeepAll, false, "Expected {actual} to match all values in {values}")
 defineIncludes("notIncludesMatchAll", includesMatchDeepAll, true, "Expected {actual} to not match all values in {values}")
@@ -836,24 +836,24 @@ makeHasOverload("notHasLooseAllKeys", hasLooseAllKeys, true, "Expected {actual} 
 makeHasOverload("hasLooseAnyKeys", hasLooseAnyKeys, false, "Expected {actual} to loosely have any key in {keys}")
 makeHasOverload("notHasLooseKeys", hasLooseAnyKeys, true, "Expected {actual} to not loosely have any key in {keys}")
 
-var hasDeepAllKeys = hasKeysType(true, deepEqual.strict)
-var hasDeepAnyKeys = hasKeysType(false, deepEqual.strict)
+var hasDeepAllKeys = hasKeysType(true, match.strict)
+var hasDeepAnyKeys = hasKeysType(false, match.strict)
 
 makeHasKeys("hasDeepKeys", hasDeepAllKeys, false, "Expected {actual} to have all keys in {keys}")
 makeHasKeys("notHasDeepAllKeys", hasDeepAllKeys, true, "Expected {actual} to not have all keys in {keys}")
 makeHasKeys("hasDeepAnyKeys", hasDeepAnyKeys, false, "Expected {actual} to have any key in {keys}")
 makeHasKeys("notHasDeepKeys", hasDeepAnyKeys, true, "Expected {actual} to not have any key in {keys}")
 
-var hasDeepLooseAllKeys = hasKeysType(true, deepEqual.loose)
-var hasDeepLooseAnyKeys = hasKeysType(false, deepEqual.loose)
+var hasDeepLooseAllKeys = hasKeysType(true, match.loose)
+var hasDeepLooseAnyKeys = hasKeysType(false, match.loose)
 
 makeHasKeys("hasDeepLooseKeys", hasDeepLooseAllKeys, false, "Expected {actual} to loosely match all keys in {keys}")
 makeHasKeys("notHasDeepLooseAllKeys", hasDeepLooseAllKeys, true, "Expected {actual} to not loosely match all keys in {keys}")
 makeHasKeys("hasDeepLooseAnyKeys", hasDeepLooseAnyKeys, false, "Expected {actual} to loosely match any key in {keys}")
 makeHasKeys("notHasDeepLooseKeys", hasDeepLooseAnyKeys, true, "Expected {actual} to not loosely match any key in {keys}")
 
-var hasMatchAllKeys = hasKeysType(true, deepEqual.match)
-var hasMatchAnyKeys = hasKeysType(false, deepEqual.match)
+var hasMatchAllKeys = hasKeysType(true, match.match)
+var hasMatchAnyKeys = hasKeysType(false, match.match)
 
 makeHasKeys("hasMatchKeys", hasMatchAllKeys, false, "Expected {actual} to match all keys in {keys}")
 makeHasKeys("notHasMatchAllKeys", hasMatchAllKeys, true, "Expected {actual} to not match all keys in {keys}")

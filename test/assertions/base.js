@@ -159,26 +159,26 @@ describe("assertions (base)", function () { // eslint-disable-line max-len, max-
         t.notEqualLoose(0, 1)
     })
 
-    Util.basic("t.deepEqual()", function () {
-        t.deepEqual(0, 0)
-        t.deepEqual(1, 1)
-        t.deepEqual(null, null)
-        t.deepEqual(undefined, undefined)
-        t.deepEqual(Infinity, Infinity)
-        t.deepEqual(NaN, NaN)
-        t.deepEqual("", "")
-        t.deepEqual("foo", "foo")
+    Util.basic("t.matchStrict()", function () {
+        t.matchStrict(0, 0)
+        t.matchStrict(1, 1)
+        t.matchStrict(null, null)
+        t.matchStrict(undefined, undefined)
+        t.matchStrict(Infinity, Infinity)
+        t.matchStrict(NaN, NaN)
+        t.matchStrict("", "")
+        t.matchStrict("foo", "foo")
 
         var obj = {}
 
-        t.deepEqual(obj, obj)
+        t.matchStrict(obj, obj)
 
-        t.deepEqual({}, {})
-        Util.fail("deepEqual", null, undefined)
-        Util.fail("deepEqual", 0, 1)
-        Util.fail("deepEqual", 1, "1")
+        t.matchStrict({}, {})
+        Util.fail("matchStrict", null, undefined)
+        Util.fail("matchStrict", 0, 1)
+        Util.fail("matchStrict", 1, "1")
 
-        t.deepEqual(
+        t.matchStrict(
             {a: [2, 3], b: [4]},
             {a: [2, 3], b: [4]})
     })
@@ -207,26 +207,26 @@ describe("assertions (base)", function () { // eslint-disable-line max-len, max-
             {a: [2, 3], b: [4]})
     })
 
-    Util.basic("t.deepEqualLoose()", function () {
-        t.deepEqualLoose(0, 0)
-        t.deepEqualLoose(1, 1)
-        t.deepEqualLoose(null, null)
-        t.deepEqualLoose(undefined, undefined)
-        t.deepEqualLoose(Infinity, Infinity)
-        t.deepEqualLoose(NaN, NaN)
-        t.deepEqualLoose("", "")
-        t.deepEqualLoose("foo", "foo")
+    Util.basic("t.matchLoose()", function () {
+        t.matchLoose(0, 0)
+        t.matchLoose(1, 1)
+        t.matchLoose(null, null)
+        t.matchLoose(undefined, undefined)
+        t.matchLoose(Infinity, Infinity)
+        t.matchLoose(NaN, NaN)
+        t.matchLoose("", "")
+        t.matchLoose("foo", "foo")
 
         var obj = {}
 
-        t.deepEqualLoose(obj, obj)
+        t.matchLoose(obj, obj)
 
-        t.deepEqualLoose({}, {})
-        t.deepEqualLoose(null, undefined)
-        Util.fail("deepEqualLoose", 0, 1)
-        t.deepEqualLoose(1, "1")
+        t.matchLoose({}, {})
+        t.matchLoose(null, undefined)
+        Util.fail("matchLoose", 0, 1)
+        t.matchLoose(1, "1")
 
-        t.deepEqualLoose(
+        t.matchLoose(
             {a: [2, 3], b: [4]},
             {a: [2, 3], b: [4]})
     })

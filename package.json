@@ -10,9 +10,12 @@
     "postversion": "git push && git push --tags",
     "version": "git add thallium.js",
     "lint": "eslint . --cache && coffeelint . --cache",
-    "karma": "karma start --single-run --browsers Chrome",
-    "test": "npm run lint && mocha && npm run karma",
-    "watch": "chokidar --initial -i \"**/test-bundle.js\" \"{bin,fixtures,helpers,lib,r,scripts,test}/**/{.,}*.{js,coffee}\" \"{index,core,assertions}.js\" -c \"npm run test\""
+    "test": "npm run lint && npm run test:mocha && npm run test:karma",
+    "test:karma": "karma start --single-run --browsers Chrome",
+    "test:mocha": "mocha",
+    "watch": "chokidar --initial -i \"**/test-bundle.js\" \"{bin,fixtures,helpers,lib,r,scripts,test}/**/{.,}*.{js,coffee}\" \"{index,core,assertions}.js\" -c \"npm run test\"",
+    "watch:karma": "chokidar --initial -i \"**/test-bundle.js\" \"{bin,fixtures,helpers,lib,r,scripts,test}/**/{.,}*.{js,coffee}\" \"{index,core,assertions}.js\" -c \"npm run test:karma\"",
+    "watch:mocha": "chokidar --initial -i \"**/test-bundle.js\" \"{bin,fixtures,helpers,lib,r,scripts,test}/**/{.,}*.{js,coffee}\" \"{index,core,assertions}.js\" -c \"npm run test:mocha\""
   },
   "browser": {
     "./lib/replaced/is-buffer.js": "is-buffer",
