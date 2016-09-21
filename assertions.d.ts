@@ -81,15 +81,11 @@ export interface Assertions {
     equalLoose(a: any, b: any): this;
     notEqualLoose(a: any, b: any): this;
 
-    // Strict deep equal, taking into account types
-    matchStrict<T>(a: T, b: T): this;
+    // Strict deep equality, checking prototypes as well
+    deepEqual<T>(a: T, b: T): this;
     notDeepEqual<T>(a: T, b: T): this;
 
-    // Loose deep equal, ignoring types
-    matchLoose(a: Object, b: Object): this;
-    notDeepEqualLoose(a: Object, b: Object): this;
-
-    // matchStrict, but ignoring types
+    // Purely structural deep equality
     match<T>(a: T, b: T): this;
     notMatch<T>(a: T, b: T): this;
 
@@ -156,23 +152,11 @@ export interface Assertions {
     includesDeepAny<T>(array: T[], keys: T | T[]): this;
     notIncludesDeep<T>(array: T[], keys: T | T[]): this;
 
-    // loose deep equal
-    includesDeepLoose<T>(array: T[], keys: T | T[]): this;
-    notIncludesDeepLooseAll<T>(array: T[], keys: T | T[]): this;
-    includesDeepLooseAny<T>(array: T[], keys: T | T[]): this;
-    notIncludesDeepLoose<T>(array: T[], keys: T | T[]): this;
-
     // structural deep equal
     includesMatch<T>(array: T[], keys: T | T[]): this;
     notIncludesMatchAll<T>(array: T[], keys: T | T[]): this;
     includesMatchAny<T>(array: T[], keys: T | T[]): this;
     notIncludesMatch<T>(array: T[], keys: T | T[]): this;
-
-    // Alias for includesDeepLoose/etc.
-    includesMatchLoose<T>(array: T[], keys: T | T[]): this;
-    notIncludesMatchLooseAll<T>(array: T[], keys: T | T[]): this;
-    includesMatchLooseAny<T>(array: T[], keys: T | T[]): this;
-    notIncludesMatchLoose<T>(array: T[], keys: T | T[]): this;
 
     // match Object.keys(object) with list of keys
     // strict equal
@@ -206,23 +190,11 @@ export interface Assertions {
     hasDeepAnyKeys(object: Object, keys: Object): this;
     notHasDeepKeys(object: Object, keys: Object): this;
 
-    // loose deep equal
-    hasDeepLooseKeys(object: Object, keys: Object): this;
-    notHasDeepLooseAllKeys(object: Object, keys: Object): this;
-    hasDeepLooseAnyKeys(object: Object, keys: Object): this;
-    notHasDeepLooseKeys(object: Object, keys: Object): this;
-
     // structural deep equal
     hasMatchKeys(object: Object, keys: Object): this;
     notHasMatchAllKeys(object: Object, keys: Object): this;
     hasMatchAnyKeys(object: Object, keys: Object): this;
     notHasMatchKeys(object: Object, keys: Object): this;
-
-    // Aliases for hasDeepLooseKeys/etc.
-    hasMatchLooseKeys(object: Object, keys: Object): this;
-    notHasMatchLooseAllKeys(object: Object, keys: Object): this;
-    hasMatchLooseAnyKeys(object: Object, keys: Object): this;
-    notHasMatchLooseKeys(object: Object, keys: Object): this;
 }
 
 /**

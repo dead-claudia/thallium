@@ -1,100 +1,163 @@
 "use strict"
 
-/* global Map, Set, Buffer */
+/* global Map, Set */
+/* eslint-env node */
 
-// Note: updates to this should also be reflected in bench/match.js, so that
-// benchmark doesn't throw errors.
+var benchmark = require("benchmark")
+var match = require("../lib/match.js")
 
-describe.only("assertions (match)", function () { // eslint-disable-line max-statements, max-len
-    function check(name, a, b, opts) {
-        function m(key) {
-            return opts[key] ? key : "not" + key[0].toUpperCase() + key.slice(1)
+// Note: updates to this should also be reflected in test/assertions/match.js,
+// so this doesn't throw errors.
+
+function run(init) {
+    function loop(list) {
+        var end = list.length
+
+        for (var count = 0; count < 1000; count++) {
+            for (var i = 0; i < end; i++) (0, list[i])()
+        }
+    }
+
+    if (process.argv[2] !== "prof") {
+        var suite = new benchmark.Suite("match")
+
+        init(suite)
+
+        process.stderr.write("\nPriming with 2000 iterations\n")
+        var end = suite.length
+
+        for (var count = 0; count < 2000; count++) {
+            for (var i = 0; i < end; i++) (0, suite[i].fn)()
         }
 
-        it(name, function () {
-            t[m("deepEqual")](a, b)
-            t[m("match")](a, b)
+        suite.on("cycle", function (event) {
+            console.log(event.target + "")
+        })
+
+        suite.run()
+    } else {
+        var funcs = []
+
+        init({add: function (_, func) { funcs.push(func) }})
+
+        process.stderr.write("\nPriming with 1000 iterations\n")
+        loop(funcs)
+
+        process.stderr.write("Running with 1000 iterations\n")
+        loop(funcs)
+    }
+}
+
+run(function (suite) { // eslint-disable-line max-statements
+    function check(name, a, b, opts) {
+        xcheck(name, a, b, opts)
+
+        suite.add(name, function () {
+            var localA = a
+            var localB = b
+
+            match.strict(localA, localB)
+            match.match(localA, localB)
         })
     }
 
-    it("exists", function () {
-        t.function(t.match)
-        t.function(t.notMatch)
-        t.function(t.deepEqual)
-        t.function(t.notDeepEqual)
-    })
+    function xcheck(name, a, b, opts) {
+        if (typeof name !== "string") {
+            throw new TypeError("`name` must be a string")
+        }
+
+        if (opts == null) {
+            throw new TypeError("`opts` must be an object")
+        }
+
+        if (typeof opts.match !== "boolean") {
+            throw new TypeError("`opts.match` must be a boolean")
+        }
+
+        if (typeof opts.strict !== "boolean") {
+            throw new TypeError("`opts.strict` must be a boolean")
+        }
+
+        if (match.strict(a, b) !== opts.strict) {
+            throw new Error(name + " failed - please fix strict")
+        }
+
+        if (match.match(a, b) !== opts.match) {
+            throw new Error(name + " failed - please fix match")
+        }
+    }
 
     var obj1 = {}
 
-    check("identical", obj1, obj1, {deepEqual: true, match: true})
+    check("identical", obj1, obj1, {strict: true, match: true})
 
     check("equal",
         {a: [2, 3], b: [4]},
         {a: [2, 3], b: [4]},
-        {deepEqual: true, match: true})
+        {strict: true, match: true})
 
     check("not equal",
         {x: 5, y: [6]},
         {x: 5, y: 6},
-        {deepEqual: false, match: false})
+        {strict: false, match: false})
 
     check("nested nulls",
         [null, null, null],
         [null, null, null],
-        {deepEqual: true, match: true})
+        {strict: true, match: true})
 
-    check("loosely equal",
+    check("strict equal",
         [{a: 3}, {b: 4}],
         [{a: "3"}, {b: "4"}],
-        {deepEqual: false, match: false})
+        {strict: false, match: false})
 
     check("same numbers", 3, 3, {
-        deepEqual: true,
+        strict: true,
         match: true,
     })
 
     check("different numbers", 1, 3, {
-        deepEqual: false,
+        strict: false,
         match: false,
     })
 
     check("same strings", "beep", "beep", {
-        deepEqual: true,
+        strict: true,
         match: true,
     })
 
     check("different strings", "beep", "beep", {
-        deepEqual: true,
+        strict: true,
         match: true,
     })
 
     check("string + number", "3", 3, {
-        deepEqual: false,
+        strict: false,
         match: false,
     })
 
     check("number + string", 3, "3", {
-        deepEqual: false,
+        strict: false,
         match: false,
     })
 
     check("different string + number", "3", 5, {
-        deepEqual: false,
+        strict: false,
         match: false,
     })
 
     check("different number + string", 3, "5", {
-        deepEqual: false,
+        strict: false,
         match: false,
     })
 
     check("string + [number]", "3", [3], {
-        deepEqual: false,
+        strict: false,
         match: false,
     })
 
     check("number + [string]", 3, ["3"], {
-        deepEqual: false,
+        strict: false,
         match: false,
     })
 
@@ -103,67 +166,67 @@ describe.only("assertions (match)", function () { // eslint-disable-line max-sta
     check("same arguments",
         toArgs(1, 2, 3),
         toArgs(1, 2, 3),
-        {deepEqual: true, match: true})
+        {strict: true, match: true})
 
     check("different arguments",
         toArgs(1, 2, 3),
         toArgs(3, 2, 1),
-        {deepEqual: false, match: false})
+        {strict: false, match: false})
 
     check("similar arguments + array",
         toArgs(1, 2, 3),
         [1, 2, 3],
-        {deepEqual: false, match: false})
+        {strict: false, match: false})
 
     check("similar array + arguments",
         [1, 2, 3],
         toArgs(1, 2, 3),
-        {deepEqual: false, match: false})
+        {strict: false, match: false})
 
     check("same date",
         new Date("Fri Dec 20 2013 16:21:18 GMT-0800 (PST)"),
         new Date("Fri Dec 20 2013 16:21:18 GMT-0800 (PST)"),
-        {deepEqual: true, match: true})
+        {strict: true, match: true})
 
     check("different date",
         new Date("Thu, 01 Jan 1970 00:00:00 GMT"),
         new Date("Fri Dec 20 2013 16:21:18 GMT-0800 (PST)"),
-        {deepEqual: false, match: false})
+        {strict: false, match: false})
 
     if (typeof Buffer === "function") {
         check("same buffers", new Buffer("xyz"), new Buffer("xyz"), {
-            deepEqual: true,
+            strict: true,
             match: true,
         })
 
         check("different buffers", new Buffer("abc"), new Buffer("xyz"), {
-            deepEqual: false,
+            strict: false,
             match: false,
         })
     }
 
     check("boolean + array", true, [], {
-        deepEqual: false,
+        strict: false,
         match: false,
     })
 
     check("both null", null, null, {
-        deepEqual: true,
+        strict: true,
         match: true,
     })
 
     check("both undefined", undefined, undefined, {
-        deepEqual: true,
+        strict: true,
         match: true,
     })
 
     check("null + undefined", null, undefined, {
-        deepEqual: false,
+        strict: false,
         match: false,
     })
 
     check("undefined + null", undefined, null, {
-        deepEqual: false,
+        strict: false,
         match: false,
     })
 
@@ -171,37 +234,37 @@ describe.only("assertions (match)", function () { // eslint-disable-line max-sta
     function B() { this.prop = 1 }
 
     check("same prototypes", new A(), new A(), {
-        deepEqual: true,
+        strict: true,
         match: true,
     })
 
     check("different prototypes", new A(), new B(), {
-        deepEqual: false,
+        strict: false,
         match: true,
     })
 
     check("object + string", "foo", {bar: 1}, {
-        deepEqual: false,
+        strict: false,
         match: false,
     })
 
     check("string + object", {foo: 1}, "bar", {
-        deepEqual: false,
+        strict: false,
         match: false,
     })
 
     check("same strings", "foo", "foo", {
-        deepEqual: true,
+        strict: true,
         match: true,
     })
 
     check("different strings", "foo", "bar", {
-        deepEqual: false,
+        strict: false,
         match: false,
     })
 
     check("differing keys", {a: 1, b: 2}, {b: 1, c: 2}, {
-        deepEqual: false,
+        strict: false,
         match: false,
     })
 
@@ -209,17 +272,17 @@ describe.only("assertions (match)", function () { // eslint-disable-line max-sta
         var symbol = Symbol("foo") // eslint-disable-line no-undef
 
         check("same symbols", symbol, symbol, {
-            deepEqual: true,
+            strict: true,
             match: true,
         })
 
         check("similar symbols", Symbol("foo"), Symbol("foo"), { // eslint-disable-line no-undef, max-len
-            deepEqual: false,
+            strict: false,
             match: true,
         })
 
         check("different symbols", Symbol("foo"), Symbol("bar"), { // eslint-disable-line no-undef, max-len
-            deepEqual: false,
+            strict: false,
             match: false,
         })
     }
@@ -267,143 +330,143 @@ describe.only("assertions (match)", function () { // eslint-disable-line max-sta
 
     if (typeof Map === "function" && typeof Set === "function") {
         check("empty maps", new Map(), new Map(), {
-            deepEqual: true,
+            strict: true,
             match: true,
         })
 
         check("maps with same primitive keys",
             new Map([["foo", "bar"]]),
             new Map([["foo", "bar"]]),
-            {deepEqual: true, match: true})
+            {strict: true, match: true})
 
         check("maps with different primitive keys",
             new Map([["foo", "bar"]]),
             new Map([["bar", "bar"]]),
-            {deepEqual: false, match: false})
+            {strict: false, match: false})
 
         check("maps with different primitive values",
             new Map([["foo", "bar"]]),
             new Map([["foo", "foo"]]),
-            {deepEqual: false, match: false})
+            {strict: false, match: false})
 
         check("maps with different primitive both",
             new Map([["foo", "bar"]]),
             new Map([["bar", "foo"]]),
-            {deepEqual: false, match: false})
+            {strict: false, match: false})
 
         check("maps with loosely same primitive key",
             new Map([[1, "foo"]]),
             new Map([["1", "foo"]]),
-            {deepEqual: false, match: false})
+            {strict: false, match: false})
 
         check("maps with loosely same primitive value",
             new Map([["foo", 1]]),
             new Map([["foo", "1"]]),
-            {deepEqual: false, match: false})
+            {strict: false, match: false})
 
         check("maps with loosely same primitive both",
             new Map([["1", 1]]),
             new Map([[1, "1"]]),
-            {deepEqual: false, match: false})
+            {strict: false, match: false})
 
         check("maps with many same primitive keys",
             new Map([["foo", "bar"], ["bar", 1], [1, 2], [true, 3]]),
             new Map([["foo", "bar"], ["bar", 1], [1, 2], [true, 3]]),
-            {deepEqual: true, match: true})
+            {strict: true, match: true})
 
         check("maps with many different primitive keys",
             new Map([["foo", "bar"], ["bar", 1], [1, 2], [true, 3]]),
             new Map([["foo", "bar"], ["bar", 2], ["15", 2], [false, 4]]),
-            {deepEqual: false, match: false})
+            {strict: false, match: false})
 
         var mapObj = {foo: "bar"}
 
         check("maps with identical keys",
             new Map([[mapObj, "bar"]]),
             new Map([[mapObj, "bar"]]),
-            {deepEqual: true, match: true})
+            {strict: true, match: true})
 
         check("maps with structurally similar keys",
             new Map([[{foo: "bar"}, "bar"]]),
             new Map([[{foo: "bar"}, "bar"]]),
-            {deepEqual: true, match: true})
+            {strict: true, match: true})
 
         check("maps with structurally different keys",
             new Map([[{foo: "bar"}, "bar"]]),
             new Map([[{bar: "foo"}, "bar"]]),
-            {deepEqual: false, match: false})
+            {strict: false, match: false})
 
         check("maps with structurally similar values",
             new Map([["bar", {foo: "bar"}]]),
             new Map([["bar", {foo: "bar"}]]),
-            {deepEqual: true, match: true})
+            {strict: true, match: true})
 
         check("maps with structurally different values",
             new Map([["bar", {foo: "bar"}]]),
             new Map([["bar", {bar: "foo"}]]),
-            {deepEqual: false, match: false})
+            {strict: false, match: false})
 
         check("maps with structurally similar both",
             new Map([[{foo: "bar"}, {foo: "bar"}]]),
             new Map([[{foo: "bar"}, {foo: "bar"}]]),
-            {deepEqual: true, match: true})
+            {strict: true, match: true})
 
         check("maps with structurally different both",
             new Map([[{foo: "bar"}, {foo: "bar"}]]),
             new Map([[{bar: "foo"}, {bar: "foo"}]]),
-            {deepEqual: false, match: false})
+            {strict: false, match: false})
 
         check("maps with inner functions",
             new Map([[{foo: "bar", bar: bar}, {foo: "bar", bar: bar}]]),
             new Map([[{foo: "bar", bar: bar}, {foo: "bar", bar: bar}]]),
-            {deepEqual: true, match: true})
+            {strict: true, match: true})
 
         check("empty sets", new Set(), new Set(), {
-            deepEqual: true,
+            strict: true,
             match: true,
         })
 
         check("sets with same primitive values",
             new Set(["foo", "bar"]),
             new Set(["foo", "bar"]),
-            {deepEqual: true, match: true})
+            {strict: true, match: true})
 
         check("sets with different primitive values",
             new Set(["foo", "bar"]),
             new Set(["bar", "bar"]),
-            {deepEqual: false, match: false})
+            {strict: false, match: false})
 
         check("sets with loosely same primitive value",
             new Set([1, "foo"]),
             new Set(["1", "foo"]),
-            {deepEqual: false, match: false})
+            {strict: false, match: false})
 
         check("sets with many same primitive values",
             new Set(["foo", "bar", "bar", 1, 1, 2, true, 3]),
             new Set(["foo", "bar", "bar", 1, 1, 2, true, 3]),
-            {deepEqual: true, match: true})
+            {strict: true, match: true})
 
         check("sets with many different primitive values",
             new Set(["foo", "bar", "bar", 1, 1, 2, true, 3]),
             new Set(["foo", "bar", "bar", 2, "15", 2, false, 4]),
-            {deepEqual: false, match: false})
+            {strict: false, match: false})
 
         var setObj = {foo: "bar"}
 
         check("sets with identical values",
             new Set([setObj, "bar"]),
             new Set([setObj, "bar"]),
-            {deepEqual: true, match: true})
+            {strict: true, match: true})
 
         check("sets with structurally similar values",
             new Set([{foo: "bar"}, "bar"]),
             new Set([{foo: "bar"}, "bar"]),
-            {deepEqual: true, match: true})
+            {strict: true, match: true})
 
         check("sets with structurally different values",
             new Set([{foo: "bar"}, "bar"]),
             new Set([{bar: "foo"}, "bar"]),
-            {deepEqual: false, match: false})
+            {strict: false, match: false})
 
         // Derived from a previously failing test
         /* eslint-disable max-len */
@@ -423,7 +486,7 @@ describe.only("assertions (match)", function () { // eslint-disable-line max-sta
             [".coffee", register(".coffee", ["coffee-script/register", "coffee-script"], load, false)],
             [0, simple("./util/env.my-shell", load)],
         ]),
-        {deepEqual: true, match: true})
+        {strict: true, match: true})
 
         check("really complex maps with classes",
         new Map([
@@ -440,7 +503,7 @@ describe.only("assertions (match)", function () { // eslint-disable-line max-sta
             [".coffee", new Register(".coffee", ["coffee-script/register", "coffee-script"], load, false)],
             [0, new Simple("./util/env.my-shell", load)],
         ]),
-        {deepEqual: true, match: true})
+        {strict: true, match: true})
 
         var map1 = new Map()
         var map2 = new Map()
@@ -449,7 +512,7 @@ describe.only("assertions (match)", function () { // eslint-disable-line max-sta
         map2.set("foo", map2)
 
         check("maps with circular references", map1, map2, {
-            deepEqual: true,
+            strict: true,
             match: true,
         })
 
@@ -468,7 +531,7 @@ describe.only("assertions (match)", function () { // eslint-disable-line max-sta
             [".coffee", register(".coffee", ["coffee-script/register", "coffee-script"], load, false)],
             [0, simple("./util/env.my-shell", load)],
         ]),
-        {deepEqual: true, match: true})
+        {strict: true, match: true})
 
         check("complex sets with differently ordered primitive + class",
         new Set([
@@ -485,7 +548,7 @@ describe.only("assertions (match)", function () { // eslint-disable-line max-sta
             [".coffee", new Register(".coffee", ["coffee-script/register", "coffee-script"], load, false)],
             [0, new Simple("./util/env.my-shell", load)],
         ]),
-        {deepEqual: true, match: true})
+        {strict: true, match: true})
 
         check("complex sets with differently ordered object + object",
         new Set([
@@ -502,7 +565,7 @@ describe.only("assertions (match)", function () { // eslint-disable-line max-sta
             [{ext: ".coffee"}, register(".coffee", ["coffee-script/register", "coffee-script"], load, false)],
             [{id: 0}, simple("./util/env.my-shell", load)],
         ]),
-        {deepEqual: true, match: true})
+        {strict: true, match: true})
 
         check("complex sets with differently ordered object + class",
         new Set([
@@ -519,7 +582,7 @@ describe.only("assertions (match)", function () { // eslint-disable-line max-sta
             [{ext: ".coffee"}, new Register(".coffee", ["coffee-script/register", "coffee-script"], load, false)],
             [{id: 0}, new Simple("./util/env.my-shell", load)],
         ]),
-        {deepEqual: true, match: true})
+        {strict: true, match: true})
 
         check("complex sets with differently ordered class + object",
         new Set([
@@ -536,7 +599,7 @@ describe.only("assertions (match)", function () { // eslint-disable-line max-sta
             [new Ext(".coffee"), register(".coffee", ["coffee-script/register", "coffee-script"], load, false)],
             [new Id(0), simple("./util/env.my-shell", load)],
         ]),
-        {deepEqual: true, match: true})
+        {strict: true, match: true})
 
         check("complex sets with differently ordered class + class",
         new Set([
@@ -553,7 +616,7 @@ describe.only("assertions (match)", function () { // eslint-disable-line max-sta
             [new Ext(".coffee"), new Register(".coffee", ["coffee-script/register", "coffee-script"], load, false)],
             [new Id(0), new Simple("./util/env.my-shell", load)],
         ]),
-        {deepEqual: true, match: true})
+        {strict: true, match: true})
 
         var set1 = new Set()
         var set2 = new Set()
@@ -562,7 +625,7 @@ describe.only("assertions (match)", function () { // eslint-disable-line max-sta
         set2.add(set2)
 
         check("sets with circular references", set1, set2, {
-            deepEqual: true,
+            strict: true,
             match: true,
         })
 
@@ -572,12 +635,12 @@ describe.only("assertions (match)", function () { // eslint-disable-line max-sta
     function f() {}
 
     check("same functions", f, f, {
-        deepEqual: true,
+        strict: true,
         match: true,
     })
 
     check("different functions", function () {}, function () {}, {
-        deepEqual: false,
+        strict: false,
         match: false,
     })
 
@@ -590,32 +653,32 @@ describe.only("assertions (match)", function () { // eslint-disable-line max-sta
     circular3.b = circular3
 
     check("circular reference match", circular1, circular2, {
-        deepEqual: true,
+        strict: true,
         match: true,
     })
 
     check("circular references don't match", circular1, circular3, {
-        deepEqual: false,
+        strict: false,
         match: false,
     })
 
     check("one circular", circular1, {foo: 1, a: {}}, {
-        deepEqual: false,
+        strict: false,
         match: false,
     })
 
     check("regexps match", /foo/gim, /foo/mig, {
-        deepEqual: true,
+        strict: true,
         match: true,
     })
 
     check("regexp source doesn't match", /foo/gim, /bar/mig, {
-        deepEqual: false,
+        strict: false,
         match: false,
     })
 
     check("regexp flags don't match", /foo/gi, /foo/gim, {
-        deepEqual: false,
+        strict: false,
         match: false,
     })
 })

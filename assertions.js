@@ -286,23 +286,15 @@ define("between", function (actual, lower, upper) {
 
 /* eslint-enable max-len */
 
-binary("matchStrict", match.strict, [
+binary("deepEqual", match.strict, [
     "Expected {actual} to deeply equal {expected}",
     "Expected {actual} to not deeply equal {expected}",
-])
-
-binary("matchLoose", match.loose, [
-    "Expected {actual} to loosely match {expected}",
-    "Expected {actual} to not loosely match {expected}",
 ])
 
 binary("match", match.match, [
     "Expected {actual} to match {expected}",
     "Expected {actual} to not match {expected}",
 ])
-
-alias("matchLoose", "matchLoose")
-alias("notMatchLoose", "notDeepEqualLoose")
 
 function has(name, _) { // eslint-disable-line max-len, max-params
     if (_.equals === Util.looseIs) {
@@ -605,10 +597,10 @@ define("notCloseTo", function (actual, expected, delta) {
  *
  * Here's the top level:
  *
- * - strict includes
- * - loose includes
- * - strict deep includes
- * - loose deep includes
+ * - strict shallow
+ * - loose shallow
+ * - strict deep
+ * - structural deep
  *
  * And the second level:
  *
@@ -619,12 +611,12 @@ define("notCloseTo", function (actual, expected, delta) {
  *
  * Here's an example using the naming scheme for `hasKeys`, etc.
  *
- *               | strict shallow  |    loose shallow     |     strict deep     |       loose deep
+ *               | strict shallow  |    loose shallow     |     strict deep     |     structural deep
  * --------------|-----------------|----------------------|---------------------|-------------------------
- * includes all  | `hasKeys`       | `hasLooseKeys`       | `hasDeepKeys`       | `hasDeepLooseKeys`
- * includes some | `hasAnyKeys`    | `hasLooseAnyKeys`    | `hasDeepAnyKeys`    | `hasDeepLooseKeys`
- * missing some  | `notHasAllKeys` | `notHasLooseAllKeys` | `notHasDeepAllKeys` | `notHasLooseDeepAllKeys`
- * missing all   | `notHasKeys`    | `notHasLooseKeys`    | `notHasDeepKeys`    | `notHasLooseDeepKeys`
+ * includes all  | `hasKeys`       | `hasLooseKeys`       | `hasDeepKeys`       | `hasMatchKeys`
+ * includes some | `hasAnyKeys`    | `hasLooseAnyKeys`    | `hasDeepAnyKeys`    | `hasMatchKeys`
+ * missing some  | `notHasAllKeys` | `notHasLooseAllKeys` | `notHasDeepAllKeys` | `notHasMatchAllKeys`
+ * missing all   | `notHasKeys`    | `notHasLooseKeys`    | `notHasDeepKeys`    | `notHasMatchKeys`
  *
  * Note that the `hasKeys` shallow comparison variants are also overloaded to
  * consume either an array (in which it simply checks against a list of keys) or
@@ -705,14 +697,6 @@ defineIncludes("includesDeep", includesDeepAll, false, "Expected {actual} to mat
 defineIncludes("notIncludesDeepAll", includesDeepAll, true, "Expected {actual} to not match all values in {values}")
 defineIncludes("includesDeepAny", includesDeepAny, false, "Expected {actual} to match any value in {values}")
 defineIncludes("notIncludesDeep", includesDeepAny, true, "Expected {actual} to not match any value in {values}")
-
-var includesDeepLooseAll = makeIncludes(true, match.loose)
-var includesDeepLooseAny = makeIncludes(false, match.loose)
-
-defineIncludes("includesDeepLoose", includesDeepLooseAll, false, "Expected {actual} to loosely match all values in {values}")
-defineIncludes("notIncludesDeepLooseAll", includesDeepLooseAll, true, "Expected {actual} to not loosely match all values in {values}")
-defineIncludes("includesDeepLooseAny", includesDeepLooseAny, false, "Expected {actual} to loosely match any value in {values}")
-defineIncludes("notIncludesDeepLoose", includesDeepLooseAny, true, "Expected {actual} to not loosely match any value in {values}")
 
 var includesMatchDeepAll = makeIncludes(true, match.match)
 var includesMatchDeepAny = makeIncludes(false, match.match)
@@ -843,14 +827,6 @@ makeHasKeys("hasDeepKeys", hasDeepAllKeys, false, "Expected {actual} to have all
 makeHasKeys("notHasDeepAllKeys", hasDeepAllKeys, true, "Expected {actual} to not have all keys in {keys}")
 makeHasKeys("hasDeepAnyKeys", hasDeepAnyKeys, false, "Expected {actual} to have any key in {keys}")
 makeHasKeys("notHasDeepKeys", hasDeepAnyKeys, true, "Expected {actual} to not have any key in {keys}")
-
-var hasDeepLooseAllKeys = hasKeysType(true, match.loose)
-var hasDeepLooseAnyKeys = hasKeysType(false, match.loose)
-
-makeHasKeys("hasDeepLooseKeys", hasDeepLooseAllKeys, false, "Expected {actual} to loosely match all keys in {keys}")
-makeHasKeys("notHasDeepLooseAllKeys", hasDeepLooseAllKeys, true, "Expected {actual} to not loosely match all keys in {keys}")
-makeHasKeys("hasDeepLooseAnyKeys", hasDeepLooseAnyKeys, false, "Expected {actual} to loosely match any key in {keys}")
-makeHasKeys("notHasDeepLooseKeys", hasDeepLooseAnyKeys, true, "Expected {actual} to not loosely match any key in {keys}")
 
 var hasMatchAllKeys = hasKeysType(true, match.match)
 var hasMatchAnyKeys = hasKeysType(false, match.match)

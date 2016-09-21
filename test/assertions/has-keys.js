@@ -155,7 +155,7 @@ describe("assertions (has keys)", function () {
             })
 
             it("is strict", function () {
-                run(opts.invert ^ opts.loose,
+                run(opts.invert,
                     {foo: "1", bar: 2, baz: 3},
                     {foo: 1})
             })
@@ -215,6 +215,13 @@ describe("assertions (has keys)", function () {
                     {foo: {foo: 1}, bar: {bar: 2}, baz: {}},
                     {quux: [], foo: {foo: 1}})
             })
+
+            it("checks structurally", function () {
+                function A() { this.foo = 1 }
+                function B() { this.foo = 1 }
+
+                run(opts.invert ^ opts.match, new A(), new B())
+            })
         })
     }
 
@@ -222,8 +229,8 @@ describe("assertions (has keys)", function () {
     deep("notHasDeepAllKeys", {invert: true, all: true})
     deep("hasDeepAnyKeys", {})
     deep("notHasDeepKeys", {invert: true})
-    deep("hasDeepLooseKeys", {loose: true, all: true})
-    deep("notHasDeepLooseAllKeys", {loose: true, invert: true, all: true})
-    deep("hasDeepLooseAnyKeys", {loose: true})
-    deep("notHasDeepLooseKeys", {loose: true, invert: true})
+    deep("hasMatchKeys", {match: true, all: true})
+    deep("notHasMatchAllKeys", {match: true, invert: true, all: true})
+    deep("hasMatchAnyKeys", {match: true})
+    deep("notHasMatchKeys", {match: true, invert: true})
 })
