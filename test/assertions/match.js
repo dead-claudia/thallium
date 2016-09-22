@@ -5,7 +5,7 @@
 // Note: updates to this should also be reflected in bench/match.js, so that
 // benchmark doesn't throw errors.
 
-describe.only("assertions (match)", function () { // eslint-disable-line max-statements, max-len
+describe("assertions (match)", function () { // eslint-disable-line max-statements, max-len
     function check(name, a, b, opts) {
         function m(key) {
             return opts[key] ? key : "not" + key[0].toUpperCase() + key.slice(1)
