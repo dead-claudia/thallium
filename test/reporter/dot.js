@@ -45,7 +45,7 @@ describe("reporter dot", function () {
                 this._acc = ""
             }
 
-            var lines = line.split("\n")
+            var lines = line.split(/\r?\n/g)
 
             // So lines are printed consistently.
             for (var i = 0; i < lines.length; i++) {
@@ -56,7 +56,7 @@ describe("reporter dot", function () {
         },
 
         write: function (str) {
-            var index = str.indexOf("\n")
+            var index = str.search(/\r?\n/g)
 
             if (index < 0) {
                 this._acc += str
@@ -65,7 +65,8 @@ describe("reporter dot", function () {
 
             this._list.push(this._acc + str.slice(0, index))
 
-            var lines = str.slice(index + 1).split("\n")
+            var lines = str.slice(index + (str[index] === "\r" ? 2 : 1))
+                .split(/\r?\n/g)
 
             this._acc = lines.pop()
 
@@ -393,7 +394,7 @@ describe("reporter dot", function () {
             }
 
             return {
-                stack: stack.join("\n"),
+                stack: stack.join(Util.R.newline),
                 parts: parts,
             }
         })()

@@ -9,10 +9,14 @@
 var path = require("path")
 var cp = require("child_process")
 var fixture = require("../../scripts/cli.js").fixture
+var newline = require("os").EOL
 
 describe("cli end-to-end (FLAKE)", function () {
     function formatList(msgs) {
-        return msgs.replace(/\r?\n/g, "\n").replace(/\n{2,}/g, "\n").trim()
+        return msgs
+            .replace(/\r?\n/g, newline)
+            .replace(/\n{2,}/g, newline)
+            .trim()
     }
 
     var binary = path.resolve(__dirname, "../../bin/thallium.js")
@@ -23,8 +27,6 @@ describe("cli end-to-end (FLAKE)", function () {
             this.timeout(opts.timeout)
 
             if (Array.isArray(opts.messages)) {
-                var newline = process.platform === "win32" ? "\r\n" : "\n"
-
                 opts.messages = opts.messages.join(newline)
             }
 

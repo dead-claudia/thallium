@@ -5,6 +5,7 @@
 
 var benchmark = require("benchmark")
 var match = require("../lib/match.js")
+var newline = require("os").EOL
 
 // Note: updates to this should also be reflected in test/assertions/match.js,
 // so this doesn't throw errors.
@@ -25,7 +26,7 @@ function run(init) {
 
         // Prime the matcher functions with all the different benchmarks, so
         // they are optimized with a diverse set of values.
-        process.stderr.write("\nPriming with 2000 iterations\n")
+        process.stderr.write(newline + "Priming with 2000 iterations" + newline)
         var end = suite.length
 
         for (var count = 0; count < 2000; count++) {
@@ -42,10 +43,10 @@ function run(init) {
 
         init({add: function (_, func) { funcs.push(func) }})
 
-        process.stderr.write("\nPriming with 1000 iterations\n")
+        process.stderr.write(newline + "Priming with 1000 iterations" + newline)
         loop(funcs)
 
-        process.stderr.write("Running with 1000 iterations\n")
+        process.stderr.write("Running with 1000 iterations" + newline)
         loop(funcs)
     }
 }

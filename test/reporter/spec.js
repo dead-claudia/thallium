@@ -361,7 +361,7 @@ describe("reporter spec", function () {
             }
 
             return {
-                stack: stack.join("\n"),
+                stack: stack.join(Util.R.newline),
                 parts: parts,
             }
         })()

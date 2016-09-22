@@ -21,7 +21,7 @@ function help(value) {
     console.log()
     console.log(
         process.platform === "win32"
-            ? text.replace(/\n/g, "\r\n")
+            ? text.replace("\n", "\r\n")
             : text)
 }
 
