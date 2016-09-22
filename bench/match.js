@@ -23,6 +23,8 @@ function run(init) {
 
         init(suite)
 
+        // Prime the matcher functions with all the different benchmarks, so
+        // they are optimized with a diverse set of values.
         process.stderr.write("\nPriming with 2000 iterations\n")
         var end = suite.length
 
@@ -328,7 +330,7 @@ run(function (suite) { // eslint-disable-line max-statements
         this.id = id
     }
 
-    if (typeof Map === "function" && typeof Set === "function") {
+    if (typeof Map === "function") {
         check("empty maps", new Map(), new Map(), {
             strict: true,
             match: true,
@@ -420,7 +422,9 @@ run(function (suite) { // eslint-disable-line max-statements
             new Map([[{foo: "bar", bar: bar}, {foo: "bar", bar: bar}]]),
             new Map([[{foo: "bar", bar: bar}, {foo: "bar", bar: bar}]]),
             {strict: true, match: true})
+    }
 
+    if (typeof Set === "function") {
         check("empty sets", new Set(), new Set(), {
             strict: true,
             match: true,
@@ -467,7 +471,9 @@ run(function (suite) { // eslint-disable-line max-statements
             new Set([{foo: "bar"}, "bar"]),
             new Set([{bar: "foo"}, "bar"]),
             {strict: false, match: false})
+    }
 
+    if (typeof Map === "function") {
         // Derived from a previously failing test
         /* eslint-disable max-len */
 
@@ -515,7 +521,9 @@ run(function (suite) { // eslint-disable-line max-statements
             strict: true,
             match: true,
         })
+    }
 
+    if (typeof Set === "function") {
         check("complex sets with differently ordered primitive + object",
         new Set([
             [".my-shell", register(".my-shell", "@company/my-shell/register", load, true)],
