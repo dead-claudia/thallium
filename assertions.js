@@ -94,12 +94,6 @@ function define(name, callback) {
     methods.push({name: name, callback: callback})
 }
 
-function alias(name, original) {
-    check(name, "name", "string")
-    check(original, "original", "string")
-    aliases.push({name: name, original: original})
-}
-
 // Much easier to type
 function negate(name) {
     check(name, "name", "string")
@@ -698,18 +692,13 @@ defineIncludes("notIncludesDeepAll", includesDeepAll, true, "Expected {actual} t
 defineIncludes("includesDeepAny", includesDeepAny, false, "Expected {actual} to match any value in {values}")
 defineIncludes("notIncludesDeep", includesDeepAny, true, "Expected {actual} to not match any value in {values}")
 
-var includesMatchDeepAll = makeIncludes(true, match.match)
-var includesMatchDeepAny = makeIncludes(false, match.match)
+var includesMatchAll = makeIncludes(true, match.match)
+var includesMatchAny = makeIncludes(false, match.match)
 
-defineIncludes("includesMatch", includesMatchDeepAll, false, "Expected {actual} to match all values in {values}")
-defineIncludes("notIncludesMatchAll", includesMatchDeepAll, true, "Expected {actual} to not match all values in {values}")
-defineIncludes("includesMatchAny", includesMatchDeepAny, false, "Expected {actual} to match any value in {values}")
-defineIncludes("notIncludesMatch", includesMatchDeepAny, true, "Expected {actual} to not match any value in {values}")
-
-alias("includesMatchLoose", "includesDeepLoose")
-alias("notIncludesMatchLooseAll", "notIncludesDeepLooseAll")
-alias("includesMatchLooseAny", "includesDeepLooseAny")
-alias("notIncludesMatchLoose", "notIncludesDeepLoose")
+defineIncludes("includesMatch", includesMatchAll, false, "Expected {actual} to match all values in {values}")
+defineIncludes("notIncludesMatchAll", includesMatchAll, true, "Expected {actual} to not match all values in {values}")
+defineIncludes("includesMatchAny", includesMatchAny, false, "Expected {actual} to match any value in {values}")
+defineIncludes("notIncludesMatch", includesMatchAny, true, "Expected {actual} to not match any value in {values}")
 
 /* eslint-enable max-len */
 
@@ -835,8 +824,3 @@ makeHasKeys("hasMatchKeys", hasMatchAllKeys, false, "Expected {actual} to match 
 makeHasKeys("notHasMatchAllKeys", hasMatchAllKeys, true, "Expected {actual} to not match all keys in {keys}")
 makeHasKeys("hasMatchAnyKeys", hasMatchAnyKeys, false, "Expected {actual} to match any key in {keys}")
 makeHasKeys("notHasMatchKeys", hasMatchAnyKeys, true, "Expected {actual} to not match any key in {keys}")
-
-alias("hasMatchLooseKeys", "hasDeepLooseKeys")
-alias("notHasMatchLooseAllKeys", "notHasDeepLooseAllKeys")
-alias("hasMatchLooseAnyKeys", "hasDeepLooseAnyKeys")
-alias("notHasMatchLooseKeys", "notHasDeepLooseKeys")

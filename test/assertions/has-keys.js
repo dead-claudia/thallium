@@ -1,13 +1,6 @@
 "use strict"
 
 describe("assertions (has keys)", function () {
-    it("correct aliases", function () {
-        t.equal(t.hasMatchLooseKeys, t.hasDeepLooseKeys)
-        t.equal(t.notHasMatchLooseAllKeys, t.notHasDeepLooseAllKeys)
-        t.equal(t.hasMatchLooseAnyKeys, t.hasDeepLooseAnyKeys)
-        t.equal(t.notHasMatchLooseKeys, t.notHasDeepLooseKeys)
-    })
-
     // It"s much easier to find problems when the tests are generated.
     function shallow(name, opts) {
         function run(succeed) {
@@ -54,7 +47,7 @@ describe("assertions (has keys)", function () {
             })
 
             it("is strict", function () {
-                run(opts.invert ^ opts.loose,
+                run(opts.invert,
                     {foo: "1", bar: 2, baz: 3},
                     {foo: 1})
             })
@@ -119,10 +112,6 @@ describe("assertions (has keys)", function () {
     shallow("notHasAllKeys", {keys: true, all: true, invert: true})
     shallow("hasAnyKeys", {keys: true})
     shallow("notHasKeys", {keys: true, invert: true})
-    shallow("hasLooseKeys", {loose: true, all: true})
-    shallow("notHasLooseAllKeys", {loose: true, all: true, invert: true})
-    shallow("hasLooseAnyKeys", {loose: true})
-    shallow("notHasLooseKeys", {loose: true, invert: true})
 
     /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
@@ -220,7 +209,7 @@ describe("assertions (has keys)", function () {
                 function A() { this.foo = 1 }
                 function B() { this.foo = 1 }
 
-                run(opts.invert ^ opts.match, new A(), new B())
+                run(opts.invert ^ opts.match, [new A()], [new B()])
             })
         })
     }

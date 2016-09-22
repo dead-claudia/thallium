@@ -1,13 +1,6 @@
 "use strict"
 
 describe("assertions (includes)", function () {
-    it("correct aliases", function () {
-        t.equal(t.includesMatchLoose, t.includesDeepLoose)
-        t.equal(t.notIncludesMatchLooseAll, t.notIncludesDeepLooseAll)
-        t.equal(t.includesMatchLooseAny, t.includesDeepLooseAny)
-        t.equal(t.notIncludesMatchLoose, t.notIncludesDeepLoose)
-    })
-
     describe("t.includes()", function () {
         it("checks numbers", function () {
             t.includes([1, 2, 3, 4, 5], 1)
