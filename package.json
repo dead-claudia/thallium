@@ -18,7 +18,6 @@
     "watch:mocha": "chokidar --initial -i \"**/test-bundle.js\" \"{bin,fixtures,helpers,lib,r,scripts,test}/**/{.,}*.{js,coffee}\" \"{index,core,assertions}.js\" -c \"npm run test:mocha\""
   },
   "browser": {
-    "./lib/replaced/is-buffer.js": "is-buffer",
     "./lib/replaced/inspect.js": "util-inspect",
     "./lib/replaced/console.js": "./lib/replaced/console-browser.js",
     "jsdom": "empty/object"
@@ -73,7 +72,6 @@
     "bluebird": "^3.4.1",
     "glob": "^7.0.5",
     "interpret": "1",
-    "is-buffer": "1",
     "minimatch": "^3.0.2",
     "resolve": "^1.1.7",
     "through2": "2",
