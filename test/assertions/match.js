@@ -1,6 +1,8 @@
 "use strict"
 
-/* global Map, Set, Buffer */
+/* global Map, Set, Buffer, Symbol, Int8Array, Int16Array, Int32Array,
+Uint8Array, Uint16Array, Uint32Array, Float32Array, Float64Array,
+Uint8ClampedArray, DataView */
 
 // Note: updates to this should also be reflected in bench/match.js, so that
 // benchmark doesn't throw errors.
@@ -16,6 +18,32 @@ describe("assertions (match)", function () { // eslint-disable-line max-statemen
             t[m("match")](a, b)
         })
     }
+
+    var symbolIterator = typeof Symbol === "function" && Symbol.iterator != null
+        ? Symbol.iterator
+        : "@@iterator"
+
+    function List(items) {
+        this.items = items
+    }
+
+    List[symbolIterator] = function () {
+        return new ListIterator(this.items)
+    }
+
+    function ListIterator(items) {
+        this.items = items
+        this.index = 0
+    }
+
+    Util.methods(ListIterator, {
+        next: function () {
+            return {
+                done: this.index === this.items.length,
+                value: this.items[this.index++],
+            }
+        },
+    })
 
     it("exists", function () {
         t.function(t.match)
@@ -120,6 +148,16 @@ describe("assertions (match)", function () { // eslint-disable-line max-statemen
         toArgs(1, 2, 3),
         {deepEqual: false, match: false})
 
+    check("similar arguments + array-like",
+        toArgs(1, 2, 3),
+        {length: 3, 0: 1, 1: 2, 2: 3},
+        {deepEqual: false, match: false})
+
+    check("similar array-like + arguments",
+        {length: 3, 0: 1, 1: 2, 2: 3},
+        toArgs(1, 2, 3),
+        {deepEqual: false, match: false})
+
     check("same date",
         new Date("Fri Dec 20 2013 16:21:18 GMT-0800 (PST)"),
         new Date("Fri Dec 20 2013 16:21:18 GMT-0800 (PST)"),
@@ -131,15 +169,135 @@ describe("assertions (match)", function () { // eslint-disable-line max-statemen
         {deepEqual: false, match: false})
 
     if (typeof Buffer === "function") {
-        check("same buffers", new Buffer("xyz"), new Buffer("xyz"), {
+        check("same Buffers", new Buffer("xyz"), new Buffer("xyz"), {
             deepEqual: true,
             match: true,
         })
 
-        check("different buffers", new Buffer("abc"), new Buffer("xyz"), {
+        check("different Buffers", new Buffer("abc"), new Buffer("xyz"), {
             deepEqual: false,
             match: false,
         })
+    }
+
+    if (typeof Int8Array === "function") {
+        check("same Int8Arrays",
+            new Int8Array([1, 2, 3]),
+            new Int8Array([1, 2, 3]),
+            {deepEqual: true, match: true})
+
+        check("different Int8Arrays",
+            new Int8Array([1, 2, 3]),
+            new Int8Array([4, 5, 6]),
+            {deepEqual: false, match: false})
+    }
+
+    if (typeof Int16Array === "function") {
+        check("same Int16Arrays",
+            new Int16Array([1, 2, 3]),
+            new Int16Array([1, 2, 3]),
+            {deepEqual: true, match: true})
+
+        check("different Int16Arrays",
+            new Int16Array([1, 2, 3]),
+            new Int16Array([4, 5, 6]),
+            {deepEqual: false, match: false})
+    }
+
+    if (typeof Int32Array === "function") {
+        check("same Int32Arrays",
+            new Int32Array([1, 2, 3]),
+            new Int32Array([1, 2, 3]),
+            {deepEqual: true, match: true})
+
+        check("different Int32Arrays",
+            new Int32Array([1, 2, 3]),
+            new Int32Array([4, 5, 6]),
+            {deepEqual: false, match: false})
+    }
+
+    if (typeof Uint8Array === "function") {
+        check("same Uint8Arrays",
+            new Uint8Array([1, 2, 3]),
+            new Uint8Array([1, 2, 3]),
+            {deepEqual: true, match: true})
+
+        check("different Uint8Arrays",
+            new Uint8Array([1, 2, 3]),
+            new Uint8Array([4, 5, 6]),
+            {deepEqual: false, match: false})
+    }
+
+    if (typeof Uint8ClampedArray === "function") {
+        check("same Uint8Arrays",
+            new Uint8ClampedArray([1, 2, 3]),
+            new Uint8ClampedArray([1, 2, 3]),
+            {deepEqual: true, match: true})
+
+        check("different Uint8Arrays",
+            new Uint8ClampedArray([1, 2, 3]),
+            new Uint8ClampedArray([4, 5, 6]),
+            {deepEqual: false, match: false})
+    }
+
+    if (typeof Uint16Array === "function") {
+        check("same Uint16Arrays",
+            new Uint16Array([1, 2, 3]),
+            new Uint16Array([1, 2, 3]),
+            {deepEqual: true, match: true})
+
+        check("different Uint16Arrays",
+            new Uint16Array([1, 2, 3]),
+            new Uint16Array([4, 5, 6]),
+            {deepEqual: false, match: false})
+    }
+
+    if (typeof Uint32Array === "function") {
+        check("same Uint32Arrays",
+            new Uint32Array([1, 2, 3]),
+            new Uint32Array([1, 2, 3]),
+            {deepEqual: true, match: true})
+
+        check("different Uint32Arrays",
+            new Uint32Array([1, 2, 3]),
+            new Uint32Array([4, 5, 6]),
+            {deepEqual: false, match: false})
+    }
+
+    if (typeof Float32Array === "function") {
+        check("same Float32Arrays",
+            new Float32Array([1, 2, 3]),
+            new Float32Array([1, 2, 3]),
+            {deepEqual: true, match: true})
+
+        check("different Float32Arrays",
+            new Float32Array([1, 2, 3]),
+            new Float32Array([4, 5, 6]),
+            {deepEqual: false, match: false})
+    }
+
+    if (typeof Float64Array === "function") {
+        check("same Float64Arrays",
+            new Float64Array([1, 2, 3]),
+            new Float64Array([1, 2, 3]),
+            {deepEqual: true, match: true})
+
+        check("different Float64Arrays",
+            new Float64Array([1, 2, 3]),
+            new Float64Array([4, 5, 6]),
+            {deepEqual: false, match: false})
+    }
+
+    if (typeof Int32Array === "function" && typeof DataView === "function") {
+        check("same DataViews",
+            new DataView(new Int32Array([1, 2, 3, 4, 5]).buffer),
+            new DataView(new Int32Array([1, 2, 3, 4, 5]).buffer),
+            {deepEqual: true, match: true})
+
+        check("different DataViews",
+            new DataView(new Int32Array([1, 2, 3, 4, 5]).buffer),
+            new DataView(new Int32Array([5, 4, 3, 2, 1]).buffer),
+            {deepEqual: false, match: false})
     }
 
     check("boolean + array", true, [], {
@@ -205,20 +363,20 @@ describe("assertions (match)", function () { // eslint-disable-line max-statemen
         match: false,
     })
 
-    if (typeof Symbol === "function") { // eslint-disable-line no-undef
-        var symbol = Symbol("foo") // eslint-disable-line no-undef
+    if (typeof Symbol === "function") {
+        var symbol = Symbol("foo")
 
         check("same symbols", symbol, symbol, {
             deepEqual: true,
             match: true,
         })
 
-        check("similar symbols", Symbol("foo"), Symbol("foo"), { // eslint-disable-line no-undef, max-len
+        check("similar symbols", Symbol("foo"), Symbol("foo"), {
             deepEqual: false,
             match: true,
         })
 
-        check("different symbols", Symbol("foo"), Symbol("bar"), { // eslint-disable-line no-undef, max-len
+        check("different symbols", Symbol("foo"), Symbol("bar"), {
             deepEqual: false,
             match: false,
         })
@@ -265,7 +423,7 @@ describe("assertions (match)", function () { // eslint-disable-line max-statemen
         this.id = id
     }
 
-    if (typeof Map === "function" && typeof Set === "function") {
+    if (typeof Map === "function") {
         check("empty maps", new Map(), new Map(), {
             deepEqual: true,
             match: true,
@@ -357,7 +515,9 @@ describe("assertions (match)", function () { // eslint-disable-line max-statemen
             new Map([[{foo: "bar", bar: bar}, {foo: "bar", bar: bar}]]),
             new Map([[{foo: "bar", bar: bar}, {foo: "bar", bar: bar}]]),
             {deepEqual: true, match: true})
+    }
 
+    if (typeof Set === "function") {
         check("empty sets", new Set(), new Set(), {
             deepEqual: true,
             match: true,
@@ -404,43 +564,45 @@ describe("assertions (match)", function () { // eslint-disable-line max-statemen
             new Set([{foo: "bar"}, "bar"]),
             new Set([{bar: "foo"}, "bar"]),
             {deepEqual: false, match: false})
+    }
 
-        // Derived from a previously failing test
-        /* eslint-disable max-len */
+    // Derived from a previously failing test
+    /* eslint-disable max-len */
 
+    if (typeof Set === "function") {
         check("really complex maps with objects",
-        new Map([
-            [".my-shell", register(".my-shell", "@company/my-shell/register", load, true)],
-            [".js", register(".js", "./babel-register-wrapper", load, true)],
-            [0, simple("./util/env.my-shell", load)],
-            [".ls", register(".ls", ["livescript", "LiveScript"], load, false)],
-            [".coffee", register(".coffee", ["coffee-script/register", "coffee-script"], load, false)],
-        ]),
-        new Map([
-            [".my-shell", register(".my-shell", "@company/my-shell/register", load, true)],
-            [".js", register(".js", "./babel-register-wrapper", load, true)],
-            [".ls", register(".ls", ["livescript", "LiveScript"], load, false)],
-            [".coffee", register(".coffee", ["coffee-script/register", "coffee-script"], load, false)],
-            [0, simple("./util/env.my-shell", load)],
-        ]),
-        {deepEqual: true, match: true})
+            new Map([
+                [".my-shell", register(".my-shell", "@company/my-shell/register", load, true)],
+                [".js", register(".js", "./babel-register-wrapper", load, true)],
+                [0, simple("./util/env.my-shell", load)],
+                [".ls", register(".ls", ["livescript", "LiveScript"], load, false)],
+                [".coffee", register(".coffee", ["coffee-script/register", "coffee-script"], load, false)],
+            ]),
+            new Map([
+                [".my-shell", register(".my-shell", "@company/my-shell/register", load, true)],
+                [".js", register(".js", "./babel-register-wrapper", load, true)],
+                [".ls", register(".ls", ["livescript", "LiveScript"], load, false)],
+                [".coffee", register(".coffee", ["coffee-script/register", "coffee-script"], load, false)],
+                [0, simple("./util/env.my-shell", load)],
+            ]),
+            {deepEqual: true, match: true})
 
         check("really complex maps with classes",
-        new Map([
-            [".my-shell", new Register(".my-shell", "@company/my-shell/register", load, true)],
-            [".js", new Register(".js", "./babel-register-wrapper", load, true)],
-            [0, new Simple("./util/env.my-shell", load)],
-            [".ls", new Register(".ls", ["livescript", "LiveScript"], load, false)],
-            [".coffee", new Register(".coffee", ["coffee-script/register", "coffee-script"], load, false)],
-        ]),
-        new Map([
-            [".my-shell", new Register(".my-shell", "@company/my-shell/register", load, true)],
-            [".js", new Register(".js", "./babel-register-wrapper", load, true)],
-            [".ls", new Register(".ls", ["livescript", "LiveScript"], load, false)],
-            [".coffee", new Register(".coffee", ["coffee-script/register", "coffee-script"], load, false)],
-            [0, new Simple("./util/env.my-shell", load)],
-        ]),
-        {deepEqual: true, match: true})
+            new Map([
+                [".my-shell", new Register(".my-shell", "@company/my-shell/register", load, true)],
+                [".js", new Register(".js", "./babel-register-wrapper", load, true)],
+                [0, new Simple("./util/env.my-shell", load)],
+                [".ls", new Register(".ls", ["livescript", "LiveScript"], load, false)],
+                [".coffee", new Register(".coffee", ["coffee-script/register", "coffee-script"], load, false)],
+            ]),
+            new Map([
+                [".my-shell", new Register(".my-shell", "@company/my-shell/register", load, true)],
+                [".js", new Register(".js", "./babel-register-wrapper", load, true)],
+                [".ls", new Register(".ls", ["livescript", "LiveScript"], load, false)],
+                [".coffee", new Register(".coffee", ["coffee-script/register", "coffee-script"], load, false)],
+                [0, new Simple("./util/env.my-shell", load)],
+            ]),
+            {deepEqual: true, match: true})
 
         var map1 = new Map()
         var map2 = new Map()
@@ -452,108 +614,110 @@ describe("assertions (match)", function () { // eslint-disable-line max-statemen
             deepEqual: true,
             match: true,
         })
+    }
 
+    if (typeof Set === "function") {
         check("complex sets with differently ordered primitive + object",
-        new Set([
-            [".my-shell", register(".my-shell", "@company/my-shell/register", load, true)],
-            [".js", register(".js", "./babel-register-wrapper", load, true)],
-            [0, simple("./util/env.my-shell", load)],
-            [".ls", register(".ls", ["livescript", "LiveScript"], load, false)],
-            [".coffee", register(".coffee", ["coffee-script/register", "coffee-script"], load, false)],
-        ]),
-        new Set([
-            [".my-shell", register(".my-shell", "@company/my-shell/register", load, true)],
-            [".js", register(".js", "./babel-register-wrapper", load, true)],
-            [".ls", register(".ls", ["livescript", "LiveScript"], load, false)],
-            [".coffee", register(".coffee", ["coffee-script/register", "coffee-script"], load, false)],
-            [0, simple("./util/env.my-shell", load)],
-        ]),
-        {deepEqual: true, match: true})
+            new Set([
+                [".my-shell", register(".my-shell", "@company/my-shell/register", load, true)],
+                [".js", register(".js", "./babel-register-wrapper", load, true)],
+                [0, simple("./util/env.my-shell", load)],
+                [".ls", register(".ls", ["livescript", "LiveScript"], load, false)],
+                [".coffee", register(".coffee", ["coffee-script/register", "coffee-script"], load, false)],
+            ]),
+            new Set([
+                [".my-shell", register(".my-shell", "@company/my-shell/register", load, true)],
+                [".js", register(".js", "./babel-register-wrapper", load, true)],
+                [".ls", register(".ls", ["livescript", "LiveScript"], load, false)],
+                [".coffee", register(".coffee", ["coffee-script/register", "coffee-script"], load, false)],
+                [0, simple("./util/env.my-shell", load)],
+            ]),
+            {deepEqual: true, match: true})
 
         check("complex sets with differently ordered primitive + class",
-        new Set([
-            [".my-shell", new Register(".my-shell", "@company/my-shell/register", load, true)],
-            [".js", new Register(".js", "./babel-register-wrapper", load, true)],
-            [0, new Simple("./util/env.my-shell", load)],
-            [".ls", new Register(".ls", ["livescript", "LiveScript"], load, false)],
-            [".coffee", new Register(".coffee", ["coffee-script/register", "coffee-script"], load, false)],
-        ]),
-        new Set([
-            [".my-shell", new Register(".my-shell", "@company/my-shell/register", load, true)],
-            [".js", new Register(".js", "./babel-register-wrapper", load, true)],
-            [".ls", new Register(".ls", ["livescript", "LiveScript"], load, false)],
-            [".coffee", new Register(".coffee", ["coffee-script/register", "coffee-script"], load, false)],
-            [0, new Simple("./util/env.my-shell", load)],
-        ]),
-        {deepEqual: true, match: true})
+            new Set([
+                [".my-shell", new Register(".my-shell", "@company/my-shell/register", load, true)],
+                [".js", new Register(".js", "./babel-register-wrapper", load, true)],
+                [0, new Simple("./util/env.my-shell", load)],
+                [".ls", new Register(".ls", ["livescript", "LiveScript"], load, false)],
+                [".coffee", new Register(".coffee", ["coffee-script/register", "coffee-script"], load, false)],
+            ]),
+            new Set([
+                [".my-shell", new Register(".my-shell", "@company/my-shell/register", load, true)],
+                [".js", new Register(".js", "./babel-register-wrapper", load, true)],
+                [".ls", new Register(".ls", ["livescript", "LiveScript"], load, false)],
+                [".coffee", new Register(".coffee", ["coffee-script/register", "coffee-script"], load, false)],
+                [0, new Simple("./util/env.my-shell", load)],
+            ]),
+            {deepEqual: true, match: true})
 
         check("complex sets with differently ordered object + object",
-        new Set([
-            [{ext: ".my-shell"}, register(".my-shell", "@company/my-shell/register", load, true)],
-            [{ext: ".js"}, register(".js", "./babel-register-wrapper", load, true)],
-            [{id: 0}, simple("./util/env.my-shell", load)],
-            [{ext: ".ls"}, register(".ls", ["livescript", "LiveScript"], load, false)],
-            [{ext: ".coffee"}, register(".coffee", ["coffee-script/register", "coffee-script"], load, false)],
-        ]),
-        new Set([
-            [{ext: ".my-shell"}, register(".my-shell", "@company/my-shell/register", load, true)],
-            [{ext: ".js"}, register(".js", "./babel-register-wrapper", load, true)],
-            [{ext: ".ls"}, register(".ls", ["livescript", "LiveScript"], load, false)],
-            [{ext: ".coffee"}, register(".coffee", ["coffee-script/register", "coffee-script"], load, false)],
-            [{id: 0}, simple("./util/env.my-shell", load)],
-        ]),
-        {deepEqual: true, match: true})
+            new Set([
+                [{ext: ".my-shell"}, register(".my-shell", "@company/my-shell/register", load, true)],
+                [{ext: ".js"}, register(".js", "./babel-register-wrapper", load, true)],
+                [{id: 0}, simple("./util/env.my-shell", load)],
+                [{ext: ".ls"}, register(".ls", ["livescript", "LiveScript"], load, false)],
+                [{ext: ".coffee"}, register(".coffee", ["coffee-script/register", "coffee-script"], load, false)],
+            ]),
+            new Set([
+                [{ext: ".my-shell"}, register(".my-shell", "@company/my-shell/register", load, true)],
+                [{ext: ".js"}, register(".js", "./babel-register-wrapper", load, true)],
+                [{ext: ".ls"}, register(".ls", ["livescript", "LiveScript"], load, false)],
+                [{ext: ".coffee"}, register(".coffee", ["coffee-script/register", "coffee-script"], load, false)],
+                [{id: 0}, simple("./util/env.my-shell", load)],
+            ]),
+            {deepEqual: true, match: true})
 
         check("complex sets with differently ordered object + class",
-        new Set([
-            [{ext: ".my-shell"}, new Register(".my-shell", "@company/my-shell/register", load, true)],
-            [{ext: ".js"}, new Register(".js", "./babel-register-wrapper", load, true)],
-            [{id: 0}, new Simple("./util/env.my-shell", load)],
-            [{ext: ".ls"}, new Register(".ls", ["livescript", "LiveScript"], load, false)],
-            [{ext: ".coffee"}, new Register(".coffee", ["coffee-script/register", "coffee-script"], load, false)],
-        ]),
-        new Set([
-            [{ext: ".my-shell"}, new Register(".my-shell", "@company/my-shell/register", load, true)],
-            [{ext: ".js"}, new Register(".js", "./babel-register-wrapper", load, true)],
-            [{ext: ".ls"}, new Register(".ls", ["livescript", "LiveScript"], load, false)],
-            [{ext: ".coffee"}, new Register(".coffee", ["coffee-script/register", "coffee-script"], load, false)],
-            [{id: 0}, new Simple("./util/env.my-shell", load)],
-        ]),
-        {deepEqual: true, match: true})
+            new Set([
+                [{ext: ".my-shell"}, new Register(".my-shell", "@company/my-shell/register", load, true)],
+                [{ext: ".js"}, new Register(".js", "./babel-register-wrapper", load, true)],
+                [{id: 0}, new Simple("./util/env.my-shell", load)],
+                [{ext: ".ls"}, new Register(".ls", ["livescript", "LiveScript"], load, false)],
+                [{ext: ".coffee"}, new Register(".coffee", ["coffee-script/register", "coffee-script"], load, false)],
+            ]),
+            new Set([
+                [{ext: ".my-shell"}, new Register(".my-shell", "@company/my-shell/register", load, true)],
+                [{ext: ".js"}, new Register(".js", "./babel-register-wrapper", load, true)],
+                [{ext: ".ls"}, new Register(".ls", ["livescript", "LiveScript"], load, false)],
+                [{ext: ".coffee"}, new Register(".coffee", ["coffee-script/register", "coffee-script"], load, false)],
+                [{id: 0}, new Simple("./util/env.my-shell", load)],
+            ]),
+            {deepEqual: true, match: true})
 
         check("complex sets with differently ordered class + object",
-        new Set([
-            [new Ext(".my-shell"), register(".my-shell", "@company/my-shell/register", load, true)],
-            [new Ext(".js"), register(".js", "./babel-register-wrapper", load, true)],
-            [new Id(0), simple("./util/env.my-shell", load)],
-            [new Ext(".ls"), register(".ls", ["livescript", "LiveScript"], load, false)],
-            [new Ext(".coffee"), register(".coffee", ["coffee-script/register", "coffee-script"], load, false)],
-        ]),
-        new Set([
-            [new Ext(".my-shell"), register(".my-shell", "@company/my-shell/register", load, true)],
-            [new Ext(".js"), register(".js", "./babel-register-wrapper", load, true)],
-            [new Ext(".ls"), register(".ls", ["livescript", "LiveScript"], load, false)],
-            [new Ext(".coffee"), register(".coffee", ["coffee-script/register", "coffee-script"], load, false)],
-            [new Id(0), simple("./util/env.my-shell", load)],
-        ]),
-        {deepEqual: true, match: true})
+            new Set([
+                [new Ext(".my-shell"), register(".my-shell", "@company/my-shell/register", load, true)],
+                [new Ext(".js"), register(".js", "./babel-register-wrapper", load, true)],
+                [new Id(0), simple("./util/env.my-shell", load)],
+                [new Ext(".ls"), register(".ls", ["livescript", "LiveScript"], load, false)],
+                [new Ext(".coffee"), register(".coffee", ["coffee-script/register", "coffee-script"], load, false)],
+            ]),
+            new Set([
+                [new Ext(".my-shell"), register(".my-shell", "@company/my-shell/register", load, true)],
+                [new Ext(".js"), register(".js", "./babel-register-wrapper", load, true)],
+                [new Ext(".ls"), register(".ls", ["livescript", "LiveScript"], load, false)],
+                [new Ext(".coffee"), register(".coffee", ["coffee-script/register", "coffee-script"], load, false)],
+                [new Id(0), simple("./util/env.my-shell", load)],
+            ]),
+            {deepEqual: true, match: true})
 
         check("complex sets with differently ordered class + class",
-        new Set([
-            [new Ext(".my-shell"), new Register(".my-shell", "@company/my-shell/register", load, true)],
-            [new Ext(".js"), new Register(".js", "./babel-register-wrapper", load, true)],
-            [new Id(0), new Simple("./util/env.my-shell", load)],
-            [new Ext(".ls"), new Register(".ls", ["livescript", "LiveScript"], load, false)],
-            [new Ext(".coffee"), new Register(".coffee", ["coffee-script/register", "coffee-script"], load, false)],
-        ]),
-        new Set([
-            [new Ext(".my-shell"), new Register(".my-shell", "@company/my-shell/register", load, true)],
-            [new Ext(".js"), new Register(".js", "./babel-register-wrapper", load, true)],
-            [new Ext(".ls"), new Register(".ls", ["livescript", "LiveScript"], load, false)],
-            [new Ext(".coffee"), new Register(".coffee", ["coffee-script/register", "coffee-script"], load, false)],
-            [new Id(0), new Simple("./util/env.my-shell", load)],
-        ]),
-        {deepEqual: true, match: true})
+            new Set([
+                [new Ext(".my-shell"), new Register(".my-shell", "@company/my-shell/register", load, true)],
+                [new Ext(".js"), new Register(".js", "./babel-register-wrapper", load, true)],
+                [new Id(0), new Simple("./util/env.my-shell", load)],
+                [new Ext(".ls"), new Register(".ls", ["livescript", "LiveScript"], load, false)],
+                [new Ext(".coffee"), new Register(".coffee", ["coffee-script/register", "coffee-script"], load, false)],
+            ]),
+            new Set([
+                [new Ext(".my-shell"), new Register(".my-shell", "@company/my-shell/register", load, true)],
+                [new Ext(".js"), new Register(".js", "./babel-register-wrapper", load, true)],
+                [new Ext(".ls"), new Register(".ls", ["livescript", "LiveScript"], load, false)],
+                [new Ext(".coffee"), new Register(".coffee", ["coffee-script/register", "coffee-script"], load, false)],
+                [new Id(0), new Simple("./util/env.my-shell", load)],
+            ]),
+            {deepEqual: true, match: true})
 
         var set1 = new Set()
         var set2 = new Set()
@@ -589,7 +753,7 @@ describe("assertions (match)", function () { // eslint-disable-line max-statemen
     circular2.a = circular2
     circular3.b = circular3
 
-    check("circular reference match", circular1, circular2, {
+    check("circular references match", circular1, circular2, {
         deepEqual: true,
         match: true,
     })
@@ -618,4 +782,219 @@ describe("assertions (match)", function () { // eslint-disable-line max-statemen
         deepEqual: false,
         match: false,
     })
+
+    function Slice(start, end) {
+        this.start = start
+        this.end = end
+        this.returned = 0
+    }
+
+    Slice.prototype[symbolIterator] = function () {
+        return new Range(this)
+    }
+
+    function Range(slice) {
+        this.slice = slice
+        this.index = slice.start
+    }
+
+    Util.methods(Range, {
+        next: function () {
+            return {
+                done: this.index >= this.slice.end,
+                value: this.index++,
+            }
+        },
+
+        return: function () {
+            this.slice.returned++
+        },
+    })
+
+    function SubSlice(start, end) { Slice.call(this, start, end) }
+    Util.methods(SubSlice, Slice)
+
+    it("iterables + same prototypes", function () {
+        var slice1 = new Slice(0, 10)
+        var slice2 = new Slice(0, 10)
+
+        t.deepEqual(slice1, slice2)
+        t.equal(slice1.returned, 1)
+        t.equal(slice2.returned, 1)
+
+        t.match(slice1, slice2)
+        t.equal(slice1.returned, 2)
+        t.equal(slice2.returned, 2)
+    })
+
+    it("iterables + different prototypes", function () {
+        var slice1 = new Slice(0, 10)
+        var slice2 = new SubSlice(0, 10)
+
+        t.notDeepEqual(slice1, slice2)
+        t.equal(slice1.returned, 0)
+        t.equal(slice2.returned, 0)
+
+        t.match(slice1, slice2)
+        t.equal(slice1.returned, 1)
+        t.equal(slice2.returned, 1)
+    })
+
+    it("iterables + same prototypes + different end times", function () {
+        var slice1 = new Slice(0, 10)
+        var slice2 = new Slice(0, 20)
+
+        t.notDeepEqual(slice1, slice2)
+        t.equal(slice1.returned, 1)
+        t.equal(slice2.returned, 1)
+
+        t.notMatch(slice1, slice2)
+        t.equal(slice1.returned, 2)
+        t.equal(slice2.returned, 2)
+    })
+
+    it("iterables + different prototypes + different end times", function () {
+        var slice1 = new Slice(0, 10)
+        var slice2 = new SubSlice(0, 20)
+
+        t.notDeepEqual(slice1, slice2)
+        t.equal(slice1.returned, 0)
+        t.equal(slice2.returned, 0)
+
+        t.notMatch(slice1, slice2)
+        t.equal(slice1.returned, 1)
+        t.equal(slice2.returned, 1)
+    })
+
+    check("iterables deeply matched",
+        new List([
+            new List([1, 2, "3"]),
+            [1, 2, {value: 3}],
+        ]),
+        new List([
+            new List([1, 2, "3"]),
+            [1, 2, {value: 3}],
+        ]),
+        {deepEqual: true, match: true})
+
+    function Value(value) {
+        this.value = value
+    }
+
+    check("iterables deeply matched + type mismatch",
+        new List([
+            new List([1, 2, "3"]),
+            [1, 2, {value: 3}],
+        ]),
+        new List([
+            new List([1, 2, "3"]),
+            [1, 2, new Value(3)],
+        ]),
+        {deepEqual: false, match: true})
+
+    check("iterables + deeply matched + value mismatch",
+        new List([
+            new List([1, 2, "3"]),
+            [1, 2, {what: "ever"}],
+        ]),
+        new List([
+            new List([1, 2, "3"]),
+            [1, 2, new Value(3)],
+        ]),
+        {deepEqual: false, match: false})
+
+    check("iterables + deeply matched + left longer",
+        new List([
+            new List([1, 2, "3"]),
+            [1, 2, {value: 3}],
+            new List([1, 2, 3]),
+        ]),
+        new List([
+            new List([1, 2, "3"]),
+            [1, 2, new Value(3)],
+        ]),
+        {deepEqual: false, match: false})
+
+    check("iterables + deeply matched + right longer",
+        new List([
+            new List([1, 2, "3"]),
+            [1, 2, {value: 3}],
+        ]),
+        new List([
+            new List([1, 2, "3"]),
+            [1, 2, new Value(3)],
+            new List([1, 2, 3]),
+        ]),
+        {deepEqual: false, match: false})
+
+    function list(items) {
+        function result() {}
+        result[symbolIterator] = function () {
+            var index = 0
+
+            return {
+                next: function () {
+                    return {done: index >= items.length, value: items[index++]}
+                },
+            }
+        }
+        return result
+    }
+
+    check("iterables deeply matched",
+        list([
+            list([1, 2, "3"]),
+            [1, 2, {value: 3}],
+        ]),
+        list([
+            list([1, 2, "3"]),
+            [1, 2, {value: 3}],
+        ]),
+        {deepEqual: true, match: true})
+
+    check("iterables deeply matched + type mismatch",
+        list([
+            list([1, 2, "3"]),
+            [1, 2, {value: 3}],
+        ]),
+        list([
+            list([1, 2, "3"]),
+            [1, 2, new Value(3)],
+        ]),
+        {deepEqual: false, match: true})
+
+    check("iterables + deeply matched + value mismatch",
+        list([
+            list([1, 2, "3"]),
+            [1, 2, {what: "ever"}],
+        ]),
+        list([
+            list([1, 2, "3"]),
+            [1, 2, new Value(3)],
+        ]),
+        {deepEqual: false, match: false})
+
+    check("iterables + deeply matched + left longer",
+        list([
+            list([1, 2, "3"]),
+            [1, 2, {value: 3}],
+            list([1, 2, 3]),
+        ]),
+        list([
+            list([1, 2, "3"]),
+            [1, 2, new Value(3)],
+        ]),
+        {deepEqual: false, match: false})
+
+    check("iterables + deeply matched + right longer",
+        list([
+            list([1, 2, "3"]),
+            [1, 2, {value: 3}],
+        ]),
+        list([
+            list([1, 2, "3"]),
+            [1, 2, new Value(3)],
+            list([1, 2, 3]),
+        ]),
+        {deepEqual: false, match: false})
 })
