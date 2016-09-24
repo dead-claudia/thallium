@@ -81,19 +81,20 @@ This list is in a very rough chronological order. If you want to complete any of
     - Why `before{,Each}` and friends aren't in core
     - Why this uses code *for* configuration, unlike nearly every other test framework out there.
 
-\* *That's something from Clojure-land I really wish was here...*
-
-\*\* *And maybe port this to Python, if/when I can find time.*
+\* *That's something from Lisp-land I really wish was here...*
 
 Also, at some point, I'd like to do the following, in no particular order:
 
-- Set up [AppVeyor](https://www.appveyor.com/) to run tests on Windows. Currently, it's only actively tested on Linux.
+- Set up [AppVeyor](https://www.appveyor.com/) to run tests on Windows. Currently, it's only actively tested on Linux, although I do try to keep it as platform-independent as possible.
     - I need to at some point hook up PhantomJS for this. It should work in its current state, but it's not tested.
     - I'm planning on using [Sauce Labs](https://saucelabs.com/) and [Karma](https://karma-runner.github.io) after Karma 1.0 is released, because I need the custom `context.html` config feature added in [this PR](https://github.com/karma-runner/karma/pull/1825). The reason is because I'm using SystemJS and I need a [custom entry script](http://github.com/isiahmeadows/thallium/blob/master/scripts/generate-browser-entry.js) to load the tests.
 
 - Trim the stack traces on reported errors and offer that to others as well.
 
-- Profile and optimize this thing. Currently, the CLI runs about 25-35% slower than Mocha because of unnecessary FS work, but I know there's room for optimization.
+- Rewrite the matching algorithm to be based off of the ES2015 Iterable (`Symbol.iterator`)/etc. protocols from the core.
+    - This may include the [proposed async iteration protocol](https://github.com/tc39/proposal-async-iteration#async-iterators-and-async-iterables) in the future.
+
+- Profile and optimize this thing. Currently, the CLI runs about 25-35% slower than Mocha because of unnecessary FS work.
 
 - Reimplement [`util-inspect`](https://www.npmjs.com/package/util-inspect) for browsers based on Node's current [`util.inspect`](https://nodejs.org/api/util.html#util_util_inspect_object_options), since that ponyfill module is completely untested and is unaware of ES6. :worried:
 
