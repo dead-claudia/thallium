@@ -1,4 +1,7 @@
 /* eslint-env node */
+// Remove after this hits npm: https://github.com/eslint/eslint/pull/7175
+/* eslint no-unused-expressions: 0 */
+
 // This is a basic TAP-generating reporter.
 
 import * as tty from "tty"
@@ -18,18 +21,17 @@ const windowWidth = (() => {
     return 75
 })()
 
-let counter = 0
-let tests = 0
-let pass = 0
-let fail = 0
-let skip = 0
+function print(text) {
+    return new Promise((resolve, reject) => {
+        process.stdout.write(text, err => err != null ? reject(err) : resolve())
+    })
+}
 
+let counter, tests, pass, fail, skip
+
+reset()
 function reset() {
-    counter = 0
-    tests = 0
-    pass = 0
-    fail = 0
-    skip = 0
+    counter = tests = pass = fail = skip = 0
 }
 
 function joinPath(ev) {
@@ -39,95 +41,90 @@ function joinPath(ev) {
 function template(ev, tmpl, skip) {
     if (!skip) counter++
 
-    console.log(tmpl.replace(/%c/g, counter)
-                    .replace(/%p/g, joinPath(ev).replace(/\$/g, "$$$$")))
+    return print(
+        tmpl.replace(/%c/g, counter)
+            .replace(/%p/g, joinPath(ev).replace(/\$/g, "$$$$")))
 }
 
-function printLines(value, skipFirst) {
+async function printLines(value, skipFirst) {
     const lines = value.replace(/^/gm, "    ").split(/\r?\n/g)
 
     for (const line of skipFirst ? lines.slice(1) : lines) {
-        console.log(line)
+        await print(line)
     }
 }
 
-function printRaw(key, str) {
+async function printRaw(key, str) {
     if (str.length > windowWidth - key.length || /\r?\n|[:?-]/.test(str)) {
-        console.log(`  ${key}: |-`)
-        printLines(str, false)
+        await print(`  ${key}: |-`)
+        await printLines(str, false)
     } else {
-        console.log(`  ${key}: ${str}`)
+        await print(`  ${key}: ${str}`)
     }
 }
 
-function printError({value: err}) {
+async function printError({value: err}) {
     if (!(err instanceof Error)) {
-        printRaw("value", inspect(err))
+        await printRaw("value", inspect(err))
     } else if (err.name !== "AssertionError") {
         // Let's *not* depend on the constructor being Thallium's...
-        console.log("  stack: |-")
-        printLines(err.stack, false)
+        await print("  stack: |-")
+        await printLines(err.stack, false)
     } else {
-        printRaw("expected", inspect(err.expected))
-        printRaw("actual", inspect(err.actual))
-        printRaw("message", err.message)
-        console.log("  stack: |-")
+        await printRaw("expected", inspect(err.expected))
+        await printRaw("actual", inspect(err.actual))
+        await printRaw("message", err.message)
+        await print("  stack: |-")
 
         const message = err.message
 
         err.message = ""
-        printLines(err.stack, true)
+        await printLines(err.stack, true)
         err.message = message
     }
 }
 
-export default function tap(ev, done) { // eslint-disable-line max-statements
+export default async function tap(ev) { // eslint-disable-line max-statements
     if (ev.start()) {
-        console.log("TAP version 13")
+        await print("TAP version 13")
     } else if (ev.enter()) {
         tests++
         pass++
         // Print a leading comment, to make some TAP formatters prettier.
-        template(ev, "# %p", true)
-        template(ev, "ok %c")
-    } else if (ev.leave()) {
-        // This is meaningless for the output.
+        await template(ev, "# %p", true)
+        await template(ev, "ok %c")
     } else if (ev.pass()) {
         tests++
         pass++
-        template(ev, "ok %c %p")
+        await template(ev, "ok %c %p")
     } else if (ev.fail()) {
         tests++
         fail++
-        template(ev, "not ok %c %p")
-        console.log("  ---")
-        printError(ev)
-        console.log("  ...")
+        await template(ev, "not ok %c %p")
+        await print("  ---")
+        await printError(ev)
+        await print("  ...")
     } else if (ev.skip()) {
         skip++
-        template(ev, "ok %c # skip %p")
+        await template(ev, "ok %c # skip %p")
     } else if (ev.extra()) {
-        template(ev, "not ok %c %p # extra")
-        console.log("  ---")
-        printRaw("count", inspect(ev.value.count))
-        printRaw("value", inspect(ev.value.value))
-        console.log("  ...")
+        await template(ev, "not ok %c %p # extra")
+        await print("  ---")
+        await printRaw("count", inspect(ev.value.count))
+        await printRaw("value", inspect(ev.value.value))
+        await print("  ...")
     } else if (ev.end()) {
-        console.log(`1..${counter}`)
-        console.log(`# tests ${tests}`)
-        if (pass) console.log(`# pass ${pass}`)
-        if (fail) console.log(`# fail ${fail}`)
-        if (skip) console.log(`# skip ${skip}`)
+        await print(`1..${counter}`)
+        await print(`# tests ${tests}`)
+        if (pass) await print(`# pass ${pass}`)
+        if (fail) await print(`# fail ${fail}`)
+        if (skip) await print(`# skip ${skip}`)
         reset()
     } else if (ev.error()) {
-        console.log("Bail out!")
-        console.log("  ---")
-        printError(ev)
-        console.log("  ...")
+        await print("Bail out!")
+        await print("  ---")
+        await printError(ev)
+        await print("  ...")
         reset()
-    } else {
-        throw new Error("unreachable")
     }
-
-    return done()
 }
