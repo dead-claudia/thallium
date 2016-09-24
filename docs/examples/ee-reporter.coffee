@@ -13,21 +13,23 @@
 
 module.exports = ->
     @reflect().wrap 'reporter', (reporter, args...) ->
-        reporter.apply undefined, args.map (reporter) ->
-            if typeof reporter is 'object' and reporter?
-                (ev, done) ->
-                    switch
-                        when ev.start() then reporter.emit 'start', ev
-                        when ev.enter() then reporter.emit 'enter', ev
-                        when ev.leave() then reporter.emit 'leave', ev
-                        when ev.pass() then reporter.emit 'pass', ev
-                        when ev.fail() then reporter.emit 'fail', ev
-                        when ev.skip() then reporter.emit 'skip', ev
-                        when ev.end() then reporter.emit 'end', ev
-                        when ev.error() then reporter.emit 'error', ev
-                        when ev.extra() then reporter.emit 'extra', ev
-                        else throw new Error 'unreachable'
-                    done()
-            else
-                # Don't fix reporter
-                reporter
+        reporter (
+            for reporter in args
+                if typeof reporter is 'object' and reporter?
+                    do (reporter = reporter) -> (ev, done) ->
+                        switch
+                            when ev.start() then reporter.emit 'start', ev
+                            when ev.enter() then reporter.emit 'enter', ev
+                            when ev.leave() then reporter.emit 'leave', ev
+                            when ev.pass() then reporter.emit 'pass', ev
+                            when ev.fail() then reporter.emit 'fail', ev
+                            when ev.skip() then reporter.emit 'skip', ev
+                            when ev.end() then reporter.emit 'end', ev
+                            when ev.error() then reporter.emit 'error', ev
+                            when ev.extra() then reporter.emit 'extra', ev
+                            else throw new Error 'unreachable'
+                        done()
+                else
+                    # Don't fix reporter
+                    reporter
+        )...

@@ -16,25 +16,17 @@ else if tty.getWindowSize?
 else
     75
 
-counter = 0
-tests = 0
-pass = 0
-fail = 0
-skip = 0
+_ = reset: ->
+    @counter = @tests = @pass = @fail = @skip = 0
+_.reset()
 
-reset = ->
-    counter = 0
-    tests = 0
-    pass = 0
-    fail = 0
-    skip = 0
-
-joinPath = (ev) -> (i.name for i in ev.path).join ' '
+joinPath = (ev) ->
+    (i.name for i in ev.path).join ' '
 
 template = (ev, tmpl, skip) ->
-    counter++ unless skip
+    _.counter++ unless skip
 
-    console.log tmpl.replace(/%c/g, counter)
+    console.log tmpl.replace(/%c/g, _.counter)
                     .replace(/%p/g, joinPath(ev).replace(/\$/g, '$$$$'))
 
 printLines = (value, skipFirst) ->
@@ -74,8 +66,8 @@ module.exports = (ev, done) ->
             console.log 'TAP version 13'
 
         when ev.enter()
-            tests++
-            pass++
+            _.tests++
+            _.pass++
             # Print a leading comment, to make some TAP formatters prettier.
             template ev, '# %p', yes
             template ev, 'ok %c'
@@ -84,20 +76,20 @@ module.exports = (ev, done) ->
         when ev.leave() then
 
         when ev.pass()
-            tests++
-            pass++
+            _.tests++
+            _.pass++
             template ev, 'ok %c %p'
 
         when ev.fail()
-            tests++
-            fail++
+            _.tests++
+            _.fail++
             template ev, 'not ok %c %p'
             console.log '  ---'
             printError ev
             console.log '  ...'
 
         when ev.skip()
-            skip++
+            _.skip++
             template ev, 'ok %c # skip %p'
 
         when ev.extra()
@@ -108,20 +100,18 @@ module.exports = (ev, done) ->
             console.log '  ...'
 
         when ev.end()
-            console.log "1..#{counter}"
-            console.log "# tests #{tests}"
-            console.log "# pass #{pass}" if pass
-            console.log "# fail #{fail}" if fail
-            console.log "# skip #{skip}" if skip
-            reset()
+            console.log "1..#{_.counter}"
+            console.log "# tests #{_.tests}"
+            console.log "# pass #{_.pass}" if _.pass
+            console.log "# fail #{_.fail}" if _.fail
+            console.log "# skip #{_.skip}" if _.skip
+            _.reset()
 
         when ev.error()
             console.log 'Bail out!'
             console.log '  ---'
             printError ev
             console.log '  ...'
-            reset()
-
-        else throw new Error 'unreachable'
+            _.reset()
 
     done()
