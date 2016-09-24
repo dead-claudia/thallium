@@ -61,7 +61,7 @@ t.use(function (t) {
 ## API Details
 
 - `tl.t` - The main module export. This is equivalent to the normal `require("thallium")` in Node, with the [primary API](./primary.md) and [assertions](../assertions.md) loaded.
-- `tl.create()` - A shorthand for [`reflect.base`](./reflect/base.md) to create a new instance.
+- `tl.create()` - A shorthand for [`reflect.base`](./reflect.md#base) to create a new instance.
 - `tl.r` - Each of the reporters live here. You can find more details on these [here](../reporters.md).
 - `tl.r.dot` - The dot reporter, same as `require("thallium/r/dot")`.
 - `tl.r.spec` - The spec reporter, same as `require("thallium/r/spec")`.

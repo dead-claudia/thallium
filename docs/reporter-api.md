@@ -112,7 +112,7 @@ module.exports = opts => {
 }
 ```
 
-Note that you still shouldn't depend on Thallium and check if it's a [`Report`](./api/reflect/report.md) instance.
+Note that you still shouldn't depend on Thallium and check if it's a [`Report`](./api/reflect.md#report) instance.
 
 ## `extra` events after `end`
 
