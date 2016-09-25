@@ -5,55 +5,53 @@ Uint8Array, Uint16Array, Uint32Array, Float32Array, Float64Array,
 Uint8ClampedArray, DataView */
 /* eslint-env node */
 
-var benchmark = require("benchmark")
 var match = require("../lib/match.js")
 var newline = require("os").EOL
 
 // Note: updates to this should also be reflected in test/assertions/match.js,
 // so this doesn't throw errors.
 
-function run(init) {
-    function loop(list) {
-        var end = list.length
+function loop(list) {
+    var end = list.length
 
-        for (var count = 0; count < 1000; count++) {
-            for (var i = 0; i < end; i++) (0, list[i])()
-        }
-    }
-
-    if (process.argv[2] !== "prof") {
-        var suite = new benchmark.Suite("match")
-
-        init(suite)
-
-        // Prime the matcher functions with all the different benchmarks, so
-        // they are optimized with a diverse set of values.
-        process.stderr.write(newline + "Priming with 2000 iterations" + newline)
-        var end = suite.length
-
-        for (var count = 0; count < 2000; count++) {
-            for (var i = 0; i < end; i++) (0, suite[i].fn)()
-        }
-
-        suite.on("cycle", function (event) {
-            console.log(event.target + "")
-        })
-
-        suite.run()
-    } else {
-        var funcs = []
-
-        init({add: function (_, func) { funcs.push(func) }})
-
-        process.stderr.write(newline + "Priming with 1000 iterations" + newline)
-        loop(funcs)
-
-        process.stderr.write("Running with 1000 iterations" + newline)
-        loop(funcs)
+    for (var count = 0; count < 2000; count++) {
+        for (var i = 0; i < end; i++) (0, list[i])()
     }
 }
 
-run(function (suite) { // eslint-disable-line max-statements
+if (process.argv[2] !== "prof") {
+    var benchmark = require("benchmark") // eslint-disable-line global-require
+    var suite = new benchmark.Suite("match")
+
+    init(suite)
+
+    // Prime the matcher functions with all the different benchmarks, so
+    // they are optimized with a diverse set of values.
+    process.stderr.write(newline + "Priming with 2000 iterations" + newline)
+    var end = suite.length
+
+    for (var count = 0; count < 2000; count++) {
+        for (var i = 0; i < end; i++) (0, suite[i].fn)()
+    }
+
+    suite.on("cycle", function (event) {
+        console.log(event.target + "")
+    })
+
+    suite.run()
+} else {
+    var funcs = []
+
+    init({add: function (_, func) { funcs.push(func) }})
+
+    process.stderr.write(newline + "Priming with 2000 iterations" + newline)
+    loop(funcs)
+
+    process.stderr.write("Running with 2000 iterations" + newline)
+    loop(funcs)
+}
+
+function init(suite) { // eslint-disable-line max-statements
     function check(name, a, b, opts) {
         xcheck(name, a, b, opts)
 
@@ -822,4 +820,4 @@ run(function (suite) { // eslint-disable-line max-statements
         deepEqual: false,
         match: false,
     })
-})
+}
