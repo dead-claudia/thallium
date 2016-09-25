@@ -1,5 +1,9 @@
 # Changelog
 
+## v0.2.10
+
+- `thallium/thallium.js` is now correctly published...
+
 ## v0.2.9
 
 - `t.matchLoose`, `t.deepEqualLoose`, and friends now removed due to lack of use case.
