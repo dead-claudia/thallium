@@ -5,10 +5,6 @@
   "main": "index.js",
   "scripts": {
     "bundle": "browserify -dr ./lib/browser-bundle.js:thallium -o thallium.js",
-    "release": "npm run test && npm run bundle",
-    "preversion": "npm run release && git add CHANGELOG.md",
-    "postversion": "git push && git push --tags",
-    "version": "git add thallium.js",
     "lint": "eslint . --cache && coffeelint . --cache",
     "test": "npm run lint && npm run test:mocha && npm run test:karma",
     "test:karma": "karma start --single-run --browsers Chrome",
@@ -66,6 +62,7 @@
     "karma-mocha": "^1.1.1",
     "mocha": "^3.0.2",
     "readline-sync": "^1.4.4",
+    "semver": "^5.3.0",
     "watchify": "^3.7.0"
   },
   "dependencies": {

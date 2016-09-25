@@ -116,7 +116,7 @@ I use [Bluebird](http://bluebirdjs.com) extensively for promises, as it makes co
 
     There's only a few of them, but they are either testing an inherently time-dependent feature, or they're dealing with the file system, and the output is order-dependent.
 
-- If you're on Linux and have [`nvm`](https://github.com/creationix/nvm) installed, there's a little `test.sh` script in the root you can run, which will test everything Travis will on your local machine, installing versions that don't exist if necessary. Note that it doesn't actually update existing installations for you, though. It's not quite *that* magical, and I don't suspect you'd want that, either.
+- If you're on Linux and have [`nvm`](https://github.com/creationix/nvm) installed, there's a little `scripts/test.sh` script in the root you can run, which will test everything Travis will on your local machine, installing versions that don't exist if necessary. Note that it doesn't actually update existing installations for you, though. It's not quite *that* magical, and I don't suspect you'd want that, either.
 
 - For the tests, feel free to use the framework's own plugin and reporter system to your advantage to simplify your testing. They are very well tested, and if any of the assertions or plugin/reporter APIs break, you'll know it immediately. For example, I used [`t.reporter`](./docs/reporter-api.md) with the `t.match` assertion to test the reporter output throughout the tests. Here's a modified example from one of the tests:
 
