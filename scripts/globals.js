@@ -2,6 +2,17 @@
 
 /* eslint-env mocha */
 
+if (typeof global.process === "object") {
+    global.process.env.NODE_ENV = "development"
+} else {
+    // Set up Bluebird's dev warnings
+    require("../lib/bluebird.js") // eslint-disable-line global-require
+    .config({
+        warnings: true,
+        longStackTraces: true,
+    })
+}
+
 /**
  * This exports everything as globals, and it is Browserified as well.
  */
