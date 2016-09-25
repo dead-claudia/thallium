@@ -9,7 +9,9 @@
  * file name/buffer: [2016-01-01T01:23:45.678Z]: access ./file.txt 9 (12.345 µs)
  */
 
+var Module = require("module")
 var fs = require("fs")
+var showStack = false
 
 function transfer(f, g, prop) {
     try {
@@ -29,6 +31,15 @@ function printEnd(str, hrtime) {
         " (" + (end[0] * 1e6 + end[1] / 1e3) + " µs)")
 }
 
+function printStack(source) {
+    if (!showStack) return
+    var e = new Error()
+
+    e.name = "Trace:"
+    Error.captureStackTrace(e, source)
+    console.error(e.stack)
+}
+
 function patch(host, method, inject, sync) {
     var old = host[method]
 
@@ -39,6 +50,8 @@ function patch(host, method, inject, sync) {
     if (sync === true) {
         f = host[method] = function () {
             var str = inject.apply(undefined, arguments)
+
+            printStack(host[method])
             var hrtime = process.hrtime()
 
             try {
@@ -50,6 +63,8 @@ function patch(host, method, inject, sync) {
     } else if (sync === false) {
         f = host[method] = function () {
             var str = inject.apply(undefined, arguments)
+
+            printStack(host[method])
             var hrtime = process.hrtime()
             var args = []
 
@@ -67,7 +82,7 @@ function patch(host, method, inject, sync) {
             }
 
             try {
-                return old.apply(this, arguments)
+                return old.apply(this, args)
             } catch (e) {
                 printEnd(str + hrtime)
                 throw e
@@ -76,6 +91,8 @@ function patch(host, method, inject, sync) {
     } else {
         f = host[method] = function () {
             var str = inject.apply(undefined, arguments)
+
+            printStack(host[method])
 
             if (str) console.error(str)
             return old.apply(this, arguments)
@@ -157,12 +174,10 @@ patch(fs, "mkdtempSync", simple("mkdtemp"), true)
 patch(fs, "open", simple("open"), false)
 patch(fs, "openSync", simple("open"), true)
 patch(fs, "read", function (fd) {
-    if (typeof fd === "number") return "read fd " + fd
-    else return ""
+    return typeof fd === "number" ? "read fd " + fd : ""
 }, false)
 patch(fs, "readSync", function (fd) {
-    if (typeof fd === "number") return "read fd " + fd
-    else return ""
+    return typeof fd === "number" ? "read fd " + fd : ""
 }, true)
 patch(fs, "readdir", simple("readdir"), false)
 patch(fs, "readdirSync", simple("readdir"), true)
@@ -192,3 +207,26 @@ patch(fs, "watch", simple("watch"))
 patch(fs, "watchFile", simple("watchFile"))
 patch(fs, "ReadStream", simple("createReadStream"))
 patch(fs, "WriteStream", simple("createReadStream"))
+
+console.error("Tracing FS calls...")
+
+if (require.main === module) {
+    var moduleName = require.resolve((function () {
+        switch (process.argv[2]) {
+        case "tl": return require.resolve("../bin/_thallium.js")
+        case "mocha": return require.resolve("mocha/bin/mocha")
+        case undefined:
+            console.error("Binary name required")
+            return process.exit(1) // eslint-disable-line no-process-exit
+        default:
+            console.error("Unknown binary: " + process.argv[2])
+            return process.exit(1) // eslint-disable-line no-process-exit
+        }
+    })())
+
+    process.argv[1] = moduleName
+    process.argv.splice(2, 1)
+    return Module._load(moduleName, null, true)
+}
+
+return undefined
