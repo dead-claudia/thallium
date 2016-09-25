@@ -1,5 +1,25 @@
 # Changelog
 
+## v0.2.9
+
+- `t.matchLoose`, `t.deepEqualLoose`, and friends now removed due to lack of use case.
+- Deep equality algorithm is much faster now.
+- Expando properties on arrays/RegExps/etc. are no longer checked. This will no longer throw:
+    ```js
+    var re = /foo/g
+    re.foo = "bar"
+    t.match(re, /foo/g)
+    ```
+- Several issues with deep equality algorithm fixed:
+    - Typed arrays, DataViews, and ArrayBuffers are fully supported
+    - This now throws as expected: `t.match(new Error("foo"), {message: "foo"})`
+    - This now throws as expected: `t.match(new Error("foo"), new TypeError("foo"))`
+    - Errors are compared with their prototypes checked to be equal, like what `t.deepEqual` does normally.
+- ES2018 async functions now used in docs/examples/tap-reporter.js
+- Examples cleaned up a little.
+- Reporters and the CLI should now be less broken on Windows, as those no longer use raw newlines.
+- The CLI is significantly faster while loading the config and `--require` stuff.
+
 ## v0.2.8
 
 - Deep equality algorithm now checks correct set of keys for thrown vs unthrown errors.
