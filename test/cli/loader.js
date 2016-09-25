@@ -588,8 +588,10 @@ describe("cli loader", function () {
                     }
                 })
                 .then(function (globs) {
-                    t.match(globs, opts.globs)
-                    t.match(modules, opts.modules)
+                    t.match({globs: globs, modules: modules}, {
+                        globs: opts.globs,
+                        modules: opts.modules,
+                    })
                 })
             })
         }
