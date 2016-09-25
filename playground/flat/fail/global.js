@@ -1,6 +1,6 @@
 "use strict"
 
-var t = require("../../index.js")
+var t = require("../../../index.js")
 
 function fail(t) {
     t.fail("fail")
