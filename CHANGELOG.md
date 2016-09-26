@@ -9,6 +9,7 @@
 - `t.matchLoose`, `t.deepEqualLoose`, and friends now removed due to lack of use case.
 - Deep equality algorithm is much faster now.
 - Expando properties on arrays/RegExps/etc. are no longer checked. This will no longer throw:
+
     ```js
     var re = /foo/g
     re.foo = "bar"
