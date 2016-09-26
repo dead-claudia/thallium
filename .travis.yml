@@ -5,7 +5,11 @@ before_install:
   - sh -e /etc/init.d/xvfb start
   - nvm install stable
 
-script: bash -e ./scripts/travis.sh
+script:
+  - nvm install stable
+  - node make lint
+  - nvm install ${TRAVIS_NODE_VERSION}
+  - bash -e ./scripts/travis.sh
 
 matrix:
   include:

@@ -9,8 +9,7 @@
 # PRs are welcome if you'd like to contribute a Windows batch equivalent for
 # nodist/nvm-windows/nvmw/etc., or if you want to add support for another OS.
 
-eslint $(dirname $0) --cache || exit $?
-coffeelint $(dirname $0) --cache || exit $?
+node make lint || exit $?
 
 for i in 0.10 0.12 1 2 3 4 5 6; do
     nvm which $i > /dev/null 2>&1 || nvm install $i || exit $?

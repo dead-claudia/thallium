@@ -4,14 +4,7 @@
   "description": "A simple, unopinionated, modular test framework",
   "main": "index.js",
   "scripts": {
-    "bundle": "browserify -dr ./lib/browser-bundle.js:thallium -o thallium.js",
-    "lint": "eslint . --cache && coffeelint . --cache",
-    "test": "npm run lint && npm run test:mocha && npm run test:karma",
-    "test:karma": "karma start --single-run --browsers Chrome",
-    "test:mocha": "mocha",
-    "watch": "chokidar --initial -i \"**/test-bundle.js\" \"{bin,fixtures,helpers,lib,r,scripts,test}/**/{.,}*.{js,coffee}\" \"{index,core,assertions}.js\" -c \"npm run test\"",
-    "watch:karma": "chokidar --initial -i \"**/test-bundle.js\" \"{bin,fixtures,helpers,lib,r,scripts,test}/**/{.,}*.{js,coffee}\" \"{index,core,assertions}.js\" -c \"npm run test:karma\"",
-    "watch:mocha": "chokidar --initial -i \"**/test-bundle.js\" \"{bin,fixtures,helpers,lib,r,scripts,test}/**/{.,}*.{js,coffee}\" \"{index,core,assertions}.js\" -c \"npm run test:mocha\""
+    "test": "node make"
   },
   "browser": {
     "./lib/replaced/inspect.js": "util-inspect",
@@ -48,7 +41,7 @@
   "devDependencies": {
     "benchmark": "^2.1.1",
     "browserify": "^13.0.1",
-    "chokidar-cli": "^1.2.0",
+    "chokidar": "^1.6.0",
     "coffee-script": "^1.10.0",
     "coffeelint": "^1.15.7",
     "empty": "^0.10.1",
@@ -61,8 +54,8 @@
     "karma-firefox-launcher": "^1.0.0",
     "karma-mocha": "^1.1.1",
     "mocha": "^3.0.2",
-    "readline-sync": "^1.4.4",
     "semver": "^5.3.0",
+    "shelljs": "^0.7.4",
     "watchify": "^3.7.0"
   },
   "dependencies": {

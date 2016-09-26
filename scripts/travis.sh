@@ -1,15 +1,5 @@
 #!/usr/bin/env bash
-
-. "${NVM_DIR}/nvm.sh" || exit $?
-
-nvm use stable
-
-eslint . || exit $?
-coffeelint . || exit $?
-
-nvm use ${TRAVIS_NODE_VERSION} || exit $?
-
-set +e
+set -e
 
 case ${ENV} in
     node) mocha ;;
