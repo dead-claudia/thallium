@@ -4,6 +4,13 @@ Did you run into issues? Great! Tell me [here](http://github.com/isiahmeadows/th
 
 Do you want to contribute code? Keep reading below.
 
+## Common tasks
+
+I've made several commands for common tasks:
+
+- `node make lint` - Lint everything (with ESLint and CoffeeLint).
+- `node make `
+
 ## General information
 
 This tries to support the following platforms:
@@ -12,24 +19,11 @@ This tries to support the following platforms:
 
 - Browser support is planned with [Sauce Labs](https://saucelabs.com/), but it is currently untested.
 
-This is written in pure ES5, and there isn't much of an option to support ES6. Some features still need polyfilled for browsers, and the way this is written doesn't really need many ES6 features. As an exception, the documentation uses ES6 exclusively, including modules.
+- This is written in pure ES5, and there isn't much of an option to support ES6. Some features still need polyfilled for browsers, and the way this is written doesn't really need many ES6 features
 
-- There is a class-ish helper [here](http://github.com/isiahmeadows/thallium/blob/master/lib/methods.js) used throughout.
+- The documentation and examples generally use anything stage 4 or later, including all the ES6 things like modules and arrow functions, and other very new, recently added features like async functions.
 
-- I used a function to fill the same role as a generator, with identical boilerplate.
-
-- I have found an easy C++-like idiom to address ES6 collections similarly to for-of loops:
-
-    ```js
-    var iter = coll.values()
-
-    for (var next = iter.next(); !next.done; next = iter.next()) {
-        var value = next.value
-        // do things...
-    }
-    ```
-
-I use [Bluebird](http://bluebirdjs.com) extensively for promises, as it makes code much easier to handle. It provides many features not present in ES6, and it is far faster.
+- I use [Bluebird](http://bluebirdjs.com) extensively for promises, as it makes code much easier to handle. It provides many features not present in ES6, and it is far faster.
 
 ## Code organization
 
@@ -111,6 +105,87 @@ I use [Bluebird](http://bluebirdjs.com) extensively for promises, as it makes co
     ```
 
 ## Tips and idioms
+
+- There is a class-ish `methods` helper [here](http://github.com/isiahmeadows/thallium/blob/master/lib/methods.js) used throughout. This is one of the main reasons why I don't really need ES6 - it even handles inheritance and non-enumerability of methods. It's used to define the API, simplify the internal DSL for the core reporters, and decouple script loading in the CLI. Here's an example:
+
+    ```js
+    // This is purely an academic example. Please prefer if-else + enumerated types
+    // over object hierarchies in pull requests, because it's both faster and easier
+    // to maintain.
+    function SumComputer(a, b) {
+        this.a = a
+        this.b = b
+    }
+
+    methods(SumComputer, {
+        compute: function () {
+            var sum = 0
+
+            for (var i = this.a; i < this.b; i++) {
+                sum += this.transform(i)
+            }
+
+            return sum
+        },
+    })
+
+    function SquareSumComputer(a, b) {
+        SumComputer.call(this, a, b)
+    }
+
+    methods(SquareSumComputer, SumComputer, {
+        transform: function (x) { return x * x },
+    })
+
+    function CubeSumComputer(a, b) {
+        SumComputer.call(this, a, b)
+    }
+
+    methods(CubeSumComputer, SumComputer, {
+        transform: function (x) { return x * x * x },
+    })
+    ```
+
+- Lazy iteration of a list can be done by taking a callback and calling it when you're ready with a value. This is done in one of the functions in [the arguments parser](http://github.com/isiahmeadows/thallium/blob/master/lib/methods.js):
+
+    ```js
+    /**
+     * Serializes `argv` into a list of tokens.
+     */
+    function serialize(argv, call) {
+        var boolean = true
+
+        for (var i = 0; i < argv.length; i++) {
+            var entry = argv[i]
+
+            if (entry === "--") {
+                // Delegate to another function by passing the `call` parameter.
+                serializeRest(boolean, argv, i + 1, call)
+                break
+            }
+
+            if (!boolean || entry[0] !== "-") {
+                // Yield a value.
+                call({type: "value", value: entry, boolean: boolean})
+                boolean = true
+                continue
+            }
+
+            // etc.
+        }
+    }
+    ```
+
+- If you need an equivalent of `for ... of` to iterate things like `Map` or `Set`:
+
+    ```js
+    var iter = coll.values()
+
+    for (var next = iter.next(); !next.done; next = iter.next()) {
+        var value = next.value
+        // do things...
+    }
+    ```
 
 - All non-deterministic tests/groups of tests are suffixed with `(FLAKE)`. This includes part of one of the end-to-end fixtures. This helps me know at a glance whether rerunning it is an option, since Mocha doesn't have a good third-party interface for retries.
 
