@@ -15,7 +15,9 @@ var fs = require("fs")
 
 function help(value) {
     var file = value === "detailed" ? "help-detailed.txt" : "help-simple.txt"
-    var text = fs.readFileSync(path.resolve(__dirname, file), "utf-8")
+    var text = fs.readFileSync(
+        path.resolve(__dirname, "../lib/cli", file),
+        "utf-8")
 
     // Pad the top by a line.
     console.log()
