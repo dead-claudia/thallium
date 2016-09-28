@@ -5,7 +5,7 @@ Uint8Array, Uint16Array, Uint32Array, Float32Array, Float64Array,
 Uint8ClampedArray, DataView */
 /* eslint-env node */
 
-var match = require("../lib/match.js")
+var match = require("../match.js")
 var newline = require("os").EOL
 
 // Note: updates to this should also be reflected in test/assertions/match.js,
