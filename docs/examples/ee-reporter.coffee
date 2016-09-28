@@ -16,7 +16,7 @@ module.exports = ->
         reporter (
             for reporter in args
                 if typeof reporter is 'object' and reporter?
-                    do (reporter = reporter) -> (ev, done) ->
+                    do (reporter) -> (ev, done) ->
                         switch
                             when ev.start() then reporter.emit 'start', ev
                             when ev.enter() then reporter.emit 'enter', ev
