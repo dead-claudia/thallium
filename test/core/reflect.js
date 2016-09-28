@@ -12,13 +12,13 @@ describe("core (reflect)", function () {
         })
 
         it("returns the correct methods", function () {
-            var base = t.reflect().base()
+            var base = t.base()
 
             t.equal(base.reflect().methods(), base)
         })
 
         it("returns the correct methods in an inner inline test", function () {
-            var tt = t.reflect().base()
+            var tt = t.base()
             var inner = tt.test("test")
             var reflect = inner.reflect().methods()
 
@@ -26,7 +26,7 @@ describe("core (reflect)", function () {
         })
 
         it("returns the correct methods in an inner block test", function () {
-            var tt = t.reflect().base()
+            var tt = t.base()
             var inner, reflect
 
             tt.test("test", function (tt) {
@@ -40,7 +40,7 @@ describe("core (reflect)", function () {
         })
 
         it("returns the correct methods in an inner async test", function () {
-            var tt = t.reflect().base()
+            var tt = t.base()
             var inner, reflect
 
             tt.async("test", function (tt, done) {
@@ -55,7 +55,7 @@ describe("core (reflect)", function () {
         })
 
         it("returns the correct methods from a previously run test", function () { // eslint-disable-line max-len
-            var tt = t.reflect().base()
+            var tt = t.base()
             var inner = tt.test("test")
 
             return tt.run().then(function () {
@@ -64,20 +64,20 @@ describe("core (reflect)", function () {
         })
     })
 
-    describe("do()", function () {
+    describe("try()", function () {
         it("exists", function () {
-            t.function(t.reflect().do)
+            t.function(t.reflect().try)
         })
 
         it("runs blocks in sync tests", function () {
-            var tt = t.reflect().base()
+            var tt = t.base()
             var ret = []
             var len, self // eslint-disable-line consistent-this
 
             tt.reporter(Util.push(ret))
 
             tt.test("test", function (tt) {
-                tt.reflect().do(/** @this */ function () {
+                tt.reflect().try(/** @this */ function () {
                     len = arguments.length
                     self = this
                 })
@@ -95,7 +95,7 @@ describe("core (reflect)", function () {
         })
 
         it("propagates errors from blocks in sync tests", function () {
-            var tt = t.reflect().base()
+            var tt = t.base()
             var ret = []
             var sentinel = new Error("sentinel")
 
@@ -104,7 +104,7 @@ describe("core (reflect)", function () {
             tt.reporter(Util.push(ret))
 
             tt.test("test", function (tt) {
-                tt.reflect().do(function () { throw sentinel })
+                tt.reflect().try(function () { throw sentinel })
             })
 
             return tt.run().then(function () {
@@ -117,14 +117,14 @@ describe("core (reflect)", function () {
         })
 
         it("runs blocks in async tests", function () {
-            var tt = t.reflect().base()
+            var tt = t.base()
             var ret = []
             var len, self // eslint-disable-line consistent-this
 
             tt.reporter(Util.push(ret))
 
             tt.async("test", function (tt, done) {
-                tt.reflect().do(/** @this */ function () {
+                tt.reflect().try(/** @this */ function () {
                     len = arguments.length
                     self = this
                 })
@@ -144,7 +144,7 @@ describe("core (reflect)", function () {
         })
 
         it("propagates errors from blocks in async tests", function () {
-            var tt = t.reflect().base()
+            var tt = t.base()
             var ret = []
             var sentinel = new Error("sentinel")
 
@@ -153,7 +153,7 @@ describe("core (reflect)", function () {
             tt.reporter(Util.push(ret))
 
             tt.async("test", function (tt, done) {
-                tt.reflect().do(function () { throw sentinel })
+                tt.reflect().try(function () { throw sentinel })
                 done()
             })
 
@@ -167,13 +167,13 @@ describe("core (reflect)", function () {
         })
 
         it("runs blocks in inline sync tests", function () {
-            var tt = t.reflect().base()
+            var tt = t.base()
             var ret = []
             var len, self // eslint-disable-line consistent-this
 
             tt.reporter(Util.push(ret))
 
-            tt.test("test").reflect().do(/** @this */ function () {
+            tt.test("test").reflect().try(/** @this */ function () {
                 len = arguments.length
                 self = this
             })
@@ -190,7 +190,7 @@ describe("core (reflect)", function () {
         })
 
         it("propagates errors from blocks in inline sync tests", function () {
-            var tt = t.reflect().base()
+            var tt = t.base()
             var ret = []
             var sentinel = new Error("sentinel")
 
@@ -198,7 +198,7 @@ describe("core (reflect)", function () {
 
             tt.reporter(Util.push(ret))
 
-            tt.test("test").reflect().do(function () { throw sentinel })
+            tt.test("test").reflect().try(function () { throw sentinel })
 
             return tt.run().then(function () {
                 t.match(ret, [
@@ -213,7 +213,7 @@ describe("core (reflect)", function () {
     function testDefine(define) {
         it("works with string + function", function () {
             var AssertionError = t.reflect().AssertionError
-            var tt = t.reflect().base()
+            var tt = t.base()
             var self // eslint-disable-line consistent-this
 
             define(tt, "assert", /** @this */ function (test, exp, act) {
@@ -250,7 +250,7 @@ describe("core (reflect)", function () {
 
         it("works with object", function () {
             var AssertionError = t.reflect().AssertionError
-            var tt = t.reflect().base()
+            var tt = t.base()
             var self // eslint-disable-line consistent-this
 
             define(tt, {
@@ -289,7 +289,7 @@ describe("core (reflect)", function () {
 
         it("interpolates arbitrary properties in the message", function () {
             var AssertionError = t.reflect().AssertionError
-            var tt = t.reflect().base()
+            var tt = t.base()
 
             define(tt, "assert", function (test, extra) {
                 return {
@@ -318,7 +318,7 @@ describe("core (reflect)", function () {
     describe("define()", function () {
         context("on base", function () {
             it("exists", function () {
-                t.function(t.reflect().base().define)
+                t.function(t.base().define)
             })
 
             testDefine(function (tt, name, func) {
@@ -353,7 +353,7 @@ describe("core (reflect)", function () {
         }
 
         it("works with string + function", function () {
-            var tt = t.reflect().base()
+            var tt = t.base()
             var r = tt.reflect()
             var sentinel = {}
 
@@ -381,7 +381,7 @@ describe("core (reflect)", function () {
         })
 
         it("works with object", function () {
-            var tt = t.reflect().base()
+            var tt = t.base()
             var sentinel = {}
 
             var f1 = tt.f1 = spy(function () {})
@@ -416,7 +416,7 @@ describe("core (reflect)", function () {
         })
 
         it("works with string + function", function () {
-            var tt = t.reflect().base()
+            var tt = t.base()
             var r = tt.reflect()
 
             r.add("foo", /** @this */ function () { return this })
@@ -432,7 +432,7 @@ describe("core (reflect)", function () {
         })
 
         it("works with object", function () {
-            var tt = t.reflect().base()
+            var tt = t.base()
 
             tt.reflect().add({
                 foo: function () { return this },
@@ -457,7 +457,7 @@ describe("core (reflect)", function () {
         it("catches errors correctly", function () {
             var inner
 
-            return t.reflect().base()
+            return t.base()
             .test("foo", function (tt) {
                 inner = tt
             })
@@ -474,23 +474,23 @@ describe("core (reflect)", function () {
         })
 
         it("checks roots", function () {
-            t.false(t.reflect().base().reflect().runnable())
+            t.false(t.base().reflect().runnable())
         })
 
         it("checks inline normal tests", function () {
-            var tt = t.reflect().base()
+            var tt = t.base()
 
             t.false(tt.test("test").reflect().runnable())
         })
 
         it("checks inline skipped tests", function () {
-            var tt = t.reflect().base()
+            var tt = t.base()
 
             t.true(tt.testSkip("test").reflect().runnable())
         })
 
         it("checks block normal tests", function () {
-            var tt = t.reflect().base()
+            var tt = t.base()
             var runnable
 
             tt.test("test", function (tt) {
@@ -503,7 +503,7 @@ describe("core (reflect)", function () {
         })
 
         it("misses block skipped tests", function () {
-            var tt = t.reflect().base()
+            var tt = t.base()
             var runnable
 
             tt.testSkip("test", function (tt) {
@@ -516,21 +516,21 @@ describe("core (reflect)", function () {
         })
 
         it("checks whitelisted `.only()` inline tests", function () {
-            var tt = t.reflect().base()
+            var tt = t.base()
 
             tt.only(["test"])
             t.false(tt.test("test").reflect().runnable())
         })
 
         it("checks non-whitelisted `.only()` inline tests", function () {
-            var tt = t.reflect().base()
+            var tt = t.base()
 
             tt.only(["nope"])
             t.true(tt.test("test").reflect().runnable())
         })
 
         it("checks whitelisted `.only()` block tests", function () {
-            var tt = t.reflect().base()
+            var tt = t.base()
             var runnable
 
             tt.only(["test"])
@@ -545,7 +545,7 @@ describe("core (reflect)", function () {
         })
 
         it("misses non-whitelisted `.only()` block tests", function () {
-            var tt = t.reflect().base()
+            var tt = t.base()
             var runnable
 
             tt.only(["nope"])
@@ -566,23 +566,23 @@ describe("core (reflect)", function () {
         })
 
         it("checks roots", function () {
-            t.false(t.reflect().base().reflect().skipped())
+            t.false(t.base().reflect().skipped())
         })
 
         it("checks inline normal tests", function () {
-            var tt = t.reflect().base()
+            var tt = t.base()
 
             t.false(tt.test("test").reflect().skipped())
         })
 
         it("checks inline skipped tests", function () {
-            var tt = t.reflect().base()
+            var tt = t.base()
 
             t.true(tt.testSkip("test").reflect().skipped())
         })
 
         it("checks block normal tests", function () {
-            var tt = t.reflect().base()
+            var tt = t.base()
             var skipped
 
             tt.test("test", function (tt) {
@@ -595,7 +595,7 @@ describe("core (reflect)", function () {
         })
 
         it("misses block skipped tests", function () {
-            var tt = t.reflect().base()
+            var tt = t.base()
             var skipped
 
             tt.testSkip("test", function (tt) {
@@ -608,21 +608,21 @@ describe("core (reflect)", function () {
         })
 
         it("checks whitelisted `.only()` inline tests", function () {
-            var tt = t.reflect().base()
+            var tt = t.base()
 
             tt.only(["test"])
             t.false(tt.test("test").reflect().skipped())
         })
 
         it("checks non-whitelisted `.only()` inline tests", function () {
-            var tt = t.reflect().base()
+            var tt = t.base()
 
             tt.only(["nope"])
             t.false(tt.test("test").reflect().skipped())
         })
 
         it("checks whitelisted `.only()` block tests", function () {
-            var tt = t.reflect().base()
+            var tt = t.base()
             var skipped
 
             tt.only(["test"])
@@ -637,7 +637,7 @@ describe("core (reflect)", function () {
         })
 
         it("misses non-whitelisted `.only()` block tests", function () {
-            var tt = t.reflect().base()
+            var tt = t.base()
             var skipped
 
             tt.only(["nope"])

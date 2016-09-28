@@ -31,7 +31,7 @@ t.test 'core (timeouts) (FLAKE)', ->
         done()
 
     @async 'succeeds with own', ->
-        tt = @reflect().base()
+        tt = @base()
         ret = []
 
         tt.reporter @push(ret)
@@ -49,7 +49,7 @@ t.test 'core (timeouts) (FLAKE)', ->
             ]
 
     @async 'fails with own', ->
-        tt = @reflect().base()
+        tt = @base()
         ret = []
 
         tt.reporter @push(ret)
@@ -67,7 +67,7 @@ t.test 'core (timeouts) (FLAKE)', ->
             ]
 
     @async 'succeeds with inherited', ->
-        tt = @reflect().base()
+        tt = @base()
         ret = []
 
         tt.reporter @push(ret)
@@ -86,7 +86,7 @@ t.test 'core (timeouts) (FLAKE)', ->
             ]
 
     @async 'fails with inherited', ->
-        tt = @reflect().base()
+        tt = @base()
         ret = []
 
         tt.reporter @push(ret)
@@ -108,7 +108,7 @@ t.test 'core (timeouts) (FLAKE)', ->
             ]
 
     @async 'gets own block timeout', ->
-        tt = @reflect().base()
+        tt = @base()
         active = raw = undefined
 
         tt.test 'test', ->
@@ -121,14 +121,14 @@ t.test 'core (timeouts) (FLAKE)', ->
             @equal raw, 50
 
     @test 'gets own inline timeout', ->
-        tt = @reflect().base()
+        tt = @base()
         ttt = tt.test('test').timeout 50
 
         @equal ttt.reflect().activeTimeout(), 50
         @equal ttt.reflect().timeout(), 50
 
     @async 'gets inherited block timeout', ->
-        tt = @reflect().base()
+        tt = @base()
         active = raw = undefined
 
         tt.test 'test'
@@ -142,7 +142,7 @@ t.test 'core (timeouts) (FLAKE)', ->
             @equal raw, 0
 
     @test 'gets inherited inline timeout', ->
-        tt = @reflect().base()
+        tt = @base()
 
         ttt = tt.test 'test'
         .timeout 50
@@ -152,7 +152,7 @@ t.test 'core (timeouts) (FLAKE)', ->
         @equal ttt.reflect().timeout(), 0
 
     @async 'gets default timeout', ->
-        tt = @reflect().base()
+        tt = @base()
         active = raw = undefined
 
         tt.test 'test', ->

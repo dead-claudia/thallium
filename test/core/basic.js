@@ -9,17 +9,19 @@
 describe("core (basic)", function () {
     var Promise = Util.Promise
 
+    describe("base()", function () {
+        it("exists", function () {
+            t.function(t.base)
+        })
+    })
+
     describe("reflect()", function () {
         it("exists", function () {
             t.function(t.reflect)
         })
 
-        it("has base()", function () {
-            t.function(t.reflect().base)
-        })
-
         it("has parent()", function () {
-            var tt = t.reflect().base()
+            var tt = t.base()
 
             t.undefined(tt.reflect().parent())
             t.equal(tt.test("test").reflect().parent(), tt)
@@ -28,30 +30,30 @@ describe("core (basic)", function () {
 
     describe("test()", function () {
         it("exists", function () {
-            t.function(t.reflect().base().test)
+            t.function(t.base().test)
         })
 
         it("accepts a string + function", function () {
-            var tt = t.reflect().base()
+            var tt = t.base()
 
             tt.test("test", function () {})
         })
 
         it("accepts a string", function () {
-            var tt = t.reflect().base()
+            var tt = t.base()
 
             tt.test("test")
         })
 
         it("returns the current instance when given a callback", function () {
-            var tt = t.reflect().base()
+            var tt = t.base()
             var test = tt.test("test", function () {})
 
             t.equal(test, tt)
         })
 
         it("returns a prototypal clone when not given a callback", function () {
-            var tt = t.reflect().base()
+            var tt = t.base()
             var test = tt.test("test")
 
             t.notEqual(test, tt)
@@ -61,11 +63,11 @@ describe("core (basic)", function () {
 
     describe("run()", function () {
         it("exists", function () {
-            t.function(t.reflect().base().run)
+            t.function(t.base().run)
         })
 
         it("runs block tests within tests", function () {
-            var tt = t.reflect().base()
+            var tt = t.base()
             var called = 0
 
             tt.test("test", function (tt) {
@@ -76,7 +78,7 @@ describe("core (basic)", function () {
         })
 
         it("runs successful inline tests within tests", function () {
-            var tt = t.reflect().base()
+            var tt = t.base()
             var err
 
             tt.reporter(function (res, done) {
@@ -92,7 +94,7 @@ describe("core (basic)", function () {
         })
 
         it("accepts a callback", function () {
-            var tt = t.reflect().base()
+            var tt = t.base()
             var err
 
             tt.reporter(function (res, done) {

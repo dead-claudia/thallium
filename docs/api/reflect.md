@@ -11,10 +11,9 @@ You can use `t.reflect()` to get a Reflect instance for access into the various 
 - [`reflect.add(method, callback)`](#add)
 - [`class reflect.AssertionError`](#assertion-error)
 - [`reflect.async()`](#async)
-- [`reflect.base()`](#base)
 - [`reflect.checkInit`](#checkinit)
 - [`reflect.define(assertion, callback)`](#define)
-- [`reflect.do(func)`](#do)
+- [`reflect.try(func)`](#try)
 - [`reflect.extra(count, value, stack)`](#extracount)
 - [`reflect.inline()`](#inline)
 - [`reflect.loc(name, index)`](#loc)
@@ -79,15 +78,6 @@ reflect.async()
 
 Check if this is an async test (i.e. defined as `t.async("test", callback)`).
 
-<a id="base"></a>
-## reflect.base()
-
-```js
-reflect.base()
-```
-
-Create a new, entirely separate Thallium test instance. This is mostly used for internal testing, but it's exposed for anyone who needs it. It's like an uncached `require("thallium/core")`, but much easier to use.
-
 <a id="checkinit"></a>
 ## reflect.checkInit()
 
@@ -95,7 +85,7 @@ Create a new, entirely separate Thallium test instance. This is mostly used for 
 reflect.checkInit()
 ```
 
-Assert that this test is currently being initialized. If you are doing an operation that is affected by test state, you *must* check this so your users don't get surprised by their tests accidentally getting in an invalid state. If you're using [`reflect.add`](#add) or [`reflect.define`](#define)/[`t.define`](./primary.md#define), this is already done for you, so you probably won't be calling this directly very often.
+Assert that this test is currently being initialized. If you are doing an operation that is affected by test state, you *must* check this so your users don't get surprised by their tests accidentally getting in an invalid state. If you're using [`reflect.add`](#add) or [`reflect.define`](#define)/[`t.define`](./thallium.md#define), this is already done for you, so you probably won't be calling this directly very often.
 
 <a id="define"></a>
 # reflect.define(assertion, callback)
@@ -105,20 +95,20 @@ reflect.define("assertion", callback)
 reflect.define({assertion: callback})
 ```
 
-This is pretty much the same as calling [`t.define`](./primary.md#define) with the same arguments, but if `t.define()` was changed at any point, this will always work like it's supposed to. Also, this returns `undefined`, so it's unsuitable for chaining.
+This is pretty much the same as calling [`t.define`](./thallium.md#define) with the same arguments, but if `t.define()` was changed at any point, this will always work like it's supposed to. Also, this returns `undefined`, so it's unsuitable for chaining.
 
-<a id="do"></a>
-## reflect.do(func)
+<a id="try"></a>
+## reflect.try(func)
 
 ```js
-reflect.do(func)
+reflect.try(func)
 ```
 
 These run a function when the assertions are being run, and is guaranteed to report errors thrown as within that test. This is probably mostly useful for plugin authors dealing with inline tests, for simple setup and/or cleanup within those. Note that it isn't safe to call API methods within this, though.
 
 ```js
 t.test("test")
-.do(() => foo.initValue())
+.try(() => foo.initValue())
 .equal(foo.getValue(), "something")
 ```
 
@@ -169,7 +159,7 @@ Get the associated methods of this instance, as in where the reflect instance ca
 reflect.parent()
 ```
 
-Get the parent instance of this instance. If this is the base Thallium instance (i.e. the result of [`reflect.base()`](./reflect.md#base) or Thallium's main export), then this will return `undefined`.
+Get the parent instance of this instance. If this is the base Thallium instance (i.e. the result of [`t.base()`](./thallium.md#base) or Thallium's main export), then this will return `undefined`.
 
 <a id="report"></a>
 ## reflect.report(type, path, value, duration, slow)
@@ -196,7 +186,7 @@ Get a list of all own reporters, or an empty list if there were none.
 reflect.root()
 ```
 
-Check if this is a root test. This is true at the global scope and for any result of `reflect.base()`, but false elsewhere.
+Check if this is a root test. This is true at the global scope and for any result of `t.base()`, but false elsewhere.
 
 <a id="runnable"></a>
 ## reflect.runnable()

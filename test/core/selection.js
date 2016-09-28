@@ -14,7 +14,7 @@ describe("core (selection)", function () {
 
     describe("skip", function () {
         it("tests with callbacks", function () {
-            var tt = t.reflect().base().use(fail)
+            var tt = t.base().use(fail)
             var ret = []
 
             tt.reporter(Util.push(ret))
@@ -46,7 +46,7 @@ describe("core (selection)", function () {
         })
 
         it("tests without callbacks", function () {
-            var tt = t.reflect().base().use(fail)
+            var tt = t.base().use(fail)
             var ret = []
 
             tt.reporter(Util.push(ret))
@@ -78,7 +78,7 @@ describe("core (selection)", function () {
         })
 
         it("async tests", function () {
-            var tt = t.reflect().base().use(fail)
+            var tt = t.base().use(fail)
             var ret = []
 
             tt.reporter(Util.push(ret))
@@ -111,7 +111,7 @@ describe("core (selection)", function () {
 
         it("inline tests run directly", function () {
             var ret = []
-            var tt = t.reflect().base().reporter(Util.push(ret))
+            var tt = t.base().reporter(Util.push(ret))
             var ttt = tt.testSkip("test")
 
             return ttt.run().then(function () {
@@ -125,7 +125,7 @@ describe("core (selection)", function () {
 
     describe("only", function () {
         it("tests with callbacks", function () {
-            var tt = t.reflect().base().use(fail)
+            var tt = t.base().use(fail)
             var ret = []
 
             tt.reporter(Util.push(ret))
@@ -153,7 +153,7 @@ describe("core (selection)", function () {
         })
 
         it("tests without callbacks", function () {
-            var tt = t.reflect().base().use(fail)
+            var tt = t.base().use(fail)
             var ret = []
 
             tt.reporter(Util.push(ret))
@@ -181,7 +181,7 @@ describe("core (selection)", function () {
         })
 
         it("async tests", function () {
-            var tt = t.reflect().base().use(fail)
+            var tt = t.base().use(fail)
             var ret = []
 
             tt.reporter(Util.push(ret))
@@ -209,7 +209,7 @@ describe("core (selection)", function () {
         })
 
         it("tests as index with callbacks", function () {
-            var tt = t.reflect().base().use(fail)
+            var tt = t.base().use(fail)
             var ret = []
 
             tt.reporter(Util.push(ret))
@@ -234,7 +234,7 @@ describe("core (selection)", function () {
         })
 
         it("tests as index index without callbacks", function () {
-            var tt = t.reflect().base().use(fail)
+            var tt = t.base().use(fail)
             var ret = []
 
             tt.reporter(Util.push(ret))
@@ -259,7 +259,7 @@ describe("core (selection)", function () {
         })
 
         it("async tests as index", function () {
-            var tt = t.reflect().base().use(fail)
+            var tt = t.base().use(fail)
             var ret = []
 
             tt.reporter(Util.push(ret))
@@ -284,7 +284,7 @@ describe("core (selection)", function () {
         })
 
         it("against regexp", function () {
-            var tt = t.reflect().base().use(fail)
+            var tt = t.base().use(fail)
             var ret = []
 
             tt.reporter(Util.push(ret))

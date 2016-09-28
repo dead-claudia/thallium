@@ -2,7 +2,7 @@
 
 This has a very straightforward, intuitive core API. If you want to know about the various assertions available here by default, please see the [TypeScript definition file](../assertions.d.ts) for now, until I can get the roughly 100 or so assertions documented.
 
-- [Primary API](./api/primary.md)
+- [Primary API](./api/thallium.md)
 - [Reflection API](./api/reflect.md)
 - [Bundle API](./api/bundle.md)
 

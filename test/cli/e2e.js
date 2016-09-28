@@ -117,7 +117,6 @@ describe("cli end-to-end (FLAKE)", function () {
         "enter [0: core (basic)] = undefined",
         "enter [0: core (basic)] > [0: reflect()] = undefined",
         "pass [0: core (basic)] > [0: reflect()] > [0: exists] = undefined",
-        "pass [0: core (basic)] > [0: reflect()] > [1: has base()] = undefined",
         "pass [0: core (basic)] > [0: reflect()] > [2: has parent()] = undefined",
         "leave [0: core (basic)] > [0: reflect()] = undefined",
         "enter [0: core (basic)] > [1: test()] = undefined",

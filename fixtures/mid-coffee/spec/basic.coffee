@@ -11,42 +11,41 @@ t = require 'thallium'
 t.test 'core (basic)', ->
     @test 'reflect()', ->
         @test('exists').function @reflect
-        @test('has base()').function @reflect().base
 
         @test 'has parent()', ->
-            tt = @reflect().base()
+            tt = @base()
 
             @undefined tt.reflect().parent()
             @equal tt.test('test').reflect().parent(), tt
 
     @test 'test()', ->
-        @test('exists').function @reflect().base().test
+        @test('exists').function @base().test
 
         @test 'accepts a string + function', ->
-            tt = @reflect().base()
+            tt = @base()
             tt.test 'test', ->
 
         @test 'accepts a string', ->
-            tt = @reflect().base()
+            tt = @base()
             tt.test('test')
 
         @test 'returns the current instance when given a callback', ->
-            tt = @reflect().base()
+            tt = @base()
             test = tt.test 'test', ->
             @equal test, tt
 
         @test 'returns a prototypal clone when not given a callback', ->
-            tt = @reflect().base()
+            tt = @base()
             test = tt.test('test')
 
             @notEqual test, tt
             @equal Object.getPrototypeOf(test), tt
 
     @test 'run()', ->
-        @test('exists').function @reflect().base().run
+        @test('exists').function @base().run
 
         @async 'runs block tests within tests', ->
-            tt = @reflect().base()
+            tt = @base()
             called = 0
 
             tt.test 'test', ->
@@ -55,7 +54,7 @@ t.test 'core (basic)', ->
             tt.run().then => @equal called, 1
 
         @async 'runs successful inline tests within tests', ->
-            tt = @reflect().base()
+            tt = @base()
             err = undefined
 
             tt.reporter (res, done) ->
@@ -69,7 +68,7 @@ t.test 'core (basic)', ->
             tt.run().then => @notOk err
 
         @async 'accepts a callback', ->
-            tt = @reflect().base()
+            tt = @base()
             err = undefined
 
             tt.reporter (res, done) ->

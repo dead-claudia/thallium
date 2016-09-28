@@ -155,7 +155,7 @@ describe("core (safety)", function () {
                 var entry = ret[i]
 
                 if (entry.extra()) {
-                    t.string(Util.getStack(entry.value))
+                    t.string(Util.R.getStack(entry.value))
                     entry.value.stack = ""
                 }
             }

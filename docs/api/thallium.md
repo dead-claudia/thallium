@@ -13,6 +13,7 @@ These are the most common methods you'll ever use.
 - [`t.timeout(timeout)`](#timeout)
 - [`t.only(only)`](#only)
 - [`t.run()`](#run)
+- [`t.base()`](#base)
 
 <a id="block"></a>
 ## Block tests
@@ -58,7 +59,7 @@ Similar to `t.test("name", callback)`, but instead, it returns a new Thallium in
 t.test("1 should equal 1").equal(1, 1)
 ```
 
-It is perfectly safe to add new properties and modify existing ones on the new instance, as none of the changes escape to the outer context. Do note that the assertions' tests and [`reflect.do` callbacks](./reflect.md#do.md) are run when the test itself is being run, not when you define the test.
+It is perfectly safe to add new properties and modify existing ones on the new instance, as none of the changes escape to the outer context. Do note that the assertions' tests and [`reflect.try` callbacks](./reflect.md#try) are run when the test itself is being run, not when you define the test.
 
 You can skip inline tests with `t.testSkip("name")`, which is identical except the test is reported as skipped instead.
 
@@ -308,3 +309,12 @@ If it's rejected, the rejection always caused by one of two things:
 2. Thallium itself threw an error it didn't catch.
 
 Either way, it's fatal, and the test has already aborted. Note that after the error, the test state *does* reset fully, so if the reporter doesn't error out a second time, the tests will run normally. Because of this, it is actually safe to rerun the tests after a rejection, since it's not in an invalid state unless the error was from Thallium itself (in which [you definitely should report it](https://github.com/isiahmeadows/thallium/issues/new)).
+
+<a id="base"></a>
+## reflect.base()
+
+```js
+t.base()
+```
+
+Create a new, entirely separate Thallium test instance. This is mostly used for internal testing, but it's exposed for anyone who needs it.
