@@ -170,13 +170,13 @@ export interface AssertionResult {
     expected?: any;
 }
 
-export class AssertionError<T, U> extends Error {
+export class AssertionError extends Error {
     name: "AssertionError";
     message: string;
-    expected: T;
-    found: U;
+    expected: any;
+    found: any;
 
-    constructor(message: string, expected: T, actual: U);
+    constructor(message: string, expected: any, actual: any);
 }
 
 export interface IteratorResult<T> {
@@ -215,11 +215,6 @@ export interface Reflect<T extends Test> {
      * A reference to the AssertionError constructor.
      */
     AssertionError: typeof AssertionError;
-
-    /**
-     * Create a new Thallium instance
-     */
-    base(): Test;
 
     /**
      * Define an assertion.
@@ -334,7 +329,7 @@ export interface Reflect<T extends Test> {
      * is immediately for block and async tests, but deferred for inline tests.
      * It's useful if you need these guarantees.
      */
-    do(func: () => any): void;
+    try(func: () => any): void;
 
     /**
      * Create a `start` report. Mostly useful for testing reporters. Note that
@@ -407,6 +402,11 @@ export interface Test {
      * @internal
      */
     _: Object;
+
+    /**
+     * Create a new Thallium instance
+     */
+    base(): Test;
 
     /**
      * Contains several internal methods that are not as useful for most users,
