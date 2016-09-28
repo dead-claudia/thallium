@@ -35,7 +35,6 @@ var Util = global.Util = {
     // module loader.
     Promise: require("../lib/bluebird.js"),
     setTimeout: global.setTimeout.bind(global),
-    getStack: require("../lib/util.js").getStack,
     m: require("../lib/messages.js"),
     methods: require("../lib/methods.js"),
     R: require("../lib/reporter.js"),
