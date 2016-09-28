@@ -3,6 +3,7 @@
 # CoffeeScript make for a much easier ShellJS experience.
 
 require 'shelljs/make'
+{resolve} = require 'path'
 chokidar = require 'chokidar'
 semver = require 'semver'
 pkg = require './package.json'
@@ -27,23 +28,46 @@ target['test:karma'] = ->
 target['test:mocha'] = ->
     exec 'mocha --colors'
 
+patterns = [
+    '{bin,fixtures,helpers,lib,r,scripts,test}/**/{.,}*.js',
+    '{bin,fixtures,helpers,lib,r,scripts,test}/**/{.,}*.coffee',
+    '{.,}*.js'
+    '{.,}*.coffee'
+]
+
 watch = (onchange) ->
-    # Give time for the file changes to settle by delaying and debouncing the
-    # `onchange` handler.
-    timeout = Date.now() + 500 # ms
-    current = undefined
+    timeout = lastEvent = lastPath = undefined
+    count = 0
 
-    invoke = (event, path) ->
-        console.error "#{event}: #{path}"
-        onchange()
+    invoke = ->
+        timeout = last = undefined
+        onchange() while count--
+        return
 
-    chokidar.watch [
-        '{bin,fixtures,helpers,lib,r,scripts,test}/**/{.,}*.js',
-        '{bin,fixtures,helpers,lib,r,scripts,test}/**/{.,}*.coffee',
-    ], ignored: ['**/test-bundle.js']
+    chokidar.watch patterns,
+        cwd: __dirname
+        ignored: ['**/test-bundle.js']
+
     .on 'all', (event, path) ->
-        clearTimeout current if current?
-        current = setTimeout (-> invoke event, path), timeout
+        console.error "#{event}: #{path}"
+        if timeout? and event is lastEvent and path is lastPath
+            clearTimeout timeout
+            timeout = undefined
+        else
+            lastEvent = event
+            lastPath = path
+        count++
+
+        # Give time for the file changes to settle by delaying and debouncing
+        # the `onchange` handler.
+        unless timeout?
+            timeout = setTimeout invoke, 500
+
+    .on 'error', (error) ->
+        console.error error.stack
+
+    .once 'ready', ->
+        console.error 'Watching', "\"#{patterns.join '", "'}\" .."
 
 target.watch = -> watch target.test
 target['watch:karma'] = -> watch target['test:karma']
