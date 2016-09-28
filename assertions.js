@@ -5,11 +5,22 @@
  * there is *so* much repetition.
  */
 
-var Util = require("./lib/util.js")
-var match = require("./lib/match.js")
+var match = require("./match.js")
 
 var toString = Object.prototype.toString
 var hasOwn = Object.prototype.hasOwnProperty
+
+/* eslint-disable no-self-compare */
+// For better NaN handling
+function strictIs(a, b) {
+    return a === b || a !== a && b !== b
+}
+
+function looseIs(a, b) {
+    return a == b || a !== a && b !== b // eslint-disable-line eqeqeq
+}
+
+/* eslint-enable no-self-compare */
 
 var check = (function () {
     function prefix(type) {
@@ -233,12 +244,12 @@ define("notInstanceof", function (object, Type) {
     }
 })
 
-binary("equal", Util.strictIs, [
+binary("equal", strictIs, [
     "Expected {actual} to equal {expected}",
     "Expected {actual} to not equal {expected}",
 ])
 
-binary("equalLoose", Util.looseIs, [
+binary("equalLoose", looseIs, [
     "Expected {actual} to loosely equal {expected}",
     "Expected {actual} to not loosely equal {expected}",
 ])
@@ -291,7 +302,7 @@ binary("match", match.match, [
 ])
 
 function has(name, _) { // eslint-disable-line max-len, max-params
-    if (_.equals === Util.looseIs) {
+    if (_.equals === looseIs) {
         define(name, function (object, key, value) {
             return {
                 test: _.has(object, key) && _.is(_.get(object, key), value),
@@ -365,7 +376,7 @@ function hasObjectGet(object, key) { return object[key] }
 function hasCollGet(object, key) { return object.get(key) }
 
 has("hasOwn", {
-    is: Util.strictIs,
+    is: strictIs,
     has: hasOwnKey,
     get: hasObjectGet,
     messages: [
@@ -377,7 +388,7 @@ has("hasOwn", {
 })
 
 has("hasOwnLoose", {
-    is: Util.looseIs,
+    is: looseIs,
     has: hasOwnKey,
     get: hasObjectGet,
     messages: [
@@ -389,7 +400,7 @@ has("hasOwnLoose", {
 })
 
 has("hasKey", {
-    is: Util.strictIs,
+    is: strictIs,
     has: hasInKey,
     get: hasObjectGet,
     messages: [
@@ -401,7 +412,7 @@ has("hasKey", {
 })
 
 has("hasKeyLoose", {
-    is: Util.looseIs,
+    is: looseIs,
     has: hasInKey,
     get: hasObjectGet,
     messages: [
@@ -413,7 +424,7 @@ has("hasKeyLoose", {
 })
 
 has("has", {
-    is: Util.strictIs,
+    is: strictIs,
     has: hasInColl,
     get: hasCollGet,
     messages: [
@@ -425,7 +436,7 @@ has("has", {
 })
 
 has("hasLoose", {
-    is: Util.looseIs,
+    is: looseIs,
     has: hasInColl,
     get: hasCollGet,
     messages: [
@@ -666,8 +677,8 @@ function defineIncludes(name, func, invert, message) {
     })
 }
 
-var includesAll = makeIncludes(true, Util.strictIs)
-var includesAny = makeIncludes(false, Util.strictIs)
+var includesAll = makeIncludes(true, strictIs)
+var includesAny = makeIncludes(false, strictIs)
 
 /* eslint-disable max-len */
 
@@ -676,8 +687,8 @@ defineIncludes("notIncludesAll", includesAll, true, "Expected {actual} to not ha
 defineIncludes("includesAny", includesAny, false, "Expected {actual} to have any value in {values}")
 defineIncludes("notIncludes", includesAny, true, "Expected {actual} to not have any value in {values}")
 
-var includesLooseAll = makeIncludes(true, Util.looseIs)
-var includesLooseAny = makeIncludes(false, Util.looseIs)
+var includesLooseAll = makeIncludes(true, looseIs)
+var includesLooseAny = makeIncludes(false, looseIs)
 
 defineIncludes("includesLoose", includesLooseAll, false, "Expected {actual} to loosely have all values in {values}")
 defineIncludes("notIncludesLooseAll", includesLooseAll, true, "Expected {actual} to not loosely have all values in {values}")
@@ -793,16 +804,16 @@ function hasOverloadType(all, func) {
 
 /* eslint-disable max-len */
 
-var hasAllKeys = hasOverloadType(true, Util.strictIs)
-var hasAnyKeys = hasOverloadType(false, Util.strictIs)
+var hasAllKeys = hasOverloadType(true, strictIs)
+var hasAnyKeys = hasOverloadType(false, strictIs)
 
 makeHasOverload("hasKeys", hasAllKeys, false, "Expected {actual} to have all keys in {keys}")
 makeHasOverload("notHasAllKeys", hasAllKeys, true, "Expected {actual} to not have all keys in {keys}")
 makeHasOverload("hasAnyKeys", hasAnyKeys, false, "Expected {actual} to have any key in {keys}")
 makeHasOverload("notHasKeys", hasAnyKeys, true, "Expected {actual} to not have any key in {keys}")
 
-var hasLooseAllKeys = hasOverloadType(true, Util.looseIs)
-var hasLooseAnyKeys = hasOverloadType(false, Util.looseIs)
+var hasLooseAllKeys = hasOverloadType(true, looseIs)
+var hasLooseAnyKeys = hasOverloadType(false, looseIs)
 
 makeHasOverload("hasLooseKeys", hasLooseAllKeys, false, "Expected {actual} to loosely have all keys in {keys}")
 makeHasOverload("notHasLooseAllKeys", hasLooseAllKeys, true, "Expected {actual} to not loosely have all keys in {keys}")
