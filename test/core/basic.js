@@ -11,26 +11,26 @@ describe("core (basic)", function () {
 
     describe("base()", function () {
         it("exists", function () {
-            t.function(t.base)
+            assert.function(t.base)
         })
     })
 
     describe("reflect()", function () {
         it("exists", function () {
-            t.function(t.reflect)
+            assert.function(t.reflect)
         })
 
         it("has parent()", function () {
             var tt = t.base()
 
-            t.undefined(tt.reflect().parent())
-            t.equal(tt.test("test").reflect().parent(), tt)
+            assert.equal(tt.reflect().parent(), undefined)
+            assert.equal(tt.test("test").reflect().parent(), tt)
         })
     })
 
     describe("test()", function () {
         it("exists", function () {
-            t.function(t.base().test)
+            assert.function(t.base().test)
         })
 
         it("accepts a string + function", function () {
@@ -49,7 +49,7 @@ describe("core (basic)", function () {
             var tt = t.base()
             var test = tt.test("test", function () {})
 
-            t.equal(test, tt)
+            assert.equal(test, tt)
         })
 
         it("returns a prototypal clone when not given a callback", function () {
@@ -57,13 +57,13 @@ describe("core (basic)", function () {
             var test = tt.test("test")
 
             t.notEqual(test, tt)
-            t.equal(Object.getPrototypeOf(test), tt)
+            assert.equal(Object.getPrototypeOf(test), tt)
         })
     })
 
     describe("run()", function () {
         it("exists", function () {
-            t.function(t.base().run)
+            assert.function(t.base().run)
         })
 
         it("runs block tests within tests", function () {
@@ -74,7 +74,7 @@ describe("core (basic)", function () {
                 tt.test("foo", function () { called++ })
             })
 
-            return tt.run().then(function () { t.equal(called, 1) })
+            return tt.run().then(function () { assert.equal(called, 1) })
         })
 
         it("runs successful inline tests within tests", function () {
@@ -108,6 +108,184 @@ describe("core (basic)", function () {
 
             return Promise.fromCallback(function (cb) { tt.run(cb) })
             .then(function () { t.notOk(err) })
+        })
+    })
+
+    describe("try()", function () {
+        it("exists", function () {
+            assert.function(t.base().try)
+            assert.function(t.reflect().try)
+        })
+
+        function makeSpy(result) {
+            /** @this */
+            function spy() {
+                var args = []
+
+                for (var i = 0; i < arguments.length; i++) {
+                    args.push(arguments[i])
+                }
+
+                spy.this.push(this)
+                spy.args.push(args)
+
+                if (result != null) throw result
+            }
+
+            spy.this = []
+            spy.args = []
+            return spy
+        }
+
+        context("with block tests", function () {
+            it("requires a function", function () {
+                assert.throws(function () { t.base().try() }, TypeError)
+                assert.throws(function () { t.base().try(1) }, TypeError)
+                assert.throws(function () { t.base().try("foo") }, TypeError)
+                assert.throws(function () { t.base().try(true) }, TypeError)
+                assert.throws(function () { t.base().try({}) }, TypeError)
+                assert.throws(function () { t.base().try([]) }, TypeError)
+                assert.throws(function () { t.base().try(null) }, TypeError)
+                if (typeof Symbol === "function") { // eslint-disable-line no-undef, max-len
+                    assert.throws(function () { t.base().try(Symbol()) }, TypeError) // eslint-disable-line no-undef, max-len
+                }
+            })
+
+            it("succeeds with 0 args", function () {
+                var spy = makeSpy()
+                var tt = t.base()
+
+                tt.try(spy)
+                assert.match(spy.this, [undefined])
+                assert.match(spy.args, [[]])
+            })
+
+            it("succeeds with 1 arg", function () {
+                var spy = makeSpy()
+                var tt = t.base()
+
+                tt.try(spy, {value: 1})
+                assert.match(spy.this, [undefined])
+                assert.match(spy.args, [[{value: 1}]])
+            })
+
+            it("succeeds with 2 args", function () {
+                var spy = makeSpy()
+                var tt = t.base()
+
+                tt.try(spy, {value: 1}, {value: 2})
+                assert.match(spy.this, [undefined])
+                assert.match(spy.args, [[{value: 1}, {value: 2}]])
+            })
+
+            it("succeeds with 3 args", function () {
+                var spy = makeSpy()
+                var tt = t.base()
+
+                tt.try(spy, {value: 1}, {value: 2}, {value: 3})
+                assert.match(spy.this, [undefined])
+                assert.match(spy.args, [[{value: 1}, {value: 2}, {value: 3}]])
+            })
+
+            it("succeeds with 4 args", function () {
+                var spy = makeSpy()
+                var tt = t.base()
+
+                tt.try(spy, {value: 1}, {value: 2}, {value: 3}, {value: 4})
+                assert.match(spy.this, [undefined])
+                assert.match(spy.args, [
+                    [{value: 1}, {value: 2}, {value: 3}, {value: 4}],
+                ])
+            })
+        })
+
+        context("with inline tests", function () {
+            it("requires a function", function () {
+                assert.throws(function () { t.base().try() }, TypeError)
+                assert.throws(function () { t.base().try(1) }, TypeError)
+                assert.throws(function () { t.base().try("foo") }, TypeError)
+                assert.throws(function () { t.base().try(true) }, TypeError)
+                assert.throws(function () { t.base().try({}) }, TypeError)
+                assert.throws(function () { t.base().try([]) }, TypeError)
+                assert.throws(function () { t.base().try(null) }, TypeError)
+                if (typeof Symbol === "function") { // eslint-disable-line no-undef, max-len
+                    assert.throws(function () { t.base().try(Symbol()) }, TypeError) // eslint-disable-line no-undef, max-len
+                }
+            })
+
+            it("succeeds with 0 args", function () {
+                var spy = makeSpy()
+                var tt = t.base()
+
+                tt.test("test")
+                .try(spy)
+
+                return Promise.fromCallback(function (cb) { tt.run(cb) })
+                .then(function () {
+                    assert.match(spy.this, [undefined])
+                    assert.match(spy.args, [[]])
+                })
+            })
+
+            it("succeeds with 1 arg", function () {
+                var spy = makeSpy()
+                var tt = t.base()
+
+                tt.test("test")
+                .try(spy, {value: 1})
+
+                return Promise.fromCallback(function (cb) { tt.run(cb) })
+                .then(function () {
+                    assert.match(spy.this, [undefined])
+                    assert.match(spy.args, [[{value: 1}]])
+                })
+            })
+
+            it("succeeds with 2 args", function () {
+                var spy = makeSpy()
+                var tt = t.base()
+
+                tt.test("test")
+                .try(spy, {value: 1}, {value: 2})
+
+                return Promise.fromCallback(function (cb) { tt.run(cb) })
+                .then(function () {
+                    assert.match(spy.this, [undefined])
+                    assert.match(spy.args, [[{value: 1}, {value: 2}]])
+                })
+            })
+
+            it("succeeds with 3 args", function () {
+                var spy = makeSpy()
+                var tt = t.base()
+
+                tt.test("test")
+                .try(spy, {value: 1}, {value: 2}, {value: 3})
+
+                return Promise.fromCallback(function (cb) { tt.run(cb) })
+                .then(function () {
+                    assert.match(spy.this, [undefined])
+                    assert.match(spy.args, [
+                        [{value: 1}, {value: 2}, {value: 3}],
+                    ])
+                })
+            })
+
+            it("succeeds with 4 args", function () {
+                var spy = makeSpy()
+                var tt = t.base()
+
+                tt.test("test")
+                .try(spy, {value: 1}, {value: 2}, {value: 3}, {value: 4})
+
+                return Promise.fromCallback(function (cb) { tt.run(cb) })
+                .then(function () {
+                    assert.match(spy.this, [undefined])
+                    assert.match(spy.args, [
+                        [{value: 1}, {value: 2}, {value: 3}, {value: 4}],
+                    ])
+                })
+            })
         })
     })
 })

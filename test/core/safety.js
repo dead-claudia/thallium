@@ -21,20 +21,20 @@ describe("core (safety)", function () {
     }
 
     it("disallows non-nullish non-functions as `test` impls", function () {
-        var tt = t.reflect().base()
+        var tt = t.base()
 
-        t.throws(function () { tt.test("test", 1) }, TypeError)
-        t.throws(function () { tt.test("test", 0) }, TypeError)
-        t.throws(function () { tt.test("test", true) }, TypeError)
-        t.throws(function () { tt.test("test", false) }, TypeError)
-        t.throws(function () { tt.test("test", "hi") }, TypeError)
-        t.throws(function () { tt.test("test", "") }, TypeError)
-        t.throws(function () { tt.test("test", []) }, TypeError)
-        t.throws(function () { tt.test("test", [1, 2, 3, 4, 5]) }, TypeError)
-        t.throws(function () { tt.test("test", {hello: "world"}) }, TypeError)
-        t.throws(function () { tt.test("test", {}) }, TypeError)
-        t.throws(function () { tt.test("test", valueOf(false)) }, TypeError)
-        t.throws(function () { tt.test("test", valueOf(undefined)) }, TypeError)
+        assert.throws(function () { tt.test("test", 1) }, TypeError)
+        assert.throws(function () { tt.test("test", 0) }, TypeError)
+        assert.throws(function () { tt.test("test", true) }, TypeError)
+        assert.throws(function () { tt.test("test", false) }, TypeError)
+        assert.throws(function () { tt.test("test", "hi") }, TypeError)
+        assert.throws(function () { tt.test("test", "") }, TypeError)
+        assert.throws(function () { tt.test("test", []) }, TypeError)
+        assert.throws(function () { tt.test("test", [1, 2, 3, 4, 5]) }, TypeError) // eslint-disable-line max-len
+        assert.throws(function () { tt.test("test", {hello: "world"}) }, TypeError) // eslint-disable-line max-len
+        assert.throws(function () { tt.test("test", {}) }, TypeError)
+        assert.throws(function () { tt.test("test", valueOf(false)) }, TypeError) // eslint-disable-line max-len
+        assert.throws(function () { tt.test("test", valueOf(undefined)) }, TypeError) // eslint-disable-line max-len
 
         /* eslint-disable no-unused-vars */
 
@@ -52,23 +52,23 @@ describe("core (safety)", function () {
     })
 
     it("disallows non-functions as `async` impls", function () {
-        var tt = t.reflect().base()
+        var tt = t.base()
 
-        t.throws(function () { tt.async("test", 1) }, TypeError)
-        t.throws(function () { tt.async("test", 0) }, TypeError)
-        t.throws(function () { tt.async("test", true) }, TypeError)
-        t.throws(function () { tt.async("test", false) }, TypeError)
-        t.throws(function () { tt.async("test", "hi") }, TypeError)
-        t.throws(function () { tt.async("test", "") }, TypeError)
-        t.throws(function () { tt.async("test", []) }, TypeError)
-        t.throws(function () { tt.async("test", [1, 2, 3, 4, 5]) }, TypeError)
-        t.throws(function () { tt.async("test", {hello: "world"}) }, TypeError)
-        t.throws(function () { tt.async("test", {}) }, TypeError)
-        t.throws(function () { tt.async("test", valueOf(false)) }, TypeError)
-        t.throws(function () { tt.async("test", valueOf(undefined)) }, TypeError) // eslint-disable-line max-len
-        t.throws(function () { tt.async("test") }, TypeError)
-        t.throws(function () { tt.async("test", undefined) }, TypeError)
-        t.throws(function () { tt.async("test", null) }, TypeError)
+        assert.throws(function () { tt.async("test", 1) }, TypeError)
+        assert.throws(function () { tt.async("test", 0) }, TypeError)
+        assert.throws(function () { tt.async("test", true) }, TypeError)
+        assert.throws(function () { tt.async("test", false) }, TypeError)
+        assert.throws(function () { tt.async("test", "hi") }, TypeError)
+        assert.throws(function () { tt.async("test", "") }, TypeError)
+        assert.throws(function () { tt.async("test", []) }, TypeError)
+        assert.throws(function () { tt.async("test", [1, 2, 3, 4, 5]) }, TypeError) // eslint-disable-line max-len
+        assert.throws(function () { tt.async("test", {hello: "world"}) }, TypeError) // eslint-disable-line max-len
+        assert.throws(function () { tt.async("test", {}) }, TypeError)
+        assert.throws(function () { tt.async("test", valueOf(false)) }, TypeError) // eslint-disable-line max-len
+        assert.throws(function () { tt.async("test", valueOf(undefined)) }, TypeError) // eslint-disable-line max-len
+        assert.throws(function () { tt.async("test") }, TypeError)
+        assert.throws(function () { tt.async("test", undefined) }, TypeError)
+        assert.throws(function () { tt.async("test", null) }, TypeError)
 
         /* eslint-disable no-unused-vars */
 
@@ -84,7 +84,7 @@ describe("core (safety)", function () {
     })
 
     it("catches unsafe access", function () {
-        var tt = t.reflect().base()
+        var tt = t.base()
         var ret = []
 
         tt.reporter(Util.push(ret))
@@ -114,7 +114,7 @@ describe("core (safety)", function () {
         })
 
         return tt.run().then(function () {
-            t.match(ret, [
+            assert.match(ret, [
                 n("start", []),
                 n("fail", [p("one", 0)], error),
                 n("fail", [p("two", 1)], error),
@@ -134,7 +134,7 @@ describe("core (safety)", function () {
     })
 
     it("reports extraneous async done", function () {
-        var tt = t.reflect().base()
+        var tt = t.base()
         var ret = []
         var sentinel = createSentinel("sentinel")
 
@@ -155,12 +155,12 @@ describe("core (safety)", function () {
                 var entry = ret[i]
 
                 if (entry.extra()) {
-                    t.string(Util.R.getStack(entry.value))
+                    assert.string(Util.R.getStack(entry.value))
                     entry.value.stack = ""
                 }
             }
 
-            t.includesMatchAny(
+            assert.includesMatchAny(
                 [3, 4, 5, 6].map(function (i) {
                     var splice1 = n("extra",
                         [p("test", 0), p("inner", 0), p("fail", 0)],
@@ -189,37 +189,37 @@ describe("core (safety)", function () {
     })
 
     it("catches concurrent runs", function () {
-        var tt = t.reflect().base()
+        var tt = t.base()
 
         tt.reporter(noopReporter)
 
         var res = tt.run()
 
-        t.throws(function () { tt.run() }, Error)
+        assert.throws(function () { tt.run() }, Error)
         return res
     })
 
     it("catches concurrent runs when given a callback", function (done) {
-        var tt = t.reflect().base()
+        var tt = t.base()
 
         tt.reporter(noopReporter)
         tt.run(done)
-        t.throws(function () { tt.run(done) }, Error)
+        assert.throws(function () { tt.run(done) }, Error)
     })
 
     it("allows non-concurrent runs with reporter error", function () {
-        var tt = t.reflect().base()
+        var tt = t.base()
         var sentinel = createSentinel("fail")
 
         tt.reporter(function (_, done) { done(sentinel) })
 
         return tt.run().then(
-            function () { t.fail("Expected a rejection") },
-            function (err) { t.equal(err, sentinel) })
+            function () { assert.fail("Expected a rejection") },
+            function (err) { assert.equal(err, sentinel) })
         .then(function () {
             return tt.run().then(
-                function () { t.fail("Expected a rejection") },
-                function (err) { t.equal(err, sentinel) })
+                function () { assert.fail("Expected a rejection") },
+                function (err) { assert.equal(err, sentinel) })
         })
     })
 })

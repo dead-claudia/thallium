@@ -24,7 +24,7 @@ describe("core (timeouts) (FLAKE)", function () {
         })
 
         return tt.run().then(function () {
-            t.match(ret, [
+            assert.match(ret, [
                 n("start", []),
                 n("pass", [p("test", 0)]),
                 n("end", []),
@@ -45,7 +45,7 @@ describe("core (timeouts) (FLAKE)", function () {
         })
 
         return tt.run().then(function () {
-            t.match(ret, [
+            assert.match(ret, [
                 n("start", []),
                 n("fail", [p("test", 0)], new Error("Timeout of 50 reached")),
                 n("end", []),
@@ -64,7 +64,7 @@ describe("core (timeouts) (FLAKE)", function () {
         .async("inner", function (tt, done) { done() })
 
         return tt.run().then(function () {
-            t.match(ret, [
+            assert.match(ret, [
                 n("start", []),
                 n("enter", [p("test", 0)]),
                 n("pass", [p("test", 0), p("inner", 0)]),
@@ -88,7 +88,7 @@ describe("core (timeouts) (FLAKE)", function () {
         })
 
         return tt.run().then(function () {
-            t.match(ret, [
+            assert.match(ret, [
                 n("start", []),
                 n("enter", [p("test", 0)]),
                 n("fail", [p("test", 0), p("inner", 0)],
@@ -110,8 +110,8 @@ describe("core (timeouts) (FLAKE)", function () {
         })
 
         return tt.run().then(function () {
-            t.equal(active, 50)
-            t.equal(raw, 50)
+            assert.equal(active, 50)
+            assert.equal(raw, 50)
         })
     })
 
@@ -119,8 +119,8 @@ describe("core (timeouts) (FLAKE)", function () {
         var tt = t.base()
         var ttt = tt.test("test").timeout(50)
 
-        t.equal(ttt.reflect().activeTimeout(), 50)
-        t.equal(ttt.reflect().timeout(), 50)
+        assert.equal(ttt.reflect().activeTimeout(), 50)
+        assert.equal(ttt.reflect().timeout(), 50)
     })
 
     it("gets inherited block timeout", function () {
@@ -135,8 +135,8 @@ describe("core (timeouts) (FLAKE)", function () {
         })
 
         return tt.run().then(function () {
-            t.equal(active, 50)
-            t.equal(raw, 0)
+            assert.equal(active, 50)
+            assert.equal(raw, 0)
         })
     })
 
@@ -146,8 +146,8 @@ describe("core (timeouts) (FLAKE)", function () {
         .timeout(50)
         .test("inner")
 
-        t.equal(ttt.reflect().activeTimeout(), 50)
-        t.equal(ttt.reflect().timeout(), 0)
+        assert.equal(ttt.reflect().activeTimeout(), 50)
+        assert.equal(ttt.reflect().timeout(), 0)
     })
 
     it("gets default timeout", function () {
@@ -160,8 +160,8 @@ describe("core (timeouts) (FLAKE)", function () {
         })
 
         return tt.run().then(function () {
-            t.equal(active, 2000)
-            t.equal(raw, 0)
+            assert.equal(active, 2000)
+            assert.equal(raw, 0)
         })
     })
 })

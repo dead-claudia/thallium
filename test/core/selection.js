@@ -6,21 +6,19 @@ describe("core (selection)", function () {
     var p = Util.p
     var n = Util.n
 
-    function fail(t) {
-        t.define("fail", function () {
-            return {test: false, message: "fail"}
-        })
+    function fail() {
+        assert.fail("fail")
     }
 
     describe("skip", function () {
         it("tests with callbacks", function () {
-            var tt = t.base().use(fail)
+            var tt = t.base()
             var ret = []
 
             tt.reporter(Util.push(ret))
 
             tt.test("one", function (tt) {
-                tt.testSkip("inner", function (tt) { tt.fail() })
+                tt.testSkip("inner", function () { fail() })
                 tt.test("other")
             })
 
@@ -46,13 +44,13 @@ describe("core (selection)", function () {
         })
 
         it("tests without callbacks", function () {
-            var tt = t.base().use(fail)
+            var tt = t.base()
             var ret = []
 
             tt.reporter(Util.push(ret))
 
             tt.test("one", function (tt) {
-                tt.testSkip("inner").fail()
+                tt.testSkip("inner").try(fail)
                 tt.test("other")
             })
 
@@ -78,13 +76,13 @@ describe("core (selection)", function () {
         })
 
         it("async tests", function () {
-            var tt = t.base().use(fail)
+            var tt = t.base()
             var ret = []
 
             tt.reporter(Util.push(ret))
 
             tt.test("one", function (tt) {
-                tt.asyncSkip("inner", function (tt) { tt.fail() })
+                tt.asyncSkip("inner", function () { fail() })
                 tt.test("other")
             })
 
@@ -125,7 +123,7 @@ describe("core (selection)", function () {
 
     describe("only", function () {
         it("tests with callbacks", function () {
-            var tt = t.base().use(fail)
+            var tt = t.base()
             var ret = []
 
             tt.reporter(Util.push(ret))
@@ -133,12 +131,12 @@ describe("core (selection)", function () {
 
             tt.test("one", function (tt) {
                 tt.test("inner", function () {})
-                tt.test("other", function (tt) { tt.fail() })
+                tt.test("other", function () { fail() })
             })
 
             tt.test("two", function (tt) {
-                tt.test("inner", function (tt) { tt.fail() })
-                tt.test("other", function (tt) { tt.fail() })
+                tt.test("inner", function () { fail() })
+                tt.test("other", function () { fail() })
             })
 
             return tt.run().then(function () {
@@ -153,7 +151,7 @@ describe("core (selection)", function () {
         })
 
         it("tests without callbacks", function () {
-            var tt = t.base().use(fail)
+            var tt = t.base()
             var ret = []
 
             tt.reporter(Util.push(ret))
@@ -161,12 +159,12 @@ describe("core (selection)", function () {
 
             tt.test("one", function (tt) {
                 tt.test("inner")
-                tt.test("other").fail()
+                tt.test("other").try(fail)
             })
 
             tt.test("two", function (tt) {
-                tt.test("inner").fail()
-                tt.test("other").fail()
+                tt.test("inner").try(fail)
+                tt.test("other").try(fail)
             })
 
             return tt.run().then(function () {
@@ -181,7 +179,7 @@ describe("core (selection)", function () {
         })
 
         it("async tests", function () {
-            var tt = t.base().use(fail)
+            var tt = t.base()
             var ret = []
 
             tt.reporter(Util.push(ret))
@@ -189,12 +187,12 @@ describe("core (selection)", function () {
 
             tt.test("one", function (tt) {
                 tt.async("inner", function (_, done) { done() })
-                tt.async("other", function (tt) { tt.fail() })
+                tt.async("other", function () { fail() })
             })
 
             tt.test("two", function (tt) {
-                tt.async("inner", function (tt) { tt.fail() })
-                tt.async("other", function (tt) { tt.fail() })
+                tt.async("inner", function () { fail() })
+                tt.async("other", function () { fail() })
             })
 
             return tt.run().then(function () {
@@ -209,7 +207,7 @@ describe("core (selection)", function () {
         })
 
         it("tests as index with callbacks", function () {
-            var tt = t.base().use(fail)
+            var tt = t.base()
             var ret = []
 
             tt.reporter(Util.push(ret))
@@ -217,12 +215,12 @@ describe("core (selection)", function () {
 
             tt.test("0", function (tt) {
                 tt.test("inner", function () {})
-                tt.test("other").fail()
+                tt.test("other").try(fail)
             })
 
             tt.test("1", function (tt) {
-                tt.test("inner").fail()
-                tt.test("other").fail()
+                tt.test("inner").try(fail)
+                tt.test("other").try(fail)
             })
 
             return tt.run().then(function () {
@@ -234,7 +232,7 @@ describe("core (selection)", function () {
         })
 
         it("tests as index index without callbacks", function () {
-            var tt = t.base().use(fail)
+            var tt = t.base()
             var ret = []
 
             tt.reporter(Util.push(ret))
@@ -242,12 +240,12 @@ describe("core (selection)", function () {
 
             tt.test("0", function (tt) {
                 tt.test("inner")
-                tt.test("other").fail()
+                tt.test("other").try(fail)
             })
 
             tt.test("1", function (tt) {
-                tt.test("inner").fail()
-                tt.test("other").fail()
+                tt.test("inner").try(fail)
+                tt.test("other").try(fail)
             })
 
             return tt.run().then(function () {
@@ -259,7 +257,7 @@ describe("core (selection)", function () {
         })
 
         it("async tests as index", function () {
-            var tt = t.base().use(fail)
+            var tt = t.base()
             var ret = []
 
             tt.reporter(Util.push(ret))
@@ -267,12 +265,12 @@ describe("core (selection)", function () {
 
             tt.test("0", function (tt) {
                 tt.async("inner", function (_, done) { done() })
-                tt.async("other", function (tt) { tt.fail() })
+                tt.async("other", function () { fail() })
             })
 
             tt.test("1", function (tt) {
-                tt.async("inner", function (tt) { tt.fail() })
-                tt.async("other", function (tt) { tt.fail() })
+                tt.async("inner", function () { fail() })
+                tt.async("other", function () { fail() })
             })
 
             return tt.run().then(function () {
@@ -284,7 +282,7 @@ describe("core (selection)", function () {
         })
 
         it("against regexp", function () {
-            var tt = t.base().use(fail)
+            var tt = t.base()
             var ret = []
 
             tt.reporter(Util.push(ret))
@@ -292,12 +290,12 @@ describe("core (selection)", function () {
 
             tt.test("one", function (tt) {
                 tt.test("inner", function () {})
-                tt.test("other", function (tt) { tt.fail() })
+                tt.test("other", function () { fail() })
             })
 
             tt.test("two", function (tt) {
-                tt.test("inner", function (tt) { tt.fail() })
-                tt.test("other", function (tt) { tt.fail() })
+                tt.test("inner", function () { fail() })
+                tt.test("other", function () { fail() })
             })
 
             return tt.run().then(function () {

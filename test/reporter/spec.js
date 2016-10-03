@@ -11,13 +11,13 @@ describe("reporter spec", function () {
     it("is not itself a reporter", function () {
         var spec = Util.r.spec
 
-        t.throws(function () { spec(n("start", [])) }, TypeError)
-        t.throws(function () { spec(n("enter", [p("test", 0)])) }, TypeError)
-        t.throws(function () { spec(n("leave", [p("test", 0)])) }, TypeError)
-        t.throws(function () { spec(n("pass", [p("test", 0)])) }, TypeError)
-        t.throws(function () { spec(n("fail", [p("test", 0)])) }, TypeError)
-        t.throws(function () { spec(n("skip", [p("test", 0)])) }, TypeError)
-        t.throws(function () { spec(n("end", [])) }, TypeError)
+        assert.throws(function () { spec(n("start", [])) }, TypeError)
+        assert.throws(function () { spec(n("enter", [p("test", 0)])) }, TypeError) // eslint-disable-line max-len
+        assert.throws(function () { spec(n("leave", [p("test", 0)])) }, TypeError) // eslint-disable-line max-len
+        assert.throws(function () { spec(n("pass", [p("test", 0)])) }, TypeError) // eslint-disable-line max-len
+        assert.throws(function () { spec(n("fail", [p("test", 0)])) }, TypeError) // eslint-disable-line max-len
+        assert.throws(function () { spec(n("skip", [p("test", 0)])) }, TypeError) // eslint-disable-line max-len
+        assert.throws(function () { spec(n("end", [])) }, TypeError)
     })
 
     function stack(e) {
@@ -59,7 +59,7 @@ describe("reporter spec", function () {
                     return Util.Resolver.resolve1(reporter, undefined, i)
                 })
                 .then(function () {
-                    t.match(list, opts.output)
+                    assert.match(list, opts.output)
                 })
             })
         }
@@ -183,7 +183,7 @@ describe("reporter spec", function () {
             ]),
         })
 
-        var AssertionError = t.reflect().AssertionError
+        var AssertionError = assert.AssertionError
         var assertion = new AssertionError("Expected 1 to equal 2", 1, 2)
 
         test("fail 2 with AssertionError", {
@@ -352,7 +352,7 @@ describe("reporter spec", function () {
             var stack
 
             e.name = ""
-            stack = Util.getStack(e).split(/\r?\n/g).slice(1)
+            stack = Util.R.getStack(e).split(/\r?\n/g).slice(1)
 
             parts.push("    " + c("fail", "- " + stack[0].trim()))
 
@@ -471,7 +471,7 @@ describe("reporter spec", function () {
                 n("pass", [p("core (basic)", 0), p("returns a prototypal clone when not given a callback", 6)]),
                 n("pass", [p("core (basic)", 0), p("runs block tests within tests", 7)]),
                 n("pass", [p("core (basic)", 0), p("runs successful inline tests within tests", 8)]),
-                n("pass", [p("core (basic)", 0), p("accepts a callback with `t.run()`", 9)]),
+                n("pass", [p("core (basic)", 0), p("accepts a callback with `run()`", 9)]),
                 n("leave", [p("core (basic)", 0)]),
                 n("enter", [p("cli normalize glob", 1)]),
                 n("enter", [p("cli normalize glob", 1), p("current directory", 0)]),
@@ -530,7 +530,7 @@ describe("reporter spec", function () {
                 "    " + pass("returns a prototypal clone when not given a callback"),
                 "    " + pass("runs block tests within tests"),
                 "    " + pass("runs successful inline tests within tests"),
-                "    " + pass("accepts a callback with `t.run()`"),
+                "    " + pass("accepts a callback with `run()`"),
                 "",
                 "  cli normalize glob",
                 "    current directory",
@@ -592,7 +592,7 @@ describe("reporter spec", function () {
                 n("fail", [p("core (basic)", 0), p("returns a prototypal clone when not given a callback", 6)], badType),
                 n("pass", [p("core (basic)", 0), p("runs block tests within tests", 7)]),
                 n("pass", [p("core (basic)", 0), p("runs successful inline tests within tests", 8)]),
-                n("pass", [p("core (basic)", 0), p("accepts a callback with `t.run()`", 9)]),
+                n("pass", [p("core (basic)", 0), p("accepts a callback with `run()`", 9)]),
                 n("leave", [p("core (basic)", 0)]),
                 n("enter", [p("cli normalize glob", 1)]),
                 n("enter", [p("cli normalize glob", 1), p("current directory", 0)]),
@@ -653,7 +653,7 @@ describe("reporter spec", function () {
                 "    " + c("fail", "1) returns a prototypal clone when not given a callback"),
                 "    " + pass("runs block tests within tests"),
                 "    " + pass("runs successful inline tests within tests"),
-                "    " + pass("accepts a callback with `t.run()`"),
+                "    " + pass("accepts a callback with `run()`"),
                 "",
                 "  cli normalize glob",
                 "    current directory",
@@ -1037,7 +1037,7 @@ describe("reporter spec", function () {
                 n("pass", [p("core (basic)", 0), p("returns a prototypal clone when not given a callback", 6)], undefined, at("medium"), 75),
                 n("pass", [p("core (basic)", 0), p("runs block tests within tests", 7)], undefined, at("fast"), 75),
                 n("pass", [p("core (basic)", 0), p("runs successful inline tests within tests", 8)], undefined, at("fast"), 75),
-                n("pass", [p("core (basic)", 0), p("accepts a callback with `t.run()`", 9)], undefined, at("fast"), 75),
+                n("pass", [p("core (basic)", 0), p("accepts a callback with `run()`", 9)], undefined, at("fast"), 75),
                 n("leave", [p("core (basic)", 0)]),
                 n("enter", [p("cli normalize glob", 1)], undefined, at("fast"), 75),
                 n("enter", [p("cli normalize glob", 1), p("current directory", 0)], undefined, at("fast"), 75),
@@ -1096,7 +1096,7 @@ describe("reporter spec", function () {
                 "    " + pass("returns a prototypal clone when not given a callback") + medium,
                 "    " + pass("runs block tests within tests"),
                 "    " + pass("runs successful inline tests within tests"),
-                "    " + pass("accepts a callback with `t.run()`"),
+                "    " + pass("accepts a callback with `run()`"),
                 "",
                 "  cli normalize glob",
                 "    current directory",

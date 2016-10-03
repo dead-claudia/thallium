@@ -6,8 +6,8 @@
  */
 
 var match = require("./match.js")
-var inspect = require("./replaced/inspect.js")
-var Errors = require("./errors.js")
+var inspect = require("./lib/replaced/inspect.js")
+var Errors = require("./lib/errors.js")
 
 var hasOwn = Object.prototype.hasOwnProperty
 
@@ -23,10 +23,19 @@ function looseIs(a, b) {
 
 /* eslint-enable no-self-compare */
 
+var templateRegexp = /(.?)\{(.+?)\}/g
+
+exports.escape = escapeFormat
+function escapeFormat(string) {
+    return string.replace(templateRegexp, function (m, pre) {
+        return pre + "\\" + m.slice(1)
+    })
+}
+
 // This formats the assertion error messages.
 exports.format = format
 function format(message, object) {
-    return message.replace(/(.?)\{(.+?)\}/g, function (m, pre, prop) {
+    return message.replace(templateRegexp, function (m, pre, prop) {
         if (pre === "\\") {
             return m.slice(1)
         } else if (hasOwn.call(object, prop)) {
@@ -74,8 +83,7 @@ exports.assert = function (test, message) {
 }
 
 exports.fail = function (message, expected, actual) {
-    if (message != null) message = "unspecified"
-    throw new AssertionError(message, expected, actual)
+    throw new AssertionError(message || "unspecified", expected, actual)
 }
 
 exports.failFormat = fail
@@ -185,13 +193,13 @@ exports.notExists = function (x) {
 }
 
 exports.array = function (x) {
-    if (Array.isArray(x)) {
+    if (!Array.isArray(x)) {
         fail("Expected {actual} to be an array", {actual: x})
     }
 }
 
 exports.notArray = function (x) {
-    if (!Array.isArray(x)) {
+    if (Array.isArray(x)) {
         fail("Expected {actual} to not be an array", {actual: x})
     }
 }
@@ -278,7 +286,7 @@ exports.equal = binary(false,
     function (a, b) { return strictIs(a, b) },
     "Expected {actual} to equal {expected}")
 
-exports.equal = binary(false,
+exports.notEqual = binary(false,
     function (a, b) { return !strictIs(a, b) },
     "Expected {actual} to not equal {expected}")
 
@@ -286,7 +294,7 @@ exports.equalLoose = binary(false,
     function (a, b) { return looseIs(a, b) },
     "Expected {actual} to loosely equal {expected}")
 
-exports.equalLoose = binary(false,
+exports.notEqualLoose = binary(false,
     function (a, b) { return !looseIs(a, b) },
     "Expected {actual} to not loosely equal {expected}")
 
@@ -319,7 +327,9 @@ exports.between = function (actual, lower, upper) {
         throw new TypeError("`upper` must be a number")
     }
 
-    if (actual < lower || actual > upper) {
+    // The negation is to address NaNs as well, without writing a ton of special
+    // case boilerplate
+    if (!(actual >= lower && actual <= upper)) {
         fail("Expected {actual} to be between {lower} and {upper}", {
             actual: actual,
             lower: lower,
@@ -368,7 +378,7 @@ function has(_) { // eslint-disable-line max-len, max-params
 
 function hasLoose(_) {
     return function (object, key, value) {
-        if (!_.has(object, key) || !_.is(_.get(object, key), value)) {
+        if (!_.has(object, key) || !looseIs(_.get(object, key), value)) {
             fail(_.messages[0], {
                 expected: value,
                 actual: object[key],
@@ -390,7 +400,7 @@ function notHas(_) { // eslint-disable-line max-len, max-params
                     object: object,
                 })
             }
-        } else if (!_.has(object, key)) {
+        } else if (_.has(object, key)) {
             fail(_.messages[3], {
                 expected: value,
                 actual: object[key],
@@ -461,104 +471,110 @@ exports.hasLoose = hasLoose(hasMethods)
 exports.notHasLoose = notHasLoose(hasMethods)
 
 function getName(func) {
-    if (func.name != null) return func.name || "<anonymous>"
-    if (func.displayName != null) return func.displayName || "<anonymous>"
+    var name = func.name
+
+    if (name == null) name = func.displayName
+    if (name) return escapeFormat(name)
     return "<anonymous>"
 }
 
-function throws(_, invert) {
-    return function (func, matcher) {
-        if (typeof func !== "function") {
-            throw new TypeError("`func` must be a function")
+exports.throws = function (callback, Type) {
+    if (typeof callback !== "function") {
+        throw new TypeError("`callback` must be a function")
+    }
+
+    if (Type != null && typeof Type !== "function") {
+        throw new TypeError("`Type` must be a function if it exists")
+    }
+
+    try {
+        callback() // eslint-disable-line callback-return
+    } catch (e) {
+        if (Type != null && !(e instanceof Type)) {
+            fail(
+                "Expected callback to throw an instance of " + getName(Type) +
+                ", but found {actual}",
+                {actual: e})
         }
+        return
+    }
 
-        _.check(matcher)
+    throw new AssertionError("Expected callback to throw", undefined, undefined)
+}
 
-        var test, error
+exports.notThrows = function (callback, Type) {
+    if (typeof callback !== "function") {
+        throw new TypeError("`callback` must be a function")
+    }
 
-        try {
-            func()
-        } catch (e) {
-            test = _.test(matcher, error = e)
+    // Actually be useful.
+    if (Type == null) {
+        throw new TypeError(
+            "`Type` must be a function. If you just intend to verify no " +
+            "error is thrown, regardless of type, just call the callback " +
+            "directly, etc.")
+    }
 
-            // Rethrow unknown errors that don't match when a matcher was
-            // passed - it's easier to debug unexpected errors when you have
-            // a stack trace. Don't rethrow non-errors, though.
-            if (_.rethrow(matcher, invert, test, e)) {
-                throw e
-            }
-        }
+    if (typeof Type !== "function") {
+        throw new TypeError("`Type` must be a function")
+    }
 
-        if (!!test ^ invert) {
-            fail(_.message(matcher, invert, test), {
-                expected: matcher,
-                error: error,
-            })
+    try {
+        callback() // eslint-disable-line callback-return
+    } catch (e) {
+        if (e instanceof Type) {
+            fail(
+                "Expected callback to not throw an instance of " +
+                getName(Type) + ", but found {actual}",
+                {actual: e})
         }
     }
 }
 
-var throwsMethods = {
-    test: function (Type, e) { return Type == null || e instanceof Type },
-    check: function (Type) {
-        if (Type != null && typeof Type !== "function") {
-            throw new TypeError("`Type` must be a function if it exists")
-        }
-    },
-
-    rethrow: function (matcher, invert, test, e) {
-        return matcher != null && !invert && !test && e instanceof Error
-    },
-
-    message: function (Type, invert, test) {
-        var str = "Expected callback to "
-
-        if (invert) str += "not "
-        str += "throw"
-
-        if (Type != null) {
-            str += " an instance of " + getName(Type)
-            if (!invert && test === false) str += ", but found {error}"
-        }
-
-        return str
-    },
+function throwsMatchTest(matcher, e) {
+    if (typeof matcher === "string") return e.message === matcher
+    if (typeof matcher === "function") return !!matcher(e)
+    return !!matcher.test(e.message)
 }
 
-var throwsMatchMethods = {
-    test: function (matcher, e) {
-        if (typeof matcher === "string") return e.message === matcher
-        if (typeof matcher === "function") return !!matcher(e)
-        return matcher.test(e.message)
-    },
+function throwsMatch(callback, matcher, invert) {
+    if (typeof callback !== "function") {
+        throw new TypeError("`callback` must be a function")
+    }
 
-    check: function (matcher) {
-        // Not accepting objects yet.
-        if (typeof matcher !== "string" &&
-                typeof matcher !== "function" &&
-                !(matcher instanceof RegExp)) {
-            throw new TypeError("`Type` must be a string, RegExp, or function")
+    // Not accepting objects yet.
+    if (typeof matcher !== "string" &&
+            typeof matcher !== "function" &&
+            !(matcher instanceof RegExp)) {
+        throw new TypeError("`matcher` must be a string, RegExp, or function")
+    }
+
+    try {
+        callback() // eslint-disable-line callback-return
+    } catch (e) {
+        if (invert === throwsMatchTest(matcher, e)) {
+            fail(
+                "Expected callback to " + (invert ? "not" : "") + " throw an " +
+                "error that matches {expected}, but found {actual}",
+                {expected: matcher, actual: e})
         }
-    },
+        return
+    }
 
-    rethrow: function () { return false },
-
-    message: function (_, invert, test) {
-        if (invert) {
-            return "Expected callback to not throw an error that matches {expected}" // eslint-disable-line max-len
-        } else if (test === undefined) {
-            return "Expected callback to throw an error that matches {expected}, but found no error" // eslint-disable-line max-len
-        } else {
-            return "Expected callback to throw an error that matches {expected}, but found {error}" // eslint-disable-line max-len
-        }
-    },
+    if (!invert) {
+        throw new AssertionError(
+            "Expected callback to throw",
+            undefined, undefined)
+    }
 }
 
-exports.throwsMatch = throws(throwsMatchMethods, false)
-exports.notThrowsMatch = throws(throwsMatchMethods, true)
+exports.throwsMatch = function (callback, matcher) {
+    return throwsMatch(callback, matcher, false)
+}
 
-exports.throws = throws(throwsMethods, false)
-exports.notThrows = throws(throwsMethods, true)
+exports.notThrowsMatch = function (callback, matcher) {
+    return throwsMatch(callback, matcher, true)
+}
 
 function len(compare, message) {
     return function (object, length) {
@@ -566,10 +582,12 @@ function len(compare, message) {
             throw new TypeError("`length` must be a number")
         }
 
-        if (!compare(+len, +length)) {
+        var found = object.length
+
+        if (!compare(+found, length)) {
             fail(message, {
                 expected: length,
-                actual: len,
+                actual: found,
                 object: object,
             })
         }
@@ -582,7 +600,7 @@ exports.length = len(
     "Expected {object} to have length {expected}, but found {actual}")
 
 exports.notLength = len(
-    function (a, b) { return a !== b },
+    function (a, b) { return a !== b && a === a && b === b }, // eslint-disable-line max-len, no-self-compare
     "Expected {object} to not have length {actual}")
 
 exports.lengthAtLeast = len(
@@ -615,7 +633,9 @@ exports.closeTo = function (actual, expected, delta) {
         throw new TypeError("`delta` must be a number")
     }
 
-    if (Math.abs(actual - expected) > Math.abs(delta)) {
+    // The negation is to address NaNs as well, without writing a ton of special
+    // case boilerplate
+    if (!(Math.abs(actual - expected) <= Math.abs(delta))) {
         fail("Expected {actual} to be within {delta} of {expected}", {
             actual: actual,
             expected: expected,
@@ -637,7 +657,9 @@ exports.notCloseTo = function (actual, expected, delta) {
         throw new TypeError("`delta` must be a number")
     }
 
-    if (Math.abs(actual - expected) <= Math.abs(delta)) {
+    // The negation is to address NaNs as well, without writing a ton of special
+    // case boilerplate
+    if (!(Math.abs(actual - expected) > Math.abs(delta))) {
         fail("Expected {actual} to not be within {delta} of {expected}", {
             actual: actual,
             expected: expected,

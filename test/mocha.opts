@@ -3,4 +3,4 @@
 --check-leaks
 --recursive
 --require ./scripts/globals.js
---globals Util,t,require
+--globals Util,t,assert

@@ -42,12 +42,16 @@ describe("core (iterators)", function () {
                 tt.async("test", function () { return wrapper })
 
                 return tt.run().then(function () {
-                    t.match(ret, [
+                    assert.match(ret, [
                         n("start", []),
                         last(sentinel),
                         n("end", []),
                     ])
-                    t.match(list, [undefined, 0, 1, 2, 3, 4].slice(0, len + 1))
+
+                    assert.match(
+                        list,
+                        [undefined, 0, 1, 2, 3, 4].slice(0, len + 1))
+
                     if (iter.check) iter.check()
                 })
             })
@@ -74,12 +78,12 @@ describe("core (iterators)", function () {
     }
 
     function unreachable() {
-        t.fail("should never happen")
+        assert.fail("should never happen")
     }
 
     function recover(sentinel, f) {
         return function (value) {
-            t.equal(value, sentinel)
+            assert.equal(value, sentinel)
             return done(f())
         }
     }
@@ -170,7 +174,7 @@ describe("core (iterators)", function () {
             },
             throw: function (value) {
                 returned++
-                t.equal(value, initial)
+                assert.equal(value, initial)
                 return done({
                     then: function (_, reject) {
                         called++
@@ -179,8 +183,8 @@ describe("core (iterators)", function () {
                 })
             },
             check: function () {
-                t.equal(returned, 1)
-                t.equal(called, 1)
+                assert.equal(returned, 1)
+                assert.equal(called, 1)
             },
         }
     })

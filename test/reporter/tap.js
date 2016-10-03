@@ -10,13 +10,13 @@ describe("reporter tap", function () { // eslint-disable-line max-statements
     it("is not itself a reporter", function () {
         var tap = Util.r.tap
 
-        t.throws(function () { tap(n("start", [])) }, TypeError)
-        t.throws(function () { tap(n("enter", [p("test", 0)])) }, TypeError)
-        t.throws(function () { tap(n("leave", [p("test", 0)])) }, TypeError)
-        t.throws(function () { tap(n("pass", [p("test", 0)])) }, TypeError)
-        t.throws(function () { tap(n("fail", [p("test", 0)])) }, TypeError)
-        t.throws(function () { tap(n("skip", [p("test", 0)])) }, TypeError)
-        t.throws(function () { tap(n("end", [])) }, TypeError)
+        assert.throws(function () { tap(n("start", [])) }, TypeError)
+        assert.throws(function () { tap(n("enter", [p("test", 0)])) }, TypeError) // eslint-disable-line max-len
+        assert.throws(function () { tap(n("leave", [p("test", 0)])) }, TypeError) // eslint-disable-line max-len
+        assert.throws(function () { tap(n("pass", [p("test", 0)])) }, TypeError)
+        assert.throws(function () { tap(n("fail", [p("test", 0)])) }, TypeError)
+        assert.throws(function () { tap(n("skip", [p("test", 0)])) }, TypeError)
+        assert.throws(function () { tap(n("end", [])) }, TypeError)
     })
 
     function printLines(prefix, lines) {
@@ -54,7 +54,7 @@ describe("reporter tap", function () { // eslint-disable-line max-statements
                 return Util.Resolver.resolve1(reporter, undefined, i)
             })
             .then(function () {
-                t.match(list, opts.output)
+                assert.match(list, opts.output)
             })
         })
     }
@@ -160,7 +160,7 @@ describe("reporter tap", function () { // eslint-disable-line max-statements
         ]),
     })
 
-    var AssertionError = t.reflect().AssertionError
+    var AssertionError = assert.AssertionError
     var assertion = new AssertionError("Expected 1 to equal 2", 1, 2)
 
     test("fail 2 with AssertionError", {
@@ -474,7 +474,7 @@ describe("reporter tap", function () { // eslint-disable-line max-statements
             n("pass", [p("core (basic)", 0), p("returns a prototypal clone when not given a callback", 6)]),
             n("pass", [p("core (basic)", 0), p("runs block tests within tests", 7)]),
             n("pass", [p("core (basic)", 0), p("runs successful inline tests within tests", 8)]),
-            n("pass", [p("core (basic)", 0), p("accepts a callback with `t.run()`", 9)]),
+            n("pass", [p("core (basic)", 0), p("accepts a callback with `run()`", 9)]),
             n("leave", [p("core (basic)", 0)]),
             n("enter", [p("cli normalize glob", 1)]),
             n("enter", [p("cli normalize glob", 1), p("current directory", 0)]),
@@ -534,7 +534,7 @@ describe("reporter tap", function () { // eslint-disable-line max-statements
             "ok 8 core (basic) returns a prototypal clone when not given a callback",
             "ok 9 core (basic) runs block tests within tests",
             "ok 10 core (basic) runs successful inline tests within tests",
-            "ok 11 core (basic) accepts a callback with `t.run()`",
+            "ok 11 core (basic) accepts a callback with `run()`",
             "# cli normalize glob",
             "ok 12",
             "# cli normalize glob current directory",
@@ -601,7 +601,7 @@ describe("reporter tap", function () { // eslint-disable-line max-statements
             n("fail", [p("core (basic)", 0), p("returns a prototypal clone when not given a callback", 6)], badType),
             n("pass", [p("core (basic)", 0), p("runs block tests within tests", 7)]),
             n("pass", [p("core (basic)", 0), p("runs successful inline tests within tests", 8)]),
-            n("pass", [p("core (basic)", 0), p("accepts a callback with `t.run()`", 9)]),
+            n("pass", [p("core (basic)", 0), p("accepts a callback with `run()`", 9)]),
             n("leave", [p("core (basic)", 0)]),
             n("enter", [p("cli normalize glob", 1)]),
             n("enter", [p("cli normalize glob", 1), p("current directory", 0)]),
@@ -666,7 +666,7 @@ describe("reporter tap", function () { // eslint-disable-line max-statements
             "  ...",
             "ok 9 core (basic) runs block tests within tests",
             "ok 10 core (basic) runs successful inline tests within tests",
-            "ok 11 core (basic) accepts a callback with `t.run()`",
+            "ok 11 core (basic) accepts a callback with `run()`",
             "# cli normalize glob",
             "ok 12",
             "# cli normalize glob current directory",

@@ -17,23 +17,23 @@ describe("cli common", function () {
         var isObjectLike = Common.isObjectLike
 
         it("passes for objects and functions", function () {
-            t.true(isObjectLike({}))
-            t.true(isObjectLike([]))
-            t.true(isObjectLike(function () {}))
+            assert.ok(isObjectLike({}))
+            assert.ok(isObjectLike([]))
+            assert.ok(isObjectLike(function () {}))
         })
 
         it("fails for other things", function () {
-            t.false(isObjectLike(""))
-            t.false(isObjectLike("foo"))
-            t.false(isObjectLike(true))
-            t.false(isObjectLike(false))
-            t.false(isObjectLike(0))
-            t.false(isObjectLike(1))
-            t.false(isObjectLike(NaN))
-            t.false(isObjectLike(null))
-            t.false(isObjectLike(undefined))
-            t.false(isObjectLike())
-            if (typeof Symbol === "function") t.false(isObjectLike(Symbol())) // eslint-disable-line no-undef, max-len
+            assert.notOk(isObjectLike(""))
+            assert.notOk(isObjectLike("foo"))
+            assert.notOk(isObjectLike(true))
+            assert.notOk(isObjectLike(false))
+            assert.notOk(isObjectLike(0))
+            assert.notOk(isObjectLike(1))
+            assert.notOk(isObjectLike(NaN))
+            assert.notOk(isObjectLike(null))
+            assert.notOk(isObjectLike(undefined))
+            assert.notOk(isObjectLike())
+            if (typeof Symbol === "function") assert.notOk(isObjectLike(Symbol())) // eslint-disable-line no-undef, max-len
         })
     })
 
@@ -43,101 +43,101 @@ describe("cli common", function () {
         it("gets CJS default functions", function () {
             function f() {}
 
-            t.equal(f, resolveDefault(f))
+            assert.equal(f, resolveDefault(f))
         })
 
         it("gets CJS default functions with `default` property", function () {
             function f() {}
             f.default = "foo"
 
-            t.equal(f, resolveDefault(f))
+            assert.equal(f, resolveDefault(f))
         })
 
         it("gets CJS default arrays with `default` property", function () {
             var array = []
 
             array.default = "foo"
-            t.equal(array, resolveDefault(array))
+            assert.equal(array, resolveDefault(array))
         })
 
         it("gets CJS default objects", function () {
             var obj = {}
 
-            t.equal(obj, resolveDefault(obj))
+            assert.equal(obj, resolveDefault(obj))
         })
 
         it("gets CJS default primitives", function () {
-            t.equal("", resolveDefault(""))
-            t.equal("foo", resolveDefault("foo"))
-            t.equal(true, resolveDefault(true))
-            t.equal(false, resolveDefault(false))
-            t.equal(0, resolveDefault(0))
-            t.equal(1, resolveDefault(1))
-            t.equal(NaN, resolveDefault(NaN))
-            t.equal(null, resolveDefault(null))
-            t.equal(undefined, resolveDefault(undefined))
-            t.equal(undefined, resolveDefault())
+            assert.equal("", resolveDefault(""))
+            assert.equal("foo", resolveDefault("foo"))
+            assert.equal(true, resolveDefault(true))
+            assert.equal(false, resolveDefault(false))
+            assert.equal(0, resolveDefault(0))
+            assert.equal(1, resolveDefault(1))
+            assert.equal(NaN, resolveDefault(NaN))
+            assert.equal(null, resolveDefault(null))
+            assert.equal(undefined, resolveDefault(undefined))
+            assert.equal(undefined, resolveDefault())
 
             if (typeof Symbol === "function") { // eslint-disable-line no-undef
                 var sym = Symbol() // eslint-disable-line no-undef
 
-                t.equal(sym, resolveDefault(sym))
+                assert.equal(sym, resolveDefault(sym))
             }
         })
 
         it("gets ES6 default functions", function () {
             function f() {}
 
-            t.equal(f, resolveDefault({default: f}))
+            assert.equal(f, resolveDefault({default: f}))
         })
 
         it("gets ES6 default objects", function () {
             var obj = {}
 
-            t.equal(obj, resolveDefault({default: obj}))
+            assert.equal(obj, resolveDefault({default: obj}))
         })
 
         it("gets ES6 default arrays", function () {
             var array = []
 
-            t.equal(array, resolveDefault({default: array}))
+            assert.equal(array, resolveDefault({default: array}))
         })
 
         it("gets ES6 default objects with `default` property", function () {
             var obj = {default: {}}
 
-            t.equal(obj, resolveDefault({default: obj}))
+            assert.equal(obj, resolveDefault({default: obj}))
         })
 
         it("gets ES6 default functions with `default` property", function () {
             function f() {}
             f.default = "foo"
 
-            t.equal(f, resolveDefault({default: f}))
+            assert.equal(f, resolveDefault({default: f}))
         })
 
         it("gets ES6 default arrays with `default` property", function () {
             var array = []
 
             array.default = "foo"
-            t.equal(array, resolveDefault({default: array}))
+            assert.equal(array, resolveDefault({default: array}))
         })
 
         it("gets ES6 default primitives", function () {
-            t.equal("", resolveDefault({default: ""}))
-            t.equal("foo", resolveDefault({default: "foo"}))
-            t.equal(true, resolveDefault({default: true}))
-            t.equal(false, resolveDefault({default: false}))
-            t.equal(0, resolveDefault({default: 0}))
-            t.equal(1, resolveDefault({default: 1}))
-            t.equal(NaN, resolveDefault({default: NaN}))
-            t.equal(null, resolveDefault({default: null}))
-            t.equal(undefined, resolveDefault({default: undefined}))
+            assert.equal("", resolveDefault({default: ""}))
+            assert.equal("foo", resolveDefault({default: "foo"}))
+            assert.equal(true, resolveDefault({default: true}))
+            assert.equal(false, resolveDefault({default: false}))
+            assert.equal(0, resolveDefault({default: 0}))
+            assert.equal(1, resolveDefault({default: 1}))
+            assert.equal(NaN, resolveDefault({default: NaN}))
+            assert.equal(null, resolveDefault({default: null}))
+            assert.equal(undefined, resolveDefault({default: undefined}))
 
             if (typeof Symbol === "function") { // eslint-disable-line no-undef
                 var sym = Symbol() // eslint-disable-line no-undef
 
-                t.equal(sym, resolveDefault({default: sym}))
+                assert.equal(sym, resolveDefault({default: sym}))
             }
         })
     })
@@ -148,25 +148,31 @@ describe("cli common", function () {
         function test(name, base, res) {
             context(name, function () {
                 it("normalizes a file", function () {
-                    t.equal(normalizeGlob(res.file[0], base), p(res.file[1]))
+                    assert.equal(
+                        normalizeGlob(res.file[0], base),
+                        p(res.file[1]))
                 })
 
                 it("normalizes a glob", function () {
-                    t.equal(normalizeGlob(res.glob[0], base), p(res.glob[1]))
+                    assert.equal(
+                        normalizeGlob(res.glob[0], base),
+                        p(res.glob[1]))
                 })
 
                 it("retains trailing slashes", function () {
-                    t.equal(normalizeGlob(res.slash[0], base), p(res.slash[1]))
+                    assert.equal(
+                        normalizeGlob(res.slash[0], base),
+                        p(res.slash[1]))
                 })
 
                 it("retains negative", function () {
-                    t.equal(
+                    assert.equal(
                         normalizeGlob(res.negate[0], base),
                         p(res.negate[1]))
                 })
 
                 it("retains negative + trailing slashes", function () {
-                    t.equal(
+                    assert.equal(
                         normalizeGlob(res.negateSlash[0], base),
                         p(res.negateSlash[1]))
                 })
@@ -200,31 +206,34 @@ describe("cli common", function () {
         // Some of these aren't likely to ever show up, but just in case.
         context("edge cases", function () {
             it("normalizes `.` with a cwd of `.`", function () {
-                t.equal(normalizeGlob(".", "."), ".")
+                assert.equal(normalizeGlob(".", "."), ".")
             })
 
             it("normalizes `..` with a cwd of `.`", function () {
-                t.equal(normalizeGlob("..", "."), "..")
+                assert.equal(normalizeGlob("..", "."), "..")
             })
 
             it("normalizes `.` with a cwd of `..`", function () {
-                t.equal(normalizeGlob(".", ".."), "..")
+                assert.equal(normalizeGlob(".", ".."), "..")
             })
 
             it("normalizes directories with a cwd of `..`", function () {
-                t.equal(normalizeGlob("foo/bar", ".."), "../foo/bar")
+                assert.equal(normalizeGlob("foo/bar", ".."), "../foo/bar")
             })
 
             it("removes excess `.`", function () {
-                t.equal(normalizeGlob("././././.", "foo"), "foo")
+                assert.equal(normalizeGlob("././././.", "foo"), "foo")
             })
 
             it("removes excess `..`", function () {
-                t.equal(normalizeGlob("foo/../bar/baz/..", "dir"), "dir/bar")
+                assert.equal(
+                    normalizeGlob("foo/../bar/baz/..", "dir"),
+                    "dir/bar")
             })
 
             it("removes excess combined junk", function () {
-                t.equal(normalizeGlob("foo/./bar/../baz/./what", "."),
+                assert.equal(
+                    normalizeGlob("foo/./bar/../baz/./what", "."),
                     "foo/baz/what")
             })
         })
@@ -234,59 +243,67 @@ describe("cli common", function () {
         var gp = Common.globParent
 
         it("strips glob magic to return parent path", function () {
-            t.equal(gp("path/to/*.js"), "path/to")
-            t.equal(gp("/root/path/to/*.js"), "/root/path/to")
-            t.equal(gp("/*.js"), "/")
-            t.equal(gp("*.js"), ".")
-            t.equal(gp("**/*.js"), ".")
-            t.equal(gp("path/{to,from}"), "path")
-            t.equal(gp("path/!(to|from)"), "path")
-            t.equal(gp("path/?(to|from)"), "path")
-            t.equal(gp("path/+(to|from)"), "path")
-            t.equal(gp("path/*(to|from)"), "path")
-            t.equal(gp("path/@(to|from)"), "path")
-            t.equal(gp("path/**/*"), "path")
-            t.equal(gp("path/**/subdir/foo.*"), "path")
+            assert.equal(gp("path/to/*.js"), "path/to")
+            assert.equal(gp("/root/path/to/*.js"), "/root/path/to")
+            assert.equal(gp("/*.js"), "/")
+            assert.equal(gp("*.js"), ".")
+            assert.equal(gp("**/*.js"), ".")
+            assert.equal(gp("path/{to,from}"), "path")
+            assert.equal(gp("path/!(to|from)"), "path")
+            assert.equal(gp("path/?(to|from)"), "path")
+            assert.equal(gp("path/+(to|from)"), "path")
+            assert.equal(gp("path/*(to|from)"), "path")
+            assert.equal(gp("path/@(to|from)"), "path")
+            assert.equal(gp("path/**/*"), "path")
+            assert.equal(gp("path/**/subdir/foo.*"), "path")
         })
 
         it("returns parent dirname from non-glob paths", function () {
-            t.equal(gp("path/foo/bar.js"), "path/foo/bar.js")
-            t.equal(gp("path/foo/"), "path/foo")
-            t.equal(gp("path/foo"), "path/foo")
+            assert.equal(gp("path/foo/bar.js"), "path/foo/bar.js")
+            assert.equal(gp("path/foo/"), "path/foo")
+            assert.equal(gp("path/foo"), "path/foo")
         })
 
         it("gets a base name", function () {
-            t.equal(gp("js/*.js"), "js")
+            assert.equal(gp("js/*.js"), "js")
         })
 
         it("gets a base name from a nested glob", function () {
-            t.equal(gp("js/**/test/*.js"), "js")
+            assert.equal(gp("js/**/test/*.js"), "js")
         })
 
         it("gets a base name from a flat file", function () {
-            t.equal(gp("js/test/wow.js"), "js/test/wow.js")
+            assert.equal(gp("js/test/wow.js"), "js/test/wow.js")
         })
 
         it("gets a base name from character class pattern", function () {
-            t.equal(gp("js/t[a-z]st}/*.js"), "js")
+            assert.equal(gp("js/t[a-z]st}/*.js"), "js")
         })
 
         it("gets a base name from brace , expansion", function () {
-            t.equal(gp("js/{src,test}/*.js"), "js")
+            assert.equal(gp("js/{src,test}/*.js"), "js")
         })
 
         it("gets a base name from brace .. expansion", function () {
-            t.equal(gp("js/test{0..9}/*.js"), "js")
+            assert.equal(gp("js/test{0..9}/*.js"), "js")
         })
 
         it("gets a base name from extglob", function () {
-            t.equal(gp("js/t+(wo|est)/*.js"), "js")
+            assert.equal(gp("js/t+(wo|est)/*.js"), "js")
         })
 
         it("gets a base name from a complex brace glob", function () {
-            t.equal(gp("lib/{components,pages}/**/{test,another}/*.txt"), "lib")
-            t.equal(gp("js/test/**/{images,components}/*.js"), "js/test")
-            t.equal(gp("ooga/{booga,sooga}/**/dooga/{eooga,fooga}"), "ooga")
+            assert.equal(
+                gp("lib/{components,pages}/**/{test,another}/*.txt"),
+                "lib")
+
+            assert.equal(
+                gp("js/test/**/{images,components}/*.js"),
+                "js/test")
+
+            assert.equal(
+                gp("ooga/{booga,sooga}/**/dooga/{eooga,fooga}"),
+                "ooga")
         })
     })
 
@@ -336,7 +353,7 @@ describe("cli common", function () {
     context("merge()", function () {
         function load(opts) {
             return function (name) {
-                t.equal(name, "thallium")
+                assert.equal(name, "thallium")
                 return Util.Promise.resolve({exports: opts.thallium || {}})
             }
         }
@@ -359,7 +376,7 @@ describe("cli common", function () {
                 return merge(files, {}, load({thallium: thallium}), true)
                 .then(function (config) {
                     t.match(config, {thallium: thallium, files: files})
-                    t.equal(config.thallium, thallium)
+                    assert.equal(config.thallium, thallium)
                 })
             })
 
@@ -370,7 +387,7 @@ describe("cli common", function () {
                 return merge(files, {thallium: thallium}, load({}), true)
                 .then(function (config) {
                     t.match(config, {thallium: thallium, files: files})
-                    t.equal(config.thallium, thallium)
+                    assert.equal(config.thallium, thallium)
                 })
             })
 
@@ -386,7 +403,7 @@ describe("cli common", function () {
                     true)
                 .then(function (config) {
                     t.match(config, {thallium: thallium, files: extra})
-                    t.equal(config.thallium, thallium)
+                    assert.equal(config.thallium, thallium)
                 })
             })
 
@@ -402,7 +419,7 @@ describe("cli common", function () {
                     true)
                 .then(function (config) {
                     t.match(config, {thallium: thallium, files: extra})
-                    t.equal(config.thallium, thallium)
+                    assert.equal(config.thallium, thallium)
                 })
             })
         })
@@ -415,7 +432,7 @@ describe("cli common", function () {
                 return merge(files, {}, load({thallium: thallium}))
                 .then(function (config) {
                     t.match(config, {thallium: thallium, files: files})
-                    t.equal(config.thallium, thallium)
+                    assert.equal(config.thallium, thallium)
                 })
             })
 
@@ -426,7 +443,7 @@ describe("cli common", function () {
                 return merge(files, {thallium: thallium}, load({}))
                 .then(function (config) {
                     t.match(config, {thallium: thallium, files: files})
-                    t.equal(config.thallium, thallium)
+                    assert.equal(config.thallium, thallium)
                 })
             })
 
@@ -438,7 +455,7 @@ describe("cli common", function () {
                 return merge(files, {files: extra}, load({thallium: thallium}))
                 .then(function (config) {
                     t.match(config, {thallium: thallium, files: files})
-                    t.equal(config.thallium, thallium)
+                    assert.equal(config.thallium, thallium)
                 })
             })
 
@@ -453,7 +470,7 @@ describe("cli common", function () {
                     load({}))
                 .then(function (config) {
                     t.match(config, {thallium: thallium, files: files})
-                    t.equal(config.thallium, thallium)
+                    assert.equal(config.thallium, thallium)
                 })
             })
         })

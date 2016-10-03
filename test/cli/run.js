@@ -28,7 +28,7 @@ describe("cli runner", function () {
                 var reporter = Run.exitReporter(state)
 
                 return execute(reporter, type)().then(function () {
-                    t.false(state.fail)
+                    assert.notOk(state.fail)
                 })
             })
         })
@@ -39,7 +39,7 @@ describe("cli runner", function () {
                 var reporter = Run.exitReporter(state)
 
                 return execute(reporter, type)().then(function () {
-                    t.true(state.fail)
+                    assert.ok(state.fail)
                 })
             })
         })
@@ -51,7 +51,7 @@ describe("cli runner", function () {
             return execute(reporter, "start")()
             .then(execute(reporter, "pass"))
             .then(execute(reporter, "pass"))
-            .then(function () { t.false(state.fail) })
+            .then(function () { assert.notOk(state.fail) })
         })
 
         it("stays triggered", function () {
@@ -61,7 +61,7 @@ describe("cli runner", function () {
             return execute(reporter, "start")()
             .then(execute(reporter, "fail"))
             .then(execute(reporter, "pass"))
-            .then(function () { t.true(state.fail) })
+            .then(function () { assert.ok(state.fail) })
         })
 
         it("is cleared on \"end\" + \"start\"", function () {
@@ -73,7 +73,7 @@ describe("cli runner", function () {
             .then(execute(reporter, "pass"))
             .then(execute(reporter, "end"))
             .then(execute(reporter, "start"))
-            .then(function () { t.false(state.fail) })
+            .then(function () { assert.notOk(state.fail) })
         })
     })
 
@@ -91,9 +91,9 @@ describe("cli runner", function () {
             }
 
             return Run.load(init, file, map, ".").then(function (config) {
-                t.equal(loaded, file)
-                t.equal(baseDir, ".")
-                t.equal(config, result)
+                assert.equal(loaded, file)
+                assert.equal(baseDir, ".")
+                assert.equal(config, result)
             })
         })
 
@@ -108,7 +108,7 @@ describe("cli runner", function () {
 
             return Run.load(function () {}, "config.js", map, ".")
             .then(function () {
-                t.match(list, mods)
+                assert.match(list, mods)
             })
         })
 
@@ -131,10 +131,10 @@ describe("cli runner", function () {
             }
 
             return Run.load(init, file, map, ".").then(function (config) {
-                t.match(list, mods)
-                t.equal(loaded, file)
-                t.equal(baseDir, ".")
-                t.equal(config, result)
+                assert.match(list, mods)
+                assert.equal(loaded, file)
+                assert.equal(baseDir, ".")
+                assert.equal(config, result)
             })
         })
     })
@@ -151,7 +151,7 @@ describe("cli runner", function () {
         Util.silenceEmptyInlineWarnings()
 
         function run(opts) {
-            var tt = t.reflect().base().use(Util.assertions)
+            var tt = t.base().use(Util.assertions)
             var tree = opts.tree(tt)
 
             if (tree["node_modules"] == null) tree["node_modules"] = {}
@@ -192,8 +192,8 @@ describe("cli runner", function () {
                     }
                 },
             }).then(function (code) {
-                t.equal(code, 0)
-                t.match(ret, [
+                assert.equal(code, 0)
+                assert.match(ret, [
                     n("start", []),
                     n("pass", [p("test 1", 0)]),
                     n("pass", [p("test 2", 1)]),
@@ -225,8 +225,8 @@ describe("cli runner", function () {
                     }
                 },
             }).then(function (code) {
-                t.equal(code, 0)
-                t.match(ret, [
+                assert.equal(code, 0)
+                assert.match(ret, [
                     n("start", []),
                     n("pass", [p("test 2", 0)]),
                     n("end", []),
@@ -257,8 +257,8 @@ describe("cli runner", function () {
                     }
                 },
             }).then(function (code) {
-                t.equal(code, 0)
-                t.match(ret, [
+                assert.equal(code, 0)
+                assert.match(ret, [
                     n("start", []),
                     n("pass", [p("test 2", 0)]),
                     n("end", []),
@@ -268,7 +268,7 @@ describe("cli runner", function () {
 
         it("runs failing tests", function () {
             var ret = []
-            var AssertionError = t.reflect().AssertionError
+            var AssertionError = assert.AssertionError
 
             return run({
                 args: "",
@@ -284,14 +284,14 @@ describe("cli runner", function () {
                             },
 
                             "two.js": function () {
-                                t.test("test 2").fail("oops")
+                                t.test("test 2").try(assert.fail, "oops")
                             },
                         },
                     }
                 },
             }).then(function (code) {
-                t.equal(code, 1)
-                t.match(ret, [
+                assert.equal(code, 1)
+                assert.match(ret, [
                     n("start", []),
                     n("pass", [p("test 1", 0)]),
                     n("fail", [p("test 2", 1)], new AssertionError("oops")),
@@ -301,7 +301,7 @@ describe("cli runner", function () {
         })
 
         it("runs moderately sized test suites", function () {
-            var AssertionError = t.reflect().AssertionError
+            var AssertionError = assert.AssertionError
             var ret = []
             var fail1 = new AssertionError("Expected 1 to not equal 1", 1, 1)
             var fail2 = new AssertionError("Expected 1 to equal 2", 2, 1)
@@ -312,19 +312,19 @@ describe("cli runner", function () {
             sentinel.marker = function () {}
 
             function isNope(x) {
-                return {
-                    test: x === "nope",
-                    actual: x,
-                    message: "Expected {actual} to be a nope",
+                if (x !== "nope") {
+                    assert.failFormat(
+                        "Expected {actual} to be a nope",
+                        {actual: x})
                 }
             }
 
             function modOne(t) {
                 t.test("mod-one", function (t) {
-                    t.test("1 === 1").equal(1, 1)
+                    t.test("1 === 1").try(assert.equal, 1, 1)
 
-                    t.test("foo()", function (t) {
-                        t.notEqual(1, 1)
+                    t.test("foo()", function () {
+                        assert.notEqual(1, 1)
                     })
 
                     t.async("bar()", function (t, done) {
@@ -338,8 +338,8 @@ describe("cli runner", function () {
                     })
 
                     t.test("nested", function (t) {
-                        t.test("nested 2", function (t) {
-                            t.true(true)
+                        t.test("nested 2", function () {
+                            assert.ok(true)
                         })
                     })
                 })
@@ -347,13 +347,13 @@ describe("cli runner", function () {
 
             function modTwo(t) {
                 t.test("mod-two", function (t) {
-                    t.test("1 === 2").equal(1, 2)
+                    t.test("1 === 2").try(assert.equal, 1, 2)
 
                     t.test("expandos don't transfer", function (t) {
                         t.notHasKey(t, "foo")
                     })
 
-                    t.test("what a fail...").isNope("yep")
+                    t.test("what a fail...").try(isNope, "yep")
                 })
             }
 
@@ -383,7 +383,6 @@ describe("cli runner", function () {
                         test: {
                             ".tl.js": function () {
                                 t.reporter(Util.push(ret))
-                                t.define("isNope", isNope)
                             },
 
                             "mod-one.js": function () { modOne(t) },
@@ -392,14 +391,16 @@ describe("cli runner", function () {
                     }
                 },
             }).then(function (code) {
-                t.equal(code, 1)
-                t.match(ret, expected)
+                assert.equal(code, 1)
+                assert.match(ret, expected)
             })
         })
 
         it("adheres to the config correctly", function () {
             var ret = []
-            var mt = t.reflect().base()
+            var custom = t.base()
+
+            function noop() {}
 
             return run({
                 args: "",
@@ -410,13 +411,10 @@ describe("cli runner", function () {
                         },
 
                         ".tl.js": function () {
-                            mt.reporter(Util.push(ret))
-                            mt.define("assert", function () {
-                                return {test: true, message: "assert"}
-                            })
+                            custom.reporter(Util.push(ret))
 
                             return {
-                                thallium: mt,
+                                thallium: custom,
                                 files: [
                                     "totally-not-a-test/**/*.coffee",
                                     "whatever/**/*.js",
@@ -426,19 +424,19 @@ describe("cli runner", function () {
 
                         "totally-not-a-test": {
                             "test.coffee": function () {
-                                mt.test("test").assert()
+                                custom.test("test").try(noop)
                             },
                         },
 
                         "whatever": {
                             "other.js": function () {
-                                mt.test("other").assert()
+                                custom.test("other").try(noop)
                             },
                         },
                     }
                 },
             }).then(function () {
-                t.match(ret, [
+                assert.match(ret, [
                     n("start", []),
                     n("pass", [p("test", 0)]),
                     n("pass", [p("other", 1)]),

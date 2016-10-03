@@ -10,7 +10,7 @@ describe("cli loader", function () {
 
     describe("keysToRegExp()", function () { // eslint-disable-line max-statements, max-len
         it("exists", function () {
-            t.function(Loader.keysToRegExp)
+            assert.function(Loader.keysToRegExp)
         })
 
         function makeRegExp(items) {
@@ -32,7 +32,7 @@ describe("cli loader", function () {
             desc += makeFor(items)
 
             it("fails " + desc, function () {
-                t.false(makeRegExp(items).test(target))
+                assert.notOk(makeRegExp(items).test(target))
             })
         }
 
@@ -40,7 +40,7 @@ describe("cli loader", function () {
             desc += makeFor(items)
 
             it("passes " + desc, function () {
-                t.true(makeRegExp(items).test(target))
+                assert.ok(makeRegExp(items).test(target))
             })
         }
 
@@ -130,7 +130,7 @@ describe("cli loader", function () {
 
     describe("class Simple", function () {
         it("exists", function () {
-            t.function(Loader.Simple)
+            assert.function(Loader.Simple)
         })
 
         var Simple = Loader.Simple
@@ -147,8 +147,8 @@ describe("cli loader", function () {
                 "./test/config.js")
 
             return loader.load().then(function () {
-                t.equal(spy.called, 1)
-                t.match(spy.args[0], [])
+                assert.equal(spy.called, 1)
+                assert.match(spy.args[0], [])
             })
         })
 
@@ -165,10 +165,10 @@ describe("cli loader", function () {
                 "./test/config.js")
 
             return loader.load().then(function () {
-                t.equal(spy1.called, 1)
-                t.length(spy1.args[0], 2)
-                t.equal(spy2.called, 1)
-                t.match(spy2.args[0], [])
+                assert.equal(spy1.called, 1)
+                assert.length(spy1.args[0], 2)
+                assert.equal(spy2.called, 1)
+                assert.match(spy2.args[0], [])
             })
         })
 
@@ -184,8 +184,8 @@ describe("cli loader", function () {
                 "./test/config.js")
 
             return loader.load().then(function () {
-                t.equal(spy.called, 1)
-                t.match(spy.args[0], [])
+                assert.equal(spy.called, 1)
+                assert.match(spy.args[0], [])
             })
         })
 
@@ -202,10 +202,10 @@ describe("cli loader", function () {
                 "./test/config.js")
 
             return loader.load().then(function () {
-                t.equal(spy1.called, 1)
-                t.length(spy1.args[0], 2)
-                t.equal(spy2.called, 1)
-                t.match(spy2.args[0], [])
+                assert.equal(spy1.called, 1)
+                assert.length(spy1.args[0], 2)
+                assert.equal(spy2.called, 1)
+                assert.match(spy2.args[0], [])
             })
         })
 
@@ -225,11 +225,11 @@ describe("cli loader", function () {
                 "./test/config.js")
 
             return loader.load().then(function () {
-                t.equal(spy1.called, 0)
-                t.equal(spy2.called, 1)
-                t.length(spy2.args[0], 2)
-                t.equal(spy3.called, 1)
-                t.match(spy3.args[0], [])
+                assert.equal(spy1.called, 0)
+                assert.equal(spy2.called, 1)
+                assert.length(spy2.args[0], 2)
+                assert.equal(spy3.called, 1)
+                assert.match(spy3.args[0], [])
             })
         })
 
@@ -249,18 +249,18 @@ describe("cli loader", function () {
                 "./test/config.js")
 
             return loader.load().then(function () {
-                t.equal(spy1.called, 0)
-                t.equal(spy2.called, 1)
-                t.length(spy2.args[0], 2)
-                t.equal(spy3.called, 1)
-                t.match(spy3.args[0], [])
+                assert.equal(spy1.called, 0)
+                assert.equal(spy2.called, 1)
+                assert.length(spy2.args[0], 2)
+                assert.equal(spy3.called, 1)
+                assert.match(spy3.args[0], [])
             })
         })
     })
 
     describe("class Interpret", function () {
         it("exists", function () {
-            t.function(Loader.Interpret)
+            assert.function(Loader.Interpret)
         })
 
         function throwMissing() {
@@ -288,7 +288,7 @@ describe("cli loader", function () {
             var loader = new Interpret({util: {load: spy}}, "base", ".js")
 
             return loader.load().then(function () {
-                t.equal(spy.called, 0)
+                assert.equal(spy.called, 0)
             })
         })
 
@@ -299,8 +299,8 @@ describe("cli loader", function () {
             var loader = new Interpret({util: {load: spy}}, "base", ".js")
 
             return loader.load().then(function () {
-                t.equal(spy.called, 1)
-                t.match(spy.args[0], ["module", "base"])
+                assert.equal(spy.called, 1)
+                assert.match(spy.args[0], ["module", "base"])
             })
         })
 
@@ -318,11 +318,11 @@ describe("cli loader", function () {
             var loader = new Interpret({util: {load: loaderSpy}}, "base", ".js")
 
             return loader.load().then(function () {
-                t.equal(loaderSpy.called, 1)
-                t.match(loaderSpy.args[0], ["module", "base"])
-                t.equal(registerSpy.called, 1)
-                t.match(registerSpy.args[0], [sentinel])
-                t.equal(registerSpy.this[0], mock)
+                assert.equal(loaderSpy.called, 1)
+                assert.match(loaderSpy.args[0], ["module", "base"])
+                assert.equal(registerSpy.called, 1)
+                assert.match(registerSpy.args[0], [sentinel])
+                assert.equal(registerSpy.this[0], mock)
             })
         })
 
@@ -332,8 +332,8 @@ describe("cli loader", function () {
             var loader = new Interpret({util: {load: loaderSpy}}, "base", ".js")
 
             return loader.load().then(function () {
-                t.equal(loaderSpy.called, 1)
-                t.match(loaderSpy.args[0], ["foo", "base"])
+                assert.equal(loaderSpy.called, 1)
+                assert.match(loaderSpy.args[0], ["foo", "base"])
             })
         })
 
@@ -345,9 +345,9 @@ describe("cli loader", function () {
             var loader = new Interpret({util: {load: loaderSpy}}, "base", ".js")
 
             return loader.load().then(function () {
-                t.equal(loaderSpy.called, 2)
-                t.match(loaderSpy.args[0], ["foo", "base"])
-                t.match(loaderSpy.args[1], ["bar", "base"])
+                assert.equal(loaderSpy.called, 2)
+                assert.match(loaderSpy.args[0], ["foo", "base"])
+                assert.match(loaderSpy.args[1], ["bar", "base"])
             })
         })
 
@@ -374,8 +374,8 @@ describe("cli loader", function () {
             var loader = new Interpret({util: {load: loaderSpy}}, "base", ".js")
 
             return loader.load().then(function () {
-                t.equal(loaderSpy.called, 1)
-                t.match(loaderSpy.args[0], ["foo", "base"])
+                assert.equal(loaderSpy.called, 1)
+                assert.match(loaderSpy.args[0], ["foo", "base"])
             })
         })
 
@@ -401,13 +401,13 @@ describe("cli loader", function () {
             var loader = new Interpret({util: {load: loaderSpy}}, "base", ".js")
 
             return loader.load().then(function () {
-                t.equal(loaderSpy.called, 2)
-                t.match(loaderSpy.args[0], ["foo", "base"])
-                t.match(loaderSpy.args[1], ["bar", "base"])
-                t.equal(registerSpy1.called, 0)
-                t.equal(registerSpy2.called, 1)
-                t.match(registerSpy2.args[0], [sentinel])
-                t.match(registerSpy2.this[0], mock[1])
+                assert.equal(loaderSpy.called, 2)
+                assert.match(loaderSpy.args[0], ["foo", "base"])
+                assert.match(loaderSpy.args[1], ["bar", "base"])
+                assert.equal(registerSpy1.called, 0)
+                assert.equal(registerSpy2.called, 1)
+                assert.match(registerSpy2.args[0], [sentinel])
+                assert.match(registerSpy2.this[0], mock[1])
             })
         })
 
@@ -430,9 +430,9 @@ describe("cli loader", function () {
             var loader = new Interpret({util: {load: loaderSpy}}, "base", ".js")
 
             return loader.load().then(function () {
-                t.equal(loaderSpy.called, 1)
-                t.match(loaderSpy.args[0], ["foo", "base"])
-                t.equal(registerSpy.called, 0)
+                assert.equal(loaderSpy.called, 1)
+                assert.match(loaderSpy.args[0], ["foo", "base"])
+                assert.equal(registerSpy.called, 0)
             })
         })
 
@@ -454,12 +454,12 @@ describe("cli loader", function () {
             var loader = new Interpret({util: {load: loaderSpy}}, "base", ".js")
 
             return loader.load().then(function () {
-                t.equal(loaderSpy.called, 2)
-                t.match(loaderSpy.args[0], ["foo", "base"])
-                t.match(loaderSpy.args[1], ["bar", "base"])
-                t.equal(registerSpy.called, 1)
-                t.match(registerSpy.args[0], [sentinel])
-                t.equal(registerSpy.this[0], mock[1])
+                assert.equal(loaderSpy.called, 2)
+                assert.match(loaderSpy.args[0], ["foo", "base"])
+                assert.match(loaderSpy.args[1], ["bar", "base"])
+                assert.equal(registerSpy.called, 1)
+                assert.match(registerSpy.args[0], [sentinel])
+                assert.equal(registerSpy.this[0], mock[1])
             })
         })
 
@@ -482,11 +482,11 @@ describe("cli loader", function () {
             var loader = new Interpret({util: {load: loaderSpy}}, "base", ".js")
 
             return loader.load().then(function () {
-                t.equal(loaderSpy.called, 1)
-                t.match(loaderSpy.args[0], ["foo", "base"])
-                t.equal(registerSpy.called, 1)
-                t.match(registerSpy.args[0], [sentinel1])
-                t.equal(registerSpy.this[0], mock[0])
+                assert.equal(loaderSpy.called, 1)
+                assert.match(loaderSpy.args[0], ["foo", "base"])
+                assert.equal(registerSpy.called, 1)
+                assert.match(registerSpy.args[0], [sentinel1])
+                assert.equal(registerSpy.this[0], mock[0])
             })
         })
 
@@ -508,17 +508,17 @@ describe("cli loader", function () {
             var loader = new Interpret({util: {load: loaderSpy}}, "base", ".js")
 
             return loader.load().then(function () {
-                t.equal(loaderSpy.called, 2)
-                t.match(loaderSpy.args[0], ["foo", "base"])
-                t.match(loaderSpy.args[1], ["bar", "base"])
-                t.equal(registerSpy.called, 0)
+                assert.equal(loaderSpy.called, 2)
+                assert.match(loaderSpy.args[0], ["foo", "base"])
+                assert.match(loaderSpy.args[1], ["bar", "base"])
+                assert.equal(registerSpy.called, 0)
             })
         })
     })
 
     describe("serialize()", function () {
         it("exists", function () {
-            t.function(Loader.serialize)
+            assert.function(Loader.serialize)
         })
 
         function S(mod) {
@@ -588,7 +588,7 @@ describe("cli loader", function () {
                     }
                 })
                 .then(function (globs) {
-                    t.match({globs: globs, modules: modules}, {
+                    assert.match({globs: globs, modules: modules}, {
                         globs: opts.globs,
                         modules: opts.modules,
                     })

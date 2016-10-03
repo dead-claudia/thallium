@@ -12,7 +12,7 @@ describe("cli glob stream", function () {
             var stream = through2.obj()
             var list = [{readable: false}]
 
-            t.throwsMatch(function () {
+            assert.throwsMatch(function () {
                 GS.addStream(Object.create(null), stream, list, list[0])
             }, "All input streams must be readable")
         })
@@ -34,7 +34,7 @@ describe("cli glob stream", function () {
             })
 
             combined.on("end", function () {
-                t.match(results, [
+                assert.match(results, [
                     "stream 1",
                     "stream 2",
                     "stream 3",
@@ -64,7 +64,7 @@ describe("cli glob stream", function () {
             })
 
             combined.on("end", function () {
-                t.match(results, [
+                assert.match(results, [
                     "data1",
                     "data2",
                     "data3",
@@ -104,7 +104,7 @@ describe("cli glob stream", function () {
                 results.push(data)
             })
             combined.on("end", function () {
-                t.match(results, [
+                assert.match(results, [
                     "stream 1",
                     "stream 2",
                     "stream 3",
@@ -144,8 +144,8 @@ describe("cli glob stream", function () {
                 error = err
             })
             combined.on("end", function () {
-                t.hasOwn(error, "message", "stop")
-                t.match(streamData, ["okay"])
+                assert.hasOwn(error, "message", "stop")
+                assert.match(streamData, ["okay"])
                 done()
             })
 
@@ -185,21 +185,21 @@ describe("cli glob stream", function () {
         it("doesn't emit single folders", function () {
             return read([fixture("glob-stream/whatsgoingon")])
             .then(function (list) {
-                t.match(list, [])
+                assert.match(list, [])
             })
         })
 
         it("doesn't emit glob folders", function () {
             return read([fixture("glob-stream/whatsgoingon/*/")])
             .then(function (list) {
-                t.match(list, [])
+                assert.match(list, [])
             })
         })
 
         it("returns a file name stream from a glob", function () {
             return read([fixture("glob-stream/*.coffee")])
             .then(function (list) {
-                t.match(list, [fixture("glob-stream/test.coffee")])
+                assert.match(list, [fixture("glob-stream/test.coffee")])
             })
         })
 
@@ -208,20 +208,20 @@ describe("cli glob stream", function () {
                 fixture("glob-stream/test.coffee"),
                 fixture("glob-stream/test.coffee"),
             ]).then(function (list) {
-                t.match(list, [fixture("glob-stream/test.coffee")])
+                assert.match(list, [fixture("glob-stream/test.coffee")])
             })
         })
 
         it("returns a file name stream from a direct path", function () {
             return read([fixture("glob-stream/test.coffee")])
             .then(function (list) {
-                t.match(list, [fixture("glob-stream/test.coffee")])
+                assert.match(list, [fixture("glob-stream/test.coffee")])
             })
         })
 
         it("returns no files with dotfiles", function () {
             return read([fixture("glob-stream/*swag")]).then(function (list) {
-                t.match(list, [])
+                assert.match(list, [])
             })
         })
 
@@ -231,7 +231,7 @@ describe("cli glob stream", function () {
                 fixture("glob-stream/**/test.coffee"),
                 fixture("glob-stream/**/test.js"),
             ]).then(function (list) {
-                t.match(list, [
+                assert.match(list, [
                     fixture("glob-stream/whatsgoingon/hey/isaidhey/whatsgoingon/test.txt"), // eslint-disable-line max-len
                     fixture("glob-stream/test.coffee"),
                     fixture("glob-stream/whatsgoingon/test.js"),
@@ -247,7 +247,7 @@ describe("cli glob stream", function () {
             ]
 
             return read(globArray).then(function (list) {
-                t.match(list, globArray)
+                assert.match(list, globArray)
             })
         })
 
@@ -256,7 +256,7 @@ describe("cli glob stream", function () {
                 fixture("glob-stream/stuff/*.dmc"),
                 "!" + fixture("glob-stream/stuff/test.dmc"),
             ]).then(function (list) {
-                t.match(list, [fixture("glob-stream/stuff/run.dmc")])
+                assert.match(list, [fixture("glob-stream/stuff/run.dmc")])
             })
         })
 
@@ -265,7 +265,7 @@ describe("cli glob stream", function () {
                 fixture("glob-stream/stuff/run.dmc"),
                 "!" + fixture("glob-stream/stuff/test.dmc"),
             ]).then(function (list) {
-                t.match(list, [fixture("glob-stream/stuff/run.dmc")])
+                assert.match(list, [fixture("glob-stream/stuff/run.dmc")])
             })
         })
 
@@ -274,7 +274,7 @@ describe("cli glob stream", function () {
                 fixture("glob-stream/**/*.js"),
                 "!" + fixture("**/test.js"),
             ]).then(function (list) {
-                t.match(list, [])
+                assert.match(list, [])
             })
         })
 
@@ -283,7 +283,7 @@ describe("cli glob stream", function () {
                 fixture("glob-stream/*.coffee"),
                 fixture("glob-stream/whatsgoingon/*.coffee"),
             ]).then(function (list) {
-                t.match(list, [fixture("glob-stream/test.coffee")])
+                assert.match(list, [fixture("glob-stream/test.coffee")])
             })
         })
 
@@ -293,7 +293,7 @@ describe("cli glob stream", function () {
                 "!" + fixture("glob-stream/stuff/*.dmc"),
                 fixture("glob-stream/stuff/run.dmc"),
             ]).then(function (list) {
-                t.match(list, [fixture("glob-stream/stuff/run.dmc")])
+                assert.match(list, [fixture("glob-stream/stuff/run.dmc")])
             })
         })
 
@@ -302,26 +302,26 @@ describe("cli glob stream", function () {
                 "!" + fixture("glob-stream/stuff/*.dmc"),
                 fixture("glob-stream/stuff/run.dmc"),
             ]).then(function (list) {
-                t.match(list, [fixture("glob-stream/stuff/run.dmc")])
+                assert.match(list, [fixture("glob-stream/stuff/run.dmc")])
             })
         })
 
         it("throws on invalid glob argument", function () {
-            t.throwsMatch(function () {
+            assert.throwsMatch(function () {
                 GS.create([42])
             }, /Invalid glob .* 0/)
 
-            t.throwsMatch(function () {
+            assert.throwsMatch(function () {
                 GS.create([".", 42])
             }, /Invalid glob .* 1/)
         })
 
         it("throws on missing positive glob", function () {
-            t.throwsMatch(function () {
+            assert.throwsMatch(function () {
                 GS.create(["!c"])
             }, /Missing positive glob/)
 
-            t.throwsMatch(function () {
+            assert.throwsMatch(function () {
                 GS.create(["!a", "!b"])
             }, /Missing positive glob/)
         })
@@ -333,7 +333,7 @@ describe("cli glob stream", function () {
             stream.on("data", function () {})
             stream.on("warn", function (str) {
                 warned = true
-                t.string(str)
+                assert.string(str)
             })
             stream.on("error", done)
             stream.on("end", function () {
@@ -351,7 +351,7 @@ describe("cli glob stream", function () {
             stream.on("data", function () {})
             stream.on("warn", function (str) {
                 warned = true
-                t.string(str)
+                assert.string(str)
             })
             stream.on("error", done)
             stream.on("end", function () {
@@ -369,7 +369,7 @@ describe("cli glob stream", function () {
             stream.on("data", function () {})
             stream.on("warn", function (str) {
                 warned = true
-                t.string(str)
+                assert.string(str)
             })
             stream.on("error", done)
             stream.on("end", function () {
@@ -379,7 +379,7 @@ describe("cli glob stream", function () {
 
         it("emits no error on glob containing {} when not found", function () {
             return read(["notfound{a,b}"]).then(function (list) {
-                t.match(list, [])
+                assert.match(list, [])
             })
         })
     })

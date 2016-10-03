@@ -65,8 +65,8 @@ describe("cli end-to-end (FLAKE)", function () {
             .then(function (list) {
                 var code = list[1] != null ? list[1] : list[2]
 
-                t.equal(formatList(output), formatList(opts.messages))
-                t.equal(code, opts.code)
+                assert.equal(formatList(output), formatList(opts.messages))
+                assert.equal(code, opts.code)
             })
         })
     }
@@ -117,7 +117,7 @@ describe("cli end-to-end (FLAKE)", function () {
         "enter [0: core (basic)] = undefined",
         "enter [0: core (basic)] > [0: reflect()] = undefined",
         "pass [0: core (basic)] > [0: reflect()] > [0: exists] = undefined",
-        "pass [0: core (basic)] > [0: reflect()] > [2: has parent()] = undefined",
+        "pass [0: core (basic)] > [0: reflect()] > [1: has parent()] = undefined",
         "leave [0: core (basic)] > [0: reflect()] = undefined",
         "enter [0: core (basic)] > [1: test()] = undefined",
         "pass [0: core (basic)] > [1: test()] > [0: exists] = undefined",

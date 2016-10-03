@@ -11,15 +11,15 @@ describe("assertions (has keys)", function () {
             }
 
             if (succeed) {
-                return t[name].apply(t, args)
+                return assert[name].apply(undefined, args)
             } else {
-                return Util.fail.apply(undefined, [name].concat(args))
+                return Util.fail1.apply(undefined, [name].concat(args))
             }
         }
 
-        describe("t." + name + "()", function () {
+        describe(name + "()", function () {
             it("exists", function () {
-                t.function(t[name])
+                assert.function(assert[name])
             })
 
             if (opts.keys) {
@@ -124,15 +124,15 @@ describe("assertions (has keys)", function () {
             }
 
             if (succeed) {
-                return t[name].apply(t, args)
+                return assert[name].apply(undefined, args)
             } else {
-                return Util.fail.apply(undefined, [name].concat(args))
+                return Util.fail1.apply(undefined, [name].concat(args))
             }
         }
 
-        describe("t." + name + "()", function () {
+        describe(name + "()", function () {
             it("exists", function () {
-                t.function(t[name])
+                assert.function(assert[name])
             })
 
             it("checks numbers", function () {

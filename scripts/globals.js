@@ -18,9 +18,12 @@ if (typeof global.process === "object") {
  */
 var Thallium = require("../lib/browser-bundle.js")
 var Tests = require("../lib/tests.js")
+
 var t = global.t = Thallium.t
 var reflect = t.reflect()
+var assert = global.assert = Thallium.assert
 var Util = global.Util = {
+    match: Thallium.match,
     assertions: Thallium.assertions,
     r: Thallium.r,
     n: reflect.report,
@@ -33,8 +36,9 @@ var Util = global.Util = {
     // Various dependencies used throughout the tests, minus the CLI tests. It's
     // easier to inject them into this bundle rather than to try to implement a
     // module loader.
+
     Promise: require("../lib/bluebird.js"),
-    setTimeout: global.setTimeout.bind(global),
+    setTimeout: global.setTimeout,
     m: require("../lib/messages.js"),
     methods: require("../lib/methods.js"),
     R: require("../lib/reporter.js"),
@@ -147,8 +151,6 @@ Util.jsdom = (function () {
     }
 })()
 
-var AssertionError = reflect.AssertionError
-
 Util.push = function (ret, keep) {
     return function push(arg, done) {
         // Any equality tests on either of these are inherently flaky.
@@ -170,6 +172,8 @@ Util.push = function (ret, keep) {
     }
 }
 
+var AssertionError = assert.AssertionError
+
 Util.fail = function (name) {
     var args = []
 
@@ -181,6 +185,27 @@ Util.fail = function (name) {
     // Thallium assertions to test.
     try {
         t[name].apply(t, args)
+    } catch (e) {
+        if (e instanceof AssertionError) return
+        throw e
+    }
+
+    throw new AssertionError(
+        "Expected t." + name + " to throw an AssertionError",
+        AssertionError)
+}
+
+Util.fail1 = function (name) {
+    var args = []
+
+    for (var i = 1; i < arguments.length; i++) {
+        args.push(arguments[i])
+    }
+
+    // Silently swallowing exceptions is bad, so we can't use traditional
+    // Thallium assertions to test.
+    try {
+        assert[name].apply(t, args)
     } catch (e) {
         if (e instanceof AssertionError) return
         throw e

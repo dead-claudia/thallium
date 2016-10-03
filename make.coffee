@@ -35,13 +35,15 @@ patterns = [
     '{.,}*.coffee'
 ]
 
-watch = (onchange) ->
-    timeout = lastEvent = lastPath = undefined
-    count = 0
+# This creates a closure with `onchange` to not use the memoized versions
+# ShellJS replaces them with after the initial tick.
+watch = (onchange) -> ->
+    config.fatal = false
+    timeout = undefined
 
     invoke = ->
-        timeout = last = undefined
-        onchange() while count--
+        timeout = undefined
+        onchange()
         return
 
     chokidar.watch patterns,
@@ -50,18 +52,10 @@ watch = (onchange) ->
 
     .on 'all', (event, path) ->
         console.error "#{event}: #{path}"
-        if timeout? and event is lastEvent and path is lastPath
-            clearTimeout timeout
-            timeout = undefined
-        else
-            lastEvent = event
-            lastPath = path
-        count++
-
+        clearTimeout timeout if timeout?
         # Give time for the file changes to settle by delaying and debouncing
         # the `onchange` handler.
-        unless timeout?
-            timeout = setTimeout invoke, 500
+        timeout = setTimeout invoke, 500
 
     .on 'error', (error) ->
         console.error error.stack
@@ -69,9 +63,9 @@ watch = (onchange) ->
     .once 'ready', ->
         console.error 'Watching', "\"#{patterns.join '", "'}\" .."
 
-target.watch = -> watch target.test
-target['watch:karma'] = -> watch target['test:karma']
-target['watch:mocha'] = -> watch target['test:mocha']
+target.watch = watch target.test
+target['watch:karma'] = watch target['test:karma']
+target['watch:mocha'] = watch target['test:mocha']
 
 target.bundle = ->
     exec 'browserify -dr ./lib/browser-bundle.js:thallium -o thallium.js'

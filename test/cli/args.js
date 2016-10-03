@@ -13,7 +13,7 @@ describe("cli arguments", function () {
         it(description, function () {
             var parsed = Args.parse(defaultCwd, str ? str.split(/\s+/g) : [])
 
-            t.match(parsed, new Args.Args(opts))
+            assert.match(parsed, new Args.Args(opts))
         })
     }
 
@@ -69,7 +69,7 @@ describe("cli arguments", function () {
             var args = str ? str.split(/\s+/g) : []
 
             it("fails with missing argument for " + str, function () {
-                t.throws(function () {
+                assert.throws(function () {
                     Args.parse("base", args)
                 }, Args.ArgumentError)
             })

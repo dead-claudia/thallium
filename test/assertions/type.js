@@ -3,22 +3,22 @@
 /* global Symbol */
 
 describe("assertions (type)", function () {
-    describe("t.type()", function () {
+    describe("type()", function () {
         it("checks good types", function () {
-            t.type(true, "boolean")
-            t.type(false, "boolean")
-            t.type(0, "number")
-            t.type(1, "number")
-            t.type(NaN, "number")
-            t.type(Infinity, "number")
-            t.type("foo", "string")
-            t.type("", "string")
-            t.type(null, "object")
-            t.type({}, "object")
-            t.type([], "object")
-            t.type(function () {}, "function")
-            t.type(undefined, "undefined")
-            if (typeof Symbol === "function") t.type(Symbol(), "symbol")
+            assert.type(true, "boolean")
+            assert.type(false, "boolean")
+            assert.type(0, "number")
+            assert.type(1, "number")
+            assert.type(NaN, "number")
+            assert.type(Infinity, "number")
+            assert.type("foo", "string")
+            assert.type("", "string")
+            assert.type(null, "object")
+            assert.type({}, "object")
+            assert.type([], "object")
+            assert.type(function () {}, "function")
+            assert.type(undefined, "undefined")
+            if (typeof Symbol === "function") assert.type(Symbol(), "symbol")
         })
 
         it("checks bad types", function () { // eslint-disable-line max-statements, max-len
@@ -26,15 +26,15 @@ describe("assertions (type)", function () {
                 // Silently swallowing exceptions is bad, so we can't use
                 // traditional Thallium assertions to test.
                 try {
-                    t.type(value, "nope")
+                    assert.type(value, "nope")
                 } catch (e) {
                     if (e instanceof TypeError) return
                     throw e
                 }
 
-                throw new (t.reflect()).AssertionError(
+                throw new assert.AssertionError(
                     "Expected t.type to throw an TypeError",
-                    TypeError)
+                    undefined, TypeError)
             }
 
             typeFail(true)
@@ -52,44 +52,44 @@ describe("assertions (type)", function () {
             typeFail(undefined)
             if (typeof Symbol === "function") typeFail(Symbol())
 
-            Util.fail("type", true, "number")
-            Util.fail("type", false, "number")
-            Util.fail("type", 0, "boolean")
-            Util.fail("type", 1, "boolean")
-            Util.fail("type", NaN, "boolean")
-            Util.fail("type", Infinity, "boolean")
-            Util.fail("type", "foo", "object")
-            Util.fail("type", "", "object")
-            Util.fail("type", null, "string")
-            Util.fail("type", {}, "string")
-            Util.fail("type", [], "string")
-            Util.fail("type", function () {}, "object")
-            Util.fail("type", undefined, "string")
+            Util.fail1("type", true, "number")
+            Util.fail1("type", false, "number")
+            Util.fail1("type", 0, "boolean")
+            Util.fail1("type", 1, "boolean")
+            Util.fail1("type", NaN, "boolean")
+            Util.fail1("type", Infinity, "boolean")
+            Util.fail1("type", "foo", "object")
+            Util.fail1("type", "", "object")
+            Util.fail1("type", null, "string")
+            Util.fail1("type", {}, "string")
+            Util.fail1("type", [], "string")
+            Util.fail1("type", function () {}, "object")
+            Util.fail1("type", undefined, "string")
 
             if (typeof Symbol === "function") {
-                Util.fail("type", Symbol(), "number")
+                Util.fail1("type", Symbol(), "number")
             }
         })
     })
 
-    describe("t.notType()", function () {
+    describe("notType()", function () {
         it("checks good types", function () {
-            Util.fail("notType", true, "boolean")
-            Util.fail("notType", false, "boolean")
-            Util.fail("notType", 0, "number")
-            Util.fail("notType", 1, "number")
-            Util.fail("notType", NaN, "number")
-            Util.fail("notType", Infinity, "number")
-            Util.fail("notType", "foo", "string")
-            Util.fail("notType", "", "string")
-            Util.fail("notType", null, "object")
-            Util.fail("notType", {}, "object")
-            Util.fail("notType", [], "object")
-            Util.fail("notType", function () {}, "function")
-            Util.fail("notType", undefined, "undefined")
+            Util.fail1("notType", true, "boolean")
+            Util.fail1("notType", false, "boolean")
+            Util.fail1("notType", 0, "number")
+            Util.fail1("notType", 1, "number")
+            Util.fail1("notType", NaN, "number")
+            Util.fail1("notType", Infinity, "number")
+            Util.fail1("notType", "foo", "string")
+            Util.fail1("notType", "", "string")
+            Util.fail1("notType", null, "object")
+            Util.fail1("notType", {}, "object")
+            Util.fail1("notType", [], "object")
+            Util.fail1("notType", function () {}, "function")
+            Util.fail1("notType", undefined, "undefined")
 
             if (typeof Symbol === "function") {
-                Util.fail("notType", Symbol(), "symbol")
+                Util.fail1("notType", Symbol(), "symbol")
             }
         })
 
@@ -98,15 +98,15 @@ describe("assertions (type)", function () {
                 // Silently swallowing exceptions is bad, so we can't use
                 // traditional Thallium assertions to test.
                 try {
-                    t.type(value, "nope")
+                    assert.type(value, "nope")
                 } catch (e) {
                     if (e instanceof TypeError) return
                     throw e
                 }
 
-                throw new (t.reflect()).AssertionError(
+                throw new assert.AssertionError(
                     "Expected t.type to throw an TypeError",
-                    TypeError)
+                    undefined, TypeError)
             }
 
             typeFail(true)
@@ -124,36 +124,32 @@ describe("assertions (type)", function () {
             typeFail(undefined)
             if (typeof Symbol === "function") typeFail(Symbol())
 
-            t.notType(true, "number")
-            t.notType(false, "number")
-            t.notType(0, "boolean")
-            t.notType(1, "boolean")
-            t.notType(NaN, "boolean")
-            t.notType(Infinity, "boolean")
-            t.notType("foo", "object")
-            t.notType("", "object")
-            t.notType(null, "string")
-            t.notType({}, "string")
-            t.notType([], "string")
-            t.notType(function () {}, "object")
-            t.notType(undefined, "string")
-            if (typeof Symbol === "function") t.notType(Symbol(), "number")
+            assert.notType(true, "number")
+            assert.notType(false, "number")
+            assert.notType(0, "boolean")
+            assert.notType(1, "boolean")
+            assert.notType(NaN, "boolean")
+            assert.notType(Infinity, "boolean")
+            assert.notType("foo", "object")
+            assert.notType("", "object")
+            assert.notType(null, "string")
+            assert.notType({}, "string")
+            assert.notType([], "string")
+            assert.notType(function () {}, "object")
+            assert.notType(undefined, "string")
+            if (typeof Symbol === "function") assert.notType(Symbol(), "number")
         })
     })
 
     function testType(name, callback) {
-        function check(name) {
-            return t[name].bind(t)
-        }
-
-        Util.basic("t." + name + "()", function () {
-            callback(check(name), Util.fail.bind(undefined, name))
+        Util.basic(name + "()", function () {
+            callback(assert[name], Util.fail1.bind(undefined, name))
         })
 
         var negated = "not" + name[0].toUpperCase() + name.slice(1)
 
-        Util.basic("t." + negated + "()", function () {
-            callback(Util.fail.bind(undefined, negated), check(negated))
+        Util.basic(negated + "()", function () {
+            callback(Util.fail1.bind(undefined, negated), assert[negated])
         })
     }
 
@@ -220,6 +216,24 @@ describe("assertions (type)", function () {
         not(Infinity)
         not("foo")
         not("")
+        not(null)
+        is({})
+        is([])
+        not(function () {})
+        not(undefined)
+        not()
+        if (typeof Symbol === "function") not(Symbol())
+    })
+
+    testType("objectOrNull", function (is, not) {
+        not(true)
+        not(false)
+        not(0)
+        not(1)
+        not(NaN)
+        not(Infinity)
+        not("foo")
+        not("")
         is(null)
         is({})
         is([])
@@ -265,78 +279,6 @@ describe("assertions (type)", function () {
         if (typeof Symbol === "function") is(Symbol())
     })
 
-    testType("undefined", function (is, not) {
-        not(true)
-        not(false)
-        not(0)
-        not(1)
-        not(NaN)
-        not(Infinity)
-        not("foo")
-        not("")
-        not(null)
-        not({})
-        not([])
-        not(function () {})
-        is(undefined)
-        is()
-        if (typeof Symbol === "function") not(Symbol())
-    })
-
-    testType("true", function (is, not) {
-        is(true)
-        not(false)
-        not(0)
-        not(1)
-        not(NaN)
-        not(Infinity)
-        not("foo")
-        not("")
-        not(null)
-        not({})
-        not([])
-        not(function () {})
-        not(undefined)
-        not()
-        if (typeof Symbol === "function") not(Symbol())
-    })
-
-    testType("false", function (is, not) {
-        not(true)
-        is(false)
-        not(0)
-        not(1)
-        not(NaN)
-        not(Infinity)
-        not("foo")
-        not("")
-        not(null)
-        not({})
-        not([])
-        not(function () {})
-        not(undefined)
-        not()
-        if (typeof Symbol === "function") not(Symbol())
-    })
-
-    testType("null", function (is, not) {
-        not(true)
-        not(false)
-        not(0)
-        not(1)
-        not(NaN)
-        not(Infinity)
-        not("foo")
-        not("")
-        is(null)
-        not({})
-        not([])
-        not(function () {})
-        not(undefined)
-        not()
-        if (typeof Symbol === "function") not(Symbol())
-    })
-
     testType("exists", function (is, not) {
         is(true)
         is(false)
@@ -373,33 +315,33 @@ describe("assertions (type)", function () {
         if (typeof Symbol === "function") not(Symbol())
     })
 
-    Util.basic("t.instanceof()", function () {
+    Util.basic("inherits()", function () {
         function A() {}
-        t.instanceof(new A(), A)
-        t.instanceof(new A(), Object)
+        assert.inherits(new A(), A)
+        assert.inherits(new A(), Object)
 
         function B() {}
         Util.methods(B, A)
 
-        t.instanceof(new B(), B)
-        t.instanceof(new B(), A)
+        assert.inherits(new B(), B)
+        assert.inherits(new B(), A)
 
-        Util.fail("instanceof", new A(), B)
-        Util.fail("instanceof", [], RegExp)
+        Util.fail1("inherits", new A(), B)
+        Util.fail1("inherits", [], RegExp)
     })
 
-    Util.basic("t.notInstanceof()", function () {
+    Util.basic("notInherits()", function () {
         function A() {}
-        Util.fail("notInstanceof", new A(), A)
-        Util.fail("notInstanceof", new A(), Object)
+        Util.fail1("notInherits", new A(), A)
+        Util.fail1("notInherits", new A(), Object)
 
         function B() {}
         Util.methods(B, A)
 
-        Util.fail("notInstanceof", new B(), B)
-        Util.fail("notInstanceof", new B(), A)
+        Util.fail1("notInherits", new B(), B)
+        Util.fail1("notInherits", new B(), A)
 
-        t.notInstanceof(new A(), B)
-        t.notInstanceof([], RegExp)
+        assert.notInherits(new A(), B)
+        assert.notInherits([], RegExp)
     })
 })

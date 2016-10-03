@@ -5,36 +5,36 @@ describe("core (asynchronous behavior)", function () {
     var p = Util.p
 
     it("with normal tests", function () {
-        var tt = t.reflect().base()
+        var tt = t.base()
         var called = false
 
         tt.test("test", function () { called = true })
 
-        var ret = tt.run().then(function () { t.true(called) })
+        var ret = tt.run().then(function () { assert.ok(called) })
 
-        t.false(called)
+        assert.notOk(called)
         return ret
     })
 
     it("with shorthand tests", function () {
-        var tt = t.reflect().base()
+        var tt = t.base()
         var called = false
 
-        tt.define("assert", function () {
+        function fail() {
             called = true
-            return {test: false}
-        })
+            return assert.fail()
+        }
 
-        tt.test("test").assert()
+        tt.test("test").try(fail)
 
-        var ret = tt.run().then(function () { t.true(called) })
+        var ret = tt.run().then(function () { assert.ok(called) })
 
-        t.false(called)
+        assert.notOk(called)
         return ret
     })
 
     it("with async tests + sync done call", function () {
-        var tt = t.reflect().base()
+        var tt = t.base()
         var called = false
 
         tt.async("test", function (_, done) {
@@ -42,14 +42,14 @@ describe("core (asynchronous behavior)", function () {
             return done()
         })
 
-        var ret = tt.run().then(function () { t.true(called) })
+        var ret = tt.run().then(function () { assert.ok(called) })
 
-        t.false(called)
+        assert.notOk(called)
         return ret
     })
 
     it("with async tests + async done call", function () {
-        var tt = t.reflect().base()
+        var tt = t.base()
         var called = false
 
         tt.async("test", function (_, done) {
@@ -57,14 +57,14 @@ describe("core (asynchronous behavior)", function () {
             Util.setTimeout(function () { done() }, 0)
         })
 
-        var ret = tt.run().then(function () { t.true(called) })
+        var ret = tt.run().then(function () { assert.ok(called) })
 
-        t.false(called)
+        assert.notOk(called)
         return ret
     })
 
     it("with async tests + duplicate thenable resolution", function () {
-        var tt = t.reflect().base()
+        var tt = t.base()
         var called = false
 
         tt.async("test", function () {
@@ -78,14 +78,14 @@ describe("core (asynchronous behavior)", function () {
             }
         })
 
-        var ret = tt.run().then(function () { t.true(called) })
+        var ret = tt.run().then(function () { assert.ok(called) })
 
-        t.false(called)
+        assert.notOk(called)
         return ret
     })
 
     it("with async tests + duplicate thenable rejection", function () {
-        var tt = t.reflect().base()
+        var tt = t.base()
         var called = false
         var ret = []
         var sentinel = new Error("sentinel")
@@ -106,19 +106,19 @@ describe("core (asynchronous behavior)", function () {
         })
 
         var result = tt.run().then(function () {
-            t.match(ret, [
+            assert.match(ret, [
                 n("start", []),
                 n("fail", [p("test", 0)], sentinel),
                 n("end", []),
             ])
         })
 
-        t.false(called)
+        assert.notOk(called)
         return result
     })
 
     it("with async tests + mixed thenable (resolve first)", function () {
-        var tt = t.reflect().base()
+        var tt = t.base()
         var called = false
         var ret = []
         var sentinel = new Error("sentinel")
@@ -140,19 +140,19 @@ describe("core (asynchronous behavior)", function () {
         })
 
         var result = tt.run().then(function () {
-            t.match(ret, [
+            assert.match(ret, [
                 n("start", []),
                 n("pass", [p("test", 0)]),
                 n("end", []),
             ])
         })
 
-        t.false(called)
+        assert.notOk(called)
         return result
     })
 
     it("with async tests + mixed thenable (reject first)", function () {
-        var tt = t.reflect().base()
+        var tt = t.base()
         var called = false
         var ret = []
         var sentinel = new Error("sentinel")
@@ -175,14 +175,14 @@ describe("core (asynchronous behavior)", function () {
         })
 
         var result = tt.run().then(function () {
-            t.match(ret, [
+            assert.match(ret, [
                 n("start", []),
                 n("fail", [p("test", 0)], sentinel),
                 n("end", []),
             ])
         })
 
-        t.false(called)
+        assert.notOk(called)
         return result
     })
 })

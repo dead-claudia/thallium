@@ -11,13 +11,13 @@ describe("reporter dot", function () {
     it("is not itself a reporter", function () {
         var dot = Util.r.dot
 
-        t.throws(function () { dot(n("start", [])) }, TypeError)
-        t.throws(function () { dot(n("enter", [p("test", 0)])) }, TypeError)
-        t.throws(function () { dot(n("leave", [p("test", 0)])) }, TypeError)
-        t.throws(function () { dot(n("pass", [p("test", 0)])) }, TypeError)
-        t.throws(function () { dot(n("fail", [p("test", 0)])) }, TypeError)
-        t.throws(function () { dot(n("skip", [p("test", 0)])) }, TypeError)
-        t.throws(function () { dot(n("end", [])) }, TypeError)
+        assert.throws(function () { dot(n("start", [])) }, TypeError)
+        assert.throws(function () { dot(n("enter", [p("test", 0)])) }, TypeError) // eslint-disable-line max-len
+        assert.throws(function () { dot(n("leave", [p("test", 0)])) }, TypeError) // eslint-disable-line max-len
+        assert.throws(function () { dot(n("pass", [p("test", 0)])) }, TypeError)
+        assert.throws(function () { dot(n("fail", [p("test", 0)])) }, TypeError)
+        assert.throws(function () { dot(n("skip", [p("test", 0)])) }, TypeError)
+        assert.throws(function () { dot(n("end", [])) }, TypeError)
     })
 
     function stack(e) {
@@ -101,7 +101,7 @@ describe("reporter dot", function () {
                     return Util.Resolver.resolve1(reporter, undefined, i)
                 })
                 .then(function () {
-                    t.match(list, opts.output)
+                    assert.match(list, opts.output)
                 })
             })
         }
@@ -224,7 +224,7 @@ describe("reporter dot", function () {
             ]),
         })
 
-        var AssertionError = t.reflect().AssertionError
+        var AssertionError = assert.AssertionError
         var assertion = new AssertionError("Expected 1 to equal 2", 1, 2)
 
         test("fail 2 with AssertionError", {
@@ -498,7 +498,7 @@ describe("reporter dot", function () {
                 n("pass", [p("core (basic)", 0), p("returns a prototypal clone when not given a callback", 6)]),
                 n("pass", [p("core (basic)", 0), p("runs block tests within tests", 7)]),
                 n("pass", [p("core (basic)", 0), p("runs successful inline tests within tests", 8)]),
-                n("pass", [p("core (basic)", 0), p("accepts a callback with `t.run()`", 9)]),
+                n("pass", [p("core (basic)", 0), p("accepts a callback with `run()`", 9)]),
                 n("leave", [p("core (basic)", 0)]),
                 n("enter", [p("cli normalize glob", 1)]),
                 n("enter", [p("cli normalize glob", 1), p("current directory", 0)]),
@@ -598,7 +598,7 @@ describe("reporter dot", function () {
                 n("fail", [p("core (basic)", 0), p("returns a prototypal clone when not given a callback", 6)], badType),
                 n("pass", [p("core (basic)", 0), p("runs block tests within tests", 7)]),
                 n("pass", [p("core (basic)", 0), p("runs successful inline tests within tests", 8)]),
-                n("pass", [p("core (basic)", 0), p("accepts a callback with `t.run()`", 9)]),
+                n("pass", [p("core (basic)", 0), p("accepts a callback with `run()`", 9)]),
                 n("leave", [p("core (basic)", 0)]),
                 n("enter", [p("cli normalize glob", 1)]),
                 n("enter", [p("cli normalize glob", 1), p("current directory", 0)]),
@@ -1009,7 +1009,7 @@ describe("reporter dot", function () {
                 n("pass", [p("core (basic)", 0), p("returns a prototypal clone when not given a callback", 6)], undefined, at("medium"), 75),
                 n("pass", [p("core (basic)", 0), p("runs block tests within tests", 7)], undefined, at("fast"), 75),
                 n("pass", [p("core (basic)", 0), p("runs successful inline tests within tests", 8)], undefined, at("fast"), 75),
-                n("pass", [p("core (basic)", 0), p("accepts a callback with `t.run()`", 9)], undefined, at("fast"), 75),
+                n("pass", [p("core (basic)", 0), p("accepts a callback with `run()`", 9)], undefined, at("fast"), 75),
                 n("leave", [p("core (basic)", 0)]),
                 n("enter", [p("cli normalize glob", 1)], undefined, at("fast"), 75),
                 n("enter", [p("cli normalize glob", 1), p("current directory", 0)], undefined, at("fast"), 75),

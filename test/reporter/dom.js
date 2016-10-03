@@ -14,13 +14,13 @@ describe("reporter dom", function () {
     it("is not itself a reporter", function () {
         var dom = Util.r.dom
 
-        t.throws(function () { dom(n("start", [])) }, TypeError)
-        t.throws(function () { dom(n("enter", [p("test", 0)])) }, TypeError)
-        t.throws(function () { dom(n("leave", [p("test", 0)])) }, TypeError)
-        t.throws(function () { dom(n("pass", [p("test", 0)])) }, TypeError)
-        t.throws(function () { dom(n("fail", [p("test", 0)])) }, TypeError)
-        t.throws(function () { dom(n("skip", [p("test", 0)])) }, TypeError)
-        t.throws(function () { dom(n("end", [])) }, TypeError)
+        assert.throws(function () { dom(n("start", [])) }, TypeError)
+        assert.throws(function () { dom(n("enter", [p("test", 0)])) }, TypeError) // eslint-disable-line max-len
+        assert.throws(function () { dom(n("leave", [p("test", 0)])) }, TypeError) // eslint-disable-line max-len
+        assert.throws(function () { dom(n("pass", [p("test", 0)])) }, TypeError)
+        assert.throws(function () { dom(n("fail", [p("test", 0)])) }, TypeError)
+        assert.throws(function () { dom(n("skip", [p("test", 0)])) }, TypeError)
+        assert.throws(function () { dom(n("end", [])) }, TypeError)
     })
 
     function test(name, opts) { // eslint-disable-line no-unused-vars

@@ -1,7 +1,7 @@
 "use strict"
 
 describe("core (assertion error)", function () {
-    var AssertionError = t.reflect().AssertionError
+    var AssertionError = assert.AssertionError
 
     it("is an error", function () {
         if (!(new AssertionError("message") instanceof Error)) {

@@ -14,7 +14,7 @@ describe("cli fs utils", function () {
     describe("chdir()", function () {
         it("works", function () {
             FSUtil.chdir(__dirname)
-            t.equal(process.cwd(), __dirname)
+            assert.equal(process.cwd(), __dirname)
         })
     })
 
@@ -23,7 +23,7 @@ describe("cli fs utils", function () {
             process.chdir(__dirname)
             return FSUtil.load(fixture("util/test-module.js"))
             .then(function (result) {
-                t.match(result, {exports: "hi!"})
+                assert.match(result, {exports: "hi!"})
             })
         })
     })
@@ -33,8 +33,8 @@ describe("cli fs utils", function () {
             process.chdir(__dirname)
             return FSUtil.stat(fixture("util/test-module.js"))
             .then(function (stat) {
-                t.true(stat.isFile())
-                t.false(stat.isDirectory())
+                assert.ok(stat.isFile())
+                assert.notOk(stat.isDirectory())
             })
         })
 
@@ -42,8 +42,8 @@ describe("cli fs utils", function () {
             process.chdir(__dirname)
             return FSUtil.stat(fixture("util"))
             .then(function (stat) {
-                t.false(stat.isFile())
-                t.true(stat.isDirectory())
+                assert.notOk(stat.isFile())
+                assert.ok(stat.isDirectory())
             })
         })
 
@@ -51,8 +51,8 @@ describe("cli fs utils", function () {
             process.chdir(__dirname)
             return FSUtil.stat(fixture("util/nope.js"))
             .then(function (stat) {
-                t.false(stat.isFile())
-                t.false(stat.isDirectory())
+                assert.notOk(stat.isFile())
+                assert.notOk(stat.isDirectory())
             })
         })
     })
@@ -63,9 +63,18 @@ describe("cli fs utils", function () {
             return FSUtil.readGlob([fixture("util/test-glob/*.js")])
             .then(function () {
                 process.chdir(fixture("util/test-glob"))
-                t.equal(require.cache[path.resolve("foo.js")].exports, "foo")
-                t.equal(require.cache[path.resolve("bar.js")].exports, "bar")
-                t.equal(require.cache[path.resolve("baz.js")].exports, "baz")
+
+                assert.equal(
+                    require.cache[path.resolve("foo.js")].exports,
+                    "foo")
+
+                assert.equal(
+                    require.cache[path.resolve("bar.js")].exports,
+                    "bar")
+
+                assert.equal(
+                    require.cache[path.resolve("baz.js")].exports,
+                    "baz")
             })
         })
     })

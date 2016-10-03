@@ -9,9 +9,9 @@ describe("core (slow) (FLAKE)", function () {
 
     function speed(data, type) {
         switch (type) {
-        case "fast": t.between(data.duration, 0, data.slow / 2); break
-        case "medium": t.between(data.duration, data.slow / 2, data.slow); break
-        case "slow": t.above(data.duration, data.slow); break
+        case "fast": assert.between(data.duration, 0, data.slow / 2); break
+        case "medium": assert.between(data.duration, data.slow / 2, data.slow); break // eslint-disable-line max-len
+        case "slow": assert.above(data.duration, data.slow); break
         default: throw new RangeError("Unknown type: `" + type + "`")
         }
     }
@@ -29,7 +29,7 @@ describe("core (slow) (FLAKE)", function () {
         })
 
         return tt.run().then(function () {
-            t.match(ret, [
+            assert.match(ret, [
                 n("start", [], undefined, -1, 75),
                 n("pass", [p("test", 0)], undefined, ret[1].duration, ret[1].slow), // eslint-disable-line max-len
                 n("end", [], undefined, -1, 75),
@@ -52,13 +52,13 @@ describe("core (slow) (FLAKE)", function () {
         })
 
         return tt.run().then(function () {
-            t.match(ret, [
+            assert.match(ret, [
                 n("start", [], undefined, -1, 75),
                 n("pass", [p("test", 0)], undefined, ret[1].duration, ret[1].slow), // eslint-disable-line max-len
                 n("end", [], undefined, -1, 75),
             ])
 
-            t.equal(ret[1].slow, 100)
+            assert.equal(ret[1].slow, 100)
             speed(ret[1], "medium")
         })
     })
@@ -76,13 +76,13 @@ describe("core (slow) (FLAKE)", function () {
         })
 
         return tt.run().then(function () {
-            t.match(ret, [
+            assert.match(ret, [
                 n("start", [], undefined, -1, 75),
                 n("pass", [p("test", 0)], undefined, ret[1].duration, ret[1].slow), // eslint-disable-line max-len
                 n("end", [], undefined, -1, 75),
             ])
 
-            t.equal(ret[1].slow, 50)
+            assert.equal(ret[1].slow, 50)
             speed(ret[1], "slow")
         })
     })
@@ -98,7 +98,7 @@ describe("core (slow) (FLAKE)", function () {
         .async("inner", function (tt, done) { done() })
 
         return tt.run().then(function () {
-            t.match(ret, [
+            assert.match(ret, [
                 n("start", [], undefined, -1, 75),
                 n("enter", [p("test", 0)], undefined, ret[1].duration, ret[1].slow), // eslint-disable-line max-len
                 n("pass", [p("test", 0), p("inner", 0)], undefined, ret[2].duration, ret[2].slow), // eslint-disable-line max-len
@@ -106,8 +106,8 @@ describe("core (slow) (FLAKE)", function () {
                 n("end", [], undefined, -1, 75),
             ])
 
-            t.equal(ret[1].slow, 50)
-            t.equal(ret[2].slow, 50)
+            assert.equal(ret[1].slow, 50)
+            assert.equal(ret[2].slow, 50)
             speed(ret[1], "fast")
             speed(ret[2], "fast")
         })
@@ -126,7 +126,7 @@ describe("core (slow) (FLAKE)", function () {
         })
 
         return tt.run().then(function () {
-            t.match(ret, [
+            assert.match(ret, [
                 n("start", [], undefined, -1, 75),
                 n("enter", [p("test", 0)], undefined, ret[1].duration, ret[1].slow), // eslint-disable-line max-len
                 n("pass", [p("test", 0), p("inner", 0)], undefined, ret[2].duration, ret[2].slow), // eslint-disable-line max-len
@@ -134,8 +134,8 @@ describe("core (slow) (FLAKE)", function () {
                 n("end", [], undefined, -1, 75),
             ])
 
-            t.equal(ret[1].slow, 50)
-            t.equal(ret[2].slow, 50)
+            assert.equal(ret[1].slow, 50)
+            assert.equal(ret[2].slow, 50)
             speed(ret[1], "fast")
             speed(ret[2], "slow")
         })
@@ -152,8 +152,8 @@ describe("core (slow) (FLAKE)", function () {
         })
 
         return tt.run().then(function () {
-            t.equal(active, 50)
-            t.equal(raw, 50)
+            assert.equal(active, 50)
+            assert.equal(raw, 50)
         })
     })
 
@@ -161,8 +161,8 @@ describe("core (slow) (FLAKE)", function () {
         var tt = t.base()
         var ttt = tt.test("test").slow(50)
 
-        t.equal(ttt.reflect().activeSlow(), 50)
-        t.equal(ttt.reflect().slow(), 50)
+        assert.equal(ttt.reflect().activeSlow(), 50)
+        assert.equal(ttt.reflect().slow(), 50)
     })
 
     it("gets inherited block slow", function () {
@@ -177,8 +177,8 @@ describe("core (slow) (FLAKE)", function () {
         })
 
         return tt.run().then(function () {
-            t.equal(active, 50)
-            t.equal(raw, 0)
+            assert.equal(active, 50)
+            assert.equal(raw, 0)
         })
     })
 
@@ -188,8 +188,8 @@ describe("core (slow) (FLAKE)", function () {
         .slow(50)
         .test("inner")
 
-        t.equal(ttt.reflect().activeSlow(), 50)
-        t.equal(ttt.reflect().slow(), 0)
+        assert.equal(ttt.reflect().activeSlow(), 50)
+        assert.equal(ttt.reflect().slow(), 0)
     })
 
     it("gets default slow", function () {
@@ -202,8 +202,8 @@ describe("core (slow) (FLAKE)", function () {
         })
 
         return tt.run().then(function () {
-            t.equal(active, 75)
-            t.equal(raw, 0)
+            assert.equal(active, 75)
+            assert.equal(raw, 0)
         })
     })
 })

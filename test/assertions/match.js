@@ -14,16 +14,16 @@ describe("assertions (match)", function () { // eslint-disable-line max-statemen
         }
 
         it(name, function () {
-            t[m("deepEqual")](a, b)
-            t[m("match")](a, b)
+            assert[m("deepEqual")](a, b)
+            assert[m("match")](a, b)
         })
     }
 
     it("exists", function () {
-        t.function(t.match)
-        t.function(t.notMatch)
-        t.function(t.deepEqual)
-        t.function(t.notDeepEqual)
+        assert.function(assert.match)
+        assert.function(assert.notMatch)
+        assert.function(assert.deepEqual)
+        assert.function(assert.notDeepEqual)
     })
 
     var obj1 = {}
