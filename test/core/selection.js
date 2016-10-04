@@ -28,7 +28,7 @@ describe("core (selection)", function () {
             })
 
             return tt.run().then(function () {
-                t.match(ret, [
+                assert.match(ret, [
                     n("start", []),
                     n("enter", [p("one", 0)]),
                     n("skip", [p("one", 0), p("inner", 0)]),
@@ -60,7 +60,7 @@ describe("core (selection)", function () {
             })
 
             return tt.run().then(function () {
-                t.match(ret, [
+                assert.match(ret, [
                     n("start", []),
                     n("enter", [p("one", 0)]),
                     n("skip", [p("one", 0), p("inner", 0)]),
@@ -92,7 +92,7 @@ describe("core (selection)", function () {
             })
 
             return tt.run().then(function () {
-                t.match(ret, [
+                assert.match(ret, [
                     n("start", []),
                     n("enter", [p("one", 0)]),
                     n("skip", [p("one", 0), p("inner", 0)]),
@@ -113,7 +113,7 @@ describe("core (selection)", function () {
             var ttt = tt.testSkip("test")
 
             return ttt.run().then(function () {
-                t.match(ret, [
+                assert.match(ret, [
                     n("start", [p("test", 0)]),
                     n("end", [p("test", 0)]),
                 ])
@@ -140,7 +140,7 @@ describe("core (selection)", function () {
             })
 
             return tt.run().then(function () {
-                t.match(ret, [
+                assert.match(ret, [
                     n("start", []),
                     n("enter", [p("one", 0)]),
                     n("pass", [p("one", 0), p("inner", 0)]),
@@ -168,7 +168,7 @@ describe("core (selection)", function () {
             })
 
             return tt.run().then(function () {
-                t.match(ret, [
+                assert.match(ret, [
                     n("start", []),
                     n("enter", [p("one", 0)]),
                     n("pass", [p("one", 0), p("inner", 0)]),
@@ -196,7 +196,7 @@ describe("core (selection)", function () {
             })
 
             return tt.run().then(function () {
-                t.match(ret, [
+                assert.match(ret, [
                     n("start", []),
                     n("enter", [p("one", 0)]),
                     n("pass", [p("one", 0), p("inner", 0)]),
@@ -224,7 +224,7 @@ describe("core (selection)", function () {
             })
 
             return tt.run().then(function () {
-                t.match(ret, [
+                assert.match(ret, [
                     n("start", []),
                     n("end", []),
                 ])
@@ -249,7 +249,7 @@ describe("core (selection)", function () {
             })
 
             return tt.run().then(function () {
-                t.match(ret, [
+                assert.match(ret, [
                     n("start", []),
                     n("end", []),
                 ])
@@ -274,7 +274,7 @@ describe("core (selection)", function () {
             })
 
             return tt.run().then(function () {
-                t.match(ret, [
+                assert.match(ret, [
                     n("start", []),
                     n("end", []),
                 ])
@@ -299,7 +299,7 @@ describe("core (selection)", function () {
             })
 
             return tt.run().then(function () {
-                t.match(ret, [
+                assert.match(ret, [
                     n("start", []),
                     n("enter", [p("one", 0)]),
                     n("pass", [p("one", 0), p("inner", 0)]),

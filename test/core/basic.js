@@ -56,7 +56,7 @@ describe("core (basic)", function () {
             var tt = t.base()
             var test = tt.test("test")
 
-            t.notEqual(test, tt)
+            assert.notEqual(test, tt)
             assert.equal(Object.getPrototypeOf(test), tt)
         })
     })
@@ -90,7 +90,7 @@ describe("core (basic)", function () {
                 tt.test("foo").use(function () {})
             })
 
-            return tt.run().then(function () { t.notOk(err) })
+            return tt.run().then(function () { assert.notOk(err) })
         })
 
         it("accepts a callback", function () {
@@ -107,7 +107,7 @@ describe("core (basic)", function () {
             })
 
             return Promise.fromCallback(function (cb) { tt.run(cb) })
-            .then(function () { t.notOk(err) })
+            .then(function () { assert.notOk(err) })
         })
     })
 

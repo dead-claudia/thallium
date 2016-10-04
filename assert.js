@@ -11,6 +11,25 @@ var Errors = require("./lib/errors.js")
 
 var hasOwn = Object.prototype.hasOwnProperty
 
+var noInject = {
+    inject: true,
+    escape: true,
+    format: true,
+    failFormat: true,
+}
+
+exports.inject = function (t) {
+    var keys = Object.keys(exports)
+
+    for (var i = 0; i < keys.length; i++) {
+        var key = keys[i]
+
+        if (!noInject[key]) t[key] = exports[key]
+    }
+
+    return t
+}
+
 /* eslint-disable no-self-compare */
 // For better NaN handling
 function strictIs(a, b) {

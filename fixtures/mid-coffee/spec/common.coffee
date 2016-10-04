@@ -16,22 +16,24 @@ t.test 'cli common', ->
         {isObjectLike} = Common
 
         @test 'passes for objects and functions', ->
-            @true isObjectLike({})
-            @true isObjectLike([])
-            @true isObjectLike(->)
+            @equal isObjectLike({}), true
+            @equal isObjectLike([]), true
+            @equal isObjectLike(->), true
 
         @test 'fails for other things', ->
-            @false isObjectLike('')
-            @false isObjectLike('foo')
-            @false isObjectLike(true)
-            @false isObjectLike(false)
-            @false isObjectLike(0)
-            @false isObjectLike(1)
-            @false isObjectLike(NaN)
-            @false isObjectLike(null)
-            @false isObjectLike(undefined)
-            @false isObjectLike()
-            @false isObjectLike(Symbol()) if typeof Symbol is 'function'
+            @equal isObjectLike(''), false
+            @equal isObjectLike('foo'), false
+            @equal isObjectLike(true), false
+            @equal isObjectLike(false), false
+            @equal isObjectLike(0), false
+            @equal isObjectLike(1), false
+            @equal isObjectLike(NaN), false
+            @equal isObjectLike(null), false
+            @equal isObjectLike(undefined), false
+            @equal isObjectLike(), false
+
+            if typeof Symbol is 'function'
+                @equal isObjectLike(Symbol()), false
 
     @test 'resolveDefault()', ->
         {resolveDefault} = Common

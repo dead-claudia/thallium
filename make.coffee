@@ -40,22 +40,32 @@ patterns = [
 watch = (onchange) -> ->
     config.fatal = false
     timeout = undefined
+    active = no
+    queue = []
 
-    invoke = ->
-        timeout = undefined
-        onchange()
-        return
+    execute = ->
+        for {event, path} in queue
+            console.error "#{event}: #{path}"
+
+        queue = []
+        active = yes
+        exec "node make #{onchange}", (code) ->
+            active = no
+            execute() if queue.length
 
     chokidar.watch patterns,
         cwd: __dirname
         ignored: ['**/test-bundle.js']
 
     .on 'all', (event, path) ->
-        console.error "#{event}: #{path}"
-        clearTimeout timeout if timeout?
         # Give time for the file changes to settle by delaying and debouncing
-        # the `onchange` handler.
-        timeout = setTimeout invoke, 500
+        # the `onchange` task.
+        clearTimeout timeout if timeout?
+        queue.push {event, path}
+        timeout = setTimeout (->
+            timeout = undefined
+            execute() unless active
+        ), 500
 
     .on 'error', (error) ->
         console.error error.stack
@@ -63,9 +73,9 @@ watch = (onchange) -> ->
     .once 'ready', ->
         console.error 'Watching', "\"#{patterns.join '", "'}\" .."
 
-target.watch = watch target.test
-target['watch:karma'] = watch target['test:karma']
-target['watch:mocha'] = watch target['test:mocha']
+target.watch = watch 'test'
+target['watch:karma'] = watch 'test:karma'
+target['watch:mocha'] = watch 'test:mocha'
 
 target.bundle = ->
     exec 'browserify -dr ./lib/browser-bundle.js:thallium -o thallium.js'

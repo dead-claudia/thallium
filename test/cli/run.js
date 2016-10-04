@@ -350,7 +350,7 @@ describe("cli runner", function () {
                     t.test("1 === 2").try(assert.equal, 1, 2)
 
                     t.test("expandos don't transfer", function (t) {
-                        t.notHasKey(t, "foo")
+                        assert.notHasKey(t, "foo")
                     })
 
                     t.test("what a fail...").try(isNope, "yep")

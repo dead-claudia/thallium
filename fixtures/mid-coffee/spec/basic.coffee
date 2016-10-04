@@ -15,7 +15,7 @@ t.test 'core (basic)', ->
         @test 'has parent()', ->
             tt = @base()
 
-            @undefined tt.reflect().parent()
+            @equal tt.reflect().parent(), undefined
             @equal tt.test('test').reflect().parent(), tt
 
     @test 'test()', ->

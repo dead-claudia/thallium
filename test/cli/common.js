@@ -314,7 +314,7 @@ describe("cli common", function () {
 
         function invalid(name, config) {
             it(name + " is invalid", function () {
-                t.throws(function () { Common.validate(config) }, TypeError)
+                assert.throws(function () { Common.validate(config) }, TypeError) // eslint-disable-line max-len
             })
         }
 
@@ -375,7 +375,7 @@ describe("cli common", function () {
 
                 return merge(files, {}, load({thallium: thallium}), true)
                 .then(function (config) {
-                    t.match(config, {thallium: thallium, files: files})
+                    assert.match(config, {thallium: thallium, files: files})
                     assert.equal(config.thallium, thallium)
                 })
             })
@@ -386,7 +386,7 @@ describe("cli common", function () {
 
                 return merge(files, {thallium: thallium}, load({}), true)
                 .then(function (config) {
-                    t.match(config, {thallium: thallium, files: files})
+                    assert.match(config, {thallium: thallium, files: files})
                     assert.equal(config.thallium, thallium)
                 })
             })
@@ -402,7 +402,7 @@ describe("cli common", function () {
                     load({thallium: thallium}),
                     true)
                 .then(function (config) {
-                    t.match(config, {thallium: thallium, files: extra})
+                    assert.match(config, {thallium: thallium, files: extra})
                     assert.equal(config.thallium, thallium)
                 })
             })
@@ -418,7 +418,7 @@ describe("cli common", function () {
                     load({}),
                     true)
                 .then(function (config) {
-                    t.match(config, {thallium: thallium, files: extra})
+                    assert.match(config, {thallium: thallium, files: extra})
                     assert.equal(config.thallium, thallium)
                 })
             })
@@ -431,7 +431,7 @@ describe("cli common", function () {
 
                 return merge(files, {}, load({thallium: thallium}))
                 .then(function (config) {
-                    t.match(config, {thallium: thallium, files: files})
+                    assert.match(config, {thallium: thallium, files: files})
                     assert.equal(config.thallium, thallium)
                 })
             })
@@ -442,7 +442,7 @@ describe("cli common", function () {
 
                 return merge(files, {thallium: thallium}, load({}))
                 .then(function (config) {
-                    t.match(config, {thallium: thallium, files: files})
+                    assert.match(config, {thallium: thallium, files: files})
                     assert.equal(config.thallium, thallium)
                 })
             })
@@ -454,7 +454,7 @@ describe("cli common", function () {
 
                 return merge(files, {files: extra}, load({thallium: thallium}))
                 .then(function (config) {
-                    t.match(config, {thallium: thallium, files: files})
+                    assert.match(config, {thallium: thallium, files: files})
                     assert.equal(config.thallium, thallium)
                 })
             })
@@ -469,7 +469,7 @@ describe("cli common", function () {
                     {thallium: thallium, files: extra},
                     load({}))
                 .then(function (config) {
-                    t.match(config, {thallium: thallium, files: files})
+                    assert.match(config, {thallium: thallium, files: files})
                     assert.equal(config.thallium, thallium)
                 })
             })

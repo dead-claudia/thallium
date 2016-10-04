@@ -96,20 +96,19 @@ describe("core (safety)", function () {
         tt.test("one", function () { tt.test("hi") })
         tt.test("two", function () { tt.define("hi", function () {}) })
         tt.define("assert", function () { return {test: true} })
-        tt.test("three", function () { tt.assert() })
-        tt.test("four", function () { tt.use(plugin) })
+        tt.test("three", function () { tt.use(plugin) })
 
-        tt.test("five", function (tt) {
+        tt.test("four", function (tt) {
             tt.test("inner", function () { tt.use(plugin) })
         })
 
-        tt.test("six", function (tt) {
+        tt.test("five", function (tt) {
             tt.test("inner", function () { tt.reporter(noopReporter) })
         })
 
-        tt.test("seven", function () { tt.add("inner", function () {}) })
+        tt.test("six", function () { tt.add("inner", function () {}) })
 
-        tt.test("eight", function () {
+        tt.test("seven", function () {
             tt.wrap("test", function (func) { return func() })
         })
 
@@ -119,15 +118,14 @@ describe("core (safety)", function () {
                 n("fail", [p("one", 0)], error),
                 n("fail", [p("two", 1)], error),
                 n("fail", [p("three", 2)], error),
-                n("fail", [p("four", 3)], error),
+                n("enter", [p("four", 3)]),
+                n("fail", [p("four", 3), p("inner", 0)], error),
+                n("leave", [p("four", 3)]),
                 n("enter", [p("five", 4)]),
                 n("fail", [p("five", 4), p("inner", 0)], error),
                 n("leave", [p("five", 4)]),
-                n("enter", [p("six", 5)]),
-                n("fail", [p("six", 5), p("inner", 0)], error),
-                n("leave", [p("six", 5)]),
+                n("fail", [p("six", 5)], error),
                 n("fail", [p("seven", 6)], error),
-                n("fail", [p("eight", 7)], error),
                 n("end", []),
             ])
         })

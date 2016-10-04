@@ -120,7 +120,7 @@ describe("assertions (computation)", function () {
         assert.length(new Array(5), 5)
         assert.length({length: 5}, 5)
 
-        assert.throws(function () { t.length({}) }, TypeError)
+        assert.throws(function () { assert.length({}) }, TypeError)
         fail("length", {}, 0)
         fail("length", [], 1)
         fail("length", [], Infinity)
@@ -128,8 +128,8 @@ describe("assertions (computation)", function () {
         fail("length", [], NaN)
         fail("length", [], -1)
 
-        assert.throws(function () { t.length(null, -1) }, TypeError)
-        assert.throws(function () { t.length(undefined, -1) }, TypeError)
+        assert.throws(function () { assert.length(null, -1) }, TypeError)
+        assert.throws(function () { assert.length(undefined, -1) }, TypeError)
     })
 
     basic("notLength()", function () {
@@ -138,7 +138,7 @@ describe("assertions (computation)", function () {
         fail("notLength", new Array(5), 5)
         fail("notLength", {length: 5}, 5)
 
-        assert.throws(function () { t.notLength({}) }, TypeError)
+        assert.throws(function () { assert.notLength({}) }, TypeError)
         fail("notLength", {}, 0)
 
         assert.notLength([], 1)
@@ -147,8 +147,8 @@ describe("assertions (computation)", function () {
         fail("notLength", [], NaN)
         assert.notLength([], -1)
 
-        assert.throws(function () { t.notLength(null, -1) }, TypeError)
-        assert.throws(function () { t.notLength(undefined, -1) }, TypeError)
+        assert.throws(function () { assert.notLength(null, -1) }, TypeError)
+        assert.throws(function () { assert.notLength(undefined, -1) }, TypeError) // eslint-disable-line max-len
     })
 
     describe("lengthAtLeast()", function () {

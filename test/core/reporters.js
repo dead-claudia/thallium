@@ -463,11 +463,11 @@ describe("core (reporters)", function () { // eslint-disable-line max-statements
         tt.use(Util.assertions)
 
         tt.test("mod-one", function (tt) {
-            tt.test("1 === 1").equal(1, 1)
+            tt.test("1 === 1").try(assert.equal, 1, 1)
 
             tt.test("foo()", function (tt) {
                 tt.foo = 1
-                tt.notEqual(1, 1)
+                assert.notEqual(1, 1)
             })
 
             tt.async("bar()", function (t, done) {
@@ -483,13 +483,13 @@ describe("core (reporters)", function () { // eslint-disable-line max-statements
             })
 
             tt.test("nested", function (tt) {
-                tt.test("nested 2", function (tt) { tt.true(true) })
+                tt.test("nested 2", function () { assert.equal(true, true) })
             })
         })
 
         tt.test("mod-two", function (tt) {
-            tt.test("1 === 2").equal(1, 2)
-            tt.test("expandos don't transfer").notHasKey(tt, "foo")
+            tt.test("1 === 2").try(assert.equal, 1, 2)
+            tt.test("expandos don't transfer").try(assert.notHasKey, tt, "foo")
         })
 
         var fail1 = new AssertionError("Expected 1 to not equal 1", 1, 1)
@@ -611,11 +611,11 @@ describe("core (reporters)", function () { // eslint-disable-line max-statements
         tt.use(Util.assertions)
 
         tt.test("mod-one", function (tt) {
-            tt.test("1 === 1").equal(1, 1)
+            tt.test("1 === 1").try(assert.equal, 1, 1)
 
             tt.test("foo()", function (tt) {
                 tt.foo = 1
-                tt.notEqual(1, 1)
+                assert.notEqual(1, 1)
             })
 
             tt.async("bar()", function (t, done) {
@@ -631,13 +631,13 @@ describe("core (reporters)", function () { // eslint-disable-line max-statements
             })
 
             tt.test("nested", function (tt) {
-                tt.test("nested 2", function (tt) { tt.true(true) })
+                tt.test("nested 2", function (tt) { assert.equal(true, true) })
             })
         })
 
         tt.test("mod-two", function (tt) {
-            tt.test("1 === 2").equal(1, 2)
-            tt.test("expandos don't transfer").notHasKey(tt, "foo")
+            tt.test("1 === 2").try(assert.equal, 1, 2)
+            tt.test("expandos don't transfer").try(assert.notHasKey, tt, "foo")
         })
 
         var fail1 = new AssertionError("Expected 1 to not equal 1", 1, 1)

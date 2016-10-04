@@ -154,10 +154,10 @@ Util.jsdom = (function () {
 Util.push = function (ret, keep) {
     return function push(arg, done) {
         // Any equality tests on either of these are inherently flaky.
-        t.hasOwn(arg, "duration")
-        t.hasOwn(arg, "slow")
-        t.number(arg.duration)
-        t.number(arg.slow)
+        assert.hasOwn(arg, "duration")
+        assert.hasOwn(arg, "slow")
+        assert.number(arg.duration)
+        assert.number(arg.slow)
         if (!keep) {
             if (arg.pass() || arg.fail() || arg.enter()) {
                 arg.duration = 10
@@ -173,27 +173,6 @@ Util.push = function (ret, keep) {
 }
 
 var AssertionError = assert.AssertionError
-
-Util.fail = function (name) {
-    var args = []
-
-    for (var i = 1; i < arguments.length; i++) {
-        args.push(arguments[i])
-    }
-
-    // Silently swallowing exceptions is bad, so we can't use traditional
-    // Thallium assertions to test.
-    try {
-        t[name].apply(t, args)
-    } catch (e) {
-        if (e instanceof AssertionError) return
-        throw e
-    }
-
-    throw new AssertionError(
-        "Expected t." + name + " to throw an AssertionError",
-        AssertionError)
-}
 
 Util.fail1 = function (name) {
     var args = []

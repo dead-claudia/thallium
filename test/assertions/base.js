@@ -21,7 +21,7 @@ describe("assertions (base)", function () { // eslint-disable-line max-len, max-
             assert.assert({})
             assert.assert([])
             assert.assert(new Date())
-            if (typeof Symbol === "function") t.assert(Symbol())
+            if (typeof Symbol === "function") assert.assert(Symbol())
 
             fail(undefined, "message")
             fail(null, "message")
@@ -310,8 +310,8 @@ describe("assertions (base)", function () { // eslint-disable-line max-len, max-
 
     if (typeof Map !== "undefined") {
         Util.basic("has()", function () {
-            t.has(new Map([["prop", 1]]), "prop")
-            t.has(new Map([["prop", 1]]), "prop", 1)
+            assert.has(new Map([["prop", 1]]), "prop")
+            assert.has(new Map([["prop", 1]]), "prop", 1)
 
             Util.fail1("has", new Map([["prop", 1]]), "value")
             Util.fail1("has", new Map([["prop", 1]]), "prop", 2)
@@ -322,14 +322,14 @@ describe("assertions (base)", function () { // eslint-disable-line max-len, max-
             Util.fail1("notHas", new Map([["prop", 1]]), "prop")
             Util.fail1("notHas", new Map([["prop", 1]]), "prop", 1)
 
-            t.notHas(new Map([["prop", 1]]), "value")
-            t.notHas(new Map([["prop", 1]]), "prop", 2)
-            t.notHas(new Map([["prop", 1]]), "prop", "1")
+            assert.notHas(new Map([["prop", 1]]), "value")
+            assert.notHas(new Map([["prop", 1]]), "prop", 2)
+            assert.notHas(new Map([["prop", 1]]), "prop", "1")
         })
 
         Util.basic("hasLoose()", function () {
-            t.hasLoose(new Map([["prop", 1]]), "prop", 1)
-            t.hasLoose(new Map([["prop", 1]]), "prop", "1")
+            assert.hasLoose(new Map([["prop", 1]]), "prop", 1)
+            assert.hasLoose(new Map([["prop", 1]]), "prop", "1")
 
             Util.fail1("hasLoose", new Map([["prop", 1]]), "prop", 2)
         })
@@ -338,7 +338,7 @@ describe("assertions (base)", function () { // eslint-disable-line max-len, max-
             Util.fail1("notHasLoose", new Map([["prop", 1]]), "prop", 1)
             Util.fail1("notHasLoose", new Map([["prop", 1]]), "prop", "1")
 
-            t.notHasLoose(new Map([["prop", 1]]), "prop", 2)
+            assert.notHasLoose(new Map([["prop", 1]]), "prop", 2)
         })
     }
 })
