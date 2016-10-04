@@ -15,11 +15,11 @@ I've made several commands for common tasks:
 
 This tries to support the following platforms:
 
-- Node 0.10 all the way to the latest stable release (version 6.x at the time of writing). I'm aware that Node 0.10 and 0.12 are unsupported, but it's not hard to maintain compatibility with the way this is structured, so I'm doing it anyways.
+- All versions of Node from the oldest maintenance release (0.10 at the time of writing) are supported.
 
-- Browser support is planned with [Sauce Labs](https://saucelabs.com/), but it is currently untested.
+- Browser support is planned with [Sauce Labs](https://saucelabs.com/), but it is currently only tested with Firefox and Chrome.
 
-- This is written in pure ES5, and there isn't much of an option to support ES6. Some features still need polyfilled for browsers, and the way this is written doesn't really need many ES6 features
+- This is written in pure ES5, and there isn't much of an option to support ES6 because of compatibility concerns. Some features still need polyfilled for older browsers, and the way this is written doesn't really need many ES6 features
 
 - The documentation and examples generally use anything stage 4 or later, including all the ES6 things like modules and arrow functions, and other very new, recently added features like async functions.
 

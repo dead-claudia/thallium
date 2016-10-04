@@ -2,7 +2,7 @@
 
 [![Build Status](https://travis-ci.org/isiahmeadows/thallium.svg?branch=master)](https://travis-ci.org/isiahmeadows/thallium) [![Join the chat at https://gitter.im/isiahmeadows/thallium](https://badges.gitter.im/isiahmeadows/thallium.svg)](https://gitter.im/isiahmeadows/thallium?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
-A simple, unopinionated, modular test framework meant to simplify your tests. It supports Node 0.10 and later, and browser support is also planned.
+A simple, unopinionated, modular test framework meant to simplify your tests. It supports Node v0.10 and later, as well as browsers (although it's not as well tested).
 
 *Note that this is a huge work in progress, and is probably not suited for production projects.*
 
@@ -14,7 +14,7 @@ npm install --save-dev thallium
 
 ## Usage and API
 
-Check out the [documentation](http://github.com/isiahmeadows/thallium/blob/master/docs/README.md)
+Check out the [documentation](http://github.com/isiahmeadows/thallium/blob/master/docs/README.md).
 
 ```
 tl
