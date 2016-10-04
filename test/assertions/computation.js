@@ -1,7 +1,7 @@
 "use strict"
 
 describe("assertions (computation)", function () {
-    var fail = Util.fail1
+    var fail = Util.fail
     var basic = Util.basic
 
     describe("throws()", function () {

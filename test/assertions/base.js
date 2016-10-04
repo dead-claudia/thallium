@@ -32,12 +32,12 @@ describe("assertions (base)", function () { // eslint-disable-line max-len, max-
         })
 
         it("escapes the message", function () {
-            Util.fail1("assert", undefined, "{test}")
-            Util.fail1("assert", null, "{test}")
-            Util.fail1("assert", false, "{test}")
-            Util.fail1("assert", 0, "{test}")
-            Util.fail1("assert", "", "{test}")
-            Util.fail1("assert", NaN, "{test}")
+            Util.fail("assert", undefined, "{test}")
+            Util.fail("assert", null, "{test}")
+            Util.fail("assert", false, "{test}")
+            Util.fail("assert", 0, "{test}")
+            Util.fail("assert", "", "{test}")
+            Util.fail("assert", NaN, "{test}")
         })
     })
 
@@ -51,24 +51,24 @@ describe("assertions (base)", function () { // eslint-disable-line max-len, max-
         assert.ok(new Date())
         if (typeof Symbol === "function") assert.ok(Symbol())
 
-        Util.fail1("ok")
-        Util.fail1("ok", undefined)
-        Util.fail1("ok", null)
-        Util.fail1("ok", false)
-        Util.fail1("ok", 0)
-        Util.fail1("ok", "")
-        Util.fail1("ok", NaN)
+        Util.fail("ok")
+        Util.fail("ok", undefined)
+        Util.fail("ok", null)
+        Util.fail("ok", false)
+        Util.fail("ok", 0)
+        Util.fail("ok", "")
+        Util.fail("ok", NaN)
     })
 
     Util.basic("notOk()", function () {
-        Util.fail1("notOk", true)
-        Util.fail1("notOk", 1)
-        Util.fail1("notOk", Infinity)
-        Util.fail1("notOk", "foo")
-        Util.fail1("notOk", {})
-        Util.fail1("notOk", [])
-        Util.fail1("notOk", new Date())
-        if (typeof Symbol === "function") Util.fail1("notOk", Symbol())
+        Util.fail("notOk", true)
+        Util.fail("notOk", 1)
+        Util.fail("notOk", Infinity)
+        Util.fail("notOk", "foo")
+        Util.fail("notOk", {})
+        Util.fail("notOk", [])
+        Util.fail("notOk", new Date())
+        if (typeof Symbol === "function") Util.fail("notOk", Symbol())
 
         assert.notOk()
         assert.notOk(undefined)
@@ -93,25 +93,25 @@ describe("assertions (base)", function () { // eslint-disable-line max-len, max-
 
         assert.equal(obj, obj)
 
-        Util.fail1("equal", {}, {})
-        Util.fail1("equal", null, undefined)
-        Util.fail1("equal", 0, 1)
-        Util.fail1("equal", 1, "1")
+        Util.fail("equal", {}, {})
+        Util.fail("equal", null, undefined)
+        Util.fail("equal", 0, 1)
+        Util.fail("equal", 1, "1")
     })
 
     Util.basic("notEqual()", function () {
-        Util.fail1("notEqual", 0, 0)
-        Util.fail1("notEqual", 1, 1)
-        Util.fail1("notEqual", null, null)
-        Util.fail1("notEqual", undefined, undefined)
-        Util.fail1("notEqual", Infinity, Infinity)
-        Util.fail1("notEqual", NaN, NaN)
-        Util.fail1("notEqual", "", "")
-        Util.fail1("notEqual", "foo", "foo")
+        Util.fail("notEqual", 0, 0)
+        Util.fail("notEqual", 1, 1)
+        Util.fail("notEqual", null, null)
+        Util.fail("notEqual", undefined, undefined)
+        Util.fail("notEqual", Infinity, Infinity)
+        Util.fail("notEqual", NaN, NaN)
+        Util.fail("notEqual", "", "")
+        Util.fail("notEqual", "foo", "foo")
 
         var obj = {}
 
-        Util.fail1("notEqual", obj, obj)
+        Util.fail("notEqual", obj, obj)
 
         assert.notEqual({}, {})
         assert.notEqual(null, undefined)
@@ -135,25 +135,25 @@ describe("assertions (base)", function () { // eslint-disable-line max-len, max-
 
         assert.equalLoose(obj, obj)
 
-        Util.fail1("equalLoose", {}, {})
-        Util.fail1("equalLoose", 0, 1)
+        Util.fail("equalLoose", {}, {})
+        Util.fail("equalLoose", 0, 1)
     })
 
     Util.basic("notEqualLoose()", function () {
-        Util.fail1("notEqualLoose", 0, 0)
-        Util.fail1("notEqualLoose", 1, 1)
-        Util.fail1("notEqualLoose", null, null)
-        Util.fail1("notEqualLoose", undefined, undefined)
-        Util.fail1("notEqualLoose", Infinity, Infinity)
-        Util.fail1("notEqualLoose", NaN, NaN)
-        Util.fail1("notEqualLoose", "", "")
-        Util.fail1("notEqualLoose", "foo", "foo")
-        Util.fail1("notEqualLoose", null, undefined)
-        Util.fail1("notEqualLoose", 1, "1")
+        Util.fail("notEqualLoose", 0, 0)
+        Util.fail("notEqualLoose", 1, 1)
+        Util.fail("notEqualLoose", null, null)
+        Util.fail("notEqualLoose", undefined, undefined)
+        Util.fail("notEqualLoose", Infinity, Infinity)
+        Util.fail("notEqualLoose", NaN, NaN)
+        Util.fail("notEqualLoose", "", "")
+        Util.fail("notEqualLoose", "foo", "foo")
+        Util.fail("notEqualLoose", null, undefined)
+        Util.fail("notEqualLoose", 1, "1")
 
         var obj = {}
 
-        Util.fail1("notEqualLoose", obj, obj)
+        Util.fail("notEqualLoose", obj, obj)
 
         assert.notEqualLoose({}, {})
         assert.notEqualLoose(0, 1)
@@ -174,9 +174,9 @@ describe("assertions (base)", function () { // eslint-disable-line max-len, max-
         assert.deepEqual(obj, obj)
 
         assert.deepEqual({}, {})
-        Util.fail1("deepEqual", null, undefined)
-        Util.fail1("deepEqual", 0, 1)
-        Util.fail1("deepEqual", 1, "1")
+        Util.fail("deepEqual", null, undefined)
+        Util.fail("deepEqual", 0, 1)
+        Util.fail("deepEqual", 1, "1")
 
         assert.deepEqual(
             {a: [2, 3], b: [4]},
@@ -184,25 +184,25 @@ describe("assertions (base)", function () { // eslint-disable-line max-len, max-
     })
 
     Util.basic("notDeepEqual()", function () {
-        Util.fail1("notDeepEqual", 0, 0)
-        Util.fail1("notDeepEqual", 1, 1)
-        Util.fail1("notDeepEqual", null, null)
-        Util.fail1("notDeepEqual", undefined, undefined)
-        Util.fail1("notDeepEqual", Infinity, Infinity)
-        Util.fail1("notDeepEqual", NaN, NaN)
-        Util.fail1("notDeepEqual", "", "")
-        Util.fail1("notDeepEqual", "foo", "foo")
+        Util.fail("notDeepEqual", 0, 0)
+        Util.fail("notDeepEqual", 1, 1)
+        Util.fail("notDeepEqual", null, null)
+        Util.fail("notDeepEqual", undefined, undefined)
+        Util.fail("notDeepEqual", Infinity, Infinity)
+        Util.fail("notDeepEqual", NaN, NaN)
+        Util.fail("notDeepEqual", "", "")
+        Util.fail("notDeepEqual", "foo", "foo")
 
         var obj = {}
 
-        Util.fail1("notDeepEqual", obj, obj)
+        Util.fail("notDeepEqual", obj, obj)
 
-        Util.fail1("notDeepEqual", {}, {})
+        Util.fail("notDeepEqual", {}, {})
         assert.notDeepEqual(null, undefined)
         assert.notDeepEqual(0, 1)
         assert.notDeepEqual(1, "1")
 
-        Util.fail1("notDeepEqual",
+        Util.fail("notDeepEqual",
             {a: [2, 3], b: [4]},
             {a: [2, 3], b: [4]})
     })
@@ -217,19 +217,19 @@ describe("assertions (base)", function () { // eslint-disable-line max-len, max-
         assert.hasOwn({prop: 1}, "prop", 1)
         assert.hasOwn(new F(), "value", 1)
 
-        Util.fail1("hasOwn", {prop: 1}, "toString")
-        Util.fail1("hasOwn", {prop: 1}, "value")
-        Util.fail1("hasOwn", {prop: 1}, "prop", 2)
-        Util.fail1("hasOwn", {prop: 1}, "prop", "1")
-        Util.fail1("hasOwn", new F(), "prop")
-        Util.fail1("hasOwn", new F(), "prop", 1)
-        Util.fail1("hasOwn", new F(), "value", 2)
+        Util.fail("hasOwn", {prop: 1}, "toString")
+        Util.fail("hasOwn", {prop: 1}, "value")
+        Util.fail("hasOwn", {prop: 1}, "prop", 2)
+        Util.fail("hasOwn", {prop: 1}, "prop", "1")
+        Util.fail("hasOwn", new F(), "prop")
+        Util.fail("hasOwn", new F(), "prop", 1)
+        Util.fail("hasOwn", new F(), "value", 2)
     })
 
     Util.basic("notHasOwn()", function () {
-        Util.fail1("notHasOwn", {prop: 1}, "prop")
-        Util.fail1("notHasOwn", {prop: 1}, "prop", 1)
-        Util.fail1("notHasOwn", new F(), "value", 1)
+        Util.fail("notHasOwn", {prop: 1}, "prop")
+        Util.fail("notHasOwn", {prop: 1}, "prop", 1)
+        Util.fail("notHasOwn", new F(), "value", 1)
 
         assert.notHasOwn({prop: 1}, "toString")
         assert.notHasOwn({prop: 1}, "value")
@@ -245,15 +245,15 @@ describe("assertions (base)", function () { // eslint-disable-line max-len, max-
         assert.hasOwnLoose(new F(), "value", 1)
         assert.hasOwnLoose({prop: 1}, "prop", "1")
 
-        Util.fail1("hasOwnLoose", {prop: 1}, "prop", 2)
-        Util.fail1("hasOwnLoose", new F(), "prop", 1)
-        Util.fail1("hasOwnLoose", new F(), "value", 2)
+        Util.fail("hasOwnLoose", {prop: 1}, "prop", 2)
+        Util.fail("hasOwnLoose", new F(), "prop", 1)
+        Util.fail("hasOwnLoose", new F(), "value", 2)
     })
 
     Util.basic("notHasOwnLoose()", function () {
-        Util.fail1("notHasOwnLoose", {prop: 1}, "prop", 1)
-        Util.fail1("notHasOwnLoose", new F(), "value", 1)
-        Util.fail1("notHasOwnLoose", {prop: 1}, "prop", "1")
+        Util.fail("notHasOwnLoose", {prop: 1}, "prop", 1)
+        Util.fail("notHasOwnLoose", new F(), "value", 1)
+        Util.fail("notHasOwnLoose", {prop: 1}, "prop", "1")
 
         assert.notHasOwnLoose({prop: 1}, "prop", 2)
         assert.notHasOwnLoose(new F(), "prop", 1)
@@ -268,19 +268,19 @@ describe("assertions (base)", function () { // eslint-disable-line max-len, max-
         assert.hasKey(new F(), "prop")
         assert.hasKey(new F(), "prop", 1)
 
-        Util.fail1("hasKey", {prop: 1}, "value")
-        Util.fail1("hasKey", {prop: 1}, "prop", 2)
-        Util.fail1("hasKey", {prop: 1}, "prop", "1")
-        Util.fail1("hasKey", new F(), "value", 2)
+        Util.fail("hasKey", {prop: 1}, "value")
+        Util.fail("hasKey", {prop: 1}, "prop", 2)
+        Util.fail("hasKey", {prop: 1}, "prop", "1")
+        Util.fail("hasKey", new F(), "value", 2)
     })
 
     Util.basic("notHasKey()", function () {
-        Util.fail1("notHasKey", {prop: 1}, "prop")
-        Util.fail1("notHasKey", {prop: 1}, "prop", 1)
-        Util.fail1("notHasKey", new F(), "value", 1)
-        Util.fail1("notHasKey", {prop: 1}, "toString")
-        Util.fail1("notHasKey", new F(), "prop")
-        Util.fail1("notHasKey", new F(), "prop", 1)
+        Util.fail("notHasKey", {prop: 1}, "prop")
+        Util.fail("notHasKey", {prop: 1}, "prop", 1)
+        Util.fail("notHasKey", new F(), "value", 1)
+        Util.fail("notHasKey", {prop: 1}, "toString")
+        Util.fail("notHasKey", new F(), "prop")
+        Util.fail("notHasKey", new F(), "prop", 1)
 
         assert.notHasKey({prop: 1}, "value")
         assert.notHasKey({prop: 1}, "prop", 2)
@@ -294,15 +294,15 @@ describe("assertions (base)", function () { // eslint-disable-line max-len, max-
         assert.hasKeyLoose(new F(), "prop", 1)
         assert.hasKeyLoose({prop: 1}, "prop", "1")
 
-        Util.fail1("hasKeyLoose", {prop: 1}, "prop", 2)
-        Util.fail1("hasKeyLoose", new F(), "value", 2)
+        Util.fail("hasKeyLoose", {prop: 1}, "prop", 2)
+        Util.fail("hasKeyLoose", new F(), "value", 2)
     })
 
     Util.basic("notHasKeyLoose()", function () {
-        Util.fail1("notHasKeyLoose", {prop: 1}, "prop", 1)
-        Util.fail1("notHasKeyLoose", new F(), "value", 1)
-        Util.fail1("notHasKeyLoose", new F(), "prop", 1)
-        Util.fail1("notHasKeyLoose", {prop: 1}, "prop", "1")
+        Util.fail("notHasKeyLoose", {prop: 1}, "prop", 1)
+        Util.fail("notHasKeyLoose", new F(), "value", 1)
+        Util.fail("notHasKeyLoose", new F(), "prop", 1)
+        Util.fail("notHasKeyLoose", {prop: 1}, "prop", "1")
 
         assert.notHasKeyLoose({prop: 1}, "prop", 2)
         assert.notHasKeyLoose(new F(), "value", 2)
@@ -313,14 +313,14 @@ describe("assertions (base)", function () { // eslint-disable-line max-len, max-
             assert.has(new Map([["prop", 1]]), "prop")
             assert.has(new Map([["prop", 1]]), "prop", 1)
 
-            Util.fail1("has", new Map([["prop", 1]]), "value")
-            Util.fail1("has", new Map([["prop", 1]]), "prop", 2)
-            Util.fail1("has", new Map([["prop", 1]]), "prop", "1")
+            Util.fail("has", new Map([["prop", 1]]), "value")
+            Util.fail("has", new Map([["prop", 1]]), "prop", 2)
+            Util.fail("has", new Map([["prop", 1]]), "prop", "1")
         })
 
         Util.basic("notHas()", function () {
-            Util.fail1("notHas", new Map([["prop", 1]]), "prop")
-            Util.fail1("notHas", new Map([["prop", 1]]), "prop", 1)
+            Util.fail("notHas", new Map([["prop", 1]]), "prop")
+            Util.fail("notHas", new Map([["prop", 1]]), "prop", 1)
 
             assert.notHas(new Map([["prop", 1]]), "value")
             assert.notHas(new Map([["prop", 1]]), "prop", 2)
@@ -331,12 +331,12 @@ describe("assertions (base)", function () { // eslint-disable-line max-len, max-
             assert.hasLoose(new Map([["prop", 1]]), "prop", 1)
             assert.hasLoose(new Map([["prop", 1]]), "prop", "1")
 
-            Util.fail1("hasLoose", new Map([["prop", 1]]), "prop", 2)
+            Util.fail("hasLoose", new Map([["prop", 1]]), "prop", 2)
         })
 
         Util.basic("notHasLoose()", function () {
-            Util.fail1("notHasLoose", new Map([["prop", 1]]), "prop", 1)
-            Util.fail1("notHasLoose", new Map([["prop", 1]]), "prop", "1")
+            Util.fail("notHasLoose", new Map([["prop", 1]]), "prop", 1)
+            Util.fail("notHasLoose", new Map([["prop", 1]]), "prop", "1")
 
             assert.notHasLoose(new Map([["prop", 1]]), "prop", 2)
         })

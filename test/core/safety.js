@@ -144,7 +144,6 @@ describe("core (safety)", function () {
                 var entry = ret[i]
 
                 if (entry.extra()) {
-                    debugger
                     assert.string(Util.R.getStack(entry.value))
                     entry.value.stack = ""
                 }

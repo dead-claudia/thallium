@@ -13,7 +13,7 @@ describe("assertions (has keys)", function () {
             if (succeed) {
                 return assert[name].apply(undefined, args)
             } else {
-                return Util.fail1.apply(undefined, [name].concat(args))
+                return Util.fail.apply(undefined, [name].concat(args))
             }
         }
 
@@ -126,7 +126,7 @@ describe("assertions (has keys)", function () {
             if (succeed) {
                 return assert[name].apply(undefined, args)
             } else {
-                return Util.fail1.apply(undefined, [name].concat(args))
+                return Util.fail.apply(undefined, [name].concat(args))
             }
         }
 

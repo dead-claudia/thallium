@@ -178,7 +178,7 @@ Util.push = function (ret, keep) {
 
 var AssertionError = assert.AssertionError
 
-Util.fail1 = function (name) {
+Util.fail = function (name) {
     var args = []
 
     for (var i = 1; i < arguments.length; i++) {

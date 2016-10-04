@@ -485,7 +485,7 @@ describe("core (reporters)", function () { // eslint-disable-line max-statements
             tt.test("expandos don't transfer").try(assert.notHasKey, tt, "foo")
         })
 
-        var fail1 = new AssertionError("Expected 1 to not equal 1", 1, 1)
+        var fail = new AssertionError("Expected 1 to not equal 1", 1, 1)
         var fail2 = new AssertionError("Expected 1 to equal 2", 2, 1)
 
         return tt.run().then(function () {
@@ -493,7 +493,7 @@ describe("core (reporters)", function () { // eslint-disable-line max-statements
                 n("start", []),
                 n("enter", [p("mod-one", 0)]),
                 n("pass", [p("mod-one", 0), p("1 === 1", 0)]),
-                n("fail", [p("mod-one", 0), p("foo()", 1)], fail1),
+                n("fail", [p("mod-one", 0), p("foo()", 1)], fail),
                 n("fail", [p("mod-one", 0), p("bar()", 2)], new Error("fail")),
                 n("fail", [p("mod-one", 0), p("baz()", 3)], sentinel),
                 n("enter", [p("mod-one", 0), p("nested", 4)]),
@@ -632,7 +632,7 @@ describe("core (reporters)", function () { // eslint-disable-line max-statements
             tt.test("expandos don't transfer").try(assert.notHasKey, tt, "foo")
         })
 
-        var fail1 = new AssertionError("Expected 1 to not equal 1", 1, 1)
+        var fail = new AssertionError("Expected 1 to not equal 1", 1, 1)
         var fail2 = new AssertionError("Expected 1 to equal 2", 2, 1)
 
         return tt.run().then(function () {
@@ -640,7 +640,7 @@ describe("core (reporters)", function () { // eslint-disable-line max-statements
                 n("start", []),
                 n("enter", [p("mod-one", 0)]),
                 n("pass", [p("mod-one", 0), p("1 === 1", 0)]),
-                n("fail", [p("mod-one", 0), p("foo()", 1)], fail1),
+                n("fail", [p("mod-one", 0), p("foo()", 1)], fail),
                 n("fail", [p("mod-one", 0), p("bar()", 2)], new Error("fail")),
                 n("fail", [p("mod-one", 0), p("baz()", 3)], sentinel),
                 n("enter", [p("mod-one", 0), p("nested", 4)]),
@@ -663,7 +663,7 @@ describe("core (reporters)", function () { // eslint-disable-line max-statements
                 n("start", []),
                 n("enter", [p("mod-one", 0)]),
                 n("pass", [p("mod-one", 0), p("1 === 1", 0)]),
-                n("fail", [p("mod-one", 0), p("foo()", 1)], fail1),
+                n("fail", [p("mod-one", 0), p("foo()", 1)], fail),
                 n("fail", [p("mod-one", 0), p("bar()", 2)], new Error("fail")),
                 n("fail", [p("mod-one", 0), p("baz()", 3)], sentinel),
                 n("enter", [p("mod-one", 0), p("nested", 4)]),

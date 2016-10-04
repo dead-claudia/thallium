@@ -8,8 +8,8 @@ describe("assertions (includes)", function () {
         })
 
         it("is strict", function () {
-            Util.fail1("includes", ["1", 2, 3, 4, 5], 1)
-            Util.fail1("includes", ["1", 2, 3, 4, 5], [1])
+            Util.fail("includes", ["1", 2, 3, 4, 5], 1)
+            Util.fail("includes", ["1", 2, 3, 4, 5], [1])
         })
 
         it("checks objects", function () {
@@ -19,7 +19,7 @@ describe("assertions (includes)", function () {
 
             assert.includes([obj1, 3, obj3, "foo"], [obj1, obj3])
             assert.includes([obj1, obj2, obj3], [obj1, obj2, obj3])
-            Util.fail1("includes", [obj1, 3, obj3, "foo"], [obj1, obj2, obj3])
+            Util.fail("includes", [obj1, 3, obj3, "foo"], [obj1, obj2, obj3])
         })
 
         it("checks nothing", function () {
@@ -27,8 +27,8 @@ describe("assertions (includes)", function () {
         })
 
         it("checks missing numbers", function () {
-            Util.fail1("includes", [1, 2, 3, 4, 5], 10)
-            Util.fail1("includes", [1, 2, 3, 4, 5], [10])
+            Util.fail("includes", [1, 2, 3, 4, 5], 10)
+            Util.fail("includes", [1, 2, 3, 4, 5], [10])
         })
 
         it("checks missing objects", function () {
@@ -36,16 +36,16 @@ describe("assertions (includes)", function () {
             var obj2 = {}
             var obj3 = {}
 
-            Util.fail1("includes", [obj1, obj2, 3, "foo", {}], [{}])
-            Util.fail1("includes", [obj1, obj2, obj3], [{}])
-            Util.fail1("includes", [obj1, obj2, obj3], [[]])
+            Util.fail("includes", [obj1, obj2, 3, "foo", {}], [{}])
+            Util.fail("includes", [obj1, obj2, obj3], [{}])
+            Util.fail("includes", [obj1, obj2, obj3], [[]])
         })
     })
 
     describe("notIncludesAll()", function () {
         it("checks numbers", function () {
-            Util.fail1("notIncludesAll", [1, 2, 3, 4, 5], 1)
-            Util.fail1("notIncludesAll", [1, 2, 3, 4, 5], [1])
+            Util.fail("notIncludesAll", [1, 2, 3, 4, 5], 1)
+            Util.fail("notIncludesAll", [1, 2, 3, 4, 5], [1])
         })
 
         it("is strict", function () {
@@ -58,8 +58,8 @@ describe("assertions (includes)", function () {
             var obj2 = {}
             var obj3 = {}
 
-            Util.fail1("notIncludesAll", [obj1, 3, obj3, "foo"], [obj1, obj3])
-            Util.fail1("notIncludesAll", [obj1, obj2, obj3], [obj1, obj2, obj3])
+            Util.fail("notIncludesAll", [obj1, 3, obj3, "foo"], [obj1, obj3])
+            Util.fail("notIncludesAll", [obj1, obj2, obj3], [obj1, obj2, obj3])
             assert.notIncludesAll([obj1, 3, obj3, "foo"], [obj1, obj2, obj3])
         })
 
@@ -90,8 +90,8 @@ describe("assertions (includes)", function () {
         })
 
         it("is strict", function () {
-            Util.fail1("includesAny", ["1", 2, 3, 4, 5], 1)
-            Util.fail1("includesAny", ["1", 2, 3, 4, 5], [1])
+            Util.fail("includesAny", ["1", 2, 3, 4, 5], 1)
+            Util.fail("includesAny", ["1", 2, 3, 4, 5], [1])
         })
 
         it("checks objects", function () {
@@ -109,8 +109,8 @@ describe("assertions (includes)", function () {
         })
 
         it("checks missing numbers", function () {
-            Util.fail1("includesAny", [1, 2, 3, 4, 5], 10)
-            Util.fail1("includesAny", [1, 2, 3, 4, 5], [10])
+            Util.fail("includesAny", [1, 2, 3, 4, 5], 10)
+            Util.fail("includesAny", [1, 2, 3, 4, 5], [10])
         })
 
         it("checks missing objects", function () {
@@ -118,16 +118,16 @@ describe("assertions (includes)", function () {
             var obj2 = {}
             var obj3 = {}
 
-            Util.fail1("includesAny", [obj1, obj2, 3, "foo", {}], [{}])
-            Util.fail1("includesAny", [obj1, obj2, obj3], [{}])
-            Util.fail1("includesAny", [obj1, obj2, obj3], [[]])
+            Util.fail("includesAny", [obj1, obj2, 3, "foo", {}], [{}])
+            Util.fail("includesAny", [obj1, obj2, obj3], [{}])
+            Util.fail("includesAny", [obj1, obj2, obj3], [[]])
         })
     })
 
     describe("notIncludes()", function () {
         it("checks numbers", function () {
-            Util.fail1("notIncludes", [1, 2, 3, 4, 5], 1)
-            Util.fail1("notIncludes", [1, 2, 3, 4, 5], [1])
+            Util.fail("notIncludes", [1, 2, 3, 4, 5], 1)
+            Util.fail("notIncludes", [1, 2, 3, 4, 5], [1])
         })
 
         it("is strict", function () {
@@ -140,9 +140,9 @@ describe("assertions (includes)", function () {
             var obj2 = {}
             var obj3 = {}
 
-            Util.fail1("notIncludes", [obj1, 3, obj3, "foo"], [obj1, obj3])
-            Util.fail1("notIncludes", [obj1, obj2, obj3], [obj1, obj2, obj3])
-            Util.fail1("notIncludes", [obj1, 3, obj3, "foo"], [obj1, obj2, obj3])
+            Util.fail("notIncludes", [obj1, 3, obj3, "foo"], [obj1, obj3])
+            Util.fail("notIncludes", [obj1, obj2, obj3], [obj1, obj2, obj3])
+            Util.fail("notIncludes", [obj1, 3, obj3, "foo"], [obj1, obj2, obj3])
         })
 
         it("checks nothing", function () {
@@ -185,7 +185,7 @@ describe("assertions (includes)", function () {
 
             assert.includesLoose([obj1, 3, obj3, "foo"], [obj1, obj3])
             assert.includesLoose([obj1, obj2, obj3], [obj1, obj2, obj3])
-            Util.fail1("includesLoose",
+            Util.fail("includesLoose",
                 [obj1, 3, obj3, "foo"],
                 [obj1, obj2, obj3])
         })
@@ -195,8 +195,8 @@ describe("assertions (includes)", function () {
         })
 
         it("checks missing numbers", function () {
-            Util.fail1("includesLoose", [1, 2, 3, 4, 5], 10)
-            Util.fail1("includesLoose", [1, 2, 3, 4, 5], [10])
+            Util.fail("includesLoose", [1, 2, 3, 4, 5], 10)
+            Util.fail("includesLoose", [1, 2, 3, 4, 5], [10])
         })
 
         it("checks missing objects", function () {
@@ -204,21 +204,21 @@ describe("assertions (includes)", function () {
             var obj2 = {}
             var obj3 = {}
 
-            Util.fail1("includesLoose", [obj1, obj2, 3, "foo", {}], [{}])
-            Util.fail1("includesLoose", [obj1, obj2, obj3], [{}])
-            Util.fail1("includesLoose", [obj1, obj2, obj3], [[]])
+            Util.fail("includesLoose", [obj1, obj2, 3, "foo", {}], [{}])
+            Util.fail("includesLoose", [obj1, obj2, obj3], [{}])
+            Util.fail("includesLoose", [obj1, obj2, obj3], [[]])
         })
     })
 
     describe("notIncludesLooseAll()", function () {
         it("checks numbers", function () {
-            Util.fail1("notIncludesLooseAll", [1, 2, 3, 4, 5], 1)
-            Util.fail1("notIncludesLooseAll", [1, 2, 3, 4, 5], [1])
+            Util.fail("notIncludesLooseAll", [1, 2, 3, 4, 5], 1)
+            Util.fail("notIncludesLooseAll", [1, 2, 3, 4, 5], [1])
         })
 
         it("is loose", function () {
-            Util.fail1("notIncludesLooseAll", ["1", 2, 3, 4, 5], 1)
-            Util.fail1("notIncludesLooseAll", ["1", 2, 3, 4, 5], [1])
+            Util.fail("notIncludesLooseAll", ["1", 2, 3, 4, 5], 1)
+            Util.fail("notIncludesLooseAll", ["1", 2, 3, 4, 5], [1])
         })
 
         it("checks objects", function () {
@@ -226,11 +226,11 @@ describe("assertions (includes)", function () {
             var obj2 = {}
             var obj3 = {}
 
-            Util.fail1("notIncludesLooseAll",
+            Util.fail("notIncludesLooseAll",
                 [obj1, 3, obj3, "foo"],
                 [obj1, obj3])
 
-            Util.fail1("notIncludesLooseAll",
+            Util.fail("notIncludesLooseAll",
                 [obj1, obj2, obj3],
                 [obj1, obj2, obj3])
 
@@ -285,8 +285,8 @@ describe("assertions (includes)", function () {
         })
 
         it("checks missing numbers", function () {
-            Util.fail1("includesLooseAny", [1, 2, 3, 4, 5], 10)
-            Util.fail1("includesLooseAny", [1, 2, 3, 4, 5], [10])
+            Util.fail("includesLooseAny", [1, 2, 3, 4, 5], 10)
+            Util.fail("includesLooseAny", [1, 2, 3, 4, 5], [10])
         })
 
         it("checks missing objects", function () {
@@ -294,21 +294,21 @@ describe("assertions (includes)", function () {
             var obj2 = {}
             var obj3 = {}
 
-            Util.fail1("includesLooseAny", [obj1, obj2, 3, "foo", {}], [{}])
-            Util.fail1("includesLooseAny", [obj1, obj2, obj3], [{}])
-            Util.fail1("includesLooseAny", [obj1, obj2, obj3], [[]])
+            Util.fail("includesLooseAny", [obj1, obj2, 3, "foo", {}], [{}])
+            Util.fail("includesLooseAny", [obj1, obj2, obj3], [{}])
+            Util.fail("includesLooseAny", [obj1, obj2, obj3], [[]])
         })
     })
 
     describe("notIncludesLoose()", function () {
         it("checks numbers", function () {
-            Util.fail1("notIncludesLoose", [1, 2, 3, 4, 5], 1)
-            Util.fail1("notIncludesLoose", [1, 2, 3, 4, 5], [1])
+            Util.fail("notIncludesLoose", [1, 2, 3, 4, 5], 1)
+            Util.fail("notIncludesLoose", [1, 2, 3, 4, 5], [1])
         })
 
         it("is loose", function () {
-            Util.fail1("notIncludesLoose", ["1", 2, 3, 4, 5], 1)
-            Util.fail1("notIncludesLoose", ["1", 2, 3, 4, 5], [1])
+            Util.fail("notIncludesLoose", ["1", 2, 3, 4, 5], 1)
+            Util.fail("notIncludesLoose", ["1", 2, 3, 4, 5], [1])
         })
 
         it("checks objects", function () {
@@ -316,13 +316,13 @@ describe("assertions (includes)", function () {
             var obj2 = {}
             var obj3 = {}
 
-            Util.fail1("notIncludesLoose", [obj1, 3, obj3, "foo"], [obj1, obj3])
+            Util.fail("notIncludesLoose", [obj1, 3, obj3, "foo"], [obj1, obj3])
 
-            Util.fail1("notIncludesLoose",
+            Util.fail("notIncludesLoose",
                 [obj1, obj2, obj3],
                 [obj1, obj2, obj3])
 
-            Util.fail1("notIncludesLoose",
+            Util.fail("notIncludesLoose",
                 [obj1, 3, obj3, "foo"],
                 [obj1, obj2, obj3])
         })
@@ -356,8 +356,8 @@ describe("assertions (includes)", function () {
         })
 
         it("is strict", function () {
-            Util.fail1("includesDeep", ["1", 2, 3, 4, 5], 1)
-            Util.fail1("includesDeep", ["1", 2, 3, 4, 5], [1])
+            Util.fail("includesDeep", ["1", 2, 3, 4, 5], 1)
+            Util.fail("includesDeep", ["1", 2, 3, 4, 5], [1])
         })
 
         it("checks objects", function () {
@@ -379,20 +379,20 @@ describe("assertions (includes)", function () {
         })
 
         it("checks missing numbers", function () {
-            Util.fail1("includesDeep", [1, 2, 3, 4, 5], 10)
-            Util.fail1("includesDeep", [1, 2, 3, 4, 5], [10])
+            Util.fail("includesDeep", [1, 2, 3, 4, 5], 10)
+            Util.fail("includesDeep", [1, 2, 3, 4, 5], [10])
         })
 
         it("checks missing objects", function () {
-            Util.fail1("includesDeep", [{foo: 1}, {bar: 2}, {}], [[]])
-            Util.fail1("includesDeep", [{foo: 1}, {bar: 2}, {}], [[], {foo: 1}])
+            Util.fail("includesDeep", [{foo: 1}, {bar: 2}, {}], [[]])
+            Util.fail("includesDeep", [{foo: 1}, {bar: 2}, {}], [[], {foo: 1}])
         })
     })
 
     describe("notIncludesDeepAll()", function () {
         it("checks numbers", function () {
-            Util.fail1("notIncludesDeepAll", [1, 2, 3, 4, 5], 1)
-            Util.fail1("notIncludesDeepAll", [1, 2, 3, 4, 5], [1])
+            Util.fail("notIncludesDeepAll", [1, 2, 3, 4, 5], 1)
+            Util.fail("notIncludesDeepAll", [1, 2, 3, 4, 5], [1])
         })
 
         it("is strict", function () {
@@ -407,7 +407,7 @@ describe("assertions (includes)", function () {
                 [{foo: 1}, {bar: 2}],
                 [{foo: 1}, {bar: 1}])
 
-            Util.fail1("notIncludesDeepAll",
+            Util.fail("notIncludesDeepAll",
                 [{foo: 1}, {bar: 2}],
                 [{foo: 1}, {bar: 2}])
         })
@@ -434,8 +434,8 @@ describe("assertions (includes)", function () {
         })
 
         it("is strict", function () {
-            Util.fail1("includesDeepAny", ["1", 2, 3, 4, 5], 1)
-            Util.fail1("includesDeepAny", ["1", 2, 3, 4, 5], [1])
+            Util.fail("includesDeepAny", ["1", 2, 3, 4, 5], 1)
+            Util.fail("includesDeepAny", ["1", 2, 3, 4, 5], [1])
         })
 
         it("checks objects", function () {
@@ -449,20 +449,20 @@ describe("assertions (includes)", function () {
         })
 
         it("checks missing numbers", function () {
-            Util.fail1("includesDeepAny", [1, 2, 3, 4, 5], 10)
-            Util.fail1("includesDeepAny", [1, 2, 3, 4, 5], [10])
+            Util.fail("includesDeepAny", [1, 2, 3, 4, 5], 10)
+            Util.fail("includesDeepAny", [1, 2, 3, 4, 5], [10])
         })
 
         it("checks missing objects", function () {
-            Util.fail1("includesDeepAny", [{foo: 1}, {bar: 2}, {}], [[]])
+            Util.fail("includesDeepAny", [{foo: 1}, {bar: 2}, {}], [[]])
             assert.includesDeepAny([{foo: 1}, {bar: 2}, {}], [[], {foo: 1}])
         })
     })
 
     describe("notIncludesDeep()", function () {
         it("checks numbers", function () {
-            Util.fail1("notIncludesDeep", [1, 2, 3, 4, 5], 1)
-            Util.fail1("notIncludesDeep", [1, 2, 3, 4, 5], [1])
+            Util.fail("notIncludesDeep", [1, 2, 3, 4, 5], 1)
+            Util.fail("notIncludesDeep", [1, 2, 3, 4, 5], [1])
         })
 
         it("is strict", function () {
@@ -471,13 +471,13 @@ describe("assertions (includes)", function () {
         })
 
         it("checks objects", function () {
-            Util.fail1("notIncludesDeep", [{foo: 1}, 3, "foo"], ["foo", 1])
+            Util.fail("notIncludesDeep", [{foo: 1}, 3, "foo"], ["foo", 1])
 
-            Util.fail1("notIncludesDeep",
+            Util.fail("notIncludesDeep",
                 [{foo: 1}, {bar: 2}],
                 [{foo: 1}, {bar: 1}])
 
-            Util.fail1("notIncludesDeep",
+            Util.fail("notIncludesDeep",
                 [{foo: 1}, {bar: 2}],
                 [{foo: 1}, {bar: 2}])
         })
@@ -494,7 +494,7 @@ describe("assertions (includes)", function () {
         it("checks missing objects", function () {
             assert.notIncludesDeep([{foo: 1}, {bar: 2}, {}], [[]])
 
-            Util.fail1("notIncludesDeep",
+            Util.fail("notIncludesDeep",
                 [{foo: 1}, {bar: 2}, {}],
                 [[], {foo: 1}])
         })
@@ -509,8 +509,8 @@ describe("assertions (includes)", function () {
         })
 
         it("is strict", function () {
-            Util.fail1("includesMatch", ["1", 2, 3, 4, 5], 1)
-            Util.fail1("includesMatch", ["1", 2, 3, 4, 5], [1])
+            Util.fail("includesMatch", ["1", 2, 3, 4, 5], 1)
+            Util.fail("includesMatch", ["1", 2, 3, 4, 5], [1])
         })
 
         it("checks objects", function () {
@@ -532,20 +532,20 @@ describe("assertions (includes)", function () {
         })
 
         it("checks missing numbers", function () {
-            Util.fail1("includesMatch", [1, 2, 3, 4, 5], 10)
-            Util.fail1("includesMatch", [1, 2, 3, 4, 5], [10])
+            Util.fail("includesMatch", [1, 2, 3, 4, 5], 10)
+            Util.fail("includesMatch", [1, 2, 3, 4, 5], [10])
         })
 
         it("checks missing objects", function () {
-            Util.fail1("includesMatch", [{foo: 1}, {bar: 2}, {}], [[]])
-            Util.fail1("includesMatch", [{foo: 1}, {bar: 2}, {}], [[], {foo: 1}])
+            Util.fail("includesMatch", [{foo: 1}, {bar: 2}, {}], [[]])
+            Util.fail("includesMatch", [{foo: 1}, {bar: 2}, {}], [[], {foo: 1}])
         })
     })
 
     describe("notIncludesMatchAll()", function () {
         it("checks numbers", function () {
-            Util.fail1("notIncludesMatchAll", [1, 2, 3, 4, 5], 1)
-            Util.fail1("notIncludesMatchAll", [1, 2, 3, 4, 5], [1])
+            Util.fail("notIncludesMatchAll", [1, 2, 3, 4, 5], 1)
+            Util.fail("notIncludesMatchAll", [1, 2, 3, 4, 5], [1])
         })
 
         it("is strict", function () {
@@ -560,7 +560,7 @@ describe("assertions (includes)", function () {
                 [{foo: 1}, {bar: 2}],
                 [{foo: 1}, {bar: 1}])
 
-            Util.fail1("notIncludesMatchAll",
+            Util.fail("notIncludesMatchAll",
                 [{foo: 1}, {bar: 2}],
                 [{foo: 1}, {bar: 2}])
         })
@@ -587,8 +587,8 @@ describe("assertions (includes)", function () {
         })
 
         it("is strict", function () {
-            Util.fail1("includesMatchAny", ["1", 2, 3, 4, 5], 1)
-            Util.fail1("includesMatchAny", ["1", 2, 3, 4, 5], [1])
+            Util.fail("includesMatchAny", ["1", 2, 3, 4, 5], 1)
+            Util.fail("includesMatchAny", ["1", 2, 3, 4, 5], [1])
         })
 
         it("checks objects", function () {
@@ -602,20 +602,20 @@ describe("assertions (includes)", function () {
         })
 
         it("checks missing numbers", function () {
-            Util.fail1("includesMatchAny", [1, 2, 3, 4, 5], 10)
-            Util.fail1("includesMatchAny", [1, 2, 3, 4, 5], [10])
+            Util.fail("includesMatchAny", [1, 2, 3, 4, 5], 10)
+            Util.fail("includesMatchAny", [1, 2, 3, 4, 5], [10])
         })
 
         it("checks missing objects", function () {
-            Util.fail1("includesMatchAny", [{foo: 1}, {bar: 2}, {}], [[]])
+            Util.fail("includesMatchAny", [{foo: 1}, {bar: 2}, {}], [[]])
             assert.includesMatchAny([{foo: 1}, {bar: 2}, {}], [[], {foo: 1}])
         })
     })
 
     describe("notIncludesMatch()", function () {
         it("checks numbers", function () {
-            Util.fail1("notIncludesMatch", [1, 2, 3, 4, 5], 1)
-            Util.fail1("notIncludesMatch", [1, 2, 3, 4, 5], [1])
+            Util.fail("notIncludesMatch", [1, 2, 3, 4, 5], 1)
+            Util.fail("notIncludesMatch", [1, 2, 3, 4, 5], [1])
         })
 
         it("is strict", function () {
@@ -624,13 +624,13 @@ describe("assertions (includes)", function () {
         })
 
         it("checks objects", function () {
-            Util.fail1("notIncludesMatch", [{foo: 1}, 3, "foo"], ["foo", 1])
+            Util.fail("notIncludesMatch", [{foo: 1}, 3, "foo"], ["foo", 1])
 
-            Util.fail1("notIncludesMatch",
+            Util.fail("notIncludesMatch",
                 [{foo: 1}, {bar: 2}],
                 [{foo: 1}, {bar: 1}])
 
-            Util.fail1("notIncludesMatch",
+            Util.fail("notIncludesMatch",
                 [{foo: 1}, {bar: 2}],
                 [{foo: 1}, {bar: 2}])
         })
@@ -647,7 +647,7 @@ describe("assertions (includes)", function () {
         it("checks missing objects", function () {
             assert.notIncludesMatch([{foo: 1}, {bar: 2}, {}], [[]])
 
-            Util.fail1("notIncludesMatch",
+            Util.fail("notIncludesMatch",
                 [{foo: 1}, {bar: 2}, {}],
                 [[], {foo: 1}])
         })

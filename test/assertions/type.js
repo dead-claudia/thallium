@@ -52,44 +52,44 @@ describe("assertions (type)", function () {
             typeFail(undefined)
             if (typeof Symbol === "function") typeFail(Symbol())
 
-            Util.fail1("type", true, "number")
-            Util.fail1("type", false, "number")
-            Util.fail1("type", 0, "boolean")
-            Util.fail1("type", 1, "boolean")
-            Util.fail1("type", NaN, "boolean")
-            Util.fail1("type", Infinity, "boolean")
-            Util.fail1("type", "foo", "object")
-            Util.fail1("type", "", "object")
-            Util.fail1("type", null, "string")
-            Util.fail1("type", {}, "string")
-            Util.fail1("type", [], "string")
-            Util.fail1("type", function () {}, "object")
-            Util.fail1("type", undefined, "string")
+            Util.fail("type", true, "number")
+            Util.fail("type", false, "number")
+            Util.fail("type", 0, "boolean")
+            Util.fail("type", 1, "boolean")
+            Util.fail("type", NaN, "boolean")
+            Util.fail("type", Infinity, "boolean")
+            Util.fail("type", "foo", "object")
+            Util.fail("type", "", "object")
+            Util.fail("type", null, "string")
+            Util.fail("type", {}, "string")
+            Util.fail("type", [], "string")
+            Util.fail("type", function () {}, "object")
+            Util.fail("type", undefined, "string")
 
             if (typeof Symbol === "function") {
-                Util.fail1("type", Symbol(), "number")
+                Util.fail("type", Symbol(), "number")
             }
         })
     })
 
     describe("notType()", function () {
         it("checks good types", function () {
-            Util.fail1("notType", true, "boolean")
-            Util.fail1("notType", false, "boolean")
-            Util.fail1("notType", 0, "number")
-            Util.fail1("notType", 1, "number")
-            Util.fail1("notType", NaN, "number")
-            Util.fail1("notType", Infinity, "number")
-            Util.fail1("notType", "foo", "string")
-            Util.fail1("notType", "", "string")
-            Util.fail1("notType", null, "object")
-            Util.fail1("notType", {}, "object")
-            Util.fail1("notType", [], "object")
-            Util.fail1("notType", function () {}, "function")
-            Util.fail1("notType", undefined, "undefined")
+            Util.fail("notType", true, "boolean")
+            Util.fail("notType", false, "boolean")
+            Util.fail("notType", 0, "number")
+            Util.fail("notType", 1, "number")
+            Util.fail("notType", NaN, "number")
+            Util.fail("notType", Infinity, "number")
+            Util.fail("notType", "foo", "string")
+            Util.fail("notType", "", "string")
+            Util.fail("notType", null, "object")
+            Util.fail("notType", {}, "object")
+            Util.fail("notType", [], "object")
+            Util.fail("notType", function () {}, "function")
+            Util.fail("notType", undefined, "undefined")
 
             if (typeof Symbol === "function") {
-                Util.fail1("notType", Symbol(), "symbol")
+                Util.fail("notType", Symbol(), "symbol")
             }
         })
 
@@ -143,13 +143,13 @@ describe("assertions (type)", function () {
 
     function testType(name, callback) {
         Util.basic(name + "()", function () {
-            callback(assert[name], Util.fail1.bind(undefined, name))
+            callback(assert[name], Util.fail.bind(undefined, name))
         })
 
         var negated = "not" + name[0].toUpperCase() + name.slice(1)
 
         Util.basic(negated + "()", function () {
-            callback(Util.fail1.bind(undefined, negated), assert[negated])
+            callback(Util.fail.bind(undefined, negated), assert[negated])
         })
     }
 
@@ -308,20 +308,20 @@ describe("assertions (type)", function () {
         assert.inherits(new B(), B)
         assert.inherits(new B(), A)
 
-        Util.fail1("inherits", new A(), B)
-        Util.fail1("inherits", [], RegExp)
+        Util.fail("inherits", new A(), B)
+        Util.fail("inherits", [], RegExp)
     })
 
     Util.basic("notInherits()", function () {
         function A() {}
-        Util.fail1("notInherits", new A(), A)
-        Util.fail1("notInherits", new A(), Object)
+        Util.fail("notInherits", new A(), A)
+        Util.fail("notInherits", new A(), Object)
 
         function B() {}
         Util.methods(B, A)
 
-        Util.fail1("notInherits", new B(), B)
-        Util.fail1("notInherits", new B(), A)
+        Util.fail("notInherits", new B(), B)
+        Util.fail("notInherits", new B(), A)
 
         assert.notInherits(new A(), B)
         assert.notInherits([], RegExp)
