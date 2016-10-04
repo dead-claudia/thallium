@@ -196,7 +196,7 @@ This tries to support the following platforms:
 - For the tests, feel free to use the framework's own plugin and reporter system to your advantage to simplify your testing. They are very well tested, and if any of the assertions or plugin/reporter APIs break, you'll know it immediately. For example, I used [`t.reporter`](./docs/reporter-api.md) with the `t.match` assertion to test the reporter output throughout the tests. Here's a modified example from one of the tests:
 
     ```js
-    var tt = t.base()
+    var tt = t.create()
     var ret = []
 
     tt.reporter(Util.push(ret))

@@ -13,39 +13,39 @@ t.test 'core (basic)', ->
         @test('exists').function @reflect
 
         @test 'has parent()', ->
-            tt = @base()
+            tt = @create()
 
             @equal tt.reflect().parent(), undefined
             @equal tt.test('test').reflect().parent(), tt
 
     @test 'test()', ->
-        @test('exists').function @base().test
+        @test('exists').function @create().test
 
         @test 'accepts a string + function', ->
-            tt = @base()
+            tt = @create()
             tt.test 'test', ->
 
         @test 'accepts a string', ->
-            tt = @base()
+            tt = @create()
             tt.test('test')
 
         @test 'returns the current instance when given a callback', ->
-            tt = @base()
+            tt = @create()
             test = tt.test 'test', ->
             @equal test, tt
 
         @test 'returns a prototypal clone when not given a callback', ->
-            tt = @base()
+            tt = @create()
             test = tt.test('test')
 
             @notEqual test, tt
             @equal Object.getPrototypeOf(test), tt
 
     @test 'run()', ->
-        @test('exists').function @base().run
+        @test('exists').function @create().run
 
         @async 'runs block tests within tests', ->
-            tt = @base()
+            tt = @create()
             called = 0
 
             tt.test 'test', ->
@@ -54,7 +54,7 @@ t.test 'core (basic)', ->
             tt.run().then => @equal called, 1
 
         @async 'runs successful inline tests within tests', ->
-            tt = @base()
+            tt = @create()
             err = undefined
 
             tt.reporter (res, done) ->
@@ -68,7 +68,7 @@ t.test 'core (basic)', ->
             tt.run().then => @notOk err
 
         @async 'accepts a callback', ->
-            tt = @base()
+            tt = @create()
             err = undefined
 
             tt.reporter (res, done) ->

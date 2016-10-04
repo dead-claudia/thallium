@@ -6,4 +6,4 @@
  */
 var Thallium = require("./lib/thallium.js")
 
-require("./assertions.js")(module.exports = new Thallium())
+require("./lib/deprecated.js").main(module.exports = new Thallium())

@@ -17,7 +17,7 @@ describe("core (slow) (FLAKE)", function () {
     }
 
     it("succeeds with own", function () {
-        var tt = t.base()
+        var tt = t.create()
         var ret = []
 
         tt.reporter(Util.push(ret, true))
@@ -40,7 +40,7 @@ describe("core (slow) (FLAKE)", function () {
     })
 
     it("hits middle with own", function () {
-        var tt = t.base()
+        var tt = t.create()
         var ret = []
 
         tt.reporter(Util.push(ret, true))
@@ -64,7 +64,7 @@ describe("core (slow) (FLAKE)", function () {
     })
 
     it("fails with own", function () {
-        var tt = t.base()
+        var tt = t.create()
         var ret = []
 
         tt.reporter(Util.push(ret, true))
@@ -88,7 +88,7 @@ describe("core (slow) (FLAKE)", function () {
     })
 
     it("succeeds with inherited", function () {
-        var tt = t.base()
+        var tt = t.create()
         var ret = []
 
         tt.reporter(Util.push(ret, true))
@@ -114,7 +114,7 @@ describe("core (slow) (FLAKE)", function () {
     })
 
     it("fails with inherited", function () {
-        var tt = t.base()
+        var tt = t.create()
         var ret = []
 
         tt.reporter(Util.push(ret, true))
@@ -142,7 +142,7 @@ describe("core (slow) (FLAKE)", function () {
     })
 
     it("gets own block slow", function () {
-        var tt = t.base()
+        var tt = t.create()
         var active, raw
 
         tt.test("test", function (tt) {
@@ -158,7 +158,7 @@ describe("core (slow) (FLAKE)", function () {
     })
 
     it("gets own inline slow", function () {
-        var tt = t.base()
+        var tt = t.create()
         var ttt = tt.test("test").slow(50)
 
         assert.equal(ttt.reflect().activeSlow(), 50)
@@ -166,7 +166,7 @@ describe("core (slow) (FLAKE)", function () {
     })
 
     it("gets inherited block slow", function () {
-        var tt = t.base()
+        var tt = t.create()
         var active, raw
 
         tt.test("test")
@@ -183,7 +183,7 @@ describe("core (slow) (FLAKE)", function () {
     })
 
     it("gets inherited inline slow", function () {
-        var tt = t.base()
+        var tt = t.create()
         var ttt = tt.test("test")
         .slow(50)
         .test("inner")
@@ -193,7 +193,7 @@ describe("core (slow) (FLAKE)", function () {
     })
 
     it("gets default slow", function () {
-        var tt = t.base()
+        var tt = t.create()
         var active, raw
 
         tt.test("test", function (tt) {

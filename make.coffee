@@ -8,7 +8,10 @@ chokidar = require 'chokidar'
 semver = require 'semver'
 pkg = require './package.json'
 
-config.fatal = true
+exec = do ({exec} = global) -> (str, cb) ->
+    exec str, stdio: 'inherit', cb
+
+config.fatal = yes
 
 target.all = ->
     target.lint()

@@ -68,8 +68,7 @@ function format(message, object) {
 var AssertionError = exports.AssertionError = Errors.defineError([
     "class AssertionError extends Error {",
     "    constructor(message, expected, actual) {",
-    "        super()",
-    "        this.message = message",
+    "        super(message)",
     "        this.expected = expected",
     "        this.actual = actual",
     "    }",
@@ -95,14 +94,13 @@ function fail(message, args) {
     throw new AssertionError(format(message, args), args.expected, args.actual)
 }
 
-// The basic assert. It's almost there for looks, given how easy it is to
-// define your own assertions.
+// The basic assert, like `assert.ok`, but gives you an optional message.
 exports.assert = function (test, message) {
     if (!test) throw new AssertionError(message, undefined, undefined)
 }
 
 exports.fail = function (message, expected, actual) {
-    throw new AssertionError(message || "unspecified", expected, actual)
+    throw new AssertionError(message, expected, actual)
 }
 
 exports.failFormat = fail
@@ -160,18 +158,6 @@ exports.object = function (x) {
 exports.notObject = function (x) {
     if (typeof x === "object" && x != null) {
         fail("Expected {actual} to not be an object", {actual: x})
-    }
-}
-
-exports.objectOrNull = function (x) {
-    if (typeof x !== "object") {
-        fail("Expected {actual} to be an object or `null`", {actual: x})
-    }
-}
-
-exports.notObjectOrNull = function (x) {
-    if (typeof x === "object") {
-        fail("Expected {actual} to not be an object or `null`", {actual: x})
     }
 }
 

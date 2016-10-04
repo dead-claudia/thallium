@@ -225,24 +225,6 @@ describe("assertions (type)", function () {
         if (typeof Symbol === "function") not(Symbol())
     })
 
-    testType("objectOrNull", function (is, not) {
-        not(true)
-        not(false)
-        not(0)
-        not(1)
-        not(NaN)
-        not(Infinity)
-        not("foo")
-        not("")
-        is(null)
-        is({})
-        is([])
-        not(function () {})
-        not(undefined)
-        not()
-        if (typeof Symbol === "function") not(Symbol())
-    })
-
     testType("string", function (is, not) {
         not(true)
         not(false)

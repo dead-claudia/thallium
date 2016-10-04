@@ -24,7 +24,6 @@ var reflect = t.reflect()
 var assert = global.assert = Thallium.assert
 var Util = global.Util = {
     match: Thallium.match,
-    assertions: Thallium.assertions,
     r: Thallium.r,
     n: reflect.report,
     p: reflect.loc,
@@ -38,7 +37,12 @@ var Util = global.Util = {
     // module loader.
 
     Promise: require("../lib/bluebird.js"),
-    setTimeout: global.setTimeout,
+
+    // Chrome complains of an illegal invocation (wrong `this`).
+    setTimeout: function (func, duration) {
+        return global.setTimeout(func, duration)
+    },
+
     m: require("../lib/messages.js"),
     methods: require("../lib/methods.js"),
     R: require("../lib/reporter.js"),

@@ -160,7 +160,7 @@ Get the associated methods of this instance, as in where the reflect instance ca
 reflect.parent()
 ```
 
-Get the parent instance of this instance. If this is the base Thallium instance (i.e. the result of [`t.base()`](./thallium.md#base) or Thallium's main export), then this will return `undefined`.
+Get the parent instance of this instance. If this is the base Thallium instance (i.e. the result of [`t.create()`](./thallium.md#create) or Thallium's main export), then this will return `undefined`.
 
 <a id="report"></a>
 ## reflect.report(type, path, value, duration, slow)
@@ -187,7 +187,7 @@ Get a list of all own reporters, or an empty list if there were none.
 reflect.root()
 ```
 
-Check if this is a root test. This is true at the global scope and for any result of `t.base()`, but false elsewhere.
+Check if this is a root test. This is true at the global scope and for any result of `t.create()`, but false elsewhere.
 
 <a id="runnable"></a>
 ## reflect.runnable()

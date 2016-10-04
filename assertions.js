@@ -6,6 +6,7 @@
  */
 
 var match = require("./match.js")
+var deprecated = require("./lib/deprecated.js")
 
 var toString = Object.prototype.toString
 var hasOwn = Object.prototype.hasOwnProperty
@@ -89,36 +90,13 @@ function checkTypeOf(value, name) {
 // This holds everything to be added.
 var methods = []
 var aliases = []
-var console = global.console
-var mustPrint = console != null && typeof console.warn === "function"
-var renamed = {
-    instanceof: "inherits",
-    notInstanceof: "notInherits",
-}
-
-function deprecate(name, callback) {
-    var printed = !mustPrint
-
-    /** @this */
-    return function () {
-        if (!printed) {
-            printed = true
-            console.warn(
-                "`t." + name + "()` is deprecated. Use `assert." +
-                (renamed[name] || name) + "()` from the " +
-                "`thallium/assert` module instead.")
-        }
-
-        return callback.apply(this, arguments)
-    }
-}
 
 /**
  * The core assertions export, as a plugin.
  */
 module.exports = function (t) {
     methods.forEach(function (m) {
-        t.define(m.name, deprecate(m.name, m.callback))
+        t.define(m.name, deprecated.wrapAssertion(m.name, m.callback))
     })
     aliases.forEach(function (alias) { t[alias.name] = t[alias.original] })
 }

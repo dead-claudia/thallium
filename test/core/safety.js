@@ -21,7 +21,7 @@ describe("core (safety)", function () {
     }
 
     it("disallows non-nullish non-functions as `test` impls", function () {
-        var tt = t.base()
+        var tt = t.create()
 
         assert.throws(function () { tt.test("test", 1) }, TypeError)
         assert.throws(function () { tt.test("test", 0) }, TypeError)
@@ -52,7 +52,7 @@ describe("core (safety)", function () {
     })
 
     it("disallows non-functions as `async` impls", function () {
-        var tt = t.base()
+        var tt = t.create()
 
         assert.throws(function () { tt.async("test", 1) }, TypeError)
         assert.throws(function () { tt.async("test", 0) }, TypeError)
@@ -84,7 +84,7 @@ describe("core (safety)", function () {
     })
 
     it("catches unsafe access", function () {
-        var tt = t.base()
+        var tt = t.create()
         var ret = []
 
         tt.reporter(Util.push(ret))
@@ -94,8 +94,7 @@ describe("core (safety)", function () {
         function plugin() {}
 
         tt.test("one", function () { tt.test("hi") })
-        tt.test("two", function () { tt.define("hi", function () {}) })
-        tt.define("assert", function () { return {test: true} })
+        tt.test("two", function () { tt.try(plugin) })
         tt.test("three", function () { tt.use(plugin) })
 
         tt.test("four", function (tt) {
@@ -104,12 +103,6 @@ describe("core (safety)", function () {
 
         tt.test("five", function (tt) {
             tt.test("inner", function () { tt.reporter(noopReporter) })
-        })
-
-        tt.test("six", function () { tt.add("inner", function () {}) })
-
-        tt.test("seven", function () {
-            tt.wrap("test", function (func) { return func() })
         })
 
         return tt.run().then(function () {
@@ -124,15 +117,13 @@ describe("core (safety)", function () {
                 n("enter", [p("five", 4)]),
                 n("fail", [p("five", 4), p("inner", 0)], error),
                 n("leave", [p("five", 4)]),
-                n("fail", [p("six", 5)], error),
-                n("fail", [p("seven", 6)], error),
                 n("end", []),
             ])
         })
     })
 
     it("reports extraneous async done", function () {
-        var tt = t.base()
+        var tt = t.create()
         var ret = []
         var sentinel = createSentinel("sentinel")
 
@@ -153,6 +144,7 @@ describe("core (safety)", function () {
                 var entry = ret[i]
 
                 if (entry.extra()) {
+                    debugger
                     assert.string(Util.R.getStack(entry.value))
                     entry.value.stack = ""
                 }
@@ -187,7 +179,7 @@ describe("core (safety)", function () {
     })
 
     it("catches concurrent runs", function () {
-        var tt = t.base()
+        var tt = t.create()
 
         tt.reporter(noopReporter)
 
@@ -198,7 +190,7 @@ describe("core (safety)", function () {
     })
 
     it("catches concurrent runs when given a callback", function (done) {
-        var tt = t.base()
+        var tt = t.create()
 
         tt.reporter(noopReporter)
         tt.run(done)
@@ -206,7 +198,7 @@ describe("core (safety)", function () {
     })
 
     it("allows non-concurrent runs with reporter error", function () {
-        var tt = t.base()
+        var tt = t.create()
         var sentinel = createSentinel("fail")
 
         tt.reporter(function (_, done) { done(sentinel) })

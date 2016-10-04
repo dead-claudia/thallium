@@ -16,7 +16,7 @@ describe("core (iterators)", function () {
             it(name, function () {
                 var sentinel = createSentinel("sentinel")
                 var iter = create(sentinel)
-                var tt = t.base()
+                var tt = t.create()
                 var ret = []
 
                 var list = []

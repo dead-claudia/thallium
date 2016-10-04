@@ -151,7 +151,7 @@ describe("cli runner", function () {
         Util.silenceEmptyInlineWarnings()
 
         function run(opts) {
-            var tt = t.base().use(Util.assertions)
+            var tt = t.create()
             var tree = opts.tree(tt)
 
             if (tree["node_modules"] == null) tree["node_modules"] = {}
@@ -328,7 +328,7 @@ describe("cli runner", function () {
                     })
 
                     t.async("bar()", function (t, done) {
-                        setTimeout(function () {
+                        Util.setTimeout(function () {
                             done(new Error("fail"))
                         }, 0)
                     })
@@ -398,7 +398,7 @@ describe("cli runner", function () {
 
         it("adheres to the config correctly", function () {
             var ret = []
-            var custom = t.base()
+            var custom = t.create()
 
             function noop() {}
 

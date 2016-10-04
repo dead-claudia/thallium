@@ -12,7 +12,7 @@ describe("core (timeouts) (FLAKE)", function () {
     var p = Util.p
 
     it("succeeds with own", function () {
-        var tt = t.base()
+        var tt = t.create()
         var ret = []
 
         tt.reporter(Util.push(ret))
@@ -33,7 +33,7 @@ describe("core (timeouts) (FLAKE)", function () {
     })
 
     it("fails with own", function () {
-        var tt = t.base()
+        var tt = t.create()
         var ret = []
 
         tt.reporter(Util.push(ret))
@@ -54,7 +54,7 @@ describe("core (timeouts) (FLAKE)", function () {
     })
 
     it("succeeds with inherited", function () {
-        var tt = t.base()
+        var tt = t.create()
         var ret = []
 
         tt.reporter(Util.push(ret))
@@ -75,7 +75,7 @@ describe("core (timeouts) (FLAKE)", function () {
     })
 
     it("fails with inherited", function () {
-        var tt = t.base()
+        var tt = t.create()
         var ret = []
 
         tt.reporter(Util.push(ret))
@@ -100,7 +100,7 @@ describe("core (timeouts) (FLAKE)", function () {
     })
 
     it("gets own block timeout", function () {
-        var tt = t.base()
+        var tt = t.create()
         var active, raw
 
         tt.test("test", function (tt) {
@@ -116,7 +116,7 @@ describe("core (timeouts) (FLAKE)", function () {
     })
 
     it("gets own inline timeout", function () {
-        var tt = t.base()
+        var tt = t.create()
         var ttt = tt.test("test").timeout(50)
 
         assert.equal(ttt.reflect().activeTimeout(), 50)
@@ -124,7 +124,7 @@ describe("core (timeouts) (FLAKE)", function () {
     })
 
     it("gets inherited block timeout", function () {
-        var tt = t.base()
+        var tt = t.create()
         var active, raw
 
         tt.test("test")
@@ -141,7 +141,7 @@ describe("core (timeouts) (FLAKE)", function () {
     })
 
     it("gets inherited inline timeout", function () {
-        var tt = t.base()
+        var tt = t.create()
         var ttt = tt.test("test")
         .timeout(50)
         .test("inner")
@@ -151,7 +151,7 @@ describe("core (timeouts) (FLAKE)", function () {
     })
 
     it("gets default timeout", function () {
-        var tt = t.base()
+        var tt = t.create()
         var active, raw
 
         tt.test("test", function (tt) {

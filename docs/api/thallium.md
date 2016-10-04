@@ -13,7 +13,7 @@ These are the most common methods you'll ever use.
 - [`t.timeout(timeout)`](#timeout)
 - [`t.only(only)`](#only)
 - [`t.run()`](#run)
-- [`t.base()`](#base)
+- [`t.create()`](#create)
 - [`t.try()`](#try)
 
 <a id="block"></a>
@@ -311,24 +311,24 @@ If it's rejected, the rejection always caused by one of two things:
 
 Either way, it's fatal, and the test has already aborted. Note that after the error, the test state *does* reset fully, so if the reporter doesn't error out a second time, the tests will run normally. Because of this, it is actually safe to rerun the tests after a rejection, since it's not in an invalid state unless the error was from Thallium itself (in which [you definitely should report it](https://github.com/isiahmeadows/thallium/issues/new)).
 
-<a id="base"></a>
-## reflect.base()
+<a id="create"></a>
+## t.create()
 
 ```js
-t.base()
+t.create()
 ```
 
 Create a new, entirely separate Thallium test instance. This is mostly used for internal testing, but it's exposed for anyone who needs it.
 
 <a id="try"></a>
-## reflect.try(func)
+## t.try(func)
 
 ```js
-reflect.try(func)
 t.try(func)
+reflect.try(func)
 ```
 
-These run a function when the assertions are being run, and is guaranteed to report errors thrown as within that test. This is probably mostly useful for plugin authors dealing with inline tests, for simple setup and/or cleanup within those. Note that it isn't safe to call API methods within this, though.
+These run a function when the assertions are being run, and is guaranteed to report errors thrown as within that test. This is probably mostly useful for plugin authors dealing with inline tests, for simple setup and/or cleanup within those. Note that it isn't safe to call API methods within this for inline tests, though.
 
 ```js
 t.test("test")

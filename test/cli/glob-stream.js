@@ -83,7 +83,7 @@ describe("cli glob stream", function () {
                 return /** @this */ function (data, enc, next) {
                     var self = this
 
-                    setTimeout(function () {
+                    Util.setTimeout(function () {
                         self.push(data)
                         next()
                     }, ms)
