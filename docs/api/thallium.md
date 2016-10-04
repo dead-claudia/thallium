@@ -14,6 +14,7 @@ These are the most common methods you'll ever use.
 - [`t.only(only)`](#only)
 - [`t.run()`](#run)
 - [`t.base()`](#base)
+- [`t.try()`](#try)
 
 <a id="block"></a>
 ## Block tests
@@ -318,3 +319,21 @@ t.base()
 ```
 
 Create a new, entirely separate Thallium test instance. This is mostly used for internal testing, but it's exposed for anyone who needs it.
+
+<a id="try"></a>
+## reflect.try(func)
+
+```js
+reflect.try(func)
+t.try(func)
+```
+
+These run a function when the assertions are being run, and is guaranteed to report errors thrown as within that test. This is probably mostly useful for plugin authors dealing with inline tests, for simple setup and/or cleanup within those. Note that it isn't safe to call API methods within this, though.
+
+```js
+t.test("test")
+.try(() => foo.initValue())
+.equal(foo.getValue(), "something")
+```
+
+Note that the callback is called with `undefined` as `this` and no arguments. The callback is *not* a plugin, and won't be treated as such.

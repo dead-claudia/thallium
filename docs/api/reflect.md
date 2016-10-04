@@ -102,6 +102,7 @@ This is pretty much the same as calling [`t.define`](./thallium.md#define) with 
 
 ```js
 reflect.try(func)
+t.try(func)
 ```
 
 These run a function when the assertions are being run, and is guaranteed to report errors thrown as within that test. This is probably mostly useful for plugin authors dealing with inline tests, for simple setup and/or cleanup within those. Note that it isn't safe to call API methods within this, though.
