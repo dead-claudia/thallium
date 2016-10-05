@@ -72,7 +72,7 @@ t.async("name", callback)
 t.asyncSkip("name", callback)
 ```
 
-This defines an asynchronous test. The callback can either take an extra `done` argument, return a thenable, or return an iterator of thenables and/or plain objects. Generators work as callbacks. Also, it does detect extra `done` calls and reports them accordingly.
+This defines an asynchronous test. The callback can either take an extra `done` argument, return a thenable, or return an iterator of thenables and/or plain objects. Also, it does detect extra `done` calls and reports them accordingly, if a `done` argument is called.
 
 ```js
 const fs = require("fs")
