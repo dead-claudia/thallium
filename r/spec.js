@@ -57,7 +57,7 @@ module.exports = R.on({
         } else if (ev.pass()) {
             return printReport(r, ev, function () {
                 var str =
-                    c("checkmark", R.Symbols.Pass + " ") +
+                    c("checkmark", R.symbols().Pass + " ") +
                     c("pass", getName(r.state.level, ev))
 
                 var speed = R.speed(ev)

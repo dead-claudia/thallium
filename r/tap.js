@@ -7,7 +7,7 @@ var R = require("../lib/reporter.js")
 var inspect = require("../lib/replaced/inspect.js")
 
 function shouldBreak(minLength, str) {
-    return str.length > R.windowWidth - minLength || /\r?\n|[:?-]/.test(str)
+    return str.length > R.windowWidth() - minLength || /\r?\n|[:?-]/.test(str)
 }
 
 function template(r, ev, tmpl, skip) {

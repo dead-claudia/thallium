@@ -9,13 +9,12 @@
 var path = require("path")
 var cp = require("child_process")
 var fixture = require("../../scripts/cli.js").fixture
-var newline = require("os").EOL
 
 describe("cli end-to-end (FLAKE)", function () {
     function formatList(msgs) {
         return msgs
-            .replace(/\r?\n/g, newline)
-            .replace(/\n{2,}/g, newline)
+            .replace(/\r?\n/g, Util.R.newline())
+            .replace(/\n{2,}/g, Util.R.newline())
             .trim()
     }
 
@@ -27,7 +26,7 @@ describe("cli end-to-end (FLAKE)", function () {
             this.timeout(opts.timeout)
 
             if (Array.isArray(opts.messages)) {
-                opts.messages = opts.messages.join(newline)
+                opts.messages = opts.messages.join(Util.R.newline())
             }
 
             opts.args.unshift(binary)

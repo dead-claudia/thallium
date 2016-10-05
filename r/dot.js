@@ -3,14 +3,17 @@
 // This is a reporter that mimics Mocha's `dot` reporter
 
 var R = require("../lib/reporter.js")
-var width = R.windowWidth * 0.75 | 0
+
+function width() {
+    return R.windowWidth() * 4 / 3 | 0
+}
 
 function printDot(r, color) {
-    if (r.state.counter++ % width === 0) {
-        return r.write(R.newline + "  ")
-        .then(function () { return r.write(R.color(color, R.Symbols.Dot)) })
+    if (r.state.counter++ % width() === 0) {
+        return r.write(R.newline() + "  ")
+        .then(function () { return r.write(R.color(color, R.symbols().Dot)) })
     } else {
-        return r.write(R.color(color, R.Symbols.Dot))
+        return r.write(R.color(color, R.symbols().Dot))
     }
 }
 

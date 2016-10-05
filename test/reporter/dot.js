@@ -112,9 +112,9 @@ describe("reporter dot", function () {
         beforeEach(function () { Util.R.Colors.forceSet(envColors) })
         afterEach(function () { Util.R.Colors.forceRestore() })
 
-        var pass = c("fast", Util.R.Symbols.Dot)
-        var fail = c("fail", Util.R.Symbols.Dot)
-        var skip = c("skip", Util.R.Symbols.Dot)
+        var pass = c("fast", Util.R.symbols().Dot)
+        var fail = c("fail", Util.R.symbols().Dot)
+        var skip = c("skip", Util.R.symbols().Dot)
         var test = makeTest(reporterColors)
 
         // So I can verify colors are enabled.
@@ -394,7 +394,7 @@ describe("reporter dot", function () {
             }
 
             return {
-                stack: stack.join(Util.R.newline),
+                stack: stack.join(Util.R.newline()),
                 parts: parts,
             }
         })()
@@ -983,9 +983,9 @@ describe("reporter dot", function () {
         var test = makeTest(true)
 
         // Speed affects `"pass"` and `"enter"` events only.
-        var fast = c("fast", Util.R.Symbols.Dot)
-        var medium = c("medium", Util.R.Symbols.Dot)
-        var slow = c("slow", Util.R.Symbols.Dot)
+        var fast = c("fast", Util.R.symbols().Dot)
+        var medium = c("medium", Util.R.symbols().Dot)
+        var slow = c("slow", Util.R.symbols().Dot)
 
         function at(speed) {
             if (speed === "slow") return 80

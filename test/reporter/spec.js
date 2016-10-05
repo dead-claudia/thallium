@@ -33,7 +33,7 @@ describe("reporter spec", function () {
     }
 
     function pass(name) {
-        return c("checkmark", Util.R.Symbols.Pass + " ") + c("pass", name)
+        return c("checkmark", Util.R.symbols().Pass + " ") + c("pass", name)
     }
 
     function time(duration) {
@@ -361,7 +361,7 @@ describe("reporter spec", function () {
             }
 
             return {
-                stack: stack.join(Util.R.newline),
+                stack: stack.join(Util.R.newline()),
                 parts: parts,
             }
         })()
