@@ -584,7 +584,10 @@ describe("core (reporters)", function () { // eslint-disable-line max-statements
 
         var ttt = tt.test("test")
 
-        ttt._.data.state.init = function () { throw sentinel }
+        Object.defineProperty(ttt._, "data", {
+            get: function () { throw sentinel },
+            set: function () { throw sentinel },
+        })
 
         return tt.run().then(
             function () { assert.fail("Expected a rejection") },
