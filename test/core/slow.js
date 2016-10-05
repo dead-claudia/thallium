@@ -16,16 +16,28 @@ describe("core (slow) (FLAKE)", function () {
         }
     }
 
+    function resolve() {
+        return {then: function (resolve) { resolve() }}
+    }
+
+    function delay(ms) {
+        return {
+            then: function (resolve) {
+                Util.setTimeout(resolve, ms)
+            },
+        }
+    }
+
     it("succeeds with own", function () {
         var tt = t.create()
         var ret = []
 
         tt.reporter(Util.push(ret, true))
 
-        tt.async("test", function (tt, done) {
+        tt.async("test", function (tt) {
             // It's highly unlikely the engine will take this long to finish.
             tt.slow(10)
-            done()
+            return resolve()
         })
 
         return tt.run().then(function () {
@@ -45,10 +57,10 @@ describe("core (slow) (FLAKE)", function () {
 
         tt.reporter(Util.push(ret, true))
 
-        tt.async("test", function (tt, done) {
+        tt.async("test", function (tt) {
             // It's highly unlikely the engine will take this long to finish.
             tt.slow(100)
-            Util.setTimeout(function () { done() }, 60)
+            return delay(60)
         })
 
         return tt.run().then(function () {
@@ -69,10 +81,10 @@ describe("core (slow) (FLAKE)", function () {
 
         tt.reporter(Util.push(ret, true))
 
-        tt.async("test", function (tt, done) {
+        tt.async("test", function (tt) {
             tt.slow(50)
             // It's highly unlikely the engine will take this long to finish
-            Util.setTimeout(function () { done() }, 200)
+            return delay(200)
         })
 
         return tt.run().then(function () {
@@ -95,7 +107,7 @@ describe("core (slow) (FLAKE)", function () {
 
         tt.test("test")
         .slow(50)
-        .async("inner", function (tt, done) { done() })
+        .async("inner", function () { return resolve() })
 
         return tt.run().then(function () {
             assert.match(ret, [
@@ -121,9 +133,7 @@ describe("core (slow) (FLAKE)", function () {
 
         tt.test("test")
         .slow(50)
-        .async("inner", function (tt, done) {
-            Util.setTimeout(function () { done() }, 200)
-        })
+        .async("inner", function () { return delay(200) })
 
         return tt.run().then(function () {
             assert.match(ret, [

@@ -327,10 +327,8 @@ describe("cli runner", function () {
                         assert.notEqual(1, 1)
                     })
 
-                    t.async("bar()", function (t, done) {
-                        Util.setTimeout(function () {
-                            done(new Error("fail"))
-                        }, 0)
+                    t.async("bar()", function () {
+                        return Util.Promise.delay(0).throw(new Error("fail"))
                     })
 
                     t.async("baz()", function () {

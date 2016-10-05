@@ -227,7 +227,7 @@ describe("core (reporters)", function () { // eslint-disable-line max-statements
 
         tt.reporter(Util.push(ret))
 
-        tt.async("test", function (t, done) { done() })
+        tt.async("test", function () { return resolve() })
         tt.test("test", function () {})
 
         return tt.run().then(function () {
@@ -247,7 +247,7 @@ describe("core (reporters)", function () { // eslint-disable-line max-statements
 
         tt.reporter(Util.push(ret))
 
-        tt.async("one", function (t, done) { done(sentinel) })
+        tt.async("one", function () { return reject(sentinel) })
         tt.test("two", function () { throw sentinel })
 
         return tt.run().then(function () {
@@ -267,8 +267,8 @@ describe("core (reporters)", function () { // eslint-disable-line max-statements
 
         tt.reporter(Util.push(ret))
 
-        tt.async("one", function (t, done) { done(sentinel) })
-        tt.async("two", function (t, done) { done() })
+        tt.async("one", function () { return reject(sentinel) })
+        tt.async("two", function () { return resolve() })
 
         return tt.run().then(function () {
             assert.match(ret, [
@@ -463,8 +463,14 @@ describe("core (reporters)", function () { // eslint-disable-line max-statements
                 assert.notEqual(1, 1)
             })
 
-            tt.async("bar()", function (t, done) {
-                Util.setTimeout(function () { done(new Error("fail")) }, 0)
+            tt.async("bar()", function () {
+                return {
+                    then: function (_, reject) {
+                        Util.setTimeout(function () {
+                            reject(new Error("fail"))
+                        }, 0)
+                    },
+                }
             })
 
             tt.async("baz()", function () {
@@ -613,8 +619,14 @@ describe("core (reporters)", function () { // eslint-disable-line max-statements
                 assert.notEqual(1, 1)
             })
 
-            tt.async("bar()", function (t, done) {
-                Util.setTimeout(function () { done(new Error("fail")) }, 0)
+            tt.async("bar()", function () {
+                return {
+                    then: function (_, reject) {
+                        Util.setTimeout(function () {
+                            reject(new Error("fail"))
+                        }, 0)
+                    },
+                }
             })
 
             tt.async("baz()", function () {

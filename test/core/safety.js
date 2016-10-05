@@ -3,7 +3,6 @@
 describe("core (safety)", function () {
     var p = Util.p
     var n = Util.n
-    var extra = Util.extra
 
     function valueOf(value) {
         return {valueOf: function () { return value }}
@@ -43,7 +42,7 @@ describe("core (safety)", function () {
         tt.test("test", null)
         tt.test("test", function () {})
         tt.test("test", function (t) {})
-        tt.test("test", function (t, done) {}) // too many arguments
+        tt.test("test", function (t, why) {}) // too many arguments
         tt.test("test", function () {
             return {next: function () { return {done: true} }}
         })
@@ -74,8 +73,8 @@ describe("core (safety)", function () {
 
         tt.async("test", function () {})
         tt.async("test", function (t) {})
-        tt.async("test", function (t, done) {})
-        tt.async("test", function (t, done, wtf) {}) // too many arguments
+        tt.async("test", function (t, why) {}) // too many arguments
+        tt.async("test", function (t, why, wtf) {}) // too many arguments
         tt.async("test", function () {
             return {next: function () { return {done: true} }}
         })
@@ -122,61 +121,6 @@ describe("core (safety)", function () {
         })
     })
 
-    it("reports extraneous async done", function () {
-        var tt = t.create()
-        var ret = []
-        var sentinel = createSentinel("sentinel")
-
-        tt.reporter(Util.push(ret))
-
-        tt.test("test", function (tt) {
-            tt.test("inner", function (tt) {
-                tt.async("fail", function (tt, done) {
-                    done() // eslint-disable-line callback-return
-                    done() // eslint-disable-line callback-return
-                    done(sentinel) // eslint-disable-line callback-return
-                })
-            })
-        })
-
-        return tt.run().then(function () {
-            for (var i = 0; i < ret.length; i++) {
-                var entry = ret[i]
-
-                if (entry.extra()) {
-                    assert.string(Util.R.getStack(entry.value))
-                    entry.value.stack = ""
-                }
-            }
-
-            assert.includesMatchAny(
-                [3, 4, 5, 6].map(function (i) {
-                    var splice1 = n("extra",
-                        [p("test", 0), p("inner", 0), p("fail", 0)],
-                        extra(2, undefined, ""))
-
-                    var splice2 = n("extra",
-                        [p("test", 0), p("inner", 0), p("fail", 0)],
-                        extra(3, sentinel, ""))
-
-                    var node = [
-                        n("start", []),
-                        n("enter", [p("test", 0)]),
-                        n("enter", [p("test", 0), p("inner", 0)]),
-                        // Extras should first appear here.
-                        n("pass", [p("test", 0), p("inner", 0), p("fail", 0)]),
-                        n("leave", [p("test", 0), p("inner", 0)]),
-                        n("leave", [p("test", 0)]),
-                        n("end", []),
-                    ]
-
-                    node.splice(i, 0, splice1, splice2)
-                    return node
-                }),
-                [ret])
-        })
-    })
-
     it("catches concurrent runs", function () {
         var tt = t.create()
 
@@ -188,12 +132,12 @@ describe("core (safety)", function () {
         return res
     })
 
-    it("catches concurrent runs when given a callback", function (done) {
-        var tt = t.create()
+    it("catches concurrent runs when given a callback", function () {
+        var tt = t.create().reporter(noopReporter)
+        var p = tt.run()
 
-        tt.reporter(noopReporter)
-        tt.run(done)
-        assert.throws(function () { tt.run(done) }, Error)
+        assert.throws(function () { tt.run() }, Error)
+        return p
     })
 
     it("allows non-concurrent runs with reporter error", function () {

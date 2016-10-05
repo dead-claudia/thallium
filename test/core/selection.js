@@ -10,6 +10,10 @@ describe("core (selection)", function () {
         assert.fail("fail")
     }
 
+    function resolve() {
+        return {then: function (resolve) { resolve() }}
+    }
+
     describe("skip", function () {
         it("tests with callbacks", function () {
             var tt = t.create()
@@ -186,7 +190,7 @@ describe("core (selection)", function () {
             tt.only(["one", "inner"])
 
             tt.test("one", function (tt) {
-                tt.async("inner", function (_, done) { done() })
+                tt.async("inner", function () { return resolve() })
                 tt.async("other", function () { fail() })
             })
 
@@ -264,7 +268,7 @@ describe("core (selection)", function () {
             tt.only(["one", "inner"])
 
             tt.test("0", function (tt) {
-                tt.async("inner", function (_, done) { done() })
+                tt.async("inner", function () { return resolve() })
                 tt.async("other", function () { fail() })
             })
 

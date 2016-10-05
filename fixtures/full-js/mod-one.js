@@ -11,8 +11,8 @@ t.test("mod-one", function (t) {
         t.try(assert.notEqual, 1, 1)
     })
 
-    t.async("bar()", function (t, done) {
-        global.setTimeout(function () { done(new Error("fail")) }, 0)
+    t.async("bar()", function () {
+        return Promise.delay(0).throw(new Error("fail"))
     })
 
     t.async("baz()", function () {

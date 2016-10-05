@@ -6,4 +6,9 @@
  */
 var Thallium = require("./lib/thallium.js")
 
+require("./migrate/common.js").deprecate(
+    "`thallium/core` is deprecated. Use `thallium` + `thallium/assert` instead.", // eslint-disable-line max-len
+    function () {}
+)()
+
 module.exports = new Thallium()

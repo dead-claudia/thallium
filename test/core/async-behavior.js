@@ -33,13 +33,13 @@ describe("core (asynchronous behavior)", function () {
         return ret
     })
 
-    it("with async tests + sync done call", function () {
+    it("with async tests + sync resolve", function () {
         var tt = t.create()
         var called = false
 
-        tt.async("test", function (_, done) {
+        tt.async("test", function () {
             called = true
-            return done()
+            return {then: function (resolve) { resolve() }}
         })
 
         var ret = tt.run().then(function () { assert.ok(called) })
@@ -48,13 +48,17 @@ describe("core (asynchronous behavior)", function () {
         return ret
     })
 
-    it("with async tests + async done call", function () {
+    it("with async tests + async resolve", function () {
         var tt = t.create()
         var called = false
 
-        tt.async("test", function (_, done) {
+        tt.async("test", function () {
             called = true
-            Util.setTimeout(function () { done() }, 0)
+            return {
+                then: function (resolve) {
+                    Util.setTimeout(resolve, 0)
+                },
+            }
         })
 
         var ret = tt.run().then(function () { assert.ok(called) })

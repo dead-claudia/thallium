@@ -11,16 +11,28 @@ describe("core (timeouts) (FLAKE)", function () {
     var n = Util.n
     var p = Util.p
 
+    function resolve() {
+        return {then: function (resolve) { resolve() }}
+    }
+
+    function delay(ms) {
+        return {
+            then: function (resolve) {
+                Util.setTimeout(resolve, ms)
+            },
+        }
+    }
+
     it("succeeds with own", function () {
         var tt = t.create()
         var ret = []
 
         tt.reporter(Util.push(ret))
 
-        tt.async("test", function (tt, done) {
+        tt.async("test", function (tt) {
             // It's highly unlikely the engine will take this long to finish.
             tt.timeout(10)
-            done()
+            return resolve()
         })
 
         return tt.run().then(function () {
@@ -38,10 +50,10 @@ describe("core (timeouts) (FLAKE)", function () {
 
         tt.reporter(Util.push(ret))
 
-        tt.async("test", function (tt, done) {
+        tt.async("test", function (tt) {
             tt.timeout(50)
             // It's highly unlikely the engine will take this long to finish
-            Util.setTimeout(function () { done() }, 200)
+            return delay(200)
         })
 
         return tt.run().then(function () {
@@ -61,7 +73,7 @@ describe("core (timeouts) (FLAKE)", function () {
 
         tt.test("test")
         .timeout(50)
-        .async("inner", function (tt, done) { done() })
+        .async("inner", function () { return resolve() })
 
         return tt.run().then(function () {
             assert.match(ret, [
@@ -82,9 +94,9 @@ describe("core (timeouts) (FLAKE)", function () {
 
         tt.test("test")
         .timeout(50)
-        .async("inner", function (tt, done) {
+        .async("inner", function () {
             // It's highly unlikely the engine will take this long to finish.
-            Util.setTimeout(function () { done() }, 200)
+            return delay(200)
         })
 
         return tt.run().then(function () {

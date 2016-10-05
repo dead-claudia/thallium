@@ -37,10 +37,10 @@ t.test 'core (timeouts) (FLAKE)', ->
 
         tt.reporter push(ret)
 
-        tt.async 'test', (_, done) ->
+        tt.async 'test', ->
             # It's highly unlikely the engine will take this long to finish.
             @timeout 10
-            done()
+            then: (resolve) -> resolve()
 
         tt.run().then ->
             assert.match ret, [
@@ -58,7 +58,7 @@ t.test 'core (timeouts) (FLAKE)', ->
         tt.async 'test', (_, done) ->
             @timeout 50
             # It's highly unlikely the engine will take this long to finish
-            setTimeout (-> done()), 200
+            then: (resolve) -> setTimeout resolve, 200
 
         tt.run().then ->
             assert.match ret, [
@@ -75,7 +75,7 @@ t.test 'core (timeouts) (FLAKE)', ->
 
         tt.test 'test'
         .timeout 50
-        .async 'inner', (_, done) -> done()
+        .async 'inner', -> then: (resolve) -> resolve()
 
         tt.run().then ->
             assert.match ret, [
@@ -94,9 +94,9 @@ t.test 'core (timeouts) (FLAKE)', ->
 
         tt.test 'test'
         .timeout 50
-        .async 'inner', (_, done) ->
+        .async 'inner', ->
             # It's highly unlikely the engine will take this long to finish.
-            setTimeout (-> done()), 200
+            then: (resolve) -> setTimeout resolve, 200
 
         tt.run().then ->
             assert.match ret, [

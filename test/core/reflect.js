@@ -43,10 +43,10 @@ describe("core (reflect)", function () {
             var tt = t.create()
             var inner, reflect
 
-            tt.async("test", function (tt, done) {
+            tt.async("test", function (tt) {
                 inner = tt
                 reflect = tt.reflect().methods()
-                return done()
+                return Util.Promise.resolve()
             })
 
             return tt.run().then(function () {
@@ -123,13 +123,13 @@ describe("core (reflect)", function () {
 
             tt.reporter(Util.push(ret))
 
-            tt.async("test", function (tt, done) {
+            tt.async("test", function (tt) {
                 tt.reflect().try(/** @this */ function () {
                     len = arguments.length
                     self = this
                 })
 
-                done()
+                return Util.Promise.resolve()
             })
 
             return tt.run().then(function () {
@@ -152,9 +152,9 @@ describe("core (reflect)", function () {
 
             tt.reporter(Util.push(ret))
 
-            tt.async("test", function (tt, done) {
+            tt.async("test", function (tt) {
                 tt.reflect().try(function () { throw sentinel })
-                done()
+                return Util.Promise.resolve()
             })
 
             return tt.run().then(function () {
