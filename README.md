@@ -88,8 +88,8 @@ This list is in a very rough chronological order. If you want to complete any of
 Also, at some point, I'd like to do the following, in no particular order:
 
 - Set up [AppVeyor](https://www.appveyor.com/) to run tests on Windows. Currently, it's only actively tested on Linux, although I do try to keep it as platform-independent as possible.
-    - I need to at some point hook up PhantomJS for this. It should work in its current state, but it's not tested.
-    - I'm planning on using [Sauce Labs](https://saucelabs.com/) and [Karma](https://karma-runner.github.io) after Karma 1.0 is released, because I need the custom `context.html` config feature added in [this PR](https://github.com/karma-runner/karma/pull/1825). The reason is because I'm using SystemJS and I need a [custom entry script](http://github.com/isiahmeadows/thallium/blob/master/scripts/generate-browser-entry.js) to load the tests.
+
+- Test this in PhantomJS. It should work in its current state, but it's not tested.
 
 - Trim the stack traces on reported errors and offer that to others as well.
 
@@ -106,8 +106,14 @@ Also, at some point, I'd like to do the following, in no particular order:
 
 ## Contributing
 
-See [CONTRIBUTING.md](https://github.com/isiahmeadows/thallium/blob/master/CONTRIBUTING.md)
+See [CONTRIBUTING.md](https://github.com/isiahmeadows/thallium/blob/master/CONTRIBUTING.md).
 
 ## License
 
-ISC, unless otherwise stated.
+The following license (ISC License), unless otherwise stated:
+
+Copyright (c) 2016 and later, Isiah Meadows <me@isiahmeadows.com> and others.
+
+Permission to use, copy, modify, and/or distribute this software for any purpose with or without fee is hereby granted, provided that the above copyright notice and this permission notice appear in all copies.
+
+THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
