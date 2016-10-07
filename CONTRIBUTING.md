@@ -4,47 +4,102 @@ Did you run into issues? Great! Tell me [here](http://github.com/isiahmeadows/th
 
 Do you want to contribute code? Keep reading below.
 
-## Common tasks
+## Process Overview
 
-I've made several commands for common tasks:
+Here's an overview of the high level contributing process.
 
+*Obligatory disclaimer: By contributing to this project, you agree to make available any and all code submitted under the ISC License and/or other relevant licenses.*
+
+### Setup
+
+1. Install Node and npm. You can find installers and instructions [here](https://nodejs.org/en/download/), or if you use Linux, look [here](https://nodejs.org/en/download/package-manager/) instead.
+2. Install [Git](https://git-scm.com/). You'll need this to clone the source.
+3. [Fork this repo](https://help.github.com/articles/fork-a-repo/).
+4. Run `git clone https://github.com/<your-username>/thallium.git` to get the source.
+5. Run `git remote add upstream https://github.com/isiahmeadows/thallium.git` to set the upstream URL.
+6. Create a new branch with `git checkout -b <some-branch>`.
+7. Hack away, and fix whatever you need to. Don't forget to add tests for anything that was fixed.
+
+### Sync with this repository
+
+If you ever need to sync your fork/branch with upstream, do this:
+
+1. Run `git pull upstream master`.
+2. If it prompts you to make a merge commit, just save the file as-is.
+3. If it prompts you to resolve a merge conflict, that means you need to manually edit some of the files so Git knows what actually changed.
+
+### Submitting your contribution
+
+Once you're ready to submit your changes, do this:
+
+1. If you're fixing something, make sure your fix is tested. Otherwise, you're not quite ready to submit them.
+2. Make sure your tests pass locally. This will make my life and your life much easier.
+    - If you don't know why something is failing, feel free to submit it anyways, so I can help you out.
+3. Run `git commit`. This will bring up an editor so you can describe your changes.
+4. Run `git push -u origin <some-branch>` to sync your new branch with the upstream repository. The branch name must match the one you initially created.
+5. On GitHub, select the branch you just sync'd, and [open a pull request](https://help.github.com/articles/creating-a-pull-request/). I'll take a look at it and work with you to ensure it works as well as possible.
+
+## Developing your patch
+
+Here's some information and utilities to help you out in hacking on this project.
+
+### Common tasks
+
+I have a make script to assist in most of the common tasks.
+
+- `node make` - Lint and test everything.
 - `node make lint` - Lint everything (with ESLint and CoffeeLint).
-- `node make `
+- `node make test` - Run all the tests once in the system version of Node and in Chrome.
+- `node make watch` - Do the above, but also run them all on each file change.
+- `node make test:chrome` - Run all the tests in Chrome only.
+- `node make test:node` - Run all the tests in Node only.
+- `node make watch:chrome` - Run all the tests in Chrome only on each file change.
+- `node make watch:node` - Run all the tests in Node only on each file change.
 
-## General information
+I personally frequently use `node make watch:node` when working on this, so I have relatively quick feedback on how ready my work is.
 
-This tries to support the following platforms:
+### Runtime Support
 
-- All versions of Node from the oldest maintenance release (0.10 at the time of writing) are supported.
+This is tested in [Travis CI](https://travis-ci.org/isiahmeadows/thallium) on Ubuntu against the following runtimes:
 
-- Browser support is planned with [Sauce Labs](https://saucelabs.com/), but it is currently only tested with Firefox and Chrome.
+- Node starting from the oldest maintenance release (0.10 at the time of writing), except for 0.11.
+- Chrome Stable
+- Firefox Stable, ESR, and Beta
 
-- This is written in pure ES5, and there isn't much of an option to support ES6 because of compatibility concerns. Some features still need polyfilled for older browsers, and the way this is written doesn't really need many ES6 features
+I plan to eventually test more browsers with [Sauce Labs](https://saucelabs.com/), and eventually Windows with [AppVeyor](https://www.appveyor.com/) and OSX with Travis.
 
-- The documentation and examples generally use anything stage 4 or later, including all the ES6 things like modules and arrow functions, and other very new, recently added features like async functions.
+For similar reasons, this is written in pure ES5, and there isn't much of an option to support ES6 because of compatibility concerns. Some features still need polyfilled for older browsers, and the way this is written doesn't really need many ES6 features. See the tips and tricks later on for some workarounds I've created for this.
 
-- I use [Bluebird](http://bluebirdjs.com) extensively for promises, as it makes code much easier to handle. It provides many features not present in ES6, and it is far faster.
+### Documentation
 
-## Code organization
+The code within the documentation and examples generally use anything stage 4 or later, including all the ES6 things like modules and arrow functions, and other very new, recently added features like async functions.
 
-- `bin/` - The executables used. Note that the directory isn't used as the raw binary directory, but it's aliased from the `package.json`.
+Note that I don't actually test the documentation's code, but please ensure it otherwise matches the code style elsewhere, and that it is actually correct.
 
-- `r` - This is the home of all reporters. Nothing goes here except for reporter modules part of the public API.
+### Code organization
 
-- `lib/` - Most of the source code for this project. Many of the modules part of the public API are merely thin wrappers pointing to some place here, including the main export.
+- `bin/` - The executables live here. Note that the binaries should also be directly linked to from the `package.json`.
+
+- `r` - The home of all reporters. Nothing goes here except for reporter modules part of the public API.
+
+- `lib/` - The core of this project. Many public API modules are just thin wrappers for something in here, including the main export.
 
 - `lib/cli` - This contains 90% of the logic for the CLI. Dependency injection is heavily used for testing.
 
-- `lib/reporter` - This contains common logic for the reporters.
+- `lib/reporter.js` - This contains common logic for the reporters.
+
+- `lib/replaced` - This contains anything replaced going from Node to Browserify.
 
 - `docs` - The documentation for this project, 100% Markdown.
 
 - `docs/examples` - This contains several examples of various things.
 
-- `test` - This contains all the tests, and generally mirrors `lib` in its file structure. Mocha is currently used as the test runner, and the assertions are fully self-hosted. Using Thallium to test Thallium is awesome!
+- `migrate` - This contains all the code shimming most of the old behavior where applicable.
+
+- `test` - This contains all the tests. Mocha is currently used as the test runner, and the assertions are fully self-hosted. Using Thallium to test Thallium is awesome!
 
 - `fixtures` - This contains the fixtures for the various tests.
-    - Some of the `test` files are mirrored in [CoffeeScript](http://coffeescript.org/) within `fixtures/large-coffee` to help aid in more real-world usage. These are very explicitly and clearly labeled, so it should be very hard to miss.
+    - Some of the `test` files are mirrored in [CoffeeScript](http://coffeescript.org/) within `fixtures/large-coffee` to help aid in more real-world usage. These are very explicitly and clearly labeled on the top, so it should be very hard to miss if you're looking at those files.
 
 - `scripts` - This contains various development/test-related utilities, including the mocks. Here's a few globals exported from `scripts/globals.js` you might appreciate knowing about:
 
@@ -54,9 +109,9 @@ This tries to support the following platforms:
 
     These are most frequently used for testing reporter output for whatever reason, and the latter two are usually locally aliased.
 
-## Code style
+### Code style
 
-- This is linted with ESLint, and uses my [`isiahmeadows/node` preset](https://npmjs.com/package/eslint-config-isiahmeadows) for the main code base and `isiahmeadows/es6` for the examples.
+- This is linted with ESLint, and uses my [`isiahmeadows/commonjs` preset](https://npmjs.com/package/eslint-config-isiahmeadows) for the main code base and `isiahmeadows/es6` for the examples.
 
 - [CoffeeLint](http://www.coffeelint.org/) is used to lint the few CoffeeScript files littered around, mostly there for testing and examples.
 
@@ -64,7 +119,7 @@ This tries to support the following platforms:
 
 - File names are lower cased, and namespaces are capitalized like constructors, except for ones imported from Node builtins and ones treated as values.
 
-- `exports.foo = bar` is preferred over `module.exports.foo = bar`, but default exports like `module.exports = foo` are okay, as long as nothing else is exported.
+- `exports.foo = bar` is preferred over `module.exports.foo = bar`, but default exports like `module.exports = foo` are okay, as long as that's the only thing exported.
 
 - Named exports are also preferred to static members on default exports. For example:
 
@@ -86,7 +141,7 @@ This tries to support the following platforms:
         return ctx.timeout || 2000 // ms - default timeout
     }
 
-    // Not as good
+    // Bad
     module.exports = Test
     function Test(name, index) {
         this.name = name
@@ -104,7 +159,9 @@ This tries to support the following platforms:
     }
     ```
 
-## Tips and idioms
+### Tips and idioms
+
+- I use [Bluebird](http://bluebirdjs.com) extensively for promises, as it makes code much easier to handle. It provides many features not present in ES6, and it is far faster.
 
 - There is a class-ish `methods` helper [here](http://github.com/isiahmeadows/thallium/blob/master/lib/methods.js) used throughout. This is one of the main reasons why I don't really need ES6 - it even handles inheritance and non-enumerability of methods. It's used to define the API, simplify the internal DSL for the core reporters, and decouple script loading in the CLI. Here's an example:
 

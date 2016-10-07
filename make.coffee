@@ -22,13 +22,13 @@ target.lint = ->
     exec 'coffeelint . --cache --color=always'
 
 target.test = ->
-    target['test:karma']()
-    target['test:mocha']()
+    target['test:chrome']()
+    target['test:node']()
 
-target['test:karma'] = ->
+target['test:chrome'] = ->
     exec 'karma start --colors --single-run --browsers Chrome'
 
-target['test:mocha'] = ->
+target['test:node'] = ->
     exec 'mocha --colors'
 
 patterns = [
@@ -77,8 +77,8 @@ watch = (onchange) -> ->
         console.error 'Watching', "\"#{patterns.join '", "'}\" .."
 
 target.watch = watch 'test'
-target['watch:karma'] = watch 'test:karma'
-target['watch:mocha'] = watch 'test:mocha'
+target['watch:chrome'] = watch 'test:chrome'
+target['watch:node'] = watch 'test:node'
 
 target.bundle = ->
     exec 'browserify -dr ./lib/browser-bundle.js:thallium -o thallium.js'
