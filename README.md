@@ -65,9 +65,11 @@ This list is in a very rough chronological order. If you want to complete any of
 
 2. Finish documenting this project. This mostly includes the core assertions.
 
-3. Support flaky tests via first-class retries. This would be enormously useful for several.
+3. Support flaky tests via first-class retries. This would be enormously useful for several, and it's an absolute requirement for this to self-host its runner.
 
 4. Allow reporters to be removed, with an on-remove hook for the reporter in case external resources need reclaimed.
+
+5. Yank `thallium/match` and `thallium/assert` out of core. They don't need to be coupled.
 
 5. Include lifecycle hooks for before/after tests, for resource management.
 
@@ -91,10 +93,8 @@ Also, at some point, I'd like to do the following, in no particular order:
 
 - Trim the stack traces on reported errors and offer that to others as well.
 
-- Rewrite the matching algorithm to be based off of the ES2015 Iterable (`Symbol.iterator`)/etc. protocols from the core.
+- Write an alternative matching algorithm to be based off of the ES2015 Iterable (`Symbol.iterator`)/etc. protocols from the core.
     - This may include the [proposed async iteration protocol](https://github.com/tc39/proposal-async-iteration#async-iterators-and-async-iterables) in the future.
-
-- Profile and optimize this thing. Currently, the CLI runs about 25-35% slower than Mocha because of unnecessary FS work.
 
 - Reimplement [`util-inspect`](https://www.npmjs.com/package/util-inspect) for browsers based on Node's current [`util.inspect`](https://nodejs.org/api/util.html#util_util_inspect_object_options), since that ponyfill module is completely untested and is unaware of ES6. :worried:
 

@@ -7,7 +7,9 @@
 // Note that this entire section may be flaky on slower machines. Thankfully,
 // these have been tested against a slower machine, so it should hopefully not
 // be too bad.
-describe("core (timeouts) (FLAKE)", function () {
+describe("core (timeouts) (FLAKE)", /** @this */ function () {
+    this.retries(3)
+
     var n = Util.n
     var p = Util.p
 

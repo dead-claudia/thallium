@@ -187,9 +187,7 @@ This tries to support the following platforms:
     }
     ```
 
-- All non-deterministic tests/groups of tests are suffixed with `(FLAKE)`. This includes part of one of the end-to-end fixtures. This helps me know at a glance whether rerunning it is an option, since Mocha doesn't have a good third-party interface for retries.
-
-    There's only a few of them, but they are either testing an inherently time-dependent feature, or they're dealing with the file system, and the output is order-dependent.
+- All non-deterministic tests/groups of tests are suffixed with `(FLAKE)`. This includes part of one of the end-to-end fixtures. This helps me know at a glance whether rerunning it is an option, since they might fail even when working otherwise as intended (e.g. a timer taking 20 milliseconds longer than expected, or a `readdir` returning files in a different order than usual).
 
 - If you're on Linux and have [`nvm`](https://github.com/creationix/nvm) installed, there's a little `scripts/test.sh` script in the root you can run, which will test everything Travis will on your local machine, installing versions that don't exist if necessary. Note that it doesn't actually update existing installations for you, though. It's not quite *that* magical, and I don't suspect you'd want that, either.
 

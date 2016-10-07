@@ -156,7 +156,9 @@ describe("cli glob stream", function () {
         })
     })
 
-    describe("create() (FLAKE)", function () { // eslint-disable-line max-statements, max-len
+    describe("create() (FLAKE)", /** @this */ function () { // eslint-disable-line max-statements, max-len
+        this.retries(3)
+
         var oldCwd = process.cwd()
 
         beforeEach(function () {

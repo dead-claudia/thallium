@@ -7,19 +7,20 @@ is trying to represent more real-world usage.
 
 Promise = require 'bluebird'
 t = require 'thallium'
+assert = require 'thallium/assert'
 
 t.test 'core (basic)', ->
     @test 'reflect()', ->
-        @test('exists').function @reflect
+        @test('exists').try assert.function, @reflect
 
         @test 'has parent()', ->
             tt = @create()
 
-            @equal tt.reflect().parent(), undefined
-            @equal tt.test('test').reflect().parent(), tt
+            assert.equal tt.reflect().parent(), undefined
+            assert.equal tt.test('test').reflect().parent(), tt
 
     @test 'test()', ->
-        @test('exists').function @create().test
+        @test('exists').try assert.function, @create().test
 
         @test 'accepts a string + function', ->
             tt = @create()
@@ -32,17 +33,17 @@ t.test 'core (basic)', ->
         @test 'returns the current instance when given a callback', ->
             tt = @create()
             test = tt.test 'test', ->
-            @equal test, tt
+            assert.equal test, tt
 
         @test 'returns a prototypal clone when not given a callback', ->
             tt = @create()
             test = tt.test('test')
 
-            @notEqual test, tt
-            @equal Object.getPrototypeOf(test), tt
+            assert.notEqual test, tt
+            assert.equal Object.getPrototypeOf(test), tt
 
     @test 'run()', ->
-        @test('exists').function @create().run
+        @test('exists').try assert.function, @create().run
 
         @async 'runs block tests within tests', ->
             tt = @create()
@@ -51,7 +52,7 @@ t.test 'core (basic)', ->
             tt.test 'test', ->
                 @test 'foo', -> called++
 
-            tt.run().then => @equal called, 1
+            tt.run().then -> assert.equal called, 1
 
         @async 'runs successful inline tests within tests', ->
             tt = @create()
@@ -65,7 +66,7 @@ t.test 'core (basic)', ->
             tt.test 'test', ->
                 @test('foo').use ->
 
-            tt.run().then => @notOk err
+            tt.run().then -> assert.notOk err
 
         @async 'accepts a callback', ->
             tt = @create()
@@ -80,4 +81,4 @@ t.test 'core (basic)', ->
                 @test('foo').use ->
 
             Promise.fromCallback (cb) -> tt.run(cb)
-            .then => @notOk err
+            .then -> assert.notOk err

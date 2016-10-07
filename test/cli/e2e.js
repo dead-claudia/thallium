@@ -10,7 +10,9 @@ var path = require("path")
 var cp = require("child_process")
 var fixture = require("../../scripts/cli.js").fixture
 
-describe("cli end-to-end (FLAKE)", function () {
+describe("cli end-to-end (FLAKE)", /** @this */ function () {
+    this.retries(3)
+
     function formatList(msgs) {
         return msgs
             .replace(/\r?\n/g, Util.R.newline())
@@ -21,15 +23,15 @@ describe("cli end-to-end (FLAKE)", function () {
     var binary = path.resolve(__dirname, "../../bin/thallium.js")
 
     function test(name, opts) {
+        opts.args.unshift(binary)
+
+        if (Array.isArray(opts.messages)) {
+            opts.messages = opts.messages.join(Util.R.newline())
+        }
+
         (opts.skip ? it.skip : it)(name, /** @this */ function () {
             this.slow(1500)
             this.timeout(opts.timeout)
-
-            if (Array.isArray(opts.messages)) {
-                opts.messages = opts.messages.join(Util.R.newline())
-            }
-
-            opts.args.unshift(binary)
 
             var child = cp.spawn(process.argv[0], opts.args, {
                 stdio: [process.stdin, "pipe", process.stderr],
