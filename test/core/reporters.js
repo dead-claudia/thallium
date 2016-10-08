@@ -523,7 +523,7 @@ describe("core (reporters)", function () { // eslint-disable-line max-statements
         tt.reporter(function (arg) {
             return {
                 then: function (resolve) {
-                    push(arg, resolve)
+                    resolve(push(arg))
                 },
             }
         })
@@ -562,10 +562,9 @@ describe("core (reporters)", function () { // eslint-disable-line max-statements
         var sentinel = createSentinel("sentinel")
         var reported
 
-        tt.reporter(function (ev, done) {
+        tt.reporter(function (ev) {
             if (ev.error()) reported = ev.value
             if (ev.start()) throw sentinel
-            return done()
         })
 
         return tt.run().then(
@@ -583,9 +582,8 @@ describe("core (reporters)", function () { // eslint-disable-line max-statements
         var sentinel = createSentinel("sentinel")
         var reported
 
-        tt.reporter(function (ev, done) {
+        tt.reporter(function (ev) {
             if (ev.error()) reported = ev.value
-            return done()
         })
 
         var ttt = tt.test("test")

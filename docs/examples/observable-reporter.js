@@ -17,13 +17,11 @@ export default function (t) {
             return new Observable(observer => {
                 let subscribed = true
 
-                reporter((ev, done) => {
+                reporter(ev => {
                     if (subscribed) {
                         if (ev.end()) observer.complete()
                         else observer.next(ev)
                     }
-
-                    return done()
                 })
 
                 return () => {

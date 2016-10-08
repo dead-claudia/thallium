@@ -17,14 +17,13 @@ module.exports = ->
             new Observable (observer) ->
                 subscribed = yes
 
-                reporter (ev, done) ->
+                reporter (ev) ->
                     if subscribed
                         if ev.end()
                             observer.complete()
                         else
                             observer.next(ev)
-
-                    done()
+                    return
 
                 ->
                     subscribed = no

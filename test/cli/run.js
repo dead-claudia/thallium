@@ -1,5 +1,7 @@
 "use strict"
 
+/* eslint max-nested-callbacks: [2, 5] */
+
 var Run = require("../../lib/cli/run.js")
 var Cli = require("../../scripts/cli.js")
 
@@ -15,10 +17,8 @@ describe("cli runner", function () {
         }
 
         function execute(reporter, type) {
-            return function () {
-                return Util.Resolver.resolve1(reporter, undefined,
-                    n(type, [p("test", 0)], map[type]))
-            }
+            return Util.Promise.resolve(
+                reporter(n(type, [p("test", 0)], map[type])))
         }
 
         ["start", "enter", "leave", "pass", "skip", "end"]
@@ -27,9 +27,8 @@ describe("cli runner", function () {
                 var state = {fail: false}
                 var reporter = Run.exitReporter(state)
 
-                return execute(reporter, type)().then(function () {
-                    assert.notOk(state.fail)
-                })
+                return execute(reporter, type)
+                .then(function () { assert.notOk(state.fail) })
             })
         })
 
@@ -38,7 +37,7 @@ describe("cli runner", function () {
                 var state = {fail: false}
                 var reporter = Run.exitReporter(state)
 
-                return execute(reporter, type)().then(function () {
+                return execute(reporter, type).then(function () {
                     assert.ok(state.fail)
                 })
             })
@@ -48,9 +47,9 @@ describe("cli runner", function () {
             var state = {fail: false}
             var reporter = Run.exitReporter(state)
 
-            return execute(reporter, "start")()
-            .then(execute(reporter, "pass"))
-            .then(execute(reporter, "pass"))
+            return execute(reporter, "start")
+            .then(function () { return execute(reporter, "pass") })
+            .then(function () { return execute(reporter, "pass") })
             .then(function () { assert.notOk(state.fail) })
         })
 
@@ -58,9 +57,9 @@ describe("cli runner", function () {
             var state = {fail: false}
             var reporter = Run.exitReporter(state)
 
-            return execute(reporter, "start")()
-            .then(execute(reporter, "fail"))
-            .then(execute(reporter, "pass"))
+            return execute(reporter, "start")
+            .then(function () { return execute(reporter, "fail") })
+            .then(function () { return execute(reporter, "pass") })
             .then(function () { assert.ok(state.fail) })
         })
 
@@ -68,11 +67,11 @@ describe("cli runner", function () {
             var state = {fail: false}
             var reporter = Run.exitReporter(state)
 
-            return execute(reporter, "start")()
-            .then(execute(reporter, "fail"))
-            .then(execute(reporter, "pass"))
-            .then(execute(reporter, "end"))
-            .then(execute(reporter, "start"))
+            return execute(reporter, "start")
+            .then(function () { return execute(reporter, "fail") })
+            .then(function () { return execute(reporter, "pass") })
+            .then(function () { return execute(reporter, "end") })
+            .then(function () { return execute(reporter, "start") })
             .then(function () { assert.notOk(state.fail) })
         })
     })

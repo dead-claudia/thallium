@@ -60,7 +60,7 @@ printError = ({value: err}) ->
         printLines err.stack, yes
         err.message = message
 
-module.exports = (ev, done) ->
+module.exports = (ev) ->
     switch
         when ev.start()
             console.log 'TAP version 13'
@@ -114,4 +114,4 @@ module.exports = (ev, done) ->
             console.log '  ...'
             _.reset()
 
-    done()
+    return

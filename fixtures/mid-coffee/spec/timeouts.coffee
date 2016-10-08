@@ -16,7 +16,7 @@ t.test 'core (timeouts) (FLAKE)', ->
     n = @reflect().report
     p = @reflect().loc
 
-    push = (ret) -> (arg, done) ->
+    push = (ret) -> (arg) ->
         # Any equality tests on either of these are inherently flaky.
         assert.hasOwn arg, 'duration'
         assert.number arg.duration
@@ -29,7 +29,6 @@ t.test 'core (timeouts) (FLAKE)', ->
             arg.duration = -1
             arg.slow = 0
         ret.push(arg)
-        done()
 
     @async 'succeeds with own', ->
         tt = @create()
@@ -55,7 +54,7 @@ t.test 'core (timeouts) (FLAKE)', ->
 
         tt.reporter push(ret)
 
-        tt.async 'test', (_, done) ->
+        tt.async 'test', ->
             @timeout 50
             # It's highly unlikely the engine will take this long to finish
             then: (resolve) -> setTimeout resolve, 200

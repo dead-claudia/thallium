@@ -2,7 +2,7 @@
 
 If you want to create your own reporter, it's relatively straightforward to do so. Thallium reporters are simple functions that accept a set of event objects. It's written to be very unopinionated, easy to work with, and if you feel a need to convert it to something else, it's very straightforward to do.
 
-Reporters are called with an event and either return a thenable or accept a `done` callback. Note that you must either resolve the thenable or call the `done` callback *at some point*, because Thallium waits for all reporters to finish before continuing what it was doing.
+Reporters are called with an event and return possibly a thenable resolved on completion.
 
 Note that when you create a reporter, especially a standalone one, it should *not* itself depend on Thallium, but merely be a function of report &rarr; update state &rarr; print (if necessary) &rarr; return. If you feel you need to depend on Thallium, you should consider wrapping the reporter in a [plugin](./plugins.md) and exposing that.
 
@@ -18,11 +18,6 @@ There are nine types of events. You can check for these using `ev.start()`, `ev.
 - `skip` - Marks a skipped test block with no children, via `t.testSkip()` or `t.asyncSkip()`.
 - `end` - Marks the end of all running tests, and is the last event fired.
 - `error` - An internal/reporter error `value`, provided for pretty-printing and the ability to close resources.
-- `extra` - Marks an extra call to `done` in an async test. The `value` is an object with the following properties:
-
-    - `count` - how many times `done` has been called in total so far
-    - `value` - denotes the last value the callback was called with.
-    - `stack` - the stack trace of the call.
 
 Each event also has the following properties:
 
@@ -60,9 +55,7 @@ Events are called in the following order:
 
 Normally, reporters are all called at the same time on each event, to speed up calling asynchronous reporters.
 
-If your reporter is synchronous, remember to call `done` or return a resolved `Promise`/thenable at the end.
-
-If your reporter is async *and* needs to be the only one running for some reason (like multiple reporters working with a poorly written server), you should add a truthy `block` property to your reporter. It's not preferred, because if you want to, for example, use a reporter that logs to a file, that will have to wait until after the blocking reporter finishes.
+If your reporter is async *and* needs to be the only one running for some reason (like multiple reporters working with a poorly written server or printing diagnostics to the console along with another console reporter), you should add a truthy `block` property to your reporter. It's not preferred, because if you want to, for example, use a reporter that logs to a file, that will have to wait until after the blocking reporter finishes.
 
 ## Options and Internal State
 
@@ -72,7 +65,7 @@ If you need to take various options, or if you need special internal state, just
 module.exports = opts => {
     // process your opts and set up initial state here
 
-    return (ev, done) => {
+    return ev => {
         // do reporter magic here
     }
 }
@@ -106,7 +99,7 @@ module.exports = opts => {
 
     // set up things...
 
-    return (ev, done) => {
+    return ev => {
         // do things...
     }
 }
@@ -122,8 +115,8 @@ If you can't handle them after the exit, you can drop a lock like this, so you c
 module.exports = () => {
     let ignore = false
 
-    return (ev, done) => {
-        if (ev.extra() && ignore) return done()
+    return (ev) => {
+        if (ev.extra() && ignore) return undefined
         if (ev.start()) ignore = false
         if (ev.end()) ignore = true
 

@@ -81,9 +81,8 @@ describe("core (basic)", function () {
             var tt = t.create()
             var err
 
-            tt.reporter(function (res, done) {
+            tt.reporter(function (res) {
                 if (res.fail()) err = res.value
-                done()
             })
 
             tt.test("test", function (tt) {
@@ -97,9 +96,8 @@ describe("core (basic)", function () {
             var tt = t.create()
             var err
 
-            tt.reporter(function (res, done) {
+            tt.reporter(function (res) {
                 if (res.fail()) err = res.value
-                done()
             })
 
             tt.test("test", function (tt) {

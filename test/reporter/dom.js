@@ -35,9 +35,7 @@ describe("reporter dom", function () {
 
             var reporter = Util.r.dom.reporter(reporterOpts)
 
-            return Util.Promise.each(opts.input, function (i) {
-                return Util.Resolver.resolve1(reporter, undefined, i)
-            })
+            return Util.Promise.each(opts.input, reporter)
             .then(function () {
                 if (opts.match) opts.match(shared, mock)
             })

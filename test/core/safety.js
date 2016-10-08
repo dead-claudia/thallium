@@ -8,10 +8,6 @@ describe("core (safety)", function () {
         return {valueOf: function () { return value }}
     }
 
-    function noopReporter(_, done) {
-        done()
-    }
-
     function createSentinel(name) {
         var e = new Error(name)
 
@@ -101,7 +97,7 @@ describe("core (safety)", function () {
         })
 
         tt.test("five", function (tt) {
-            tt.test("inner", function () { tt.reporter(noopReporter) })
+            tt.test("inner", function () { tt.reporter(function () {}) })
         })
 
         return tt.run().then(function () {
@@ -123,9 +119,6 @@ describe("core (safety)", function () {
 
     it("catches concurrent runs", function () {
         var tt = t.create()
-
-        tt.reporter(noopReporter)
-
         var res = tt.run()
 
         assert.throws(function () { tt.run() }, Error)
@@ -133,7 +126,7 @@ describe("core (safety)", function () {
     })
 
     it("catches concurrent runs when given a callback", function () {
-        var tt = t.create().reporter(noopReporter)
+        var tt = t.create()
         var p = tt.run()
 
         assert.throws(function () { tt.run() }, Error)
@@ -144,7 +137,7 @@ describe("core (safety)", function () {
         var tt = t.create()
         var sentinel = createSentinel("fail")
 
-        tt.reporter(function (_, done) { done(sentinel) })
+        tt.reporter(function () { throw sentinel })
 
         return tt.run().then(
             function () { assert.fail("Expected a rejection") },

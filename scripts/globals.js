@@ -46,7 +46,6 @@ var Util = global.Util = {
     m: require("../lib/messages.js"),
     methods: require("../lib/methods.js"),
     R: require("../lib/reporter.js"),
-    Resolver: require("../lib/resolver.js"),
     inspect: require("../lib/replaced/inspect.js"),
     silenceEmptyInlineWarnings: function () {
         require("../lib/tests.js").silenceEmptyInlineWarnings()
@@ -156,7 +155,7 @@ Util.jsdom = (function () {
 })()
 
 Util.push = function (ret, keep) {
-    return function push(arg, done) {
+    return function push(arg) {
         // Any equality tests on either of these are inherently flaky.
         assert.hasOwn(arg, "duration")
         assert.hasOwn(arg, "slow")
@@ -172,7 +171,6 @@ Util.push = function (ret, keep) {
             }
         }
         ret.push(arg)
-        return done()
     }
 }
 

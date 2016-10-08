@@ -41,18 +41,11 @@ describe("reporter tap", function () { // eslint-disable-line max-statements
         it(name, function () {
             var list = []
             var reporter = Util.r.tap({
-                print: function (arg, callback) {
-                    list.push(arg)
-                    return callback()
-                },
-                reset: function (callback) {
-                    return callback()
-                },
+                print: function (arg) { list.push(arg) },
+                reset: function () {},
             })
 
-            return Util.Promise.each(opts.input, function (i) {
-                return Util.Resolver.resolve1(reporter, undefined, i)
-            })
+            return Util.Promise.each(opts.input, reporter)
             .then(function () {
                 assert.match(list, opts.output)
             })

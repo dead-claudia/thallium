@@ -58,10 +58,9 @@ t.test 'core (basic)', ->
             tt = @create()
             err = undefined
 
-            tt.reporter (res, done) ->
-                if res.fail()
-                    err = res.value
-                done()
+            tt.reporter (res) ->
+                err = res.value if res.fail()
+                return
 
             tt.test 'test', ->
                 @test('foo').use ->
@@ -72,10 +71,9 @@ t.test 'core (basic)', ->
             tt = @create()
             err = undefined
 
-            tt.reporter (res, done) ->
-                if res.fail()
-                    err = res.value
-                done()
+            tt.reporter (res) ->
+                err = res.value if res.fail()
+                return
 
             tt.test 'test', ->
                 @test('foo').use ->

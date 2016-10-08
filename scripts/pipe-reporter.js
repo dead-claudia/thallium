@@ -31,12 +31,10 @@ function fix(value) {
     return value
 }
 
-module.exports = function (ev, done) {
+module.exports = function (ev) {
     var path = ev.path
     .map(function (x) { return "[" + x.index + ": " + x.name + "]" })
     .join(" > ")
 
     console.log(ev.type() + " " + (path ? path + " = " : "= ") + fix(ev.value))
-
-    return done()
 }

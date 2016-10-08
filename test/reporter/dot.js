@@ -32,61 +32,6 @@ describe("reporter dot", function () {
         return lines
     }
 
-    function Options(list, colors) {
-        this._list = list
-        this._acc = ""
-        this.colors = colors
-    }
-
-    Util.methods(Options, {
-        print: function (line) {
-            if (this._acc !== "") {
-                line += this._acc
-                this._acc = ""
-            }
-
-            var lines = line.split(/\r?\n/g)
-
-            // So lines are printed consistently.
-            for (var i = 0; i < lines.length; i++) {
-                this._list.push(lines[i])
-            }
-
-            return Util.Promise.resolve()
-        },
-
-        write: function (str) {
-            var index = str.search(/\r?\n/g)
-
-            if (index < 0) {
-                this._acc += str
-                return Util.Promise.resolve()
-            }
-
-            this._list.push(this._acc + str.slice(0, index))
-
-            var lines = str.slice(index + (str[index] === "\r" ? 2 : 1))
-                .split(/\r?\n/g)
-
-            this._acc = lines.pop()
-
-            for (var i = 0; i < lines.length; i++) {
-                this._list.push(lines[i])
-            }
-
-            return Util.Promise.resolve()
-        },
-
-        reset: function () {
-            if (this._acc !== "") {
-                this._list.push(this._acc)
-                this._acc = ""
-            }
-
-            return Util.Promise.resolve()
-        },
-    })
-
     function time(duration) {
         return c("light", " (" + duration + ")")
     }
@@ -95,11 +40,37 @@ describe("reporter dot", function () {
         return function (name, opts) {
             it(name, function () {
                 var list = []
-                var reporter = Util.r.dot(new Options(list, colors))
+                var acc = ""
+                var reporter = Util.r.dot({
+                    colors: colors,
 
-                return Util.Promise.each(opts.input, function (i) {
-                    return Util.Resolver.resolve1(reporter, undefined, i)
+                    print: function (line) {
+                        if (acc !== "") {
+                            line += acc
+                            acc = ""
+                        }
+
+                        // So lines are printed consistently.
+                        list.push.apply(list, line.split(/\r?\n/g))
+                    },
+
+                    write: function (str) {
+                        // So lines are printed consistently.
+                        var lines = (acc + str).split(/\r?\n/g)
+
+                        acc = lines.pop()
+                        list.push.apply(list, lines)
+                    },
+
+                    reset: function () {
+                        if (acc !== "") {
+                            list.push(acc)
+                            acc = ""
+                        }
+                    },
                 })
+
+                return Util.Promise.each(opts.input, reporter)
                 .then(function () {
                     assert.match(list, opts.output)
                 })
