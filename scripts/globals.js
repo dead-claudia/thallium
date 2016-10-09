@@ -2,12 +2,22 @@
 
 /* eslint-env mocha */
 
-if (typeof global.process === "object") {
-    global.process.env.NODE_ENV = "development"
-} else {
+/**
+ * Global settings. These are also configurable in Node via the environment.
+ */
+var settings = {
+    migrate: false,
+    release: false,
+}
+
+var Promise = require("../lib/bluebird.js")
+
+if (global.process != null && global.process.env != null) {
+    if (!settings.migrate) settings.migrate = !!global.process.env.MIGRATE
+    if (!settings.release) global.process.env.NODE_ENV = "development"
+} else if (!settings.release) {
     // Set up Bluebird's dev warnings
-    require("../lib/bluebird.js") // eslint-disable-line global-require
-    .config({
+    Promise.config({ // eslint-disable-line global-require
         warnings: true,
         longStackTraces: true,
     })
@@ -36,9 +46,9 @@ var Util = global.Util = {
     // easier to inject them into this bundle rather than to try to implement a
     // module loader.
 
-    Promise: require("../lib/bluebird.js"),
+    Promise: Promise,
 
-    // Chrome complains of an illegal invocation (wrong `this`).
+    // Chrome complains of an illegal invocation without a bound `this`.
     setTimeout: function (func, duration) {
         return global.setTimeout(func, duration)
     },
@@ -202,3 +212,5 @@ Util.basic = function (desc, callback) {
         it("works", callback)
     })
 }
+
+if (settings.migrate) Thallium.migrate()
