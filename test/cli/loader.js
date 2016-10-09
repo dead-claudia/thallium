@@ -524,9 +524,9 @@ describe("cli loader", function () {
         })
     })
 
-    describe("serialize()", function () {
+    describe("initialize()", function () {
         it("exists", function () {
-            assert.function(Loader.serialize)
+            assert.function(Loader.initialize)
         })
 
         function S(mod) {
@@ -584,7 +584,7 @@ describe("cli loader", function () {
 
                 var modules = []
 
-                return Loader.serialize(loader.state, function (mod) {
+                return Loader.initialize(loader.state, function (mod) {
                     if (!(mod.mask & Loader.Mask.Internal)) {
                         modules.push(new S(mod.mod))
                     } else if (!(mod.mask & Loader.Mask.Config)) {
