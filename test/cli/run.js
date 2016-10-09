@@ -75,68 +75,6 @@ describe("cli runner", function () {
         })
     })
 
-    describe("load()", function () {
-        it("loads the config file", function () {
-            var file = "config.js"
-            var map = Object.create(null)
-            var result = {config: true}
-            var loaded, baseDir
-
-            function init(file, base) {
-                loaded = file
-                baseDir = base
-                return result
-            }
-
-            return Run.load(init, file, map, ".").then(function (config) {
-                assert.equal(loaded, file)
-                assert.equal(baseDir, ".")
-                assert.equal(config, result)
-            })
-        })
-
-        it("registers all the loaders from the map", function () {
-            var mods = ["one", "two", "three", "four", "five"]
-            var list = []
-            var map = Object.create(null)
-
-            mods.forEach(function (m) {
-                map[m] = {register: function () { list.push(m) }}
-            })
-
-            return Run.load(function () {}, "config.js", map, ".")
-            .then(function () {
-                assert.match(list, mods)
-            })
-        })
-
-        it("does both", function () {
-            var file = "config.js"
-            var mods = ["one", "two", "three", "four", "five"]
-            var list = []
-            var map = Object.create(null)
-            var result = {config: true}
-            var loaded, baseDir
-
-            mods.forEach(function (m) {
-                map[m] = {register: function () { list.push(m) }}
-            })
-
-            function init(file, base) {
-                loaded = file
-                baseDir = base
-                return result
-            }
-
-            return Run.load(init, file, map, ".").then(function (config) {
-                assert.match(list, mods)
-                assert.equal(loaded, file)
-                assert.equal(baseDir, ".")
-                assert.equal(config, result)
-            })
-        })
-    })
-
     describe("run()", /* @this */ function () {
         this.slow(150)
 
