@@ -128,12 +128,10 @@ describe("cli loader", function () {
         return spy
     }
 
-    describe("class Simple", function () {
+    describe("makeSimple()", function () {
         it("exists", function () {
-            assert.function(Loader.Simple)
+            assert.function(Loader.makeSimple)
         })
-
-        var Simple = Loader.Simple
 
         it("loads a normal module", function () {
             var spy = makeSpy()
@@ -143,10 +141,10 @@ describe("cli loader", function () {
                 },
             })
 
-            var loader = new Simple({util: util}, util.cwd(),
+            var loader = Loader.makeSimple({util: util}, util.cwd(),
                 "./test/config.js")
 
-            return loader.load().then(function () {
+            return Loader.load(loader).then(function () {
                 assert.equal(spy.called, 1)
                 assert.match(spy.args[0], [])
             })
@@ -161,10 +159,10 @@ describe("cli loader", function () {
                 },
             })
 
-            var loader = new Simple({util: util}, util.cwd(),
+            var loader = Loader.makeSimple({util: util}, util.cwd(),
                 "./test/config.js")
 
-            return loader.load().then(function () {
+            return Loader.load(loader).then(function () {
                 assert.equal(spy1.called, 1)
                 assert.length(spy1.args[0], 2)
                 assert.equal(spy2.called, 1)
@@ -180,10 +178,10 @@ describe("cli loader", function () {
                 },
             })
 
-            var loader = new Simple({util: util}, util.cwd(),
+            var loader = Loader.makeSimple({util: util}, util.cwd(),
                 "./test/config.js")
 
-            return loader.load().then(function () {
+            return Loader.load(loader).then(function () {
                 assert.equal(spy.called, 1)
                 assert.match(spy.args[0], [])
             })
@@ -198,10 +196,10 @@ describe("cli loader", function () {
                 },
             })
 
-            var loader = new Simple({util: util}, util.cwd(),
+            var loader = Loader.makeSimple({util: util}, util.cwd(),
                 "./test/config.js")
 
-            return loader.load().then(function () {
+            return Loader.load(loader).then(function () {
                 assert.equal(spy1.called, 1)
                 assert.length(spy1.args[0], 2)
                 assert.equal(spy2.called, 1)
@@ -221,10 +219,10 @@ describe("cli loader", function () {
                 },
             })
 
-            var loader = new Simple({util: util}, util.cwd(),
+            var loader = Loader.makeSimple({util: util}, util.cwd(),
                 "./test/config.js")
 
-            return loader.load().then(function () {
+            return Loader.load(loader).then(function () {
                 assert.equal(spy1.called, 0)
                 assert.equal(spy2.called, 1)
                 assert.length(spy2.args[0], 2)
@@ -245,10 +243,10 @@ describe("cli loader", function () {
                 },
             })
 
-            var loader = new Simple({util: util}, util.cwd(),
+            var loader = Loader.makeSimple({util: util}, util.cwd(),
                 "./test/config.js")
 
-            return loader.load().then(function () {
+            return Loader.load(loader).then(function () {
                 assert.equal(spy1.called, 0)
                 assert.equal(spy2.called, 1)
                 assert.length(spy2.args[0], 2)
@@ -258,9 +256,9 @@ describe("cli loader", function () {
         })
     })
 
-    describe("class Interpret", function () {
+    describe("makeInterpret()", function () {
         it("exists", function () {
-            assert.function(Loader.Interpret)
+            assert.function(Loader.makeInterpret)
         })
 
         function throwMissing() {
@@ -274,7 +272,6 @@ describe("cli loader", function () {
         // which is horribly brittle. Thankfully, node-interpret doesn't use
         // getters, but patching it is easier than using a mock.
 
-        var Interpret = Loader.Interpret
         var old = interpret.jsVariants[".js"]
 
         afterEach(function () {
@@ -285,9 +282,10 @@ describe("cli loader", function () {
             interpret.jsVariants[".js"] = null
 
             var spy = makeSpy()
-            var loader = new Interpret({util: {load: spy}}, "base", ".js")
+            var loader = Loader.makeInterpret({util: {load: spy}},
+                "base", ".js")
 
-            return loader.load().then(function () {
+            return Loader.load(loader).then(function () {
                 assert.equal(spy.called, 0)
             })
         })
@@ -296,9 +294,10 @@ describe("cli loader", function () {
             interpret.jsVariants[".js"] = "module"
 
             var spy = makeSpy(Util.Promise.method(function () {}))
-            var loader = new Interpret({util: {load: spy}}, "base", ".js")
+            var loader = Loader.makeInterpret({util: {load: spy}},
+                "base", ".js")
 
-            return loader.load().then(function () {
+            return Loader.load(loader).then(function () {
                 assert.equal(spy.called, 1)
                 assert.match(spy.args[0], ["module", "base"])
             })
@@ -315,9 +314,10 @@ describe("cli loader", function () {
             var loaderSpy = makeSpy(Util.Promise.method(function () {
                 return {exports: sentinel}
             }))
-            var loader = new Interpret({util: {load: loaderSpy}}, "base", ".js")
+            var loader = Loader.makeInterpret({util: {load: loaderSpy}},
+                "base", ".js")
 
-            return loader.load().then(function () {
+            return Loader.load(loader).then(function () {
                 assert.equal(loaderSpy.called, 1)
                 assert.match(loaderSpy.args[0], ["module", "base"])
                 assert.equal(registerSpy.called, 1)
@@ -329,9 +329,10 @@ describe("cli loader", function () {
         it("loads first module in string array", function () {
             interpret.jsVariants[".js"] = ["foo", "bar"]
             var loaderSpy = makeSpy(Util.Promise.method(function () {}))
-            var loader = new Interpret({util: {load: loaderSpy}}, "base", ".js")
+            var loader = Loader.makeInterpret({util: {load: loaderSpy}},
+                "base", ".js")
 
-            return loader.load().then(function () {
+            return Loader.load(loader).then(function () {
                 assert.equal(loaderSpy.called, 1)
                 assert.match(loaderSpy.args[0], ["foo", "base"])
             })
@@ -342,9 +343,10 @@ describe("cli loader", function () {
             var loaderSpy = makeSpy(Util.Promise.method(function (mod) {
                 if (mod === "foo") throwMissing()
             }))
-            var loader = new Interpret({util: {load: loaderSpy}}, "base", ".js")
+            var loader = Loader.makeInterpret({util: {load: loaderSpy}},
+                "base", ".js")
 
-            return loader.load().then(function () {
+            return Loader.load(loader).then(function () {
                 assert.equal(loaderSpy.called, 2)
                 assert.match(loaderSpy.args[0], ["foo", "base"])
                 assert.match(loaderSpy.args[1], ["bar", "base"])
@@ -371,9 +373,10 @@ describe("cli loader", function () {
                 if (mod === "bar") return {exports: sentinel2}
                 return {exports: undefined}
             }))
-            var loader = new Interpret({util: {load: loaderSpy}}, "base", ".js")
+            var loader = Loader.makeInterpret({util: {load: loaderSpy}},
+                "base", ".js")
 
-            return loader.load().then(function () {
+            return Loader.load(loader).then(function () {
                 assert.equal(loaderSpy.called, 1)
                 assert.match(loaderSpy.args[0], ["foo", "base"])
             })
@@ -398,9 +401,10 @@ describe("cli loader", function () {
                 if (mod === "bar") return {exports: sentinel}
                 return {exports: undefined}
             }))
-            var loader = new Interpret({util: {load: loaderSpy}}, "base", ".js")
+            var loader = Loader.makeInterpret({util: {load: loaderSpy}},
+                "base", ".js")
 
-            return loader.load().then(function () {
+            return Loader.load(loader).then(function () {
                 assert.equal(loaderSpy.called, 2)
                 assert.match(loaderSpy.args[0], ["foo", "base"])
                 assert.match(loaderSpy.args[1], ["bar", "base"])
@@ -427,9 +431,10 @@ describe("cli loader", function () {
                 if (mod === "bar") return {exports: sentinel2}
                 return {exports: undefined}
             }))
-            var loader = new Interpret({util: {load: loaderSpy}}, "base", ".js")
+            var loader = Loader.makeInterpret({util: {load: loaderSpy}},
+                "base", ".js")
 
-            return loader.load().then(function () {
+            return Loader.load(loader).then(function () {
                 assert.equal(loaderSpy.called, 1)
                 assert.match(loaderSpy.args[0], ["foo", "base"])
                 assert.equal(registerSpy.called, 0)
@@ -451,9 +456,10 @@ describe("cli loader", function () {
                 if (mod === "bar") return {exports: sentinel}
                 return {exports: undefined}
             }))
-            var loader = new Interpret({util: {load: loaderSpy}}, "base", ".js")
+            var loader = Loader.makeInterpret({util: {load: loaderSpy}},
+                "base", ".js")
 
-            return loader.load().then(function () {
+            return Loader.load(loader).then(function () {
                 assert.equal(loaderSpy.called, 2)
                 assert.match(loaderSpy.args[0], ["foo", "base"])
                 assert.match(loaderSpy.args[1], ["bar", "base"])
@@ -479,9 +485,10 @@ describe("cli loader", function () {
                 if (mod === "bar") return {exports: sentinel2}
                 return {exports: undefined}
             }))
-            var loader = new Interpret({util: {load: loaderSpy}}, "base", ".js")
+            var loader = Loader.makeInterpret({util: {load: loaderSpy}},
+                "base", ".js")
 
-            return loader.load().then(function () {
+            return Loader.load(loader).then(function () {
                 assert.equal(loaderSpy.called, 1)
                 assert.match(loaderSpy.args[0], ["foo", "base"])
                 assert.equal(registerSpy.called, 1)
@@ -505,9 +512,10 @@ describe("cli loader", function () {
                 if (mod === "bar") return {exports: sentinel}
                 return {exports: undefined}
             }))
-            var loader = new Interpret({util: {load: loaderSpy}}, "base", ".js")
+            var loader = Loader.makeInterpret({util: {load: loaderSpy}},
+                "base", ".js")
 
-            return loader.load().then(function () {
+            return Loader.load(loader).then(function () {
                 assert.equal(loaderSpy.called, 2)
                 assert.match(loaderSpy.args[0], ["foo", "base"])
                 assert.match(loaderSpy.args[1], ["bar", "base"])
@@ -527,6 +535,10 @@ describe("cli loader", function () {
 
         function I(ext) {
             this.ext = ext
+        }
+
+        function D() {
+            this.type = "default"
         }
 
         function finder(name, opts) {
@@ -573,16 +585,16 @@ describe("cli loader", function () {
                 var modules = []
 
                 return Loader.serialize(loader.state, function (mod) {
-                    if (mod instanceof Loader.Simple) {
+                    if (!(mod.mask & Loader.Mask.Internal)) {
                         modules.push(new S(mod.mod))
-                    } else if (mod instanceof Loader.Interpret) {
+                    } else if (!(mod.mask & Loader.Mask.Config)) {
                         modules.push(new I(mod.ext))
                     } else {
-                        throw new TypeError("Unknown module spec: " + mod)
+                        modules.push(new D())
                     }
 
                     if (opts.load != null && opts.load.indexOf(mod) !== -1) {
-                        return mod.load()
+                        return Loader.load(mod)
                     } else {
                         return undefined
                     }
@@ -653,31 +665,31 @@ describe("cli loader", function () {
         })
 
         context("no config", function () {
-            finder("returns null when none exists", {
+            finder("returns default when none exists", {
                 tree: {
                     test: {"nope.js": ""},
                 },
                 args: "",
                 globs: ["test/**/*.js"],
-                modules: [],
+                modules: [new D()],
             })
 
-            finder("returns null when non-executable extension exists", {
+            finder("returns default when non-executable extension exists", {
                 tree: {
                     test: {".tl.json": "contents"},
                 },
                 args: "",
                 globs: ["test/**/*.js"],
-                modules: [],
+                modules: [new D()],
             })
 
-            finder("returns null when a directory", {
+            finder("returns default when a directory", {
                 tree: {
                     test: {".tl.js": {}},
                 },
                 args: "",
                 globs: ["test/**/*.js"],
-                modules: [],
+                modules: [new D()],
             })
         })
 
@@ -810,6 +822,7 @@ describe("cli loader", function () {
                     new I(".coffee"),
                     new I(".ls"),
                     new I(".litcoffee"),
+                    new D(),
                 ],
             })
 
@@ -831,6 +844,7 @@ describe("cli loader", function () {
                     new I(".coffee"),
                     new I(".ls"),
                     new I(".litcoffee"),
+                    new D(),
                 ],
             })
 
@@ -851,6 +865,7 @@ describe("cli loader", function () {
                 modules: [
                     new I(".coffee"),
                     new I(".litcoffee"),
+                    new D(),
                 ],
             })
 
