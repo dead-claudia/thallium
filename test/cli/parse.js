@@ -13,6 +13,7 @@ describe("cli args parsing", function () {
             if (opts.config == null) opts.config = undefined
             if (opts.cwd == null) opts.cwd = undefined
             if (opts.files == null) opts.files = []
+            if (opts.forceLocal == null) opts.forceLocal = false
             if (opts.help == null) opts.help = undefined
             if (opts.require == null) opts.require = []
             if (opts.respawn == null) opts.respawn = true
@@ -22,7 +23,7 @@ describe("cli args parsing", function () {
         })
     }
 
-    context("basic pass", function () {
+    context("basic pass", function () { // eslint-disable-line max-statements
         var it = alias
 
         it("works with defaults", "", {})
@@ -49,6 +50,11 @@ describe("cli args parsing", function () {
         it("works with -r (no dot + no module)",
             "-r module/register",
             {require: ["module/register"]})
+
+        it("works with --respawn", "--respawn", {respawn: true})
+        it("works with --no-respawn", "--no-respawn", {respawn: false})
+        it("works with --force-local", "--force-local", {forceLocal: true})
+        it("works with --no-force-local", "--no-force-local", {forceLocal: false}) // eslint-disable-line max-len
 
         var my = path.join("my-test", "**", "*")
         var other = path.join("other-test", "**", "*")

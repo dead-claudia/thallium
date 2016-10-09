@@ -20,10 +20,9 @@ describe("cli end-to-end (FLAKE)", /** @this */ function () {
             .trim()
     }
 
-    var binary = path.resolve(__dirname, "../../bin/tl.js")
-
     function test(name, opts) {
-        opts.args.unshift(binary)
+        opts.args.unshift("--force-local")
+        opts.args.unshift(path.resolve(__dirname, "../../bin/tl.js"))
 
         if (Array.isArray(opts.messages)) {
             opts.messages = opts.messages.join(Util.R.newline())

@@ -13,9 +13,14 @@ if (require.main !== module) {
 var path = require("path")
 var fs = require("fs")
 var parse = require("../lib/cli/parse.js")
+var args = parse(process.argv.slice(2))
 
-function help(value) {
-    var file = value === "detailed" ? "help-detailed.txt" : "help-simple.txt"
+// If help is requested, print it now.
+if (args.help) {
+    var file = args.help === "detailed"
+        ? "help-detailed.txt"
+        : "help-simple.txt"
+
     var text = fs.readFileSync(
         path.resolve(__dirname, "../lib/cli", file),
         "utf-8")
@@ -26,13 +31,19 @@ function help(value) {
         process.platform === "win32"
             ? text.replace("\n", "\r\n")
             : text)
+    process.exit()
 }
 
-var args = parse(process.argv.slice(2))
+function resolveModule(cwd, name) {
+    if (args.forceLocal) return path.resolve(__dirname, "../lib/cli", name)
 
-if (args.help) {
-    help(args.help)
-    process.exit()
+    var resolve = require("resolve") // eslint-disable-line global-require
+
+    try {
+        return resolve.sync(path.join("thallium/lib/cli", name), {basedir: cwd})
+    } catch (_) {
+        return path.resolve(__dirname, "../lib/cli", name)
+    }
 }
 
 if (args.respawn && args.unknown.length !== 0) {
@@ -70,10 +81,13 @@ if (args.respawn && args.unknown.length !== 0) {
     // Uncomment to log all FS calls.
     // require("../scripts/log-fs.js")
 
+    // Resolve the full path first, and prefer a local installation to a global
+    // one if possible.
     /* eslint-disable global-require */
 
-    var Run = require("../lib/cli/run.js")
-    var Util = require("../lib/cli/util.js")
+    var cwd = args.cwd != null ? path.resolve(args.cwd) : process.cwd()
+    var Run = require(resolveModule(cwd, "run.js"))
+    var Util = require(resolveModule(cwd, "util.js"))
 
     /* eslint-enable global-require */
 

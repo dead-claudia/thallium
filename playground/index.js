@@ -54,6 +54,7 @@ function exit(code) {
 
 cp.spawn(process.argv[0], [
     path.resolve(__dirname, "../bin/tl.js"),
+    "--force-local",
     path.resolve(__dirname, dir, "**/*.js"),
 ], {
     cwd: process.cwd(),
