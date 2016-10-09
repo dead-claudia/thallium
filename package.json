@@ -26,9 +26,8 @@
     "docs"
   ],
   "bin": {
-    "tl": "bin/thallium.js",
-    "thallium": "bin/thallium.js",
-    "_thallium": "bin/_thallium.js"
+    "tl": "bin/tl.js",
+    "_tl": "bin/_tl.js"
   },
   "keywords": [
     "test",

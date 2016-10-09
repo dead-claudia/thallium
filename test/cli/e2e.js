@@ -20,7 +20,7 @@ describe("cli end-to-end (FLAKE)", /** @this */ function () {
             .trim()
     }
 
-    var binary = path.resolve(__dirname, "../../bin/thallium.js")
+    var binary = path.resolve(__dirname, "../../bin/tl.js")
 
     function test(name, opts) {
         opts.args.unshift(binary)

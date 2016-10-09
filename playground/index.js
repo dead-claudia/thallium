@@ -3,7 +3,7 @@
 
 /* eslint-env node */
 /* eslint-disable no-process-exit */
-// This script filters out Thallium's arguments, and fires `_thallium.js` with
+// This script filters out Thallium's arguments, and fires `_tl.js` with
 // them.
 
 if (require.main !== module) {
@@ -53,7 +53,7 @@ function exit(code) {
 }
 
 cp.spawn(process.argv[0], [
-    path.resolve(__dirname, "../bin/_thallium.js"),
+    path.resolve(__dirname, "../bin/_tl.js"),
     path.resolve(__dirname, dir, "**/*.js"),
 ], {
     cwd: process.cwd(),

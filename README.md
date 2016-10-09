@@ -72,8 +72,8 @@ Do note that it isn't necessarily comprehensive, although I try to keep it somew
 6. ~~Remove `done` callback support for `t.async`, reporters, etc.~~
 7. ~~Allow reporters to be removed~~
 8. ~~Add default config~~
-9. Remove the `thallium` alias, rename `_thallium` &rarr; `_tl`, and rename the repo's binaries accordingly
-    - Only `tl` is actually documented
+9. ~~Remove the `thallium` alias, rename `_thallium` &rarr; `_tl`, and rename the repo's binaries accordingly~~~
+    - ~~Only `tl` is actually documented~~
 10. Alert the user if no files are found
 11. Create before/after lifecycle hooks
 12. Rename `t.async` &rarr; `t.test`, deprecate old form
