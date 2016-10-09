@@ -431,20 +431,10 @@ describe("core (reporters)", function () { // eslint-disable-line max-statements
     })
 
     it("called correctly with subtest run", function () {
-        var tt = t.create()
-        var ret = []
+        var tt = t.create().test("test")
 
-        tt.reporter(Util.push(ret))
-
-        return tt.test("test")
-        .test("foo", function () {})
-        .run().then(function () {
-            assert.match(ret, [
-                n("start", [p("test", 0)]),
-                n("pass", [p("test", 0), p("foo", 0)]),
-                n("end", [p("test", 0)]),
-            ])
-        })
+        tt.test("foo", function () {})
+        assert.throws(function () { tt.run() }, Error)
     })
 
     it("called correctly with complex sequence", function () {

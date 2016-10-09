@@ -110,19 +110,6 @@ describe("core (selection)", function () {
                 ])
             })
         })
-
-        it("inline tests run directly", function () {
-            var ret = []
-            var tt = t.create().reporter(Util.push(ret))
-            var ttt = tt.testSkip("test")
-
-            return ttt.run().then(function () {
-                assert.match(ret, [
-                    n("start", [p("test", 0)]),
-                    n("end", [p("test", 0)]),
-                ])
-            })
-        })
     })
 
     describe("only", function () {
