@@ -7,9 +7,64 @@
 
 var match = require("./match.js")
 var inspect = require("./lib/replaced/inspect.js")
-var Errors = require("./lib/errors.js")
+var Util = require("./lib/util.js")
 
 var hasOwn = Object.prototype.hasOwnProperty
+
+// This mess is simply to make a native-looking Error subclass
+var AssertionError = exports.AssertionError = (function () {
+    try {
+        return new Function([ // eslint-disable-line no-new-func
+            "'use strict';",
+            "class AssertionError extends Error {",
+            "    constructor(message, expected, actual) {",
+            "        super(message)",
+            "        this.expected = expected",
+            "        this.actual = actual",
+            "    }",
+            "",
+            "    get name() {",
+            "        return 'AssertionError'",
+            "    }",
+            "}",
+            // check native subclassing support
+            "new AssertionError('message', 1, 2)",
+            "return AssertionError",
+        ].join("\n"))()
+    } catch (e) {
+        var AssertionError = typeof Error.captureStackTrace === "function"
+            ? function AssertionError(message, expected, actual) {
+                this.message = message
+                this.expected = expected
+                this.actual = actual
+                Error.captureStackTrace(this, this.constructor)
+            }
+            : function AssertionError(message, expected, actual) {
+                this.message = message
+                this.expected = expected
+                this.actual = actual
+                this.stack = Util.getStack(e)
+            }
+
+        AssertionError.prototype = Object.create(Error.prototype)
+
+        Object.defineProperty(AssertionError.prototype, "constructor", {
+            configurable: true,
+            writable: true,
+            enumerable: false,
+            value: AssertionError,
+        })
+
+        Object.defineProperty(AssertionError.prototype, "name", {
+            configurable: true,
+            writable: true,
+            enumerable: false,
+            value: "AssertionError",
+        })
+
+        return AssertionError
+    }
+})()
 
 /* eslint-disable no-self-compare */
 // For better NaN handling
@@ -45,31 +100,6 @@ function format(message, object) {
         }
     })
 }
-
-var AssertionError = exports.AssertionError = Errors.defineError([
-    "class AssertionError extends Error {",
-    "    constructor(message, expected, actual) {",
-    "        super(message)",
-    "        this.expected = expected",
-    "        this.actual = actual",
-    "    }",
-    "",
-    "    get name() {",
-    "        return 'AssertionError'",
-    "    }",
-    "}",
-    "new AssertionError('message', 1, 2)", // check native subclassing support
-    "return AssertionError",
-], {
-    constructor: function (message, expected, actual) {
-        Errors.readStack(this)
-        this.message = message
-        this.expected = expected
-        this.actual = actual
-    },
-
-    name: "AssertionError",
-})
 
 function fail(message, args) {
     throw new AssertionError(format(message, args), args.expected, args.actual)

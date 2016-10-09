@@ -1,7 +1,6 @@
 "use strict"
 
 var Promise = require("../lib/bluebird.js")
-var m = require("../lib/messages.js")
 var R = require("../lib/reporter.js")
 var getType = require("../lib/util.js").getType
 
@@ -260,7 +259,9 @@ module.exports = R.on({
         }
 
         if (root == null) {
-            throw new TypeError(m("type.reporter.dom.element", getType(root)))
+            throw new TypeError(
+                "Expected `element` to be an `Element` or string ID, but " +
+                "found a(n) " + getType(root))
         }
 
         return new R.Reporter(Tree,
@@ -289,14 +290,6 @@ module.exports = R.on({
         } else if (ev.enter() || ev.pass() || ev.fail() || ev.skip()) {
             showTestResult(r, ev)
             updateStats(r)
-        } else if (ev.extra()) {
-            // TODO
-            // r.get(ev.path).status = R.Status.Failing
-            //
-            // var child = r.get(ev.path).node
-            // var parent = r.get(ev.path.slice(0, -1)).node
-            //
-            // child.className = child.className.replace(/\bpass\b/g, "fail")
         } else if (ev.error()) {
             if (r.opts.window.console) {
                 var console = r.opts.window.conosle

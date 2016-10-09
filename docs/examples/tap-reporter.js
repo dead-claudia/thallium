@@ -107,12 +107,6 @@ export default async function tap(ev) { // eslint-disable-line max-statements
     } else if (ev.skip()) {
         skip++
         await template(ev, "ok %c # skip %p")
-    } else if (ev.extra()) {
-        await template(ev, "not ok %c %p # extra")
-        await print("  ---")
-        await printRaw("count", inspect(ev.value.count))
-        await printRaw("value", inspect(ev.value.value))
-        await print("  ...")
     } else if (ev.end()) {
         await print(`1..${counter}`)
         await print(`# tests ${tests}`)

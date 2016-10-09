@@ -19,22 +19,15 @@ describe("reporter tap", function () { // eslint-disable-line max-statements
         assert.throws(function () { tap(n("end", [])) }, TypeError)
     })
 
-    function printLines(prefix, lines) {
-        return [prefix].concat(lines.replace(/^/gm, "    ").split(/\r?\n/g))
-    }
-
     function stack(err) {
         var stack = Util.R.getStack(err)
 
         if (err.name === "AssertionError") {
-            stack = Util.R.getStack(err).replace(/^.*?\r?\n/, "")
+            stack = stack.replace(/^.*?\r?\n/, "")
         }
 
-        return printLines("  stack: |-", stack)
-    }
-
-    function printError(err) {
-        return printLines("  value: |-", Util.inspect(err))
+        return ["  stack: |-"]
+            .concat(stack.replace(/^/gm, "    ").split(/\r?\n/g))
     }
 
     function test(name, opts) {
@@ -336,95 +329,7 @@ describe("reporter tap", function () { // eslint-disable-line max-statements
         ]),
     })
 
-    var extraStack = (function () {
-        var e = new Error()
-
-        e.name = ""
-        return Util.R.getStack(e).replace(/^\s+/gm, "")
-    })()
-
-    test("extra pass", {
-        input: [
-            n("start", []),
-            n("enter", [p("test", 0)]),
-            n("enter", [p("test", 0), p("inner", 0)]),
-            n("pass", [p("test", 0), p("inner", 0), p("fail", 0)]),
-            n("leave", [p("test", 0), p("inner", 0)]),
-            n("extra", [p("test", 0), p("inner", 0), p("fail", 0)],
-                Util.extra(2, undefined, extraStack)),
-            n("extra", [p("test", 0), p("inner", 0), p("fail", 0)],
-                Util.extra(3, sentinel, extraStack)),
-            n("leave", [p("test", 0)]),
-            n("end", []),
-        ],
-        output: [].concat([
-            "TAP version 13",
-            "# test",
-            "ok 1",
-            "# test inner",
-            "ok 2",
-            "ok 3 test inner fail",
-            "not ok 4 test inner fail # extra",
-            "  ---",
-            "  count: 2",
-            "  value: undefined",
-            "  ...",
-            "not ok 5 test inner fail # extra",
-            "  ---",
-            "  count: 3",
-        ], printError(sentinel), [
-            "  ...",
-            "1..5",
-            "# tests 3",
-            "# pass 3",
-            "# fail 1",
-            "# duration 30ms",
-        ]),
-    })
-
     var badType = new TypeError("undefined is not a function")
-
-    test("extra fail", {
-        input: [
-            n("start", []),
-            n("enter", [p("test", 0)]),
-            n("enter", [p("test", 0), p("inner", 0)]),
-            n("fail", [p("test", 0), p("inner", 0), p("fail", 0)], badType),
-            n("leave", [p("test", 0), p("inner", 0)]),
-            n("extra", [p("test", 0), p("inner", 0), p("fail", 0)],
-                Util.extra(2, undefined, extraStack)),
-            n("extra", [p("test", 0), p("inner", 0), p("fail", 0)],
-                Util.extra(3, sentinel, extraStack)),
-            n("leave", [p("test", 0)]),
-            n("end", []),
-        ],
-        output: [].concat([
-            "TAP version 13",
-            "# test",
-            "ok 1",
-            "# test inner",
-            "ok 2",
-            "not ok 3 test inner fail",
-            "  ---",
-        ], stack(badType), [
-            "  ...",
-            "not ok 4 test inner fail # extra",
-            "  ---",
-            "  count: 2",
-            "  value: undefined",
-            "  ...",
-            "not ok 5 test inner fail # extra",
-            "  ---",
-            "  count: 3",
-        ], printError(sentinel), [
-            "  ...",
-            "1..5",
-            "# tests 3",
-            "# pass 2",
-            "# fail 1",
-            "# duration 30ms",
-        ]),
-    })
 
     test("internal errors", {
         input: [
@@ -634,8 +539,6 @@ describe("reporter tap", function () { // eslint-disable-line max-statements
             n("pass", [p("core (timeouts)", 2), p("succeeds with inherited", 2)]),
             n("pass", [p("core (timeouts)", 2), p("fails with inherited", 3)]),
             n("pass", [p("core (timeouts)", 2), p("gets own set timeout", 4)]),
-            n("extra", [p("core (timeouts)", 2), p("fails with own", 1)],
-                Util.extra(2, badType, extraStack)),
             n("fail", [p("core (timeouts)", 2), p("gets own inline set timeout", 5)], sentinel),
             n("skip", [p("core (timeouts)", 2), p("gets own sync inner timeout", 6)]),
             n("pass", [p("core (timeouts)", 2), p("gets default timeout", 7)]),
@@ -705,21 +608,16 @@ describe("reporter tap", function () { // eslint-disable-line max-statements
             "ok 42 core (timeouts) succeeds with inherited",
             "ok 43 core (timeouts) fails with inherited",
             "ok 44 core (timeouts) gets own set timeout",
-            "not ok 45 core (timeouts) fails with own # extra",
-            "  ---",
-            "  count: 2",
-        ], printError(badType), [
-            "  ...",
-            "not ok 46 core (timeouts) gets own inline set timeout",
+            "not ok 45 core (timeouts) gets own inline set timeout",
             "  ---",
         ], stack(sentinel), [
             "  ...",
-            "ok 47 # skip core (timeouts) gets own sync inner timeout",
-            "ok 48 core (timeouts) gets default timeout",
-            "1..48",
+            "ok 46 # skip core (timeouts) gets own sync inner timeout",
+            "ok 47 core (timeouts) gets default timeout",
+            "1..47",
             "# tests 43",
             "# pass 39",
-            "# fail 5",
+            "# fail 4",
             "# skip 4",
             "# duration 430ms",
         ]),

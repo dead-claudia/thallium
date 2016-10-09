@@ -350,94 +350,7 @@ describe("reporter dot", function () {
             ]),
         })
 
-        var extra = (function () {
-            var e = new Error("extra")
-            var parts = []
-            var stack
-
-            e.name = ""
-            stack = Util.R.getStack(e).split(/\r?\n/g).slice(1)
-
-            parts.push("    " + c("fail", "- " + stack[0].trim()))
-
-            for (var i = 1; i < stack.length; i++) {
-                parts.push("      " + c("fail", stack[i].trim()))
-            }
-
-            return {
-                stack: stack.join(Util.R.newline()),
-                parts: parts,
-            }
-        })()
-
-        test("extra pass", {
-            input: [
-                n("start", []),
-                n("enter", [p("test", 0)]),
-                n("enter", [p("test", 0), p("inner", 0)]),
-                n("pass", [p("test", 0), p("inner", 0), p("fail", 0)]),
-                n("leave", [p("test", 0), p("inner", 0)]),
-                n("extra", [p("test", 0), p("inner", 0), p("fail", 0)],
-                    Util.extra(2, undefined, extra.stack)),
-                n("extra", [p("test", 0), p("inner", 0), p("fail", 0)],
-                    Util.extra(3, sentinel, extra.stack)),
-                n("leave", [p("test", 0)]),
-                n("end", []),
-            ],
-            output: [].concat([
-                "",
-                "  " + pass + pass + pass,
-                "",
-                c("bright pass", "  ") + c("green", "3 passing") + time("30ms"),
-                c("bright fail", "  ") + c("fail", "1 failing"),
-                "",
-                "  " + c("plain", "1) test inner fail: (extra)"),
-                "    " + c("fail", "- value: undefined"),
-            ], extra.parts, [
-                "",
-                "  " + c("plain", "2) test inner fail: (extra)"),
-                "    " + c("fail", "- value: [Error: sentinel]"),
-            ], extra.parts, [
-                "",
-            ]),
-        })
-
         var badType = new TypeError("undefined is not a function")
-
-        test("extra fail", {
-            input: [
-                n("start", []),
-                n("enter", [p("test", 0)]),
-                n("enter", [p("test", 0), p("inner", 0)]),
-                n("fail", [p("test", 0), p("inner", 0), p("fail", 0)], badType),
-                n("leave", [p("test", 0), p("inner", 0)]),
-                n("extra", [p("test", 0), p("inner", 0), p("fail", 0)],
-                    Util.extra(2, undefined, extra.stack)),
-                n("extra", [p("test", 0), p("inner", 0), p("fail", 0)],
-                    Util.extra(3, sentinel, extra.stack)),
-                n("leave", [p("test", 0)]),
-                n("end", []),
-            ],
-            output: [].concat([
-                "",
-                "  " + pass + pass + fail,
-                "",
-                c("bright pass", "  ") + c("green", "2 passing") + time("30ms"),
-                c("bright fail", "  ") + c("fail", "1 failing"),
-                "",
-                "  " + c("plain", "1) test inner fail:"),
-            ], stack(badType), [
-                "",
-                "  " + c("plain", "2) test inner fail: (extra)"),
-                "    " + c("fail", "- value: undefined"),
-            ], extra.parts, [
-                "",
-                "  " + c("plain", "3) test inner fail: (extra)"),
-                "    " + c("fail", "- value: [Error: sentinel]"),
-            ], extra.parts, [
-                "",
-            ]),
-        })
 
         test("internal errors", {
             input: [
@@ -609,8 +522,6 @@ describe("reporter dot", function () {
                 n("pass", [p("core (timeouts)", 2), p("succeeds with inherited", 2)]),
                 n("pass", [p("core (timeouts)", 2), p("fails with inherited", 3)]),
                 n("pass", [p("core (timeouts)", 2), p("gets own set timeout", 4)]),
-                n("extra", [p("core (timeouts)", 2), p("fails with own", 1)],
-                    Util.extra(2, badType, extra.stack)),
                 n("fail", [p("core (timeouts)", 2), p("gets own inline set timeout", 5)], sentinel),
                 n("skip", [p("core (timeouts)", 2), p("gets own sync inner timeout", 6)]),
                 n("pass", [p("core (timeouts)", 2), p("gets default timeout", 7)]),
@@ -651,7 +562,7 @@ describe("reporter dot", function () {
                 "",
                 c("bright pass", "  ") + c("green", "39 passing") + time("430ms"),
                 c("skip", "  4 skipped"),
-                c("bright fail", "  ") + c("fail", "5 failing"),
+                c("bright fail", "  ") + c("fail", "4 failing"),
                 "",
                 "  " + c("plain", "1) core (basic) returns a prototypal clone when not given a callback:"),
             ], stack(badType), [
@@ -662,11 +573,7 @@ describe("reporter dot", function () {
                 "  " + c("plain", "3) cli normalize glob relative directory retains negative + trailing slashes:"),
             ], stack(badType), [
                 "",
-                "  " + c("plain", "4) core (timeouts) fails with own: (extra)"),
-                "    " + c("fail", "- value: [TypeError: undefined is not a function]"),
-            ], extra.parts, [
-                "",
-                "  " + c("plain", "5) core (timeouts) gets own inline set timeout:"),
+                "  " + c("plain", "4) core (timeouts) gets own inline set timeout:"),
             ], stack(sentinel), [
                 "",
             ]),

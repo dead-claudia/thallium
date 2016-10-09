@@ -14,11 +14,11 @@
 //
 // Inside a test:
 //
-//    Test index     Subtest index             Value
-//  Type  |  Test name     |   Subtest name      |
-//   |    |      |         |        |            |
-//  \|/  \|/    \|/       \|/      \|/          \|/
-// extra [0: test name] > [1: subtest name] = "value"
+//   Test index     Subtest index             Value
+// Type  |  Test name     |   Subtest name      |
+//  |    |      |         |        |            |
+// \|/  \|/    \|/       \|/      \|/          \|/
+// fail [0: test name] > [1: subtest name] = "value"
 
 function fix(value) {
     if (typeof value === "string") return JSON.stringify(value)

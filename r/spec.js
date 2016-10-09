@@ -80,7 +80,6 @@ module.exports = R.on({
             })
         }
 
-        if (ev.extra()) return r.pushError(ev, true)
         if (ev.end()) return r.printResults()
         if (ev.error()) return r.printError(ev)
         return undefined

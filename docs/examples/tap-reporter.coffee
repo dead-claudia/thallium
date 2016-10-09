@@ -92,13 +92,6 @@ module.exports = (ev) ->
             _.skip++
             template ev, 'ok %c # skip %p'
 
-        when ev.extra()
-            template ev, 'not ok %c %p # extra'
-            console.log '  ---'
-            printRaw 'count', inspect(ev.value.count)
-            printRaw 'value', inspect(ev.value.value)
-            console.log '  ...'
-
         when ev.end()
             console.log "1..#{_.counter}"
             console.log "# tests #{_.tests}"

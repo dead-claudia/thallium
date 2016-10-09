@@ -13,7 +13,6 @@ describe("cli runner", function () {
         var map = {
             fail: new Error("fail"),
             error: new Error("fail"),
-            extra: Util.extra(2, new Error("fail"), ""),
         }
 
         function execute(reporter, type) {
@@ -32,7 +31,7 @@ describe("cli runner", function () {
             })
         })
 
-        ;["fail", "extra", "error"].forEach(function (type) {
+        ;["fail", "error"].forEach(function (type) {
             it("does trigger for \"" + type + "\" events", function () {
                 var state = {fail: false}
                 var reporter = Run.exitReporter(state)

@@ -28,12 +28,10 @@ module.exports = R.on({
         if (ev.enter() || ev.pass()) {
             return printDot(r, R.speed(ev))
         } else if (ev.fail()) {
-            r.pushError(ev, false)
+            r.pushError(ev)
             return printDot(r, "fail")
         } else if (ev.skip()) {
             return printDot(r, "skip")
-        } else if (ev.extra()) {
-            return r.pushError(ev, true)
         } else if (ev.end()) {
             return r.print().then(function () { return r.printResults() })
         } else if (ev.error()) {

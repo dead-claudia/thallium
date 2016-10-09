@@ -131,7 +131,6 @@ describe("cli end-to-end (FLAKE)", /** @this */ function () {
         "pass [0: core (basic)] > [2: run()] > [0: exists] = undefined",
         "pass [0: core (basic)] > [2: run()] > [1: runs block tests within tests] = undefined",
         "pass [0: core (basic)] > [2: run()] > [2: runs successful inline tests within tests] = undefined",
-        "pass [0: core (basic)] > [2: run()] > [3: accepts a callback] = undefined",
         "leave [0: core (basic)] > [2: run()] = undefined",
         "leave [0: core (basic)] = undefined",
         "enter [1: cli common] = undefined",

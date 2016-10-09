@@ -90,12 +90,6 @@ module.exports = R.on({
             .then(function () { return r.print("  ...") })
         } else if (ev.skip()) {
             return template(r, ev, "ok %c # skip %p")
-        } else if (ev.extra()) {
-            return template(r, ev, "not ok %c %p # extra")
-            .then(function () { return r.print("  ---") })
-            .then(function () { return printValue(r, "count", ev.value.count) })
-            .then(function () { return printValue(r, "value", ev.value.value) })
-            .then(function () { return r.print("  ...") })
         } else if (ev.end()) {
             var p = r.print("1.." + r.state.counter)
             .then(function () { return r.print("# tests " + r.tests) })

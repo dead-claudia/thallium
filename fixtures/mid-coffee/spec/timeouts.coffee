@@ -7,7 +7,6 @@ is trying to represent more real-world usage.
 
 t = require 'thallium'
 assert = require 'thallium/assert'
-{Report, Location, toReportType} = require '../../../lib/tests.js'
 
 # Note that this entire section may be flaky on slower machines. Thankfully,
 # these have been tested against a slower machine, so it should hopefully not

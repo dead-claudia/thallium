@@ -10,10 +10,12 @@
 
 var Common = require("./common.js")
 var methods = require("../lib/methods.js")
-var m = require("../lib/messages.js")
 var Promise = require("../lib/bluebird.js")
 
-var Flags = require("../lib/tests.js").Flags
+var Tests = require("../lib/tests.js")
+var Flags = Tests.Flags
+var Report = Tests.Report
+
 var assert = require("../assert.js")
 var AssertionError = assert.AssertionError
 var format = assert.format
@@ -25,11 +27,11 @@ var Reflect = new Thallium().reflect().constructor
  * `t.async` now only understands promises.                                  *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-var test = Thallium.prototype.async
+var async = Thallium.prototype.async
 
 function runAsync(callback, t, resolve, reject) {
     var resolved = false
-    var gen = callback.apply(t, t, function (err) {
+    var gen = callback.call(t, t, function (err) {
         if (resolved) return
         Common.warn("The second `done` argument of `t.async` is " +
             "deprecated. Return a promise instead.")
@@ -74,11 +76,16 @@ function runAsync(callback, t, resolve, reject) {
 
 methods(Thallium, {
     async: function (name, callback) {
-        return test.call(this, name, function (t) {
-            return new Promise(function (resolve, reject) {
-                return runAsync(callback, t, resolve, reject)
+        if (typeof callback !== "function") {
+            // Reuse the normal error handling.
+            return async.apply(this, arguments)
+        } else {
+            return async.call(this, name, function (t) {
+                return new Promise(function (resolve, reject) {
+                    return runAsync(callback, t, resolve, reject)
+                })
             })
-        })
+        }
     },
 })
 
@@ -86,22 +93,6 @@ methods(Thallium, {
  * `reflect.define`, `t.define`, `reflect.wrap`, and `reflect.add`, are all  *
  * removed.                                                                  *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-
-function checkInit(test) {
-    if (!(test.status & Flags.Init)) {
-        throw new ReferenceError(m("fail.checkInit"))
-    }
-}
-
-// This is literally run for most of the primary API, so it must be fast.
-function isSkipped(test) {
-    // Roots aren't skippable, so that must be checked as well.
-    return test.status & (
-        Flags.Root |
-        Flags.Skipped |
-        Flags.OnlyChild
-    ) === Flags.Skipped
-}
 
 function isLocked(method) {
     return method === "_" ||
@@ -131,8 +122,8 @@ function getEnumerableSymbols(keys, object) {
 
 // This handles name + func vs object with methods.
 function iterateSetter(test, name, func, iterator) {
-    checkInit(test)
-    if (isSkipped(test)) return
+    new Reflect(test).checkInit()
+    if (test.status & Flags.Skipped) return
 
     // Check both the name and function, so ES6 symbol polyfills (which use
     // objects since it's impossible to fully polyfill primitives) work.
@@ -203,8 +194,8 @@ function defineAssertion(test, name, func) {
     }
 
     return /** @this */ function () {
-        checkInit(this._)
-        if (!isSkipped(this._)) attempt.apply(this, arguments)
+        new Reflect(this._).checkInit()
+        if (!(this._.status & Flags.Skipped)) attempt.apply(this, arguments)
         return this
     }
 }
@@ -273,7 +264,7 @@ function addAssertion(test, name, func) {
     }
 
     return /** @this */ function () {
-        checkInit(this._)
+        new Reflect(this._).checkInit()
         var ret = apply.apply(this, arguments)
 
         return ret !== undefined ? ret : this
@@ -320,7 +311,6 @@ methods(Reflect, {
     do: Common.deprecate(
         "`reflect.do` was renamed to `reflect.try`, aliased `t.try`.",
         Reflect.prototype.try),
-    AssertionError: AssertionError,
     base: Common.deprecate(
         "`reflect.base` was renamed to `t.create`.",
         function () { return new Thallium() }),
@@ -366,3 +356,29 @@ methods(Thallium, {
 Common.hideDeprecation()
 require("../assertions.js")(require("../index.js"))
 Common.showDeprecation()
+
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ * `extra` events are no longer a thing.                                     *
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+methods(Report, {
+    extra: Common.deprecate(
+        "`extra` events no longer exist. You no longer need to handle them",
+        function () { return false }),
+})
+
+var createReport = Thallium.prototype.report
+
+methods(Thallium, {
+    report: function (type, path, value, duration, slow) { // eslint-disable-line
+        // Just throw an error here. It's way easier than working up all the
+        // magic to patch back in this report type, and constructing raw events
+        // is relatively rare, anyways.
+        if (type === "extra") {
+            throw new RangeError(
+                "`extra` events no longer exist. Please don't create them, " +
+                "and you may stop handling them")
+        }
+
+        return createReport.apply(this, arguments)
+    },
+})

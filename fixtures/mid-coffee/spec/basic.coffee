@@ -66,17 +66,3 @@ t.test 'core (basic)', ->
                 @test('foo').use ->
 
             tt.run().then -> assert.notOk err
-
-        @async 'accepts a callback', ->
-            tt = @create()
-            err = undefined
-
-            tt.reporter (res) ->
-                err = res.value if res.fail()
-                return
-
-            tt.test 'test', ->
-                @test('foo').use ->
-
-            Promise.fromCallback (cb) -> tt.run(cb)
-            .then -> assert.notOk err

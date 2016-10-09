@@ -84,23 +84,30 @@ describe("core (safety)", function () {
 
         tt.reporter(Util.push(ret))
 
-        var error = new ReferenceError(Util.m("fail.checkInit"))
+        // This is not exactly elegant...
+        var error = (function () {
+            var inner
+            var tt = t.create().test("test", function (tt) { inner = tt })
 
-        function plugin() {}
+            return tt.run().then(function () {
+                try { inner.reflect().checkInit() } catch (e) { return e }
+                return assert.fail("Expected an error to be thrown")
+            })
+        })()
 
         tt.test("one", function () { tt.test("hi") })
-        tt.test("two", function () { tt.try(plugin) })
-        tt.test("three", function () { tt.use(plugin) })
+        tt.test("two", function () { tt.try(function () {}) })
+        tt.test("three", function () { tt.use(function () {}) })
 
         tt.test("four", function (tt) {
-            tt.test("inner", function () { tt.use(plugin) })
+            tt.test("inner", function () { tt.use(function () {}) })
         })
 
         tt.test("five", function (tt) {
             tt.test("inner", function () { tt.reporter(function () {}) })
         })
 
-        return tt.run().then(function () {
+        return Util.Promise.join(error, tt.run(), function (error) {
             assert.match(ret, [
                 n("start", []),
                 n("fail", [p("one", 0)], error),

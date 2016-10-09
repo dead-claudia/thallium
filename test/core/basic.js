@@ -7,8 +7,6 @@
 // real-world usage.
 
 describe("core (basic)", function () {
-    var Promise = Util.Promise
-
     describe("create()", function () {
         it("exists", function () {
             assert.function(t.create)
@@ -90,22 +88,6 @@ describe("core (basic)", function () {
             })
 
             return tt.run().then(function () { assert.notOk(err) })
-        })
-
-        it("accepts a callback", function () {
-            var tt = t.create()
-            var err
-
-            tt.reporter(function (res) {
-                if (res.fail()) err = res.value
-            })
-
-            tt.test("test", function (tt) {
-                tt.test("foo").use(function () {})
-            })
-
-            return Promise.fromCallback(function (cb) { tt.run(cb) })
-            .then(function () { assert.notOk(err) })
         })
     })
 
@@ -218,8 +200,7 @@ describe("core (basic)", function () {
                 tt.test("test")
                 .try(spy)
 
-                return Promise.fromCallback(function (cb) { tt.run(cb) })
-                .then(function () {
+                return tt.run().then(function () {
                     assert.match(spy.this, [undefined])
                     assert.match(spy.args, [[]])
                 })
@@ -232,8 +213,7 @@ describe("core (basic)", function () {
                 tt.test("test")
                 .try(spy, {value: 1})
 
-                return Promise.fromCallback(function (cb) { tt.run(cb) })
-                .then(function () {
+                return tt.run().then(function () {
                     assert.match(spy.this, [undefined])
                     assert.match(spy.args, [[{value: 1}]])
                 })
@@ -246,8 +226,7 @@ describe("core (basic)", function () {
                 tt.test("test")
                 .try(spy, {value: 1}, {value: 2})
 
-                return Promise.fromCallback(function (cb) { tt.run(cb) })
-                .then(function () {
+                return tt.run().then(function () {
                     assert.match(spy.this, [undefined])
                     assert.match(spy.args, [[{value: 1}, {value: 2}]])
                 })
@@ -260,8 +239,7 @@ describe("core (basic)", function () {
                 tt.test("test")
                 .try(spy, {value: 1}, {value: 2}, {value: 3})
 
-                return Promise.fromCallback(function (cb) { tt.run(cb) })
-                .then(function () {
+                return tt.run().then(function () {
                     assert.match(spy.this, [undefined])
                     assert.match(spy.args, [
                         [{value: 1}, {value: 2}, {value: 3}],
@@ -276,8 +254,7 @@ describe("core (basic)", function () {
                 tt.test("test")
                 .try(spy, {value: 1}, {value: 2}, {value: 3}, {value: 4})
 
-                return Promise.fromCallback(function (cb) { tt.run(cb) })
-                .then(function () {
+                return tt.run().then(function () {
                     assert.match(spy.this, [undefined])
                     assert.match(spy.args, [
                         [{value: 1}, {value: 2}, {value: 3}, {value: 4}],

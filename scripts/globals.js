@@ -37,7 +37,6 @@ var Util = global.Util = {
     r: Thallium.r,
     n: reflect.report,
     p: reflect.loc,
-    extra: reflect.extra,
     Tests: Tests,
 
     /* eslint-disable global-require */
@@ -53,7 +52,6 @@ var Util = global.Util = {
         return global.setTimeout(func, duration)
     },
 
-    m: require("../lib/messages.js"),
     methods: require("../lib/methods.js"),
     R: require("../lib/reporter.js"),
     inspect: require("../lib/replaced/inspect.js"),

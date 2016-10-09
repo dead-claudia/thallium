@@ -236,19 +236,19 @@ describe("core (reflect)", function () {
         })
 
         it("checks roots", function () {
-            assert.equal(t.create().reflect().runnable(), false)
+            assert.equal(t.create().reflect().runnable(), true)
         })
 
         it("checks inline normal tests", function () {
             var tt = t.create()
 
-            assert.equal(tt.test("test").reflect().runnable(), false)
+            assert.equal(tt.test("test").reflect().runnable(), true)
         })
 
         it("checks inline skipped tests", function () {
             var tt = t.create()
 
-            assert.equal(tt.testSkip("test").reflect().runnable(), true)
+            assert.equal(tt.testSkip("test").reflect().runnable(), false)
         })
 
         it("checks block normal tests", function () {
@@ -260,7 +260,7 @@ describe("core (reflect)", function () {
             })
 
             return tt.run().then(function () {
-                assert.equal(runnable, false)
+                assert.equal(runnable, true)
             })
         })
 
@@ -281,14 +281,14 @@ describe("core (reflect)", function () {
             var tt = t.create()
 
             tt.only(["test"])
-            assert.equal(tt.test("test").reflect().runnable(), false)
+            assert.equal(tt.test("test").reflect().runnable(), true)
         })
 
         it("checks non-whitelisted `.only()` inline tests", function () {
             var tt = t.create()
 
             tt.only(["nope"])
-            assert.equal(tt.test("test").reflect().runnable(), true)
+            assert.equal(tt.test("test").reflect().runnable(), false)
         })
 
         it("checks whitelisted `.only()` block tests", function () {
@@ -302,7 +302,7 @@ describe("core (reflect)", function () {
             })
 
             return tt.run().then(function () {
-                assert.equal(runnable, false)
+                assert.equal(runnable, true)
             })
         })
 
@@ -416,131 +416,123 @@ describe("core (reflect)", function () {
 
     describe("report()", function () {
         var Report = Util.Tests.Report
-        var r = Util.Tests.toReportType
+        var Types = Util.Tests.Types
 
         it("correctly creates `start` reports", function () {
             var report = t.reflect().report("start", [], {value: "hello"})
-            var expected = new Report(r("start"), [], undefined, -1, 0)
+            var expected = new Report(Types.Start, [], undefined, -1, 0)
 
             assert.match(report, expected)
         })
 
         it("correctly creates `enter` reports", function () {
             var report = t.reflect().report("enter", [], {value: "hello"})
-            var expected = new Report(r("enter"), [], undefined, 10, 75)
+            var expected = new Report(Types.Enter, [], undefined, 10, 75)
 
             assert.match(report, expected)
         })
 
         it("correctly creates `enter` reports with duration", function () {
             var report = t.reflect().report("enter", [], {value: "hello"}, 20)
-            var expected = new Report(r("enter"), [], undefined, 20, 75)
+            var expected = new Report(Types.Enter, [], undefined, 20, 75)
 
             assert.match(report, expected)
         })
 
         it("correctly creates `enter` reports with slow", function () {
             var report = t.reflect().report("enter", [], {value: "hello"}, null, 10) // eslint-disable-line max-len
-            var expected = new Report(r("enter"), [], undefined, 10, 10)
+            var expected = new Report(Types.Enter, [], undefined, 10, 10)
 
             assert.match(report, expected)
         })
 
         it("correctly creates `enter` reports with duration + slow", function () { // eslint-disable-line max-len
             var report = t.reflect().report("enter", [], {value: "hello"}, null, 10) // eslint-disable-line max-len
-            var expected = new Report(r("enter"), [], undefined, 10, 10)
+            var expected = new Report(Types.Enter, [], undefined, 10, 10)
 
             assert.match(report, expected)
         })
 
         it("correctly creates `leave` reports", function () {
             var report = t.reflect().report("leave", [], {value: "hello"})
-            var expected = new Report(r("leave"), [], undefined, -1, 0)
+            var expected = new Report(Types.Leave, [], undefined, -1, 0)
 
             assert.match(report, expected)
         })
 
         it("correctly creates `pass` reports", function () {
             var report = t.reflect().report("pass", [], {value: "hello"})
-            var expected = new Report(r("pass"), [], undefined, 10, 75)
+            var expected = new Report(Types.Pass, [], undefined, 10, 75)
 
             assert.match(report, expected)
         })
 
         it("correctly creates `pass` reports with duration", function () {
             var report = t.reflect().report("pass", [], {value: "hello"}, 20)
-            var expected = new Report(r("pass"), [], undefined, 20, 75)
+            var expected = new Report(Types.Pass, [], undefined, 20, 75)
 
             assert.match(report, expected)
         })
 
         it("correctly creates `pass` reports with slow", function () {
             var report = t.reflect().report("pass", [], {value: "hello"}, null, 10) // eslint-disable-line max-len
-            var expected = new Report(r("pass"), [], undefined, 10, 10)
+            var expected = new Report(Types.Pass, [], undefined, 10, 10)
 
             assert.match(report, expected)
         })
 
         it("correctly creates `pass` reports with duration + slow", function () { // eslint-disable-line max-len
             var report = t.reflect().report("pass", [], {value: "hello"}, null, 10) // eslint-disable-line max-len
-            var expected = new Report(r("pass"), [], undefined, 10, 10)
+            var expected = new Report(Types.Pass, [], undefined, 10, 10)
 
             assert.match(report, expected)
         })
 
         it("correctly creates `fail` reports", function () {
             var report = t.reflect().report("fail", [], {value: "hello"})
-            var expected = new Report(r("fail"), [], {value: "hello"}, 10, 75)
+            var expected = new Report(Types.Fail, [], {value: "hello"}, 10, 75)
 
             assert.match(report, expected)
         })
 
         it("correctly creates `fail` reports with duration", function () {
             var report = t.reflect().report("fail", [], {value: "hello"}, 20)
-            var expected = new Report(r("fail"), [], {value: "hello"}, 20, 75)
+            var expected = new Report(Types.Fail, [], {value: "hello"}, 20, 75)
 
             assert.match(report, expected)
         })
 
         it("correctly creates `fail` reports with slow", function () {
             var report = t.reflect().report("fail", [], {value: "hello"}, null, 10) // eslint-disable-line max-len
-            var expected = new Report(r("fail"), [], {value: "hello"}, 10, 10)
+            var expected = new Report(Types.Fail, [], {value: "hello"}, 10, 10)
 
             assert.match(report, expected)
         })
 
         it("correctly creates `fail` reports with duration + slow", function () { // eslint-disable-line max-len
             var report = t.reflect().report("fail", [], {value: "hello"}, null, 10) // eslint-disable-line max-len
-            var expected = new Report(r("fail"), [], {value: "hello"}, 10, 10)
+            var expected = new Report(Types.Fail, [], {value: "hello"}, 10, 10)
 
             assert.match(report, expected)
         })
 
         it("correctly creates `skip` reports", function () {
             var report = t.reflect().report("skip", [], {value: "hello"})
-            var expected = new Report(r("skip"), [], undefined, -1, 0)
+            var expected = new Report(Types.Skip, [], undefined, -1, 0)
 
             assert.match(report, expected)
         })
 
         it("correctly creates `end` reports", function () {
             var report = t.reflect().report("end", [], {value: "hello"})
-            var expected = new Report(r("end"), [], undefined, -1, 0)
+            var expected = new Report(Types.End, [], undefined, -1, 0)
 
             assert.match(report, expected)
         })
 
         it("correctly creates `error` reports", function () {
             var report = t.reflect().report("error", [], {value: "hello"})
-            var expected = new Report(r("error"), [], {value: "hello"}, -1, 0)
-
-            assert.match(report, expected)
-        })
-
-        it("correctly creates `extra` reports", function () {
-            var extra = t.reflect().extra(2, null, "")
-            var report = t.reflect().report("extra", [], extra)
-            var expected = new Report(r("extra"), [], extra, -1, 0)
+            var expected = new Report(Types.Error, [], {value: "hello"}, -1, 0)
 
             assert.match(report, expected)
         })
@@ -557,7 +549,6 @@ describe("core (reflect)", function () {
                 assert.equal(report.skip(), false)
                 assert.equal(report.end(), false)
                 assert.equal(report.error(), false)
-                assert.equal(report.extra(), false)
             })
 
             it("correctly identifies `enter` reports", function () {
@@ -571,7 +562,6 @@ describe("core (reflect)", function () {
                 assert.equal(report.skip(), false)
                 assert.equal(report.end(), false)
                 assert.equal(report.error(), false)
-                assert.equal(report.extra(), false)
             })
 
             it("correctly identifies `leave` reports", function () {
@@ -585,7 +575,6 @@ describe("core (reflect)", function () {
                 assert.equal(report.skip(), false)
                 assert.equal(report.end(), false)
                 assert.equal(report.error(), false)
-                assert.equal(report.extra(), false)
             })
 
             it("correctly identifies `pass` reports", function () {
@@ -599,7 +588,6 @@ describe("core (reflect)", function () {
                 assert.equal(report.skip(), false)
                 assert.equal(report.end(), false)
                 assert.equal(report.error(), false)
-                assert.equal(report.extra(), false)
             })
 
             it("correctly identifies `fail` reports", function () {
@@ -613,7 +601,6 @@ describe("core (reflect)", function () {
                 assert.equal(report.skip(), false)
                 assert.equal(report.end(), false)
                 assert.equal(report.error(), false)
-                assert.equal(report.extra(), false)
             })
 
             it("correctly identifies `skip` reports", function () {
@@ -627,7 +614,6 @@ describe("core (reflect)", function () {
                 assert.equal(report.skip(), true)
                 assert.equal(report.end(), false)
                 assert.equal(report.error(), false)
-                assert.equal(report.extra(), false)
             })
 
             it("correctly identifies `end` reports", function () {
@@ -641,7 +627,6 @@ describe("core (reflect)", function () {
                 assert.equal(report.skip(), false)
                 assert.equal(report.end(), true)
                 assert.equal(report.error(), false)
-                assert.equal(report.extra(), false)
             })
 
             it("correctly identifies `error` reports", function () {
@@ -655,23 +640,6 @@ describe("core (reflect)", function () {
                 assert.equal(report.skip(), false)
                 assert.equal(report.end(), false)
                 assert.equal(report.error(), true)
-                assert.equal(report.extra(), false)
-            })
-
-            it("correctly identifies `extra` reports", function () {
-                var reflect = t.reflect()
-                var report = reflect.report("extra", [],
-                    reflect.extra(2, null, ""))
-
-                assert.equal(report.start(), false)
-                assert.equal(report.enter(), false)
-                assert.equal(report.leave(), false)
-                assert.equal(report.pass(), false)
-                assert.equal(report.fail(), false)
-                assert.equal(report.skip(), false)
-                assert.equal(report.end(), false)
-                assert.equal(report.error(), false)
-                assert.equal(report.extra(), true)
             })
         })
 
@@ -722,14 +690,6 @@ describe("core (reflect)", function () {
                 var report = t.reflect().report("error", [])
 
                 assert.match(report.type(), "error")
-            })
-
-            it("returns correct value for `extra` reports", function () {
-                var reflect = t.reflect()
-                var report = reflect.report("extra", [],
-                    reflect.extra(2, null, ""))
-
-                assert.match(report.type(), "extra")
             })
         })
     })
