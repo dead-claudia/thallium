@@ -88,6 +88,52 @@ describe("core (reporters)", function () { // eslint-disable-line max-statements
             [plugin1, plugin2, plugin3, plugin4, plugin5])
     })
 
+    it("removed individually correctly", function () {
+        var tt = t.create()
+
+        function plugin() {}
+
+        tt.reporter(plugin)
+        tt.removeReporter(plugin)
+        assert.match(tt.reflect().reporters(), [])
+    })
+
+    it("removed in batches correctly", function () {
+        var tt = t.create()
+
+        function plugin1() {}
+        function plugin2() {}
+        function plugin3() {}
+        function plugin4() {}
+        function plugin5() {}
+
+        tt.reporter(plugin1, plugin2, plugin3, plugin4, plugin5)
+        tt.removeReporter(plugin1, plugin2, plugin4)
+        assert.match(tt.reflect().reporters(), [plugin3, plugin5])
+    })
+
+    it("removed on children correctly", function () {
+        var tt = t.create()
+
+        function plugin1() {}
+        function plugin2() {}
+        function plugin3() {}
+        function plugin4() {}
+        function plugin5() {}
+        function plugin6() {}
+
+        tt.reporter(plugin6)
+
+        var ttt = tt.test("test")
+        .reporter(plugin1, plugin2, plugin3, plugin4, plugin5)
+
+        ttt.removeReporter(plugin1, plugin2, plugin4)
+
+        assert.match(ttt.reflect().reporters(), [plugin3, plugin5])
+        assert.match(ttt.reflect().activeReporters(), [plugin3, plugin5])
+        assert.match(tt.reflect().reporters(), [plugin6])
+    })
+
     it("only added once", function () {
         var tt = t.create()
 

@@ -63,11 +63,11 @@ This list is in a very rough chronological order. If you want to complete any of
 1. ~~Create basic reporters for TAP, spec, and dot.~~ **Done!**
     - ~~Browser support~~ and a DOM reporter is planned as well.
 
-2. Finish documenting this project. This mostly includes the core assertions.
+2. ~~Allow reporters to be removed.~~ **Done!**
 
-3. Support flaky tests via first-class retries. This would be enormously useful for several, and it's an absolute requirement for this to self-host its runner.
+3. Finish documenting this project. This mostly includes the core assertions.
 
-4. Allow reporters to be removed, with an on-remove hook for the reporter in case external resources need reclaimed.
+4. Support flaky tests via first-class retries. This would be enormously useful for several, and it's an absolute requirement for this to self-host its runner.
 
 5. Yank `thallium/match` and `thallium/assert` out of core. They don't need to be coupled.
 
@@ -80,7 +80,6 @@ This list is in a very rough chronological order. If you want to complete any of
     - This will include more reporters as well.
 
 8. Write lots of blog posts.\*\* :smile:
-    - Why `before{,Each}` and friends aren't in core
     - Why this uses code *for* configuration, unlike nearly every other test framework out there.
 
 \* *That's something from Lisp-land I really wish was here...*
