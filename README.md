@@ -72,15 +72,17 @@ Do note that it isn't necessarily comprehensive, although I try to keep it somew
 6. ~~Remove `done` callback support for `t.async`, reporters, etc.~~
 7. ~~Allow reporters to be removed~~
 8. ~~Add default config~~
-9. Create before/after lifecycle hooks
-10. Rename `t.async` &rarr; `t.test`, deprecate old form
-11. Add a `.tl.opts` file to prepend CLI arguments (and way to disable it)
-12. Add `reflect.api()` to get current running test (not necessarily that of the backing instance)
-13. Add `t.call(plugin)`, where `plugin` accepts a `reflect` instance, and the whole thing returns the function's result, and deprecate `t.use(plugin)` and `t.reflect()` in favor of the above
-14. Add diff support to all existing reporters
-15. Add PhantomJS and OS X to the Travis build, and [AppVeyor](https://www.appveyor.com/) support for Windows testing
-16. Complete migration utility
-17. Update existing documentation
+9. Remove the `thallium` alias, rename `_thallium` &rarr; `_tl`, and rename the repo's binaries accordingly
+    - Only `tl` is actually documented
+10. Create before/after lifecycle hooks
+11. Rename `t.async` &rarr; `t.test`, deprecate old form
+12. Add a `.tl.opts` file to prepend CLI arguments (and way to disable it)
+13. Add `reflect.api()` to get current running test (not necessarily that of the backing instance)
+14. Add `t.call(plugin)`, where `plugin` accepts a `reflect` instance, and the whole thing returns the function's result, and deprecate `t.use(plugin)` and `t.reflect()` in favor of the above
+15. Add diff support to all existing reporters
+16. Add PhantomJS and OS X to the Travis build, and [AppVeyor](https://www.appveyor.com/) support for Windows testing
+17. Complete migration utility
+18. Update existing documentation
 
 **0.4:**
 
