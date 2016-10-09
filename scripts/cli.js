@@ -6,6 +6,7 @@ var path = require("path")
 var minimatch = require("minimatch")
 var interpret = require("interpret")
 var Promise = require("../lib/bluebird.js")
+var parse = require("../lib/cli/parse.js")
 var State = require("../lib/cli/run.js").State
 
 var hasOwn = Object.prototype.hasOwnProperty
@@ -317,17 +318,12 @@ exports.mock = function (tree) {
     }
 }
 
-exports.state = function (argv, util) {
-    return new State({cwd: util.cwd(), argv: argv, util: util})
-}
-
-exports.Loader = Loader
-function Loader(argv, util) {
-    if (typeof argv === "string") {
-        argv = argv.trim()
-        argv = argv ? argv.split(/\s+/g) : []
+exports.Loader = function (args, util) {
+    if (typeof args === "string") {
+        args = args.trim()
+        args = args ? args.split(/\s+/g) : []
     }
 
-    this.state = new State({cwd: util.cwd(), argv: argv, util: util})
+    this.state = new State(parse(args), util)
     this.load = util.load
 }

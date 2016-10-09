@@ -25,10 +25,7 @@
     "r",
     "docs"
   ],
-  "bin": {
-    "tl": "bin/tl.js",
-    "_tl": "bin/_tl.js"
-  },
+  "bin": {"tl": "bin/tl.js"},
   "keywords": [
     "test",
     "testing",

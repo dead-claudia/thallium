@@ -1,19 +1,24 @@
 "use strict"
 
 var path = require("path")
-var Args = require("../../lib/cli/args.js")
+var parse = require("../../lib/cli/parse.js")
 
-describe("cli arguments", function () {
-    var defaultCwd = "base"
-
+describe("cli args parsing", function () {
     function alias(description, str, opts) {
-        opts.cwd = opts.cwd || defaultCwd
-
         str = str.trim()
         it(description, function () {
-            var parsed = Args.parse(defaultCwd, str ? str.split(/\s+/g) : [])
+            var parsed = parse(str ? str.split(/\s+/g) : [])
 
-            assert.match(parsed, new Args.Args(opts))
+            if (opts.color == null) opts.color = undefined
+            if (opts.config == null) opts.config = undefined
+            if (opts.cwd == null) opts.cwd = undefined
+            if (opts.files == null) opts.files = []
+            if (opts.help == null) opts.help = undefined
+            if (opts.require == null) opts.require = []
+            if (opts.respawn == null) opts.respawn = true
+            if (opts.unknown == null) opts.unknown = []
+
+            assert.match(parsed, opts)
         })
     }
 
@@ -60,7 +65,9 @@ describe("cli arguments", function () {
             my + " -- --help",
             {files: [my, "--help"]})
 
-        it("ignores invalid options", "--why -AM -i --here", {})
+        it("tracks invalid long options", "--why -AM -i --here", {
+            unknown: ["why", "here"],
+        })
     })
 
     context("basic fail", function () {
@@ -69,7 +76,7 @@ describe("cli arguments", function () {
             var args = str ? str.split(/\s+/g) : []
 
             it("fails with missing argument for " + str, function () {
-                assert.throws(function () { Args.parse("base", args) }, Error)
+                assert.throws(function () { parse(args) }, Error)
             })
         }
 

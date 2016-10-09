@@ -2,6 +2,7 @@
 
 /* eslint max-nested-callbacks: [2, 5] */
 
+var parse = require("../../lib/cli/parse.js")
 var Run = require("../../lib/cli/run.js")
 var Cli = require("../../scripts/cli.js")
 
@@ -93,16 +94,14 @@ describe("cli runner", function () {
             if (tree["node_modules"] == null) tree["node_modules"] = {}
             tree["node_modules"].thallium = function () { return tt }
 
-            var util = Cli.mock(tree)
-            var cwd = opts.cwd != null ? opts.cwd : util.cwd()
-            var argv = opts.args
+            var args = opts.args
 
-            if (typeof argv === "string") {
-                argv = opts.args.trim()
-                argv = argv ? argv.split(/\s+/g) : []
+            if (typeof args === "string") {
+                args = opts.args.trim()
+                args = args ? args.split(/\s+/g) : []
             }
 
-            return Run.run({argv: argv, cwd: cwd, util: util})
+            return Run.run(parse(args), Cli.mock(tree))
         }
 
         it("runs valid tests in the root", function () {

@@ -213,7 +213,7 @@ console.error("Tracing FS calls...")
 if (require.main === module) {
     var moduleName = require.resolve((function () {
         switch (process.argv[2]) {
-        case "tl": return require.resolve("../bin/_tl.js")
+        case "tl": return require.resolve("../bin/tl.js")
         case "mocha": return require.resolve("mocha/bin/mocha")
         case undefined:
             console.error("Binary name required")

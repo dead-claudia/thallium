@@ -27,12 +27,12 @@ Options:
 -r [ext:module], --require [ext:module]
     Register an extension with that module (so Thallium knows it's a register
     hook). Usually you don't even need to register the extension yourself, but
-    if either the module or the language itself not listed in node-interpret,
-    you'll need to specify an extension. If you're using Babel, you can use
-    `.tl.babel.js` to the same effect.
+    it's there for things like running Babel with a different set of plugins
+    than what's specified in your `.babelrc`. Also, if you're either using a
+    language not understood by node-interpret, you'll need to use this.
 
-    Note: the preceding dot in `ext` is optional. Both `ext` and `.ext` mean the
-    same thing.
+    Note: you may add an optional preceding dot before `ext` (i.e. `.ext`), and
+    it's considered equivalent.
 
 --
     Stop parsing options past this point. Treat any further argument as a file.
@@ -44,6 +44,14 @@ Options:
 --no-color
     Force-disable terminal colors for core reporters, so that even if the
     terminal does support colors, only raw Unicode is printed.
+
+--no-color
+    Force-disable terminal colors for core reporters, so that even if the
+    terminal does support colors, only raw Unicode is printed.
+
+--respawn, --no-respawn
+    Allow or prevent respawning Node if there's unknown options. `--respawn` is
+    the default, so it only exists to override a previous `--no-respawn` flag.
 
 All options are optional, and all unknown options are passed directly to Node.
 If no file globs are given, `test/**/*.{extname of config found}` is used as the

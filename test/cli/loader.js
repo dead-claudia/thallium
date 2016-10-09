@@ -580,7 +580,9 @@ describe("cli loader", function () {
                     }
                 })
 
-                mock.chdir(loader.state.args.cwd)
+                if (loader.state.args.cwd != null) {
+                    mock.chdir(loader.state.args.cwd)
+                }
 
                 var modules = []
 

@@ -19,7 +19,9 @@ Options:
 
 -r [ext:module], --require [ext:module]
     Register an extension with that module (so Thallium knows it's a register
-    hook). Usually, you won't need to use this.
+    hook). Usually, you won't need to use this, but it's mainly for things like
+    running Babel with a different set of plugins than what's specified in your
+    `.babelrc`.
 
 --
     Stop parsing options.
@@ -31,6 +33,10 @@ Options:
 --no-color
     Force-disable terminal colors for core reporters, so that even if the
     terminal does support colors, only raw Unicode is printed.
+
+--respawn, --no-respawn
+    Allow or prevent respawning Node if there's unknown options. `--respawn` is
+    the default, so it only exists to override a previous `--no-respawn` flag.
 
 All unknown options are passed directly to Node. For more details on each
 option, run the following command:

@@ -72,7 +72,7 @@ Do note that it isn't necessarily comprehensive, although I try to keep it somew
 6. ~~Remove `done` callback support for `t.async`, reporters, etc.~~
 7. ~~Allow reporters to be removed~~
 8. ~~Add default config~~
-9. ~~Remove the `thallium` alias, rename `_thallium` &rarr; `_tl`, and rename the repo's binaries accordingly~~~
+9. ~~Remove the `thallium` and `_thallium` aliases, and rename the repo's binaries accordingly~~~
     - ~~Only `tl` is actually documented~~
 10. Alert the user if no files are found
 11. Create before/after lifecycle hooks
@@ -88,15 +88,16 @@ Do note that it isn't necessarily comprehensive, although I try to keep it somew
 **0.4:**
 
 1. Remove all the deprecated 0.2 crud
-2. Create DOM reporter
-3. Add some promise-aware assertions
-4. Document all the assertions
-5. Drop support for Node pre-4
-6. Support flaky tests via first-class retries
+2. Transition to TypeScript
+3. Create DOM reporter
+4. Add some promise-aware assertions
+5. Document all the assertions
+6. Drop support for Node pre-4
+7. Support flaky tests via first-class retries
     - This is a requirement to self-host the runner
-7. Trim off internal stack traces when sending errors to reporters
-8. Add file watching support
-9. Integrate with Istanbul
+8. Trim off internal stack traces when sending errors to reporters
+9. Add file watching support
+19. Integrate with Istanbul
 
 **0.5:**
 
