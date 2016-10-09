@@ -54,54 +54,78 @@ I will try to avoid breaking changes on patch updates, but it's not guaranteed, 
 
 ## Recent Updates
 
-See the [changelog](https://github.com/isiahmeadows/thallium/blob/master/CHANGELOG.md) for the most recent changes. It also contains some useful migration information for dealing with breaking changes.
+See the [changelog](https://github.com/isiahmeadows/thallium/blob/master/CHANGELOG.md) for the most recent published changes. It also contains some useful migration information for dealing with breaking changes.
 
 ## Roadmap
 
-This list is in a very rough chronological order. If you want to complete any of these yourself, feel free to send me a PR! :smile:
+This list is in a very rough chronological order, with whatever's done struck through. If you want to complete any of these yourself, feel free to send me a PR! :smile:
 
-1. ~~Create basic reporters for TAP, spec, and dot.~~ **Done!**
-    - ~~Browser support~~ and a DOM reporter is planned as well.
+Do note that it isn't necessarily comprehensive, although I try to keep it somewhat up to date.
 
-2. ~~Allow reporters to be removed.~~ **Done!**
+**0.3:**
 
-3. Finish documenting this project. This mostly includes the core assertions.
+1. ~~Expose matching algorithm~~
+2. ~~Separate assertions from test instance~~
+3. ~~Allow for arguments to be bound for `t.try` (was `reflect.do`)~~
+4. ~~Remove support for generators in `t.async` in favor of [`co`](https://www.npmjs.com/package/co), async functions, etc.~~
+5. ~~Make most of the CLI/reporter constants configurable~~
+6. ~~Remove `done` callback support for `t.async`, reporters, etc.~~
+7. ~~Allow reporters to be removed~~
+8. ~~Add default config~~
+9. Create before/after lifecycle hooks
+10. Rename `t.async` &rarr; `t.test`, deprecate old form
+11. Add a `.tl.opts` file to prepend CLI arguments (and way to disable it)
+12. Add `reflect.api()` to get current running test (not necessarily that of the backing instance)
+13. Add `t.call(plugin)`, where `plugin` accepts a `reflect` instance, and the whole thing returns the function's result, and deprecate `t.use(plugin)` and `t.reflect()` in favor of the above
+14. Add diff support to all existing reporters
+15. Add PhantomJS and OS X to the Travis build, and [AppVeyor](https://www.appveyor.com/) support for Windows testing
+16. Complete migration utility
+17. Update existing documentation
 
-4. Support flaky tests via first-class retries. This would be enormously useful for several, and it's an absolute requirement for this to self-host its runner.
+**0.4:**
 
-5. Yank `thallium/match` and `thallium/assert` out of core. They don't need to be coupled.
+1. Remove all the deprecated 0.2 crud
+2. Create DOM reporter
+3. Add some promise-aware assertions
+4. Document all the assertions
+5. Drop support for Node pre-4
+6. Support flaky tests via first-class retries
+    - This is a requirement to self-host the runner
+7. Trim off internal stack traces when sending errors to reporters
+8. Add file watching support
+9. Integrate with Istanbul
 
-5. Include lifecycle hooks for before/after tests, for resource management.
+**0.5:**
 
-6. Create a nice REPL driver for Node, in addition to the CLI.\*
-    - This will just be a module + sugar binary, so you can use it with any language.
+1. Move `thallium/match` and `thallium/assert` out of core
+2. Reimplement [`util-inspect`](https://www.npmjs.com/package/util-inspect) for browsers based on Node's current [`util.inspect`](https://nodejs.org/api/util.html#util_util_inspect_object_options), since that is completely untested and completely unaware of ES6. :worried:
+    - This will be published out of core
+3. Add support for running tests in parallel
 
-7. Write a few plugins/utilities for `describe`/`it` (likely trivial), `before{,Each}`/`after{,Each}` hooks, etc.
-    - This will include more reporters as well.
+**Later:**
 
-8. Write lots of blog posts.\*\* :smile:
-    - Why this uses code *for* configuration, unlike nearly every other test framework out there.
+Here's the nice-to-haves, and so these are in no particular order:
 
-\* *That's something from Lisp-land I really wish was here...*
+- Create a nice REPL driver for Node, in addition to the CLI.\*
+    - This will just be a module + sugar binary, so you can use it with any language
 
-Also, at some point, I'd like to do the following, in no particular order:
+- Write a few plugins/utilities for `describe`/`it` (likely trivial), etc
+    - This will include more reporters as well
 
-- Set up [AppVeyor](https://www.appveyor.com/) to run tests on Windows. Currently, it's only actively tested on Linux, although I do try to keep it as platform-independent as possible.
-
-- Test this in PhantomJS. It should work in its current state, but it's not tested.
-
-- Trim the stack traces on reported errors and offer that to others as well.
+- Write lots of blog posts. :smile:
+    - Why another testing framework
+    - Why this uses code *for* configuration
+    - Why this tries to infer so much (it's not as magical as it seems)
+    - Why such a high focus on flexibility
+    - etc.
 
 - Write an alternative matching algorithm to be based off of the ES2015 Iterable (`Symbol.iterator`)/etc. protocols from the core.
     - This may include the [proposed async iteration protocol](https://github.com/tc39/proposal-async-iteration#async-iterators-and-async-iterables) in the future.
 
-- Reimplement [`util-inspect`](https://www.npmjs.com/package/util-inspect) for browsers based on Node's current [`util.inspect`](https://nodejs.org/api/util.html#util_util_inspect_object_options), since that ponyfill module is completely untested and is unaware of ES6. :worried:
+- Use the patience diff for larger data sets, since it deals with those a little more readably, a plus for data-heavy integration/end-to-end tests (this repo has some of those)
+    - There doesn't appear to be a JS port yet, and algorithm documentation is scarce, so I'd have to write it myself, and it could be challenging.
 
-    - This'll end up out of core.
-
-- Use the patience diff for larger data sets, since it deals with those a little more readably, a plus for data-heavy integration/end-to-end tests (this repo has some of those), but there doesn't appear to be a JS port yet, and algorithm documentation is scarce.
-
-- Add file watching support for this.
+\* *That's something from Lisp-land I really wish was here...*
 
 ## Contributing
 
