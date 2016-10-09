@@ -2,7 +2,7 @@
 
 Did you run into issues? Great! Tell me [here](http://github.com/isiahmeadows/thallium/issues/new) and I'll see how I can help you.
 
-Do you want to contribute code? Keep reading below.
+Do you want to contribute code? First, I'd like to thank you in advance for your contribution. I'll take any help I can get.
 
 ## Process Overview
 
