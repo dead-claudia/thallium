@@ -32,8 +32,8 @@ target['test:node'] = ->
     exec 'mocha --colors'
 
 patterns = [
-    '{bin,fixtures,helpers,lib,r,scripts,test}/**/{.,}*.js',
-    '{bin,fixtures,helpers,lib,r,scripts,test}/**/{.,}*.coffee',
+    '{bin,fixtures,helpers,lib,r,scripts,test,migrate}/**/{.,}*.js',
+    '{bin,fixtures,helpers,lib,r,scripts,test,migrate}/**/{.,}*.coffee',
     '{.,}*.js'
     '{.,}*.coffee'
 ]
