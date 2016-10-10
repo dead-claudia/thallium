@@ -10,9 +10,9 @@ path = require 'path'
 Common = require '../../../lib/cli/common.js'
 assert = require 'thallium/assert'
 
-p = (str) -> str.replace /[\\\/]/g, path.sep
-
 t.test 'cli common', ->
+    p = path.normalize
+
     @test 'isObjectLike()', ->
         {isObjectLike} = Common
 
@@ -116,24 +116,21 @@ t.test 'cli common', ->
 
     @test 'normalizeGlob()', ->
         {normalizeGlob} = Common
+        format = (str) -> str.replace /[\\\/]/g, path.sep
 
         check = (name, base, {file, glob, dir, negate, negateDir}) =>
+            check1 = ([arg, expected]) ->
+                assert.equal(
+                    normalizeGlob format(arg), p(base)
+                    p(expected)
+                )
+
             @test name, ->
-                @test 'normalizes a file', ->
-                    assert.equal normalizeGlob(file[0], base), p(file[1])
-
-                @test 'normalizes a glob', ->
-                    assert.equal normalizeGlob(glob[0], base), p(glob[1])
-
-                @test 'retains trailing slashes', ->
-                    assert.equal normalizeGlob(dir[0], base), p(dir[1])
-
-                @test 'retains negative', ->
-                    assert.equal normalizeGlob(negate[0], base), p(negate[1])
-
-                @test 'retains negative + trailing slashes', ->
-                    assert.equal normalizeGlob(negateDir[0], base),
-                        p(negateDir[1])
+                @test 'normalizes a file', -> check1 file
+                @test 'normalizes a glob', -> check1 glob
+                @test 'retains trailing slashes', -> check1 dir
+                @test 'retains negative', -> check1 negate
+                @test 'retains negative + trailing slashes', -> check1 negateDir
 
         check 'current directory', '.',
             file: ['a', 'a']
@@ -168,65 +165,83 @@ t.test 'cli common', ->
                 assert.equal normalizeGlob('.', '..'), '..'
 
             @test 'normalizes directories with a cwd of `..`', ->
-                assert.equal normalizeGlob('foo/bar', '..'), '../foo/bar'
+                assert.equal(
+                    normalizeGlob format('foo/bar'), '..'
+                    p('../foo/bar')
+                )
 
             @test 'removes excess `.`', ->
-                assert.equal normalizeGlob('././././.', 'foo'), 'foo'
+                assert.equal(
+                    normalizeGlob format('././././.'), 'foo'
+                    'foo'
+                )
 
             @test 'removes excess `..`', ->
-                assert.equal normalizeGlob('foo/../bar/baz/..', 'dir'),
-                    'dir/bar'
+                assert.equal(
+                    normalizeGlob format('foo/../bar/baz/..'), 'dir'
+                    p('dir/bar')
+                )
 
             @test 'removes excess combined junk', ->
-                assert.equal normalizeGlob('foo/./bar/../baz/./what', '.'),
-                    'foo/baz/what'
+                assert.equal(
+                    normalizeGlob format('foo/./bar/../baz/./what'), '.'
+                    p('foo/baz/what')
+                )
 
     @test 'globParent()', ->
         gp = Common.globParent
 
         @test 'strips glob magic to return parent path', ->
-            assert.equal gp('path/to/*.js'), 'path/to'
-            assert.equal gp('/root/path/to/*.js'), '/root/path/to'
-            assert.equal gp('/*.js'), '/'
-            assert.equal gp('*.js'), '.'
-            assert.equal gp('**/*.js'), '.'
-            assert.equal gp('path/{to,from}'), 'path'
-            assert.equal gp('path/!(to|from)'), 'path'
-            assert.equal gp('path/?(to|from)'), 'path'
-            assert.equal gp('path/+(to|from)'), 'path'
-            assert.equal gp('path/*(to|from)'), 'path'
-            assert.equal gp('path/@(to|from)'), 'path'
-            assert.equal gp('path/**/*'), 'path'
-            assert.equal gp('path/**/subdir/foo.*'), 'path'
+            assert.equal gp(p('path/to/*.js')), p('path/to')
+            assert.equal gp(p('/root/path/to/*.js')), p('/root/path/to')
+            assert.equal gp(p('/*.js')), p('/')
+            assert.equal gp(p('*.js')), '.'
+            assert.equal gp(p('**/*.js')), '.'
+            assert.equal gp(p('path/{to,from}')), 'path'
+            assert.equal gp(p('path/!(to|from)')), 'path'
+            assert.equal gp(p('path/?(to|from)')), 'path'
+            assert.equal gp(p('path/+(to|from)')), 'path'
+            assert.equal gp(p('path/*(to|from)')), 'path'
+            assert.equal gp(p('path/@(to|from)')), 'path'
+            assert.equal gp(p('path/**/*')), 'path'
+            assert.equal gp(p('path/**/subdir/foo.*')), 'path'
 
         @test 'returns glob itself from non-glob paths', ->
-            assert.equal gp('path/foo/bar.js'), 'path/foo/bar.js'
-            assert.equal gp('path/foo/'), 'path/foo'
-            assert.equal gp('path/foo'), 'path/foo'
+            assert.equal gp(p('path/foo/bar.js')), p('path/foo/bar.js')
+            assert.equal gp(p('path/foo/')), p('path/foo')
+            assert.equal gp(p('path/foo')), p('path/foo')
 
         @test 'gets a base name', ->
-            assert.equal gp('js/*.js'), 'js'
+            assert.equal gp(p('js/*.js')), 'js'
 
         @test 'gets a base name from a nested glob', ->
-            assert.equal gp('js/**/test/*.js'), 'js'
+            assert.equal gp(p('js/**/test/*.js')), 'js'
 
         @test 'gets a base name from a flat file', ->
-            assert.equal gp('js/test/wow.js'), 'js/test/wow.js'
+            assert.equal gp(p('js/test/wow.js')), p('js/test/wow.js')
 
         @test 'gets a base name from character class pattern', ->
-            assert.equal gp('js/t[a-z]st}/*.js'), 'js'
+            assert.equal gp(p('js/t[a-z]st}/*.js')), 'js'
 
         @test 'gets a base name from brace , expansion', ->
-            assert.equal gp('js/{src,test}/*.js'), 'js'
+            assert.equal gp(p('js/{src,test}/*.js')), 'js'
 
         @test 'gets a base name from brace .. expansion', ->
-            assert.equal gp('js/test{0..9}/*.js'), 'js'
+            assert.equal gp(p('js/test{0..9}/*.js')), 'js'
 
         @test 'gets a base name from extglob', ->
-            assert.equal gp('js/t+(wo|est)/*.js'), 'js'
+            assert.equal gp(p('js/t+(wo|est)/*.js')), 'js'
 
         @test 'gets a base name from a complex brace glob', ->
-            assert.equal gp('lib/{components,pages}/**/{test,another}/*.txt'),
+            assert.equal(
+                gp p('lib/{components,pages}/**/{test,another}/*.txt')
                 'lib'
-            assert.equal gp('js/test/**/{images,components}/*.js'), 'js/test'
-            assert.equal gp('ooga/{booga,sooga}/**/dooga/{eooga,fooga}'), 'ooga'
+            )
+            assert.equal(
+                gp p('js/test/**/{images,components}/*.js')
+                p('js/test')
+            )
+            assert.equal(
+                gp p('ooga/{booga,sooga}/**/dooga/{eooga,fooga}')
+                'ooga'
+            )
