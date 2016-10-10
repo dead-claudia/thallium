@@ -19,10 +19,12 @@ function template(r, ev, tmpl, skip) {
 }
 
 function printLines(r, value, skipFirst) {
-    var lines = value.replace(/^/gm, "    ").split(/\r?\n/g)
+    var lines = value.split(/\r?\n/g)
 
-    if (skipFirst) lines = lines.slice(1)
-    return Promise.each(lines, function (line) { return r.print(line) })
+    if (skipFirst) lines.shift()
+    return Promise.each(lines, function (line) {
+        return r.print("    " + line)
+    })
 }
 
 function printRaw(r, key, str) {

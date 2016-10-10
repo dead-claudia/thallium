@@ -9,9 +9,7 @@ var path = require("path")
 var Common = require("../../lib/cli/common.js")
 
 describe("cli common", function () {
-    function p(str) {
-        return str.replace(/[\\\/]/g, path.sep)
-    }
+    var p = path.normalize
 
     describe("isObjectLike()", function () {
         var isObjectLike = Common.isObjectLike
@@ -145,37 +143,25 @@ describe("cli common", function () {
     describe("normalizeGlob()", function () {
         var normalizeGlob = Common.normalizeGlob
 
+        function format(str) {
+            return str.replace(/[\\\/]/g, path.sep)
+        }
+
         function test(name, base, res) {
+            function check(name, pair) {
+                it(name, function () {
+                    assert.equal(
+                        normalizeGlob(format(pair[0]), p(base)),
+                        p(pair[1]))
+                })
+            }
+
             context(name, function () {
-                it("normalizes a file", function () {
-                    assert.equal(
-                        normalizeGlob(res.file[0], base),
-                        p(res.file[1]))
-                })
-
-                it("normalizes a glob", function () {
-                    assert.equal(
-                        normalizeGlob(res.glob[0], base),
-                        p(res.glob[1]))
-                })
-
-                it("retains trailing slashes", function () {
-                    assert.equal(
-                        normalizeGlob(res.slash[0], base),
-                        p(res.slash[1]))
-                })
-
-                it("retains negative", function () {
-                    assert.equal(
-                        normalizeGlob(res.negate[0], base),
-                        p(res.negate[1]))
-                })
-
-                it("retains negative + trailing slashes", function () {
-                    assert.equal(
-                        normalizeGlob(res.negateSlash[0], base),
-                        p(res.negateSlash[1]))
-                })
+                check("normalizes a file", res.file)
+                check("normalizes a glob", res.glob)
+                check("retains trailing slashes", res.slash)
+                check("retains negative", res.negate)
+                check("retains negative + trailing slashes", res.negateSlash)
             })
         }
 
@@ -218,23 +204,25 @@ describe("cli common", function () {
             })
 
             it("normalizes directories with a cwd of `..`", function () {
-                assert.equal(normalizeGlob("foo/bar", ".."), "../foo/bar")
+                assert.equal(
+                    normalizeGlob(format("foo/bar"), ".."),
+                    p("../foo/bar"))
             })
 
             it("removes excess `.`", function () {
-                assert.equal(normalizeGlob("././././.", "foo"), "foo")
+                assert.equal(normalizeGlob(format("././././."), "foo"), "foo")
             })
 
             it("removes excess `..`", function () {
                 assert.equal(
-                    normalizeGlob("foo/../bar/baz/..", "dir"),
-                    "dir/bar")
+                    normalizeGlob(format("foo/../bar/baz/.."), "dir"),
+                    p("dir/bar"))
             })
 
             it("removes excess combined junk", function () {
                 assert.equal(
-                    normalizeGlob("foo/./bar/../baz/./what", "."),
-                    "foo/baz/what")
+                    normalizeGlob(format("foo/./bar/../baz/./what"), "."),
+                    p("foo/baz/what"))
             })
         })
     })
@@ -243,66 +231,66 @@ describe("cli common", function () {
         var gp = Common.globParent
 
         it("strips glob magic to return parent path", function () {
-            assert.equal(gp("path/to/*.js"), "path/to")
-            assert.equal(gp("/root/path/to/*.js"), "/root/path/to")
-            assert.equal(gp("/*.js"), "/")
-            assert.equal(gp("*.js"), ".")
-            assert.equal(gp("**/*.js"), ".")
-            assert.equal(gp("path/{to,from}"), "path")
-            assert.equal(gp("path/!(to|from)"), "path")
-            assert.equal(gp("path/?(to|from)"), "path")
-            assert.equal(gp("path/+(to|from)"), "path")
-            assert.equal(gp("path/*(to|from)"), "path")
-            assert.equal(gp("path/@(to|from)"), "path")
-            assert.equal(gp("path/**/*"), "path")
-            assert.equal(gp("path/**/subdir/foo.*"), "path")
+            assert.equal(gp(p("path/to/*.js")), p("path/to"))
+            assert.equal(gp(p("/root/path/to/*.js")), p("/root/path/to"))
+            assert.equal(gp(p("/*.js")), p("/"))
+            assert.equal(gp(p("*.js")), ".")
+            assert.equal(gp(p("**/*.js")), ".")
+            assert.equal(gp(p("path/{to,from}")), "path")
+            assert.equal(gp(p("path/!(to|from)")), "path")
+            assert.equal(gp(p("path/?(to|from)")), "path")
+            assert.equal(gp(p("path/+(to|from)")), "path")
+            assert.equal(gp(p("path/*(to|from)")), "path")
+            assert.equal(gp(p("path/@(to|from)")), "path")
+            assert.equal(gp(p("path/**/*")), "path")
+            assert.equal(gp(p("path/**/subdir/foo.*")), "path")
         })
 
         it("returns parent dirname from non-glob paths", function () {
-            assert.equal(gp("path/foo/bar.js"), "path/foo/bar.js")
-            assert.equal(gp("path/foo/"), "path/foo")
-            assert.equal(gp("path/foo"), "path/foo")
+            assert.equal(gp(p("path/foo/bar.js")), p("path/foo/bar.js"))
+            assert.equal(gp(p("path/foo/")), p("path/foo"))
+            assert.equal(gp(p("path/foo")), p("path/foo"))
         })
 
         it("gets a base name", function () {
-            assert.equal(gp("js/*.js"), "js")
+            assert.equal(gp(p("js/*.js")), "js")
         })
 
         it("gets a base name from a nested glob", function () {
-            assert.equal(gp("js/**/test/*.js"), "js")
+            assert.equal(gp(p("js/**/test/*.js")), "js")
         })
 
         it("gets a base name from a flat file", function () {
-            assert.equal(gp("js/test/wow.js"), "js/test/wow.js")
+            assert.equal(gp(p("js/test/wow.js")), p("js/test/wow.js"))
         })
 
         it("gets a base name from character class pattern", function () {
-            assert.equal(gp("js/t[a-z]st}/*.js"), "js")
+            assert.equal(gp(p("js/t[a-z]st}/*.js")), "js")
         })
 
         it("gets a base name from brace , expansion", function () {
-            assert.equal(gp("js/{src,test}/*.js"), "js")
+            assert.equal(gp(p("js/{src,test}/*.js")), "js")
         })
 
         it("gets a base name from brace .. expansion", function () {
-            assert.equal(gp("js/test{0..9}/*.js"), "js")
+            assert.equal(gp(p("js/test{0..9}/*.js")), "js")
         })
 
         it("gets a base name from extglob", function () {
-            assert.equal(gp("js/t+(wo|est)/*.js"), "js")
+            assert.equal(gp(p("js/t+(wo|est)/*.js")), "js")
         })
 
         it("gets a base name from a complex brace glob", function () {
             assert.equal(
-                gp("lib/{components,pages}/**/{test,another}/*.txt"),
+                gp(p("lib/{components,pages}/**/{test,another}/*.txt")),
                 "lib")
 
             assert.equal(
-                gp("js/test/**/{images,components}/*.js"),
-                "js/test")
+                gp(p("js/test/**/{images,components}/*.js")),
+                p("js/test"))
 
             assert.equal(
-                gp("ooga/{booga,sooga}/**/dooga/{eooga,fooga}"),
+                gp(p("ooga/{booga,sooga}/**/dooga/{eooga,fooga}")),
                 "ooga")
         })
     })
@@ -371,7 +359,7 @@ describe("cli common", function () {
         context("default", function () {
             it("merges an empty object", function () {
                 var thallium = {thallium: true}
-                var files = ["custom/**"]
+                var files = [p("custom/**")]
 
                 return merge(files, {}, load({thallium: thallium}), true)
                 .then(function (config) {
@@ -382,7 +370,7 @@ describe("cli common", function () {
 
             it("merges `thallium`", function () {
                 var thallium = {thallium: true}
-                var files = ["custom/**"]
+                var files = [p("custom/**")]
 
                 return merge(files, {thallium: thallium}, load({}), true)
                 .then(function (config) {
@@ -393,8 +381,8 @@ describe("cli common", function () {
 
             it("merges `files`", function () {
                 var thallium = {thallium: true}
-                var files = ["custom/**"]
-                var extra = ["other/**"]
+                var files = [p("custom/**")]
+                var extra = [p("other/**")]
 
                 return merge(
                     files,
@@ -409,8 +397,8 @@ describe("cli common", function () {
 
             it("merges everything", function () {
                 var thallium = {thallium: true}
-                var files = ["custom/**"]
-                var extra = ["other/**"]
+                var files = [p("custom/**")]
+                var extra = [p("other/**")]
 
                 return merge(
                     files,
@@ -427,7 +415,7 @@ describe("cli common", function () {
         context("with args", function () {
             it("merges an empty object", function () {
                 var thallium = {thallium: true}
-                var files = ["custom/**"]
+                var files = [p("custom/**")]
 
                 return merge(files, {}, load({thallium: thallium}))
                 .then(function (config) {
@@ -438,7 +426,7 @@ describe("cli common", function () {
 
             it("merges `thallium`", function () {
                 var thallium = {thallium: true}
-                var files = ["custom/**"]
+                var files = [p("custom/**")]
 
                 return merge(files, {thallium: thallium}, load({}))
                 .then(function (config) {
@@ -449,8 +437,8 @@ describe("cli common", function () {
 
             it("merges `files`", function () {
                 var thallium = {thallium: true}
-                var files = ["custom/**"]
-                var extra = ["other/**"]
+                var files = [p("custom/**")]
+                var extra = [p("other/**")]
 
                 return merge(files, {files: extra}, load({thallium: thallium}))
                 .then(function (config) {
@@ -461,8 +449,8 @@ describe("cli common", function () {
 
             it("merges everything", function () {
                 var thallium = {thallium: true}
-                var files = ["custom/**"]
-                var extra = ["other/**"]
+                var files = [p("custom/**")]
+                var extra = [p("other/**")]
 
                 return merge(
                     files,

@@ -20,14 +20,14 @@ describe("reporter tap", function () { // eslint-disable-line max-statements
     })
 
     function stack(err) {
-        var stack = Util.R.getStack(err)
+        var stack = Util.R.getStack(err).split(/\r?\n/g)
 
         if (err.name === "AssertionError") {
-            stack = stack.replace(/^.*?\r?\n/, "")
+            stack = stack.slice(1)
         }
 
-        return ["  stack: |-"]
-            .concat(stack.replace(/^/gm, "    ").split(/\r?\n/g))
+        return ["  stack: |-"].concat(
+            stack.map(function (line) { return "    " + line }))
     }
 
     function test(name, opts) {
