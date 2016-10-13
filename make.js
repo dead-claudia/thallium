@@ -58,7 +58,7 @@ function watch(task) {
 
     function execute() {
         for (var i = 0; i < queue.length; i++) {
-            console.error(queue[i].event, queue[i].error)
+            console.error(queue[i].event, queue[i].path)
         }
 
         queue = []
