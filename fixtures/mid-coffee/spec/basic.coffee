@@ -13,11 +13,81 @@ t.test 'core (basic)', ->
     @test 'reflect()', ->
         @test('exists').try assert.function, @reflect
 
-        @test 'has parent()', ->
+        @test 'parent()', ->
+            @test 'works on the root instance', ->
+                tt = @create()
+                assert.equal tt.reflect().parent(), undefined
+
+            @test 'works on children', ->
+                tt = @create()
+                assert.equal tt.test('test').reflect().parent(), tt
+
+        @test 'count()', ->
+            tt = @create()
+            reflect = tt.reflect()
+
+            @test('works with 0 tests').try assert.equal, reflect.count(), 0
+            tt.test('test')
+            @test('works with 1 test').try assert.equal, reflect.count(), 1
+            tt.test('test')
+            @test('works with 2 tests').try assert.equal, reflect.count(), 2
+            tt.test('test')
+            @test('works with 3 tests').try assert.equal, reflect.count(), 3
+
+            # Test this test itself
+            count = @reflect().count()
+            @test('works with itself').try assert.equal, count, 4
+
+        @test 'name()', ->
             tt = @create()
 
-            assert.equal tt.reflect().parent(), undefined
-            assert.equal tt.test('test').reflect().parent(), tt
+            @test 'works with the root test', ->
+                assert.equal tt.reflect().name(), undefined
+
+            @test 'works with child tests', ->
+                assert.equal tt.test('test').reflect().name(), 'test'
+
+            @test 'works with itself', ->
+                assert.equal @reflect().name(), 'works with itself'
+
+        @test 'index()', ->
+            tt = @create()
+
+            @test 'works with the root test', ->
+                assert.equal tt.reflect().index(), -1
+
+            first = tt.test('test')
+            @test 'works with the first child test', ->
+                assert.equal first.reflect().index(), 0
+
+            second = tt.test('test')
+            @test 'works with the second child test', ->
+                assert.equal second.reflect().index(), 1
+
+            @test 'works with itself', ->
+                assert.equal @reflect().index(), 3
+
+        @test 'children()', ->
+            @test 'works with 0 tests', ->
+                tt = t.create()
+                assert.match tt.reflect().children(), []
+
+            @test 'works with 1 test', ->
+                tt = @create()
+                test = tt.test('test').reflect()
+                assert.match tt.reflect().children(), [test]
+
+            @test 'works with 2 tests', ->
+                tt = @create()
+                first = tt.test('first').reflect()
+                second = tt.test('second').reflect()
+                assert.match tt.reflect().children(), [first, second]
+
+            @test 'returns a copy', ->
+                tt = @create()
+                slice = tt.reflect().children()
+                tt.test('test')
+                assert.match slice, []
 
     @test 'test()', ->
         @test('exists').try assert.function, @create().test
