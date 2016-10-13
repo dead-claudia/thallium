@@ -64,7 +64,7 @@ function watch(task) {
         queue = []
         active = true
 
-        exec("ndoe make " + task, function () {
+        exec("node make " + task, function () {
             active = false
             if (queue.length) execute()
         })
