@@ -29,6 +29,8 @@ install:
   - npm update -g npm
   - npm install
   - nvm install ${TRAVIS_NODE_VERSION}
+  # Oddly, Travis doesn't set the PATH on OSX...
+  - if [[ "${TRAVIS_OS_NAME}" == 'osx' ]]; then export PATH=$(pwd)/node_modules/.bin:${PATH}; fi
 
 script:
   - nvm use stable
