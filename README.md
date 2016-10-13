@@ -87,7 +87,7 @@ Do note that it isn't necessarily comprehensive, although I try to keep it somew
     })
     ```
 12. Create before/after lifecycle hooks
-13. Rename `t.async` &rarr; `t.test`, deprecate old form
+13. ~~Rename `t.async` &rarr; `t.test`, deprecate old form~~
 14. Support a `.tl.opts` file to prepend CLI arguments (and way to disable it)
 15. Add PhantomJS and OS X to the Travis build, and ~~[AppVeyor](https://www.appveyor.com/) support for Windows testing~~
 16. Move `reflect.loc`, `reflect.report`, and `reflect.parent` to their own module and deprecate them.

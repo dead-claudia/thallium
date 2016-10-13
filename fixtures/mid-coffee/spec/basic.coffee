@@ -115,7 +115,7 @@ t.test 'core (basic)', ->
     @test 'run()', ->
         @test('exists').try assert.function, @create().run
 
-        @async 'runs block tests within tests', ->
+        @test 'runs block tests within tests', ->
             tt = @create()
             called = 0
 
@@ -124,7 +124,7 @@ t.test 'core (basic)', ->
 
             tt.run().then -> assert.equal called, 1
 
-        @async 'runs successful inline tests within tests', ->
+        @test 'runs successful inline tests within tests', ->
             tt = @create()
             err = undefined
 

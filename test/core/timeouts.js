@@ -31,7 +31,7 @@ describe("core (timeouts) (FLAKE)", /** @this */ function () {
 
         tt.reporter(Util.push(ret))
 
-        tt.async("test", function (tt) {
+        tt.test("test", function (tt) {
             // It's highly unlikely the engine will take this long to finish.
             tt.timeout(10)
             return resolve()
@@ -52,7 +52,7 @@ describe("core (timeouts) (FLAKE)", /** @this */ function () {
 
         tt.reporter(Util.push(ret))
 
-        tt.async("test", function (tt) {
+        tt.test("test", function (tt) {
             tt.timeout(50)
             // It's highly unlikely the engine will take this long to finish
             return delay(200)
@@ -75,7 +75,7 @@ describe("core (timeouts) (FLAKE)", /** @this */ function () {
 
         tt.test("test")
         .timeout(50)
-        .async("inner", function () { return resolve() })
+        .test("inner", function () { return resolve() })
 
         return tt.run().then(function () {
             assert.match(ret, [
@@ -96,7 +96,7 @@ describe("core (timeouts) (FLAKE)", /** @this */ function () {
 
         tt.test("test")
         .timeout(50)
-        .async("inner", function () {
+        .test("inner", function () {
             // It's highly unlikely the engine will take this long to finish.
             return delay(200)
         })

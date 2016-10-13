@@ -39,21 +39,6 @@ describe("core (reflect)", function () {
             })
         })
 
-        it("returns the correct methods in an inner async test", function () {
-            var tt = t.create()
-            var inner, reflect
-
-            tt.async("test", function (tt) {
-                inner = tt
-                reflect = tt.reflect().methods()
-                return Util.Promise.resolve()
-            })
-
-            return tt.run().then(function () {
-                assert.equal(reflect, inner)
-            })
-        })
-
         it("returns the correct methods from a previously run test", function () { // eslint-disable-line max-len
             var tt = t.create()
             var inner = tt.test("test")
@@ -123,7 +108,7 @@ describe("core (reflect)", function () {
 
             tt.reporter(Util.push(ret))
 
-            tt.async("test", function (tt) {
+            tt.test("test", function (tt) {
                 tt.reflect().try(/** @this */ function () {
                     len = arguments.length
                     self = this
@@ -152,7 +137,7 @@ describe("core (reflect)", function () {
 
             tt.reporter(Util.push(ret))
 
-            tt.async("test", function (tt) {
+            tt.test("test", function (tt) {
                 tt.reflect().try(function () { throw sentinel })
                 return Util.Promise.resolve()
             })

@@ -262,11 +262,11 @@ describe("cli runner", function () {
                         assert.notEqual(1, 1)
                     })
 
-                    t.async("bar()", function () {
+                    t.test("bar()", function () {
                         return Util.Promise.delay(0).throw(new Error("fail"))
                     })
 
-                    t.async("baz()", function () {
+                    t.test("baz()", function () {
                         return Util.Promise.reject(sentinel)
                     })
 

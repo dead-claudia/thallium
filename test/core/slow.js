@@ -36,7 +36,7 @@ describe("core (slow) (FLAKE)", /** @this */ function () {
 
         tt.reporter(Util.push(ret, true))
 
-        tt.async("test", function (tt) {
+        tt.test("test", function (tt) {
             // It's highly unlikely the engine will take this long to finish.
             tt.slow(10)
             return resolve()
@@ -59,7 +59,7 @@ describe("core (slow) (FLAKE)", /** @this */ function () {
 
         tt.reporter(Util.push(ret, true))
 
-        tt.async("test", function (tt) {
+        tt.test("test", function (tt) {
             // It's highly unlikely the engine will take this long to finish.
             tt.slow(100)
             return delay(60)
@@ -83,7 +83,7 @@ describe("core (slow) (FLAKE)", /** @this */ function () {
 
         tt.reporter(Util.push(ret, true))
 
-        tt.async("test", function (tt) {
+        tt.test("test", function (tt) {
             tt.slow(50)
             // It's highly unlikely the engine will take this long to finish
             return delay(200)
@@ -109,7 +109,7 @@ describe("core (slow) (FLAKE)", /** @this */ function () {
 
         tt.test("test")
         .slow(50)
-        .async("inner", function () { return resolve() })
+        .test("inner", function () { return resolve() })
 
         return tt.run().then(function () {
             assert.match(ret, [
@@ -135,7 +135,7 @@ describe("core (slow) (FLAKE)", /** @this */ function () {
 
         tt.test("test")
         .slow(50)
-        .async("inner", function () { return delay(200) })
+        .test("inner", function () { return delay(200) })
 
         return tt.run().then(function () {
             assert.match(ret, [

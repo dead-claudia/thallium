@@ -29,13 +29,13 @@ t.test 'core (timeouts) (FLAKE)', ->
             arg.slow = 0
         ret.push(arg)
 
-    @async 'succeeds with own', ->
+    @test 'succeeds with own', ->
         tt = @create()
         ret = []
 
         tt.reporter push(ret)
 
-        tt.async 'test', ->
+        tt.test 'test', ->
             # It's highly unlikely the engine will take this long to finish.
             @timeout 10
             then: (resolve) -> resolve()
@@ -47,13 +47,13 @@ t.test 'core (timeouts) (FLAKE)', ->
                 n 'end', []
             ]
 
-    @async 'fails with own', ->
+    @test 'fails with own', ->
         tt = @create()
         ret = []
 
         tt.reporter push(ret)
 
-        tt.async 'test', ->
+        tt.test 'test', ->
             @timeout 50
             # It's highly unlikely the engine will take this long to finish
             then: (resolve) -> setTimeout resolve, 200
@@ -65,7 +65,7 @@ t.test 'core (timeouts) (FLAKE)', ->
                 n 'end', []
             ]
 
-    @async 'succeeds with inherited', ->
+    @test 'succeeds with inherited', ->
         tt = @create()
         ret = []
 
@@ -73,7 +73,7 @@ t.test 'core (timeouts) (FLAKE)', ->
 
         tt.test 'test'
         .timeout 50
-        .async 'inner', -> then: (resolve) -> resolve()
+        .test 'inner', -> then: (resolve) -> resolve()
 
         tt.run().then ->
             assert.match ret, [
@@ -84,7 +84,7 @@ t.test 'core (timeouts) (FLAKE)', ->
                 n 'end', []
             ]
 
-    @async 'fails with inherited', ->
+    @test 'fails with inherited', ->
         tt = @create()
         ret = []
 
@@ -92,7 +92,7 @@ t.test 'core (timeouts) (FLAKE)', ->
 
         tt.test 'test'
         .timeout 50
-        .async 'inner', ->
+        .test 'inner', ->
             # It's highly unlikely the engine will take this long to finish.
             then: (resolve) -> setTimeout resolve, 200
 
@@ -106,7 +106,7 @@ t.test 'core (timeouts) (FLAKE)', ->
                 n 'end', []
             ]
 
-    @async 'gets own block timeout', ->
+    @test 'gets own block timeout', ->
         tt = @create()
         active = raw = undefined
 
@@ -126,7 +126,7 @@ t.test 'core (timeouts) (FLAKE)', ->
         assert.equal ttt.reflect().activeTimeout(), 50
         assert.equal ttt.reflect().timeout(), 50
 
-    @async 'gets inherited block timeout', ->
+    @test 'gets inherited block timeout', ->
         tt = @create()
         active = raw = undefined
 
@@ -150,7 +150,7 @@ t.test 'core (timeouts) (FLAKE)', ->
         assert.equal ttt.reflect().activeTimeout(), 50
         assert.equal ttt.reflect().timeout(), 0
 
-    @async 'gets default timeout', ->
+    @test 'gets default timeout', ->
         tt = @create()
         active = raw = undefined
 

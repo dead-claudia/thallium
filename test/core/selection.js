@@ -78,38 +78,6 @@ describe("core (selection)", function () {
                 ])
             })
         })
-
-        it("async tests", function () {
-            var tt = t.create()
-            var ret = []
-
-            tt.reporter(Util.push(ret))
-
-            tt.test("one", function (tt) {
-                tt.asyncSkip("inner", function () { fail() })
-                tt.test("other")
-            })
-
-            tt.test("two", function (tt) {
-                tt.test("inner")
-                tt.test("other")
-            })
-
-            return tt.run().then(function () {
-                assert.match(ret, [
-                    n("start", []),
-                    n("enter", [p("one", 0)]),
-                    n("skip", [p("one", 0), p("inner", 0)]),
-                    n("pass", [p("one", 0), p("other", 1)]),
-                    n("leave", [p("one", 0)]),
-                    n("enter", [p("two", 1)]),
-                    n("pass", [p("two", 1), p("inner", 0)]),
-                    n("pass", [p("two", 1), p("other", 1)]),
-                    n("leave", [p("two", 1)]),
-                    n("end", []),
-                ])
-            })
-        })
     })
 
     describe("only", function () {
@@ -169,34 +137,6 @@ describe("core (selection)", function () {
             })
         })
 
-        it("async tests", function () {
-            var tt = t.create()
-            var ret = []
-
-            tt.reporter(Util.push(ret))
-            tt.only(["one", "inner"])
-
-            tt.test("one", function (tt) {
-                tt.async("inner", function () { return resolve() })
-                tt.async("other", function () { fail() })
-            })
-
-            tt.test("two", function (tt) {
-                tt.async("inner", function () { fail() })
-                tt.async("other", function () { fail() })
-            })
-
-            return tt.run().then(function () {
-                assert.match(ret, [
-                    n("start", []),
-                    n("enter", [p("one", 0)]),
-                    n("pass", [p("one", 0), p("inner", 0)]),
-                    n("leave", [p("one", 0)]),
-                    n("end", []),
-                ])
-            })
-        })
-
         it("tests as index with callbacks", function () {
             var tt = t.create()
             var ret = []
@@ -237,31 +177,6 @@ describe("core (selection)", function () {
             tt.test("1", function (tt) {
                 tt.test("inner").try(fail)
                 tt.test("other").try(fail)
-            })
-
-            return tt.run().then(function () {
-                assert.match(ret, [
-                    n("start", []),
-                    n("end", []),
-                ])
-            })
-        })
-
-        it("async tests as index", function () {
-            var tt = t.create()
-            var ret = []
-
-            tt.reporter(Util.push(ret))
-            tt.only(["one", "inner"])
-
-            tt.test("0", function (tt) {
-                tt.async("inner", function () { return resolve() })
-                tt.async("other", function () { fail() })
-            })
-
-            tt.test("1", function (tt) {
-                tt.async("inner", function () { fail() })
-                tt.async("other", function () { fail() })
             })
 
             return tt.run().then(function () {

@@ -46,38 +46,6 @@ describe("core (safety)", function () {
         /* eslint-enable no-unused-vars */
     })
 
-    it("disallows non-functions as `async` impls", function () {
-        var tt = t.create()
-
-        assert.throws(function () { tt.async("test", 1) }, TypeError)
-        assert.throws(function () { tt.async("test", 0) }, TypeError)
-        assert.throws(function () { tt.async("test", true) }, TypeError)
-        assert.throws(function () { tt.async("test", false) }, TypeError)
-        assert.throws(function () { tt.async("test", "hi") }, TypeError)
-        assert.throws(function () { tt.async("test", "") }, TypeError)
-        assert.throws(function () { tt.async("test", []) }, TypeError)
-        assert.throws(function () { tt.async("test", [1, 2, 3, 4, 5]) }, TypeError) // eslint-disable-line max-len
-        assert.throws(function () { tt.async("test", {hello: "world"}) }, TypeError) // eslint-disable-line max-len
-        assert.throws(function () { tt.async("test", {}) }, TypeError)
-        assert.throws(function () { tt.async("test", valueOf(false)) }, TypeError) // eslint-disable-line max-len
-        assert.throws(function () { tt.async("test", valueOf(undefined)) }, TypeError) // eslint-disable-line max-len
-        assert.throws(function () { tt.async("test") }, TypeError)
-        assert.throws(function () { tt.async("test", undefined) }, TypeError)
-        assert.throws(function () { tt.async("test", null) }, TypeError)
-
-        /* eslint-disable no-unused-vars */
-
-        tt.async("test", function () {})
-        tt.async("test", function (t) {})
-        tt.async("test", function (t, why) {}) // too many arguments
-        tt.async("test", function (t, why, wtf) {}) // too many arguments
-        tt.async("test", function () {
-            return {next: function () { return {done: true} }}
-        })
-
-        /* eslint-enable no-unused-vars */
-    })
-
     it("catches unsafe access", function () {
         var tt = t.create()
         var ret = []
