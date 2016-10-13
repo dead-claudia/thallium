@@ -98,7 +98,7 @@ Do note that it isn't necessarily comprehensive, although I try to keep it somew
 
 1. Add `reflect.current()` to get current running test as a `Reflect` (not necessarily that of the backing instance)
     - This could be difficult, but will be immensely useful for plugin authors
-    - Deprecate `reflect.methods()` and test inheritance in favor of this
+    - Deprecate test inheritance in favor of this
 2. Add diff support to all existing reporters
 3. Document all the assertions
 4. Support flaky tests via first-class retries
