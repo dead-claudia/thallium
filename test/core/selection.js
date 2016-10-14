@@ -6,14 +6,6 @@ describe("core (selection)", function () {
     var p = Util.p
     var n = Util.n
 
-    function fail() {
-        assert.fail("fail")
-    }
-
-    function resolve() {
-        return {then: function (resolve) { resolve() }}
-    }
-
     describe("skip", function () {
         it("tests with callbacks", function () {
             var tt = t.create()
@@ -22,7 +14,7 @@ describe("core (selection)", function () {
             tt.reporter(Util.push(ret))
 
             tt.test("one", function (tt) {
-                tt.testSkip("inner", function () { fail() })
+                tt.testSkip("inner", function () { assert.fail("fail") })
                 tt.test("other")
             })
 
@@ -54,7 +46,7 @@ describe("core (selection)", function () {
             tt.reporter(Util.push(ret))
 
             tt.test("one", function (tt) {
-                tt.testSkip("inner").try(fail)
+                tt.testSkip("inner").try(assert.fail, "fail")
                 tt.test("other")
             })
 
@@ -90,12 +82,12 @@ describe("core (selection)", function () {
 
             tt.test("one", function (tt) {
                 tt.test("inner", function () {})
-                tt.test("other", function () { fail() })
+                tt.test("other", function () { assert.fail("fail") })
             })
 
             tt.test("two", function (tt) {
-                tt.test("inner", function () { fail() })
-                tt.test("other", function () { fail() })
+                tt.test("inner", function () { assert.fail("fail") })
+                tt.test("other", function () { assert.fail("fail") })
             })
 
             return tt.run().then(function () {
@@ -118,12 +110,12 @@ describe("core (selection)", function () {
 
             tt.test("one", function (tt) {
                 tt.test("inner")
-                tt.test("other").try(fail)
+                tt.test("other").try(assert.fail, "fail")
             })
 
             tt.test("two", function (tt) {
-                tt.test("inner").try(fail)
-                tt.test("other").try(fail)
+                tt.test("inner").try(assert.fail, "fail")
+                tt.test("other").try(assert.fail, "fail")
             })
 
             return tt.run().then(function () {
@@ -146,12 +138,12 @@ describe("core (selection)", function () {
 
             tt.test("0", function (tt) {
                 tt.test("inner", function () {})
-                tt.test("other").try(fail)
+                tt.test("other").try(assert.fail, "fail")
             })
 
             tt.test("1", function (tt) {
-                tt.test("inner").try(fail)
-                tt.test("other").try(fail)
+                tt.test("inner").try(assert.fail, "fail")
+                tt.test("other").try(assert.fail, "fail")
             })
 
             return tt.run().then(function () {
@@ -171,12 +163,12 @@ describe("core (selection)", function () {
 
             tt.test("0", function (tt) {
                 tt.test("inner")
-                tt.test("other").try(fail)
+                tt.test("other").try(assert.fail, "fail")
             })
 
             tt.test("1", function (tt) {
-                tt.test("inner").try(fail)
-                tt.test("other").try(fail)
+                tt.test("inner").try(assert.fail, "fail")
+                tt.test("other").try(assert.fail, "fail")
             })
 
             return tt.run().then(function () {
@@ -196,12 +188,12 @@ describe("core (selection)", function () {
 
             tt.test("one", function (tt) {
                 tt.test("inner", function () {})
-                tt.test("other", function () { fail() })
+                tt.test("other", function () { assert.fail("fail") })
             })
 
             tt.test("two", function (tt) {
-                tt.test("inner", function () { fail() })
-                tt.test("other", function () { fail() })
+                tt.test("inner", function () { assert.fail("fail") })
+                tt.test("other", function () { assert.fail("fail") })
             })
 
             return tt.run().then(function () {
