@@ -10,14 +10,15 @@
 # terminates the stream instead.
 
 module.exports = ->
-    @reflect().wrap 'reporter', (reporter, args...) ->
-        if args.length
-            reporter args...
+    old = @methods().reporter
+    @methods().reporter = ->
+        if arguments.length
+            old.apply this, arguments
         else
             new Observable (observer) ->
                 subscribed = yes
 
-                reporter (ev) ->
+                old.call this, (ev) ->
                     if subscribed
                         if ev.end()
                             observer.complete()

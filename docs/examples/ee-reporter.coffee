@@ -12,9 +12,10 @@
 # Each event is called the `value` and `path` properties as arguments.
 
 module.exports = ->
-    @reflect().wrap 'reporter', (reporter, args...) ->
-        reporter (
-            for reporter in args
+    old = @methods().reporter
+    @methods().reporter = ->
+        old.apply this, (
+            for reporter in arguments
                 if typeof reporter is 'object' and reporter?
                     do (reporter) -> (ev) ->
                         reporter.emit ev.type(), ev
@@ -22,4 +23,4 @@ module.exports = ->
                 else
                     # Don't fix reporter
                     reporter
-        )...
+        )

@@ -12,8 +12,8 @@ assert = require 'thallium/assert'
 # these have been tested against a slower machine, so it should hopefully not
 # be too bad.
 t.test 'core (timeouts) (FLAKE)', ->
-    n = @reflect().report
-    p = @reflect().loc
+    n = @call -> @report
+    p = @call -> @loc
 
     push = (ret) -> (arg) ->
         # Any equality tests on either of these are inherently flaky.
@@ -112,8 +112,8 @@ t.test 'core (timeouts) (FLAKE)', ->
 
         tt.test 'test', ->
             @timeout 50
-            active = @reflect().activeTimeout()
-            raw = @reflect().timeout()
+            active = @call -> @activeTimeout()
+            raw = @call -> @timeout()
 
         tt.run().then ->
             assert.equal active, 50
@@ -123,8 +123,8 @@ t.test 'core (timeouts) (FLAKE)', ->
         tt = @create()
         ttt = tt.test('test').timeout 50
 
-        assert.equal ttt.reflect().activeTimeout(), 50
-        assert.equal ttt.reflect().timeout(), 50
+        assert.equal ttt.call(-> @activeTimeout()), 50
+        assert.equal ttt.call(-> @timeout()), 50
 
     @test 'gets inherited block timeout', ->
         tt = @create()
@@ -133,8 +133,8 @@ t.test 'core (timeouts) (FLAKE)', ->
         tt.test 'test'
         .timeout 50
         .test 'inner', ->
-            active = @reflect().activeTimeout()
-            raw = @reflect().timeout()
+            active = @call -> @activeTimeout()
+            raw = @call -> @timeout()
 
         tt.run().then ->
             assert.equal active, 50
@@ -147,16 +147,16 @@ t.test 'core (timeouts) (FLAKE)', ->
         .timeout 50
         .test 'inner'
 
-        assert.equal ttt.reflect().activeTimeout(), 50
-        assert.equal ttt.reflect().timeout(), 0
+        assert.equal ttt.call(-> @activeTimeout()), 50
+        assert.equal ttt.call(-> @timeout()), 0
 
     @test 'gets default timeout', ->
         tt = @create()
         active = raw = undefined
 
         tt.test 'test', ->
-            active = @reflect().activeTimeout()
-            raw = @reflect().timeout()
+            active = @call -> @activeTimeout()
+            raw = @call -> @timeout()
 
         tt.run().then ->
             assert.equal active, 2000

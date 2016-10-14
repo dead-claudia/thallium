@@ -58,17 +58,17 @@ describe("core (safety)", function () {
             var tt = t.create().test("test", function (tt) { inner = tt })
 
             return tt.run().then(function () {
-                try { inner.reflect().checkInit() } catch (e) { return e }
+                try { inner.call(function () {}) } catch (e) { return e }
                 return assert.fail("Expected an error to be thrown")
             })
         })()
 
         tt.test("one", function () { tt.test("hi") })
         tt.test("two", function () { tt.try(function () {}) })
-        tt.test("three", function () { tt.use(function () {}) })
+        tt.test("three", function () { tt.call(function () {}) })
 
         tt.test("four", function (tt) {
-            tt.test("inner", function () { tt.use(function () {}) })
+            tt.test("inner", function () { tt.call(function () {}) })
         })
 
         tt.test("five", function (tt) {

@@ -21,10 +21,11 @@ var AssertionError = assert.AssertionError
 var format = assert.format
 
 var Thallium = require("../lib/thallium.js")
-var Reflect = new Thallium().reflect().constructor
+var Reflect = new Thallium().call(function (r) { return r.constructor })
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- * `t.async` -> `t.test`, which now supports promises.                       *
+ * - `t.async` -> `t.test`, which now supports promises.                     *
+ * - All tests are now async.                                                *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 var test = Thallium.prototype.test
@@ -89,6 +90,13 @@ methods(Thallium, {
     },
 
     asyncSkip: Thallium.prototype.testSkip,
+})
+
+methods(Reflect, {
+    async: function () {
+        new Reflect(this._).checkInit()
+        return true
+    },
 })
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -386,11 +394,40 @@ methods(Thallium, {
 })
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- * All tests are now async                                                   *
+ * - `t.reflect` and `t.use` -> non-caching `t.call`                         *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-methods(Reflect, {
-    async: function () {
-        new Reflect(this._).checkInit()
-        return true
-    },
+var call = Thallium.prototype.call
+
+function id(x) { return x }
+
+methods(Thallium, {
+    reflect: Common.deprecate(
+        "`t.reflect` is deprecated. Use `t.call` instead",
+        /** @this */ function () { return call.call(this, id) }),
+
+    use: Common.deprecate(
+        "`t.use` is deprecated. Use `t.call` instead",
+        /** @this */ function () {
+            var reflect = call.call(this, id)
+
+            if (!reflect.skipped()) {
+                for (var i = 0; i < arguments.length; i++) {
+                    var plugin = arguments[i]
+
+                    if (typeof plugin !== "function") {
+                        throw new TypeError(
+                            "Expected `plugin` to be a function")
+                    }
+
+                    if (this._.plugins == null) this._.plugins = []
+                    if (this._.plugins.indexOf(plugin) === -1) {
+                        // Add plugin before calling it.
+                        this._.plugins.push(plugin)
+                        plugin.call(this, this)
+                    }
+                }
+            }
+
+            return this
+        }),
 })

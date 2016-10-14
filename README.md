@@ -76,9 +76,9 @@ Do note that it isn't necessarily comprehensive, although I try to keep it somew
 9. ~~Remove the `thallium` and `_thallium` aliases, and rename the repo's binaries accordingly~~~
     - ~~Only `tl` is actually documented~~
 10. ~~Add more useful introspection methods (e.g. test name, test index, test's children, etc.)~~
-11. Add `t.call(plugin)`, where `plugin` accepts a `reflect` instance, and the result is returned untouched
-    - Deprecate `t.reflect()`, equivalent to `t.call(reflect => reflect)`
-    - Deprecate `t.use(...plugins)`, equivalent to the following:
+11. ~~Add `t.call(plugin)`, where `plugin` accepts a `reflect` instance, and the result is returned untouched~~
+    - ~~Deprecate `t.reflect()`, equivalent to `t.call(reflect => reflect)`~~
+    - ~~Deprecate `t.use(...plugins)`, equivalent to the following:~~
 
     ```js
     t.call(reflect => {

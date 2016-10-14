@@ -10,82 +10,84 @@ t = require 'thallium'
 assert = require 'thallium/assert'
 
 t.test 'core (basic)', ->
-    @test 'reflect()', ->
-        @test('exists').try assert.function, @reflect
-
+    @test 'reflect', ->
         @test 'parent()', ->
+            tt = @create()
+            parent = -> @parent()
+
             @test 'works on the root instance', ->
-                tt = @create()
-                assert.equal tt.reflect().parent(), undefined
+                assert.equal tt.call(parent), undefined
 
             @test 'works on children', ->
-                tt = @create()
-                assert.equal tt.test('test').reflect().parent(), tt
+                assert.equal tt.test('test').call(parent), tt
 
-        @test 'count()', ->
+        @test 'count()', (t) ->
             tt = @create()
-            reflect = tt.reflect()
+            count = -> @count()
 
-            @test('works with 0 tests').try assert.equal, reflect.count(), 0
+            @test('works with 0 tests').try assert.equal, tt.call(count), 0
             tt.test('test')
-            @test('works with 1 test').try assert.equal, reflect.count(), 1
+            @test('works with 1 test').try assert.equal, tt.call(count), 1
             tt.test('test')
-            @test('works with 2 tests').try assert.equal, reflect.count(), 2
+            @test('works with 2 tests').try assert.equal, tt.call(count), 2
             tt.test('test')
-            @test('works with 3 tests').try assert.equal, reflect.count(), 3
+            @test('works with 3 tests').try assert.equal, tt.call(count), 3
 
             # Test this test itself
-            count = @reflect().count()
-            @test('works with itself').try assert.equal, count, 4
+            @test('works with itself').try assert.equal, @call(count), 5
 
         @test 'name()', ->
             tt = @create()
+            name = -> @name()
 
             @test 'works with the root test', ->
-                assert.equal tt.reflect().name(), undefined
+                assert.equal tt.call(name), undefined
 
             @test 'works with child tests', ->
-                assert.equal tt.test('test').reflect().name(), 'test'
+                assert.equal tt.test('test').call(name), 'test'
 
             @test 'works with itself', ->
-                assert.equal @reflect().name(), 'works with itself'
+                assert.equal @call(name), 'works with itself'
 
         @test 'index()', ->
             tt = @create()
+            index = -> @index()
 
             @test 'works with the root test', ->
-                assert.equal tt.reflect().index(), -1
+                assert.equal tt.call(index), -1
 
             first = tt.test('test')
             @test 'works with the first child test', ->
-                assert.equal first.reflect().index(), 0
+                assert.equal first.call(index), 0
 
             second = tt.test('test')
             @test 'works with the second child test', ->
-                assert.equal second.reflect().index(), 1
+                assert.equal second.call(index), 1
 
             @test 'works with itself', ->
-                assert.equal @reflect().index(), 3
+                assert.equal @call(index), 3
 
         @test 'children()', ->
+            children = -> @children()
+
             @test 'works with 0 tests', ->
                 tt = t.create()
-                assert.match tt.reflect().children(), []
+                assert.match tt.call(children), []
 
             @test 'works with 1 test', ->
                 tt = @create()
-                test = tt.test('test').reflect()
-                assert.match tt.reflect().children(), [test]
+                test = tt.test('test').call -> this
+                assert.match tt.call(children), [test]
 
             @test 'works with 2 tests', ->
                 tt = @create()
-                first = tt.test('first').reflect()
-                second = tt.test('second').reflect()
-                assert.match tt.reflect().children(), [first, second]
+                first = tt.test('first').call -> this
+                second = tt.test('second').call -> this
+                assert.match tt.call(children), [first, second]
 
             @test 'returns a copy', ->
                 tt = @create()
-                slice = tt.reflect().children()
+                slice = tt.call(children)
                 tt.test('test')
                 assert.match slice, []
 
@@ -133,6 +135,6 @@ t.test 'core (basic)', ->
                 return
 
             tt.test 'test', ->
-                @test('foo').use ->
+                @test('foo').call ->
 
             tt.run().then -> assert.notOk err

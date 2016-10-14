@@ -30,13 +30,10 @@ var Thallium = require("../lib/browser-bundle.js")
 var Tests = require("../lib/tests.js")
 
 var t = global.t = Thallium.t
-var reflect = t.reflect()
 var assert = global.assert = Thallium.assert
 var Util = global.Util = {
     match: Thallium.match,
     r: Thallium.r,
-    n: reflect.report,
-    p: reflect.loc,
     Tests: Tests,
 
     /* eslint-disable global-require */
@@ -61,6 +58,11 @@ var Util = global.Util = {
 
     /* eslint-enable global-require */
 }
+
+t.call(function (reflect) {
+    Util.n = reflect.report
+    Util.p = reflect.loc
+})
 
 // We need to set the environment to not warn on inline tests not having
 // children, because they're used so extensively in testing. It remains an
