@@ -9,10 +9,10 @@
 // Events are the same as what's in the API.
 // Each event is called the `value` and `path` properties as arguments.
 
-export default function (reflect) {
-    const old = reflect.methods().reporter
+export default function ({methods}) {
+    const old = methods.reporter
 
-    reflect.methods().reporter = function (...args) {
+    methods.reporter = function (...args) {
         return old.apply(this, args.map(reporter => {
             if (typeof reporter === "object" && reporter != null) {
                 return ev => { reporter.emit(ev.type(), ev) }

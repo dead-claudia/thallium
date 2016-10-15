@@ -34,6 +34,8 @@ var assert = global.assert = Thallium.assert
 var Util = global.Util = {
     match: Thallium.match,
     r: Thallium.r,
+    n: Thallium.createReport,
+    p: Thallium.createLocation,
     Tests: Tests,
 
     /* eslint-disable global-require */
@@ -58,11 +60,6 @@ var Util = global.Util = {
 
     /* eslint-enable global-require */
 }
-
-t.call(function (reflect) {
-    Util.n = reflect.report
-    Util.p = reflect.loc
-})
 
 // We need to set the environment to not warn on inline tests not having
 // children, because they're used so extensively in testing. It remains an

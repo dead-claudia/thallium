@@ -376,23 +376,6 @@ methods(Report, {
         function () { return false }),
 })
 
-var createReport = Thallium.prototype.report
-
-methods(Thallium, {
-    report: function (type, path, value, duration, slow) { // eslint-disable-line
-        // Just throw an error here. It's way easier than working up all the
-        // magic to patch back in this report type, and constructing raw events
-        // is relatively rare, anyways.
-        if (type === "extra") {
-            throw new RangeError(
-                "`extra` events no longer exist. Please don't create them, " +
-                "and you may stop handling them")
-        }
-
-        return createReport.apply(this, arguments)
-    },
-})
-
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * - `t.reflect` and `t.use` -> non-caching `t.call`                         *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
@@ -410,7 +393,7 @@ methods(Thallium, {
         /** @this */ function () {
             var reflect = call.call(this, id)
 
-            if (!reflect.skipped()) {
+            if (!reflect.skipped) {
                 for (var i = 0; i < arguments.length; i++) {
                     var plugin = arguments[i]
 
@@ -430,4 +413,26 @@ methods(Thallium, {
 
             return this
         }),
+})
+
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ * - `reflect.report` -> `internal.createReport`                             *
+ * - `reflect.loc` -> `internal.createLocation`                              *
+ * - `reflect.scheduler` -> `internal.setScheduler`                          *
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+var Internal = require("../internal.js")
+
+methods(Reflect, {
+    report: Common.deprecate(
+        "`reflect.report` is deprecated. Use `internal.createReport` from thallium/internal instead", // eslint-disable-line max-len
+        Internal.createReport),
+
+    loc: Common.deprecate(
+        "`reflect.loc` is deprecated. Use `internal.createLocation` from thallium/internal instead", // eslint-disable-line max-len
+        Internal.createLocation),
+
+    scheduler: Common.deprecate(
+        "`reflect.scheduler` is deprecated. Use `internal.setScheduler` from thallium/internal instead", // eslint-disable-line max-len
+        Internal.setScheduler),
 })

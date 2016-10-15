@@ -11,19 +11,19 @@ assert = require 'thallium/assert'
 
 t.test 'core (basic)', ->
     @test 'reflect', ->
-        @test 'parent()', ->
+        @test 'get parent', ->
             tt = @create()
-            parent = -> @parent()
+            parent = -> @parent
 
             @test 'works on the root instance', ->
                 assert.equal tt.call(parent), undefined
 
             @test 'works on children', ->
-                assert.equal tt.test('test').call(parent), tt
+                assert.equal tt.test('test').call(parent).methods, tt
 
-        @test 'count()', (t) ->
+        @test 'get count', (t) ->
             tt = @create()
-            count = -> @count()
+            count = -> @count
 
             @test('works with 0 tests').try assert.equal, tt.call(count), 0
             tt.test('test')
@@ -36,9 +36,9 @@ t.test 'core (basic)', ->
             # Test this test itself
             @test('works with itself').try assert.equal, @call(count), 5
 
-        @test 'name()', ->
+        @test 'get name', ->
             tt = @create()
-            name = -> @name()
+            name = -> @name
 
             @test 'works with the root test', ->
                 assert.equal tt.call(name), undefined
@@ -49,9 +49,9 @@ t.test 'core (basic)', ->
             @test 'works with itself', ->
                 assert.equal @call(name), 'works with itself'
 
-        @test 'index()', ->
+        @test 'get index', ->
             tt = @create()
-            index = -> @index()
+            index = -> @index
 
             @test 'works with the root test', ->
                 assert.equal tt.call(index), -1
@@ -67,8 +67,8 @@ t.test 'core (basic)', ->
             @test 'works with itself', ->
                 assert.equal @call(index), 3
 
-        @test 'children()', ->
-            children = -> @children()
+        @test 'get children', ->
+            children = -> @children
 
             @test 'works with 0 tests', ->
                 tt = t.create()

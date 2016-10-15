@@ -114,11 +114,11 @@ describe("core (timeouts) (FLAKE)", /** @this */ function () {
     })
 
     function timeout(reflect) {
-        return reflect.timeout()
+        return reflect.timeout
     }
 
     function activeTimeout(reflect) {
-        return reflect.activeTimeout()
+        return reflect.activeTimeout
     }
 
     it("gets own block timeout", function () {

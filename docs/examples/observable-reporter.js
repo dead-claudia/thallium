@@ -9,10 +9,10 @@
 // The observable emits the same events as the normal reporters, except "exit"
 // terminates the stream instead.
 
-export default function (reflect) {
-    const old = reflect.methods().reporter
+export default function ({methods}) {
+    const old = methods.reporter
 
-    reflect.methods().reporter = function (...args) {
+    methods.reporter = function (...args) {
         if (args.length) {
             return old.apply(this, args)
         } else {

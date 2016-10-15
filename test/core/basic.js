@@ -14,8 +14,8 @@ describe("core (basic)", function () {
     })
 
     describe("reflect", function () {
-        describe("parent()", function () {
-            function parent(reflect) { return reflect.parent() }
+        describe("get parent", function () {
+            function parent(reflect) { return reflect.parent }
 
             it("works on the root instance", function () {
                 var tt = t.create()
@@ -27,12 +27,12 @@ describe("core (basic)", function () {
                 var tt = t.create()
 
                 assert.equal(tt.call(parent), undefined)
-                assert.equal(tt.test("test").call(parent), tt)
+                assert.equal(tt.test("test").call(parent).methods, tt)
             })
         })
 
-        describe("count()", function () {
-            function count(reflect) { return reflect.count() }
+        describe("count", function () {
+            function count(reflect) { return reflect.count }
 
             it("works with 0 tests", function () {
                 var tt = t.create()
@@ -68,8 +68,8 @@ describe("core (basic)", function () {
             })
         })
 
-        describe("name()", function () {
-            function name(reflect) { return reflect.name() }
+        describe("get name", function () {
+            function name(reflect) { return reflect.name }
 
             it("works with the root test", function () {
                 var tt = t.create()
@@ -84,8 +84,8 @@ describe("core (basic)", function () {
             })
         })
 
-        describe("index()", function () {
-            function index(reflect) { return reflect.index() }
+        describe("get index", function () {
+            function index(reflect) { return reflect.index }
 
             it("works with the root test", function () {
                 var tt = t.create()
@@ -109,8 +109,8 @@ describe("core (basic)", function () {
             })
         })
 
-        describe("children()", function () {
-            function children(reflect) { return reflect.children() }
+        describe("get children", function () {
+            function children(reflect) { return reflect.children }
 
             it("works with 0 tests", function () {
                 var tt = t.create()

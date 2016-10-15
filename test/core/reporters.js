@@ -21,11 +21,11 @@ describe("core (reporters)", function () { // eslint-disable-line max-statements
     }
 
     function reporters(reflect) {
-        return reflect.reporters()
+        return reflect.reporters
     }
 
     function activeReporters(reflect) {
-        return reflect.activeReporters()
+        return reflect.activeReporters
     }
 
     it("added individually correctly", function () {

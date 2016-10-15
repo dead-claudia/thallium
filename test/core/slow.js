@@ -154,11 +154,11 @@ describe("core (slow) (FLAKE)", /** @this */ function () {
     })
 
     function slow(reflect) {
-        return reflect.slow()
+        return reflect.slow
     }
 
     function activeSlow(reflect) {
-        return reflect.activeSlow()
+        return reflect.activeSlow
     }
 
     it("gets own block slow", function () {

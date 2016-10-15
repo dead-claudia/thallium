@@ -12,8 +12,8 @@
 # Each event is called the `value` and `path` properties as arguments.
 
 module.exports = ->
-    old = @methods().reporter
-    @methods().reporter = ->
+    old = @methods.reporter
+    @methods.reporter = ->
         old.apply this, (
             for reporter in arguments
                 if typeof reporter is 'object' and reporter?

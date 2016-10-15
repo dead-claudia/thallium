@@ -10,8 +10,8 @@
 # terminates the stream instead.
 
 module.exports = ->
-    old = @methods().reporter
-    @methods().reporter = ->
+    old = @methods.reporter
+    @methods.reporter = ->
         if arguments.length
             old.apply this, arguments
         else
