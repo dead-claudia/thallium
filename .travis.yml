@@ -17,12 +17,6 @@ matrix:
       env: ENV=node
     - node_js: "0.12"
       env: ENV=node
-    - node_js: "1"
-      env: ENV=node
-    - node_js: "2"
-      env: ENV=node
-    - node_js: "3"
-      env: ENV=node
     - node_js: "4"
       env: ENV=node
     - node_js: "5"
