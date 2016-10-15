@@ -8,6 +8,7 @@ represent more real-world usage.
 t = require 'thallium'
 path = require 'path'
 Common = require '../../../lib/cli/common.js'
+gp = require '../../../lib/cli/glob-parent.js'
 assert = require 'thallium/assert'
 
 t.test 'cli common', ->
@@ -189,8 +190,6 @@ t.test 'cli common', ->
                 )
 
     @test 'globParent()', ->
-        gp = Common.globParent
-
         @test 'strips glob magic to return parent path', ->
             assert.equal gp(p('path/to/*.js')), p('path/to')
             assert.equal gp(p('/root/path/to/*.js')), p('/root/path/to')

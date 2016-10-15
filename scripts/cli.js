@@ -144,8 +144,8 @@ exports.mock = function (tree) {
         } else if (typeof entry === "string") {
             // Node tries to execute unknown extensions as JS, but this is
             // better.
-            files[file] = Promise.method(function (type) {
-                if (type === "read") return entry
+            files[file] = Promise.method(function (load) {
+                if (!load) return entry
                 throw new Error(file + " is not executable!")
             })
             listing.push(file)
@@ -153,15 +153,13 @@ exports.mock = function (tree) {
             // Cache the load, like Node.
             var value
 
-            files[file] = Promise.method(function (type) {
-                if (type === "load") {
-                    if (entry != null) {
-                        value = {exports: entry()}
-                        entry = null
-                    }
-                    return value
+            files[file] = Promise.method(function (load) {
+                if (!load) throw new Error(file + " shouldn't be read!")
+                if (entry != null) {
+                    value = {exports: entry()}
+                    entry = null
                 }
-                throw new Error(file + " shouldn't be read!")
+                return value
             })
             listing.push(file)
         } else {
@@ -216,26 +214,12 @@ exports.mock = function (tree) {
             return Promise.reject(notFound(file))
         }
 
-        return func("load")
+        return func(true)
     }
 
     return {
         resolve: resolve,
         load: load,
-
-        readGlob: function (globs) {
-            if (!Array.isArray(globs)) globs = [globs]
-
-            var matcher
-
-            if (globs.length === 1) {
-                matcher = singleMatcher(resolve, globs[0])
-            } else {
-                matcher = multiMatcher(resolve, globs)
-            }
-
-            return Promise.filter(listing, matcher).each(load)
-        },
 
         read: function (file) {
             var target = resolve(file)
@@ -262,7 +246,21 @@ exports.mock = function (tree) {
                 }))
             }
 
-            return func("read")
+            return func(false)
+        },
+
+        readGlob: function (globs) {
+            if (!Array.isArray(globs)) globs = [globs]
+
+            var matcher
+
+            if (globs.length === 1) {
+                matcher = singleMatcher(resolve, globs[0])
+            } else {
+                matcher = multiMatcher(resolve, globs)
+            }
+
+            return Promise.filter(listing, matcher).each(load)
         },
 
         readdir: function (dir) {

@@ -15,6 +15,7 @@ describe("cli args parsing", function () {
             if (opts.files == null) opts.files = []
             if (opts.forceLocal == null) opts.forceLocal = false
             if (opts.help == null) opts.help = undefined
+            if (opts.opts == null) opts.opts = undefined
             if (opts.require == null) opts.require = []
             if (opts.respawn == null) opts.respawn = true
             if (opts.unknown == null) opts.unknown = []

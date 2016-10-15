@@ -88,7 +88,7 @@ Do note that it isn't necessarily comprehensive, although I try to keep it somew
     ```
 12. ~~Create before/after lifecycle hooks~~
 13. ~~Rename `t.async` &rarr; `t.test`, deprecate old form~~
-14. Support a `.tl.opts` file to prepend CLI arguments (and way to disable it)
+14. ~~Support a `.tl.opts` file to prepend CLI arguments (and way to disable it)~~
 15. ~~Add [AppVeyor](https://www.appveyor.com/) support for Windows testing~~
 16. Add PhantomJS 2 to the Travis build
 17. Drop support for Node pre-4

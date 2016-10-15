@@ -7,6 +7,7 @@
 
 var path = require("path")
 var Common = require("../../lib/cli/common.js")
+var gp = require("../../lib/cli/glob-parent.js")
 
 describe("cli common", function () {
     var p = path.normalize
@@ -228,8 +229,6 @@ describe("cli common", function () {
     })
 
     describe("globParent()", function () {
-        var gp = Common.globParent
-
         it("strips glob magic to return parent path", function () {
             assert.equal(gp(p("path/to/*.js")), p("path/to"))
             assert.equal(gp(p("/root/path/to/*.js")), p("/root/path/to"))

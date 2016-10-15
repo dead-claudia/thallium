@@ -34,6 +34,7 @@ describe("cli end-to-end (FLAKE)", /** @this */ function () {
 
             var child = cp.spawn(process.argv[0], opts.args, {
                 stdio: [process.stdin, "pipe", process.stderr],
+                cwd: opts.cwd,
             })
 
             var output = ""
@@ -83,7 +84,7 @@ describe("cli end-to-end (FLAKE)", /** @this */ function () {
         ],
     })
 
-    test("runs small sized test suites", {
+    test("runs small sized failing test suites", {
         args: ["--cwd", fixture("."), "full-js/**"],
         code: 1,
         timeout: 5000,
@@ -290,5 +291,34 @@ describe("cli end-to-end (FLAKE)", /** @this */ function () {
         code: 0,
         timeout: 7500,
         messages: midCoffeeMessages,
+    })
+
+    var optsMessages = [
+        "start = undefined",
+        "pass [0: injection worked] = undefined",
+        "end = undefined",
+    ]
+
+    test("runs tests with .tl.opts", {
+        args: [],
+        cwd: fixture("js-opts"),
+        code: 0,
+        timeout: 5000,
+        messages: optsMessages,
+    })
+
+    test("runs tests with .tl.opts and files", {
+        args: [fixture("js-opts/test/**")],
+        code: 0,
+        timeout: 5000,
+        messages: optsMessages,
+    })
+
+    test("runs tests with specified --opts", {
+        args: ["--opts", fixture("js-opts/config.opts")],
+        cwd: fixture("js-opts"),
+        code: 0,
+        timeout: 5000,
+        messages: optsMessages,
     })
 })
