@@ -16,7 +16,7 @@ describe("core (safety)", function () {
     }
 
     it("disallows non-nullish non-functions as `test` impls", function () {
-        var tt = t.create()
+        var tt = Util.create()
 
         assert.throws(function () { tt.test("test", 1) }, TypeError)
         assert.throws(function () { tt.test("test", 0) }, TypeError)
@@ -47,7 +47,7 @@ describe("core (safety)", function () {
     })
 
     it("catches unsafe access", function () {
-        var tt = t.create()
+        var tt = Util.create()
         var ret = []
 
         tt.reporter(Util.push(ret))
@@ -55,7 +55,7 @@ describe("core (safety)", function () {
         // This is not exactly elegant...
         var error = (function () {
             var inner
-            var tt = t.create().test("test", function (tt) { inner = tt })
+            var tt = Util.create().test("test", function (tt) { inner = tt })
 
             return tt.run().then(function () {
                 try { inner.call(function () {}) } catch (e) { return e }
@@ -93,7 +93,7 @@ describe("core (safety)", function () {
     })
 
     it("catches concurrent runs", function () {
-        var tt = t.create()
+        var tt = Util.create()
         var res = tt.run()
 
         assert.throws(function () { tt.run() }, Error)
@@ -101,7 +101,7 @@ describe("core (safety)", function () {
     })
 
     it("catches concurrent runs when given a callback", function () {
-        var tt = t.create()
+        var tt = Util.create()
         var p = tt.run()
 
         assert.throws(function () { tt.run() }, Error)
@@ -109,7 +109,7 @@ describe("core (safety)", function () {
     })
 
     it("allows non-concurrent runs with reporter error", function () {
-        var tt = t.create()
+        var tt = Util.create()
         var sentinel = createSentinel("fail")
 
         tt.reporter(function () { throw sentinel })

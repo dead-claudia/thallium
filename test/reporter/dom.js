@@ -27,7 +27,7 @@ describe("reporter dom", function () {
         (opts.skip ? it.skip : it)(name, function () {
             var shared = {}
             var reporterOpts = {
-                inst: t.create(),
+                inst: Util.create(),
                 opts: {window: mock.window()},
             }
 

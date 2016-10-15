@@ -34,6 +34,7 @@ var assert = global.assert = Thallium.assert
 var Util = global.Util = {
     match: Thallium.match,
     r: Thallium.r,
+    create: Thallium.createBase,
     n: Thallium.createReport,
     p: Thallium.createLocation,
     Tests: Tests,

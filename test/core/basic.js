@@ -7,24 +7,18 @@
 // real-world usage.
 
 describe("core (basic)", function () {
-    describe("create()", function () {
-        it("exists", function () {
-            assert.function(t.create)
-        })
-    })
-
     describe("reflect", function () {
         describe("get parent", function () {
             function parent(reflect) { return reflect.parent }
 
             it("works on the root instance", function () {
-                var tt = t.create()
+                var tt = Util.create()
 
                 assert.equal(tt.call(parent), undefined)
             })
 
             it("works on children", function () {
-                var tt = t.create()
+                var tt = Util.create()
 
                 assert.equal(tt.call(parent), undefined)
                 assert.equal(tt.test("test").call(parent).methods, tt)
@@ -35,13 +29,13 @@ describe("core (basic)", function () {
             function count(reflect) { return reflect.count }
 
             it("works with 0 tests", function () {
-                var tt = t.create()
+                var tt = Util.create()
 
                 assert.equal(tt.call(count), 0)
             })
 
             it("works with 1 test", function () {
-                var tt = t.create()
+                var tt = Util.create()
 
                 tt.test("test")
 
@@ -49,7 +43,7 @@ describe("core (basic)", function () {
             })
 
             it("works with 2 tests", function () {
-                var tt = t.create()
+                var tt = Util.create()
 
                 tt.test("test")
                 tt.test("test")
@@ -58,7 +52,7 @@ describe("core (basic)", function () {
             })
 
             it("works with 3 tests", function () {
-                var tt = t.create()
+                var tt = Util.create()
 
                 tt.test("test")
                 tt.test("test")
@@ -72,13 +66,13 @@ describe("core (basic)", function () {
             function name(reflect) { return reflect.name }
 
             it("works with the root test", function () {
-                var tt = t.create()
+                var tt = Util.create()
 
                 assert.equal(tt.call(name), undefined)
             })
 
             it("works with child tests", function () {
-                var tt = t.create().test("test")
+                var tt = Util.create().test("test")
 
                 assert.equal(tt.call(name), "test")
             })
@@ -88,19 +82,19 @@ describe("core (basic)", function () {
             function index(reflect) { return reflect.index }
 
             it("works with the root test", function () {
-                var tt = t.create()
+                var tt = Util.create()
 
                 assert.equal(tt.call(index), -1)
             })
 
             it("works with the first child test", function () {
-                var tt = t.create().test("test")
+                var tt = Util.create().test("test")
 
                 assert.equal(tt.call(index), 0)
             })
 
             it("works with the second child test", function () {
-                var tt = t.create()
+                var tt = Util.create()
 
                 tt.test("test")
                 var second = tt.test("test")
@@ -113,20 +107,20 @@ describe("core (basic)", function () {
             function children(reflect) { return reflect.children }
 
             it("works with 0 tests", function () {
-                var tt = t.create()
+                var tt = Util.create()
 
                 assert.match(tt.call(children), [])
             })
 
             it("works with 1 test", function () {
-                var tt = t.create()
+                var tt = Util.create()
                 var test = tt.test("test").call(function (r) { return r })
 
                 assert.match(tt.call(children), [test])
             })
 
             it("works with 2 tests", function () {
-                var tt = t.create()
+                var tt = Util.create()
                 var first = tt.test("first").call(function (r) { return r })
                 var second = tt.test("second").call(function (r) { return r })
 
@@ -134,7 +128,7 @@ describe("core (basic)", function () {
             })
 
             it("returns a copy", function () {
-                var tt = t.create()
+                var tt = Util.create()
                 var slice = tt.call(children)
 
                 tt.test("test")
@@ -145,30 +139,30 @@ describe("core (basic)", function () {
 
     describe("test()", function () {
         it("exists", function () {
-            assert.function(t.create().test)
+            assert.function(Util.create().test)
         })
 
         it("accepts a string + function", function () {
-            var tt = t.create()
+            var tt = Util.create()
 
             tt.test("test", function () {})
         })
 
         it("accepts a string", function () {
-            var tt = t.create()
+            var tt = Util.create()
 
             tt.test("test")
         })
 
         it("returns the current instance when given a callback", function () {
-            var tt = t.create()
+            var tt = Util.create()
             var test = tt.test("test", function () {})
 
             assert.equal(test, tt)
         })
 
         it("returns a prototypal clone when not given a callback", function () {
-            var tt = t.create()
+            var tt = Util.create()
             var test = tt.test("test")
 
             assert.notEqual(test, tt)
@@ -178,11 +172,11 @@ describe("core (basic)", function () {
 
     describe("run()", function () {
         it("exists", function () {
-            assert.function(t.create().run)
+            assert.function(Util.create().run)
         })
 
         it("runs block tests within tests", function () {
-            var tt = t.create()
+            var tt = Util.create()
             var called = 0
 
             tt.test("test", function (tt) {
@@ -193,7 +187,7 @@ describe("core (basic)", function () {
         })
 
         it("runs successful inline tests within tests", function () {
-            var tt = t.create()
+            var tt = Util.create()
             var err
 
             tt.reporter(function (res) {
@@ -210,7 +204,7 @@ describe("core (basic)", function () {
 
     describe("try()", function () {
         it("exists", function () {
-            assert.function(t.create().try)
+            assert.function(Util.create().try)
             t.call(function (reflect) { assert.function(reflect.try) })
         })
 
@@ -236,21 +230,21 @@ describe("core (basic)", function () {
 
         context("with block tests", function () {
             it("requires a function", function () {
-                assert.throws(function () { t.create().try() }, TypeError)
-                assert.throws(function () { t.create().try(1) }, TypeError)
-                assert.throws(function () { t.create().try("foo") }, TypeError)
-                assert.throws(function () { t.create().try(true) }, TypeError)
-                assert.throws(function () { t.create().try({}) }, TypeError)
-                assert.throws(function () { t.create().try([]) }, TypeError)
-                assert.throws(function () { t.create().try(null) }, TypeError)
+                assert.throws(function () { Util.create().try() }, TypeError)
+                assert.throws(function () { Util.create().try(1) }, TypeError)
+                assert.throws(function () { Util.create().try("foo") }, TypeError) // eslint-disable-line max-len
+                assert.throws(function () { Util.create().try(true) }, TypeError) // eslint-disable-line max-len
+                assert.throws(function () { Util.create().try({}) }, TypeError)
+                assert.throws(function () { Util.create().try([]) }, TypeError)
+                assert.throws(function () { Util.create().try(null) }, TypeError) // eslint-disable-line max-len
                 if (typeof Symbol === "function") { // eslint-disable-line no-undef, max-len
-                    assert.throws(function () { t.create().try(Symbol()) }, TypeError) // eslint-disable-line no-undef, max-len
+                    assert.throws(function () { Util.create().try(Symbol()) }, TypeError) // eslint-disable-line no-undef, max-len
                 }
             })
 
             it("succeeds with 0 args", function () {
                 var spy = makeSpy()
-                var tt = t.create()
+                var tt = Util.create()
 
                 tt.try(spy)
                 assert.match(spy.this, [undefined])
@@ -259,7 +253,7 @@ describe("core (basic)", function () {
 
             it("succeeds with 1 arg", function () {
                 var spy = makeSpy()
-                var tt = t.create()
+                var tt = Util.create()
 
                 tt.try(spy, {value: 1})
                 assert.match(spy.this, [undefined])
@@ -268,7 +262,7 @@ describe("core (basic)", function () {
 
             it("succeeds with 2 args", function () {
                 var spy = makeSpy()
-                var tt = t.create()
+                var tt = Util.create()
 
                 tt.try(spy, {value: 1}, {value: 2})
                 assert.match(spy.this, [undefined])
@@ -277,7 +271,7 @@ describe("core (basic)", function () {
 
             it("succeeds with 3 args", function () {
                 var spy = makeSpy()
-                var tt = t.create()
+                var tt = Util.create()
 
                 tt.try(spy, {value: 1}, {value: 2}, {value: 3})
                 assert.match(spy.this, [undefined])
@@ -286,7 +280,7 @@ describe("core (basic)", function () {
 
             it("succeeds with 4 args", function () {
                 var spy = makeSpy()
-                var tt = t.create()
+                var tt = Util.create()
 
                 tt.try(spy, {value: 1}, {value: 2}, {value: 3}, {value: 4})
                 assert.match(spy.this, [undefined])
@@ -298,21 +292,21 @@ describe("core (basic)", function () {
 
         context("with inline tests", function () {
             it("requires a function", function () {
-                assert.throws(function () { t.create().try() }, TypeError)
-                assert.throws(function () { t.create().try(1) }, TypeError)
-                assert.throws(function () { t.create().try("foo") }, TypeError)
-                assert.throws(function () { t.create().try(true) }, TypeError)
-                assert.throws(function () { t.create().try({}) }, TypeError)
-                assert.throws(function () { t.create().try([]) }, TypeError)
-                assert.throws(function () { t.create().try(null) }, TypeError)
+                assert.throws(function () { Util.create().try() }, TypeError)
+                assert.throws(function () { Util.create().try(1) }, TypeError)
+                assert.throws(function () { Util.create().try("foo") }, TypeError) // eslint-disable-line max-len
+                assert.throws(function () { Util.create().try(true) }, TypeError) // eslint-disable-line max-len
+                assert.throws(function () { Util.create().try({}) }, TypeError)
+                assert.throws(function () { Util.create().try([]) }, TypeError)
+                assert.throws(function () { Util.create().try(null) }, TypeError) // eslint-disable-line max-len
                 if (typeof Symbol === "function") { // eslint-disable-line no-undef, max-len
-                    assert.throws(function () { t.create().try(Symbol()) }, TypeError) // eslint-disable-line no-undef, max-len
+                    assert.throws(function () { Util.create().try(Symbol()) }, TypeError) // eslint-disable-line no-undef, max-len
                 }
             })
 
             it("succeeds with 0 args", function () {
                 var spy = makeSpy()
-                var tt = t.create()
+                var tt = Util.create()
 
                 tt.test("test")
                 .try(spy)
@@ -325,7 +319,7 @@ describe("core (basic)", function () {
 
             it("succeeds with 1 arg", function () {
                 var spy = makeSpy()
-                var tt = t.create()
+                var tt = Util.create()
 
                 tt.test("test")
                 .try(spy, {value: 1})
@@ -338,7 +332,7 @@ describe("core (basic)", function () {
 
             it("succeeds with 2 args", function () {
                 var spy = makeSpy()
-                var tt = t.create()
+                var tt = Util.create()
 
                 tt.test("test")
                 .try(spy, {value: 1}, {value: 2})
@@ -351,7 +345,7 @@ describe("core (basic)", function () {
 
             it("succeeds with 3 args", function () {
                 var spy = makeSpy()
-                var tt = t.create()
+                var tt = Util.create()
 
                 tt.test("test")
                 .try(spy, {value: 1}, {value: 2}, {value: 3})
@@ -366,7 +360,7 @@ describe("core (basic)", function () {
 
             it("succeeds with 4 args", function () {
                 var spy = makeSpy()
-                var tt = t.create()
+                var tt = Util.create()
 
                 tt.test("test")
                 .try(spy, {value: 1}, {value: 2}, {value: 3}, {value: 4})

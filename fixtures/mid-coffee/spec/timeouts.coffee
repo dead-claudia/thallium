@@ -7,7 +7,11 @@ is trying to represent more real-world usage.
 
 t = require 'thallium'
 assert = require 'thallium/assert'
-{createReport: n, createLocation: p} = require 'thallium/internal'
+{
+    createReport: n
+    createLocation: p
+    createBase: create
+} = require 'thallium/internal'
 
 # Note that this entire section may be flaky on slower machines. Thankfully,
 # these have been tested against a slower machine, so it should hopefully not
@@ -28,7 +32,7 @@ t.test 'core (timeouts) (FLAKE)', ->
         ret.push(arg)
 
     @test 'succeeds with own', ->
-        tt = @create()
+        tt = create()
         ret = []
 
         tt.reporter push(ret)
@@ -46,7 +50,7 @@ t.test 'core (timeouts) (FLAKE)', ->
             ]
 
     @test 'fails with own', ->
-        tt = @create()
+        tt = create()
         ret = []
 
         tt.reporter push(ret)
@@ -64,7 +68,7 @@ t.test 'core (timeouts) (FLAKE)', ->
             ]
 
     @test 'succeeds with inherited', ->
-        tt = @create()
+        tt = create()
         ret = []
 
         tt.reporter push(ret)
@@ -83,7 +87,7 @@ t.test 'core (timeouts) (FLAKE)', ->
             ]
 
     @test 'fails with inherited', ->
-        tt = @create()
+        tt = create()
         ret = []
 
         tt.reporter push(ret)
@@ -105,7 +109,7 @@ t.test 'core (timeouts) (FLAKE)', ->
             ]
 
     @test 'gets own block timeout', ->
-        tt = @create()
+        tt = create()
         active = raw = undefined
 
         tt.test 'test', ->
@@ -118,14 +122,14 @@ t.test 'core (timeouts) (FLAKE)', ->
             assert.equal raw, 50
 
     @test 'gets own inline timeout', ->
-        tt = @create()
+        tt = create()
         ttt = tt.test('test').timeout 50
 
         assert.equal ttt.call(-> @activeTimeout), 50
         assert.equal ttt.call(-> @timeout), 50
 
     @test 'gets inherited block timeout', ->
-        tt = @create()
+        tt = create()
         active = raw = undefined
 
         tt.test 'test'
@@ -139,7 +143,7 @@ t.test 'core (timeouts) (FLAKE)', ->
             assert.equal raw, 0
 
     @test 'gets inherited inline timeout', ->
-        tt = @create()
+        tt = create()
 
         ttt = tt.test 'test'
         .timeout 50
@@ -149,7 +153,7 @@ t.test 'core (timeouts) (FLAKE)', ->
         assert.equal ttt.call(-> @timeout), 0
 
     @test 'gets default timeout', ->
-        tt = @create()
+        tt = create()
         active = raw = undefined
 
         tt.test 'test', ->

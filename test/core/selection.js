@@ -8,7 +8,7 @@ describe("core (selection)", function () {
 
     describe("skip", function () {
         it("tests with callbacks", function () {
-            var tt = t.create()
+            var tt = Util.create()
             var ret = []
 
             tt.reporter(Util.push(ret))
@@ -40,7 +40,7 @@ describe("core (selection)", function () {
         })
 
         it("tests without callbacks", function () {
-            var tt = t.create()
+            var tt = Util.create()
             var ret = []
 
             tt.reporter(Util.push(ret))
@@ -74,7 +74,7 @@ describe("core (selection)", function () {
 
     describe("only", function () {
         it("tests with callbacks", function () {
-            var tt = t.create()
+            var tt = Util.create()
             var ret = []
 
             tt.reporter(Util.push(ret))
@@ -102,7 +102,7 @@ describe("core (selection)", function () {
         })
 
         it("tests without callbacks", function () {
-            var tt = t.create()
+            var tt = Util.create()
             var ret = []
 
             tt.reporter(Util.push(ret))
@@ -130,7 +130,7 @@ describe("core (selection)", function () {
         })
 
         it("tests as index with callbacks", function () {
-            var tt = t.create()
+            var tt = Util.create()
             var ret = []
 
             tt.reporter(Util.push(ret))
@@ -155,7 +155,7 @@ describe("core (selection)", function () {
         })
 
         it("tests as index index without callbacks", function () {
-            var tt = t.create()
+            var tt = Util.create()
             var ret = []
 
             tt.reporter(Util.push(ret))
@@ -180,7 +180,7 @@ describe("core (selection)", function () {
         })
 
         it("against regexp", function () {
-            var tt = t.create()
+            var tt = Util.create()
             var ret = []
 
             tt.reporter(Util.push(ret))

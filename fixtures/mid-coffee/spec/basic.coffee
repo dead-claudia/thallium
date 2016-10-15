@@ -8,11 +8,12 @@ is trying to represent more real-world usage.
 Promise = require 'bluebird'
 t = require 'thallium'
 assert = require 'thallium/assert'
+{createBase: create} = require 'thallium/internal'
 
 t.test 'core (basic)', ->
     @test 'reflect', ->
         @test 'get parent', ->
-            tt = @create()
+            tt = create()
             parent = -> @parent
 
             @test 'works on the root instance', ->
@@ -22,7 +23,7 @@ t.test 'core (basic)', ->
                 assert.equal tt.test('test').call(parent).methods, tt
 
         @test 'get count', (t) ->
-            tt = @create()
+            tt = create()
             count = -> @count
 
             @test('works with 0 tests').try assert.equal, tt.call(count), 0
@@ -37,7 +38,7 @@ t.test 'core (basic)', ->
             @test('works with itself').try assert.equal, @call(count), 5
 
         @test 'get name', ->
-            tt = @create()
+            tt = create()
             name = -> @name
 
             @test 'works with the root test', ->
@@ -50,7 +51,7 @@ t.test 'core (basic)', ->
                 assert.equal @call(name), 'works with itself'
 
         @test 'get index', ->
-            tt = @create()
+            tt = create()
             index = -> @index
 
             @test 'works with the root test', ->
@@ -71,54 +72,54 @@ t.test 'core (basic)', ->
             children = -> @children
 
             @test 'works with 0 tests', ->
-                tt = t.create()
+                tt = create()
                 assert.match tt.call(children), []
 
             @test 'works with 1 test', ->
-                tt = @create()
+                tt = create()
                 test = tt.test('test').call -> this
                 assert.match tt.call(children), [test]
 
             @test 'works with 2 tests', ->
-                tt = @create()
+                tt = create()
                 first = tt.test('first').call -> this
                 second = tt.test('second').call -> this
                 assert.match tt.call(children), [first, second]
 
             @test 'returns a copy', ->
-                tt = @create()
+                tt = create()
                 slice = tt.call(children)
                 tt.test('test')
                 assert.match slice, []
 
     @test 'test()', ->
-        @test('exists').try assert.function, @create().test
+        @test('exists').try assert.function, create().test
 
         @test 'accepts a string + function', ->
-            tt = @create()
+            tt = create()
             tt.test 'test', ->
 
         @test 'accepts a string', ->
-            tt = @create()
+            tt = create()
             tt.test('test')
 
         @test 'returns the current instance when given a callback', ->
-            tt = @create()
+            tt = create()
             test = tt.test 'test', ->
             assert.equal test, tt
 
         @test 'returns a prototypal clone when not given a callback', ->
-            tt = @create()
+            tt = create()
             test = tt.test('test')
 
             assert.notEqual test, tt
             assert.equal Object.getPrototypeOf(test), tt
 
     @test 'run()', ->
-        @test('exists').try assert.function, @create().run
+        @test('exists').try assert.function, create().run
 
         @test 'runs block tests within tests', ->
-            tt = @create()
+            tt = create()
             called = 0
 
             tt.test 'test', ->
@@ -127,7 +128,7 @@ t.test 'core (basic)', ->
             tt.run().then -> assert.equal called, 1
 
         @test 'runs successful inline tests within tests', ->
-            tt = @create()
+            tt = create()
             err = undefined
 
             tt.reporter (res) ->

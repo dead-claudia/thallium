@@ -5,7 +5,7 @@ describe("core (asynchronous behavior)", function () {
     var p = Util.p
 
     it("with normal tests", function () {
-        var tt = t.create()
+        var tt = Util.create()
         var called = false
 
         tt.test("test", function () { called = true })
@@ -17,7 +17,7 @@ describe("core (asynchronous behavior)", function () {
     })
 
     it("with shorthand tests", function () {
-        var tt = t.create()
+        var tt = Util.create()
         var called = false
 
         function fail() {
@@ -34,7 +34,7 @@ describe("core (asynchronous behavior)", function () {
     })
 
     it("with async tests + sync resolve", function () {
-        var tt = t.create()
+        var tt = Util.create()
         var called = false
 
         tt.test("test", function () {
@@ -49,7 +49,7 @@ describe("core (asynchronous behavior)", function () {
     })
 
     it("with async tests + async resolve", function () {
-        var tt = t.create()
+        var tt = Util.create()
         var called = false
 
         tt.test("test", function () {
@@ -68,7 +68,7 @@ describe("core (asynchronous behavior)", function () {
     })
 
     it("with async tests + duplicate thenable resolution", function () {
-        var tt = t.create()
+        var tt = Util.create()
         var called = false
 
         tt.test("test", function () {
@@ -89,7 +89,7 @@ describe("core (asynchronous behavior)", function () {
     })
 
     it("with async tests + duplicate thenable rejection", function () {
-        var tt = t.create()
+        var tt = Util.create()
         var called = false
         var ret = []
         var sentinel = new Error("sentinel")
@@ -122,7 +122,7 @@ describe("core (asynchronous behavior)", function () {
     })
 
     it("with async tests + mixed thenable (resolve first)", function () {
-        var tt = t.create()
+        var tt = Util.create()
         var called = false
         var ret = []
         var sentinel = new Error("sentinel")
@@ -156,7 +156,7 @@ describe("core (asynchronous behavior)", function () {
     })
 
     it("with async tests + mixed thenable (reject first)", function () {
-        var tt = t.create()
+        var tt = Util.create()
         var called = false
         var ret = []
         var sentinel = new Error("sentinel")

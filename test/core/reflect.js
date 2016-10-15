@@ -10,20 +10,20 @@ describe("core (reflect)", function () {
         function methods(reflect) { return reflect.methods }
 
         it("returns the correct methods", function () {
-            var tt = t.create()
+            var tt = Util.create()
 
             assert.equal(tt.call(methods), tt)
         })
 
         it("returns the correct methods in an inner inline test", function () {
-            var tt = t.create()
+            var tt = Util.create()
             var inner = tt.test("test")
 
             assert.equal(inner.call(methods), inner)
         })
 
         it("returns the correct methods in an inner block test", function () {
-            var tt = t.create()
+            var tt = Util.create()
             var inner, found
 
             tt.test("test", function (tt) {
@@ -37,7 +37,7 @@ describe("core (reflect)", function () {
         })
 
         it("returns the correct methods from a previously run test", function () { // eslint-disable-line max-len
-            var tt = t.create()
+            var tt = Util.create()
             var inner = tt.test("test")
 
             return tt.run().then(function () {
@@ -60,7 +60,7 @@ describe("core (reflect)", function () {
         }
 
         it("runs blocks in sync tests", function () {
-            var tt = t.create()
+            var tt = Util.create()
             var ret = []
             var len, self // eslint-disable-line consistent-this
 
@@ -85,7 +85,7 @@ describe("core (reflect)", function () {
         })
 
         it("propagates errors from blocks in sync tests", function () {
-            var tt = t.create()
+            var tt = Util.create()
             var ret = []
             var sentinel = new Error("sentinel")
 
@@ -107,7 +107,7 @@ describe("core (reflect)", function () {
         })
 
         it("runs blocks in async tests", function () {
-            var tt = t.create()
+            var tt = Util.create()
             var ret = []
             var len, self // eslint-disable-line consistent-this
 
@@ -134,7 +134,7 @@ describe("core (reflect)", function () {
         })
 
         it("propagates errors from blocks in async tests", function () {
-            var tt = t.create()
+            var tt = Util.create()
             var ret = []
             var sentinel = new Error("sentinel")
 
@@ -157,7 +157,7 @@ describe("core (reflect)", function () {
         })
 
         it("runs blocks in inline sync tests", function () {
-            var tt = t.create()
+            var tt = Util.create()
             var ret = []
             var len, self // eslint-disable-line consistent-this
 
@@ -180,7 +180,7 @@ describe("core (reflect)", function () {
         })
 
         it("propagates errors from blocks in inline sync tests", function () {
-            var tt = t.create()
+            var tt = Util.create()
             var ret = []
             var sentinel = new Error("sentinel")
 
@@ -204,7 +204,7 @@ describe("core (reflect)", function () {
         it("catches errors correctly", function () {
             var inner
 
-            return t.create()
+            return Util.create()
             .test("foo", function (tt) {
                 inner = tt.call(function (reflect) { return reflect })
             })
@@ -218,23 +218,23 @@ describe("core (reflect)", function () {
         function runnable(reflect) { return reflect.runnable }
 
         it("checks roots", function () {
-            assert.equal(t.create().call(runnable), true)
+            assert.equal(Util.create().call(runnable), true)
         })
 
         it("checks inline normal tests", function () {
-            var tt = t.create()
+            var tt = Util.create()
 
             assert.equal(tt.test("test").call(runnable), true)
         })
 
         it("checks inline skipped tests", function () {
-            var tt = t.create()
+            var tt = Util.create()
 
             assert.equal(tt.testSkip("test").call(runnable), false)
         })
 
         it("checks block normal tests", function () {
-            var tt = t.create()
+            var tt = Util.create()
             var inner
 
             tt.test("test", function (tt) {
@@ -247,7 +247,7 @@ describe("core (reflect)", function () {
         })
 
         it("misses block skipped tests", function () {
-            var tt = t.create()
+            var tt = Util.create()
             var inner
 
             tt.testSkip("test", function (tt) {
@@ -260,21 +260,21 @@ describe("core (reflect)", function () {
         })
 
         it("checks whitelisted `.only()` inline tests", function () {
-            var tt = t.create()
+            var tt = Util.create()
 
             tt.only(["test"])
             assert.equal(tt.test("test").call(runnable), true)
         })
 
         it("checks non-whitelisted `.only()` inline tests", function () {
-            var tt = t.create()
+            var tt = Util.create()
 
             tt.only(["nope"])
             assert.equal(tt.test("test").call(runnable), false)
         })
 
         it("checks whitelisted `.only()` block tests", function () {
-            var tt = t.create()
+            var tt = Util.create()
             var inner
 
             tt.only(["test"])
@@ -289,7 +289,7 @@ describe("core (reflect)", function () {
         })
 
         it("misses non-whitelisted `.only()` block tests", function () {
-            var tt = t.create()
+            var tt = Util.create()
             var inner
 
             tt.only(["nope"])
@@ -308,23 +308,23 @@ describe("core (reflect)", function () {
         function skipped(reflect) { return reflect.skipped }
 
         it("checks roots", function () {
-            assert.equal(t.create().call(skipped), false)
+            assert.equal(Util.create().call(skipped), false)
         })
 
         it("checks inline normal tests", function () {
-            var tt = t.create()
+            var tt = Util.create()
 
             assert.equal(tt.test("test").call(skipped), false)
         })
 
         it("checks inline skipped tests", function () {
-            var tt = t.create()
+            var tt = Util.create()
 
             assert.equal(tt.testSkip("test").call(skipped), true)
         })
 
         it("checks block normal tests", function () {
-            var tt = t.create()
+            var tt = Util.create()
             var inner
 
             tt.test("test", function (tt) {
@@ -337,7 +337,7 @@ describe("core (reflect)", function () {
         })
 
         it("misses block skipped tests", function () {
-            var tt = t.create()
+            var tt = Util.create()
             var inner
 
             tt.testSkip("test", function (tt) {
@@ -350,21 +350,21 @@ describe("core (reflect)", function () {
         })
 
         it("checks whitelisted `.only()` inline tests", function () {
-            var tt = t.create()
+            var tt = Util.create()
 
             tt.only(["test"])
             assert.equal(tt.test("test").call(skipped), false)
         })
 
         it("checks non-whitelisted `.only()` inline tests", function () {
-            var tt = t.create()
+            var tt = Util.create()
 
             tt.only(["nope"])
             assert.equal(tt.test("test").call(skipped), false)
         })
 
         it("checks whitelisted `.only()` block tests", function () {
-            var tt = t.create()
+            var tt = Util.create()
             var inner
 
             tt.only(["test"])
@@ -379,7 +379,7 @@ describe("core (reflect)", function () {
         })
 
         it("misses non-whitelisted `.only()` block tests", function () {
-            var tt = t.create()
+            var tt = Util.create()
             var inner
 
             tt.only(["nope"])

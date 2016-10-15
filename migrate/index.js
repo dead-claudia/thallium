@@ -9,6 +9,7 @@
  */
 
 var Common = require("./common.js")
+var Internal = require("../internal.js")
 var methods = require("../lib/methods.js")
 var Promise = require("../lib/bluebird.js")
 
@@ -312,18 +313,18 @@ methods(Thallium, {
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * - `reflect.do` -> `reflect.try`/`t.try`                                   *
- * - `reflect.base` -> `t.create`                                            *
+ * - `reflect.base` -> `internal.createBase`                                 *
  * - `reflect.AssertionError` -> `assert.AssertionError`.                    *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 methods(Reflect, {
     // Deprecated aliases
     do: Common.deprecate(
-        "`reflect.do` was renamed to `reflect.try`, aliased `t.try`.",
+        "`reflect.do` is deprecated. Use `reflect.try` or `t.try` instead.",
         Reflect.prototype.try),
     base: Common.deprecate(
-        "`reflect.base` was renamed to `t.create`.",
-        function () { return new Thallium() }),
+        "`reflect.base` is deprecated. Use `internal.createBase` from `thallium/internal` instead.", // eslint-disable-line max-len
+        Internal.createBase),
 })
 
 // ESLint oddly can't tell these are shadowed.
@@ -421,18 +422,16 @@ methods(Thallium, {
  * - `reflect.scheduler` -> `internal.setScheduler`                          *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-var Internal = require("../internal.js")
-
 methods(Reflect, {
     report: Common.deprecate(
-        "`reflect.report` is deprecated. Use `internal.createReport` from thallium/internal instead", // eslint-disable-line max-len
+        "`reflect.report` is deprecated. Use `internal.createReport` from `thallium/internal` instead", // eslint-disable-line max-len
         Internal.createReport),
 
     loc: Common.deprecate(
-        "`reflect.loc` is deprecated. Use `internal.createLocation` from thallium/internal instead", // eslint-disable-line max-len
+        "`reflect.loc` is deprecated. Use `internal.createLocation` from `thallium/internal` instead", // eslint-disable-line max-len
         Internal.createLocation),
 
     scheduler: Common.deprecate(
-        "`reflect.scheduler` is deprecated. Use `internal.setScheduler` from thallium/internal instead", // eslint-disable-line max-len
+        "`reflect.scheduler` is deprecated. Use `internal.setScheduler` from `thallium/internal` instead", // eslint-disable-line max-len
         Internal.setScheduler),
 })

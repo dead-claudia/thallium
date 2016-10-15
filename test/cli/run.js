@@ -88,7 +88,7 @@ describe("cli runner", function () {
         Util.silenceEmptyInlineWarnings()
 
         function run(opts) {
-            var tt = t.create()
+            var tt = Util.create()
             var tree = opts.tree(tt)
 
             if (tree["node_modules"] == null) tree["node_modules"] = {}
@@ -331,7 +331,7 @@ describe("cli runner", function () {
 
         it("adheres to the config correctly", function () {
             var ret = []
-            var custom = t.create()
+            var custom = Util.create()
 
             function noop() {}
 

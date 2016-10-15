@@ -1,6 +1,7 @@
 "use strict"
 
 var Promise = require("./lib/bluebird.js")
+var Thallium = require("./lib/thallium.js")
 var Tests = require("./lib/tests.js")
 var Types = Tests.Types
 var Report = Tests.Report
@@ -20,6 +21,10 @@ function toReportType(type) {
     case "error": return Types.Error
     default: throw new RangeError("Unknown report `type`: " + type)
     }
+}
+
+exports.createBase = function () {
+    return new Thallium()
 }
 
 /**
