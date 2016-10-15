@@ -20,7 +20,7 @@ module.exports = ->
 
                 old.call this, (ev) ->
                     if subscribed
-                        if ev.end()
+                        if ev.end
                             observer.complete()
                         else
                             observer.next(ev)

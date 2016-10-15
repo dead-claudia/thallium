@@ -21,7 +21,7 @@ export default function ({methods}) {
 
                 old.call(this, ev => {
                     if (subscribed) {
-                        if (ev.end()) observer.complete()
+                        if (ev.end) observer.complete()
                         else observer.next(ev)
                     }
                 })

@@ -163,22 +163,22 @@ Util.jsdom = (function () {
 })()
 
 Util.push = function (ret, keep) {
-    return function push(arg) {
+    return function push(ev) {
         // Any equality tests on either of these are inherently flaky.
-        assert.hasOwn(arg, "duration")
-        assert.hasOwn(arg, "slow")
-        assert.number(arg.duration)
-        assert.number(arg.slow)
+        assert.hasOwn(ev, "duration")
+        assert.hasOwn(ev, "slow")
+        assert.number(ev.duration)
+        assert.number(ev.slow)
         if (!keep) {
-            if (arg.pass() || arg.fail() || arg.enter()) {
-                arg.duration = 10
-                arg.slow = 75
+            if (ev.pass || ev.fail || ev.enter) {
+                ev.duration = 10
+                ev.slow = 75
             } else {
-                arg.duration = -1
-                arg.slow = 0
+                ev.duration = -1
+                ev.slow = 0
             }
         }
-        ret.push(arg)
+        ret.push(ev)
     }
 }
 

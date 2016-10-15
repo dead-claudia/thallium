@@ -25,16 +25,16 @@ module.exports = R.on({
     init: function (state) { state.counter = 0 },
 
     report: function (r, ev) {
-        if (ev.enter() || ev.pass()) {
+        if (ev.enter || ev.pass) {
             return printDot(r, R.speed(ev))
-        } else if (ev.fail()) {
+        } else if (ev.fail) {
             r.pushError(ev)
             return printDot(r, "fail")
-        } else if (ev.skip()) {
+        } else if (ev.skip) {
             return printDot(r, "skip")
-        } else if (ev.end()) {
+        } else if (ev.end) {
             return r.print().then(function () { return r.printResults() })
-        } else if (ev.error()) {
+        } else if (ev.error) {
             if (r.state.counter) {
                 return r.print().then(function () { return r.printError(ev) })
             } else {

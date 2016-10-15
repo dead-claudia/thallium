@@ -36,5 +36,5 @@ module.exports = function (ev) {
     .map(function (x) { return "[" + x.index + ": " + x.name + "]" })
     .join(" > ")
 
-    console.log(ev.type() + " " + (path ? path + " = " : "= ") + fix(ev.value))
+    console.log(ev.type + " " + (path ? path + " = " : "= ") + fix(ev.value))
 }

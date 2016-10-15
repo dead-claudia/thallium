@@ -40,21 +40,21 @@ module.exports = R.on({
     },
 
     report: function (r, ev) {
-        if (ev.start()) {
+        if (ev.start) {
             if (ev.path.length === 0) return r.print()
 
             return r.print().return(ev.path).each(function (entry) {
                 return r.print(indent(r.state.level++) + entry.name)
             })
-        } else if (ev.enter()) {
+        } else if (ev.enter) {
             return printReport(r, ev, function () {
                 return getName(r.state.level++, ev)
             })
-        } else if (ev.leave()) {
+        } else if (ev.leave) {
             r.state.level--
             r.state.lastIsNested = true
             return undefined
-        } else if (ev.pass()) {
+        } else if (ev.pass) {
             return printReport(r, ev, function () {
                 var str =
                     c("checkmark", R.symbols().Pass + " ") +
@@ -68,20 +68,20 @@ module.exports = R.on({
 
                 return str
             })
-        } else if (ev.fail()) {
+        } else if (ev.fail) {
             return printReport(r, ev, function () {
                 r.pushError(ev, false)
                 return c("fail", r.errors.length + ") " +
                     getName(r.state.level, ev))
             })
-        } else if (ev.skip()) {
+        } else if (ev.skip) {
             return printReport(r, ev, function () {
                 return c("skip", "- " + getName(r.state.level, ev))
             })
         }
 
-        if (ev.end()) return r.printResults()
-        if (ev.error()) return r.printError(ev)
+        if (ev.end) return r.printResults()
+        if (ev.error) return r.printError(ev)
         return undefined
     },
 })

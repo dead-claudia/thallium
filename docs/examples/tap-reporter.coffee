@@ -62,10 +62,10 @@ printError = ({value: err}) ->
 
 module.exports = (ev) ->
     switch
-        when ev.start()
+        when ev.start
             console.log 'TAP version 13'
 
-        when ev.enter()
+        when ev.enter
             _.tests++
             _.pass++
             # Print a leading comment, to make some TAP formatters prettier.
@@ -73,14 +73,14 @@ module.exports = (ev) ->
             template ev, 'ok %c'
 
         # This is meaningless for the output.
-        when ev.leave() then
+        when ev.leave then
 
-        when ev.pass()
+        when ev.pass
             _.tests++
             _.pass++
             template ev, 'ok %c %p'
 
-        when ev.fail()
+        when ev.fail
             _.tests++
             _.fail++
             template ev, 'not ok %c %p'
@@ -88,11 +88,11 @@ module.exports = (ev) ->
             printError ev
             console.log '  ...'
 
-        when ev.skip()
+        when ev.skip
             _.skip++
             template ev, 'ok %c # skip %p'
 
-        when ev.end()
+        when ev.end
             console.log "1..#{_.counter}"
             console.log "# tests #{_.tests}"
             console.log "# pass #{_.pass}" if _.pass
@@ -100,7 +100,7 @@ module.exports = (ev) ->
             console.log "# skip #{_.skip}" if _.skip
             _.reset()
 
-        when ev.error()
+        when ev.error
             console.log 'Bail out!'
             console.log '  ---'
             printError ev

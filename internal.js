@@ -19,6 +19,7 @@ function toReportType(type) {
     case "skip": return Types.Skip
     case "end": return Types.End
     case "error": return Types.Error
+    case "hook": return Types.Hook
     default: throw new RangeError("Unknown report `type`: " + type)
     }
 }
@@ -62,7 +63,7 @@ exports.createReport = function (type, path, value, duration, slow) { // eslint-
         } else {
             return new Report(converted, path, undefined, duration|0, slow|0)
         }
-    } else if (converted === Types.Error) {
+    } else if (converted === Types.Error || converted === Types.Hook) {
         return new Report(converted, path, value, -1, 0)
     } else {
         return new Report(converted, path, undefined, -1, 0)

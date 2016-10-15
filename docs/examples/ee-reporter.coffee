@@ -18,7 +18,7 @@ module.exports = ->
             for reporter in arguments
                 if typeof reporter is 'object' and reporter?
                     do (reporter) -> (ev) ->
-                        reporter.emit ev.type(), ev
+                        reporter.emit ev.type, ev
                         return
                 else
                     # Don't fix reporter

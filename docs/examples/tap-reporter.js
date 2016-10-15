@@ -85,36 +85,36 @@ async function printError({value: err}) {
 }
 
 export default async function tap(ev) { // eslint-disable-line max-statements
-    if (ev.start()) {
+    if (ev.start) {
         await print("TAP version 13")
-    } else if (ev.enter()) {
+    } else if (ev.enter) {
         tests++
         pass++
         // Print a leading comment, to make some TAP formatters prettier.
         await template(ev, "# %p", true)
         await template(ev, "ok %c")
-    } else if (ev.pass()) {
+    } else if (ev.pass) {
         tests++
         pass++
         await template(ev, "ok %c %p")
-    } else if (ev.fail()) {
+    } else if (ev.fail) {
         tests++
         fail++
         await template(ev, "not ok %c %p")
         await print("  ---")
         await printError(ev)
         await print("  ...")
-    } else if (ev.skip()) {
+    } else if (ev.skip) {
         skip++
         await template(ev, "ok %c # skip %p")
-    } else if (ev.end()) {
+    } else if (ev.end) {
         await print(`1..${counter}`)
         await print(`# tests ${tests}`)
         if (pass) await print(`# pass ${pass}`)
         if (fail) await print(`# fail ${fail}`)
         if (skip) await print(`# skip ${skip}`)
         reset()
-    } else if (ev.error()) {
+    } else if (ev.error) {
         await print("Bail out!")
         await print("  ---")
         await printError(ev)

@@ -217,14 +217,14 @@ function initFirstTest(r, ev) {
 
 function showTestResult(r, ev) {
     var document = r.state.window.document
-    var className = ev.enter() ? "" : "test " + ev.type()
+    var className = ev.enter ? "" : "test " + ev.type
     var name = ev.path[ev.path.length - 1].name
     var outer = document.createElement("li")
-    var inner = document.createElement(ev.enter() ? "h1" : "h2")
+    var inner = document.createElement(ev.enter ? "h1" : "h2")
 
     inner.appendChild(document.createTextNode(name))
 
-    if (!ev.skip()) {
+    if (!ev.skip) {
         className += " " + R.speed(ev)
         var duration = document.createElement("span")
 
@@ -235,7 +235,7 @@ function showTestResult(r, ev) {
     outer.className = className
     outer.appendChild(inner)
 
-    if (ev.enter()) {
+    if (ev.enter) {
         r.get(ev.path).node = document.createElement("ul")
         outer.appendChild(r.get(ev.path).node)
     }
@@ -285,12 +285,12 @@ module.exports = R.on({
     },
 
     report: function (r, ev) {
-        if (ev.start()) {
+        if (ev.start) {
             initFirstTest(r, ev)
-        } else if (ev.enter() || ev.pass() || ev.fail() || ev.skip()) {
+        } else if (ev.enter || ev.pass || ev.fail || ev.skip) {
             showTestResult(r, ev)
             updateStats(r)
-        } else if (ev.error()) {
+        } else if (ev.error) {
             if (r.opts.window.console) {
                 var console = r.opts.window.conosle
 

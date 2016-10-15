@@ -15,7 +15,7 @@ export default function ({methods}) {
     methods.reporter = function (...args) {
         return old.apply(this, args.map(reporter => {
             if (typeof reporter === "object" && reporter != null) {
-                return ev => { reporter.emit(ev.type(), ev) }
+                return ev => { reporter.emit(ev.type, ev) }
             } else {
                 // Don't fix reporter
                 return reporter

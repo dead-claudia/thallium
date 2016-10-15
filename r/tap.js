@@ -77,22 +77,22 @@ module.exports = R.on({
     init: function (state) { state.counter = 0 },
 
     report: function (r, ev) {
-        if (ev.start()) {
+        if (ev.start) {
             return r.print("TAP version 13")
-        } else if (ev.enter()) {
+        } else if (ev.enter) {
             // Print a leading comment, to make some TAP formatters prettier.
             return template(r, ev, "# %p", true)
             .then(function () { return template(r, ev, "ok %c") })
-        } else if (ev.pass()) {
+        } else if (ev.pass) {
             return template(r, ev, "ok %c %p")
-        } else if (ev.fail()) {
+        } else if (ev.fail) {
             return template(r, ev, "not ok %c %p")
             .then(function () { return r.print("  ---") })
             .then(function () { return printError(r, ev) })
             .then(function () { return r.print("  ...") })
-        } else if (ev.skip()) {
+        } else if (ev.skip) {
             return template(r, ev, "ok %c # skip %p")
-        } else if (ev.end()) {
+        } else if (ev.end) {
             var p = r.print("1.." + r.state.counter)
             .then(function () { return r.print("# tests " + r.tests) })
 
@@ -100,7 +100,7 @@ module.exports = R.on({
             if (r.fail) p = printLine(p, r, "# fail " + r.fail)
             if (r.skip) p = printLine(p, r, "# skip " + r.skip)
             return printLine(p, r, "# duration " + R.formatTime(r.duration))
-        } else if (ev.error()) {
+        } else if (ev.error) {
             return r.print("Bail out!")
             .then(function () { return r.print("  ---") })
             .then(function () { return printError(r, ev) })

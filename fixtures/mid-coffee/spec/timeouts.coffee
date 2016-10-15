@@ -17,19 +17,19 @@ assert = require 'thallium/assert'
 # these have been tested against a slower machine, so it should hopefully not
 # be too bad.
 t.test 'core (timeouts) (FLAKE)', ->
-    push = (ret) -> (arg) ->
+    push = (ret) -> (ev) ->
         # Any equality tests on either of these are inherently flaky.
-        assert.hasOwn arg, 'duration'
-        assert.number arg.duration
-        assert.hasOwn arg, 'slow'
-        assert.number arg.slow
-        if arg.pass() or arg.fail() or arg.enter()
-            arg.duration = 10
-            arg.slow = 75
+        assert.hasOwn ev, 'duration'
+        assert.number ev.duration
+        assert.hasOwn ev, 'slow'
+        assert.number ev.slow
+        if ev.pass or ev.fail or ev.enter
+            ev.duration = 10
+            ev.slow = 75
         else
-            arg.duration = -1
-            arg.slow = 0
-        ret.push(arg)
+            ev.duration = -1
+            ev.slow = 0
+        ret.push(ev)
 
     @test 'succeeds with own', ->
         tt = create()
