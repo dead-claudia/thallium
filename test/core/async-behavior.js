@@ -37,7 +37,7 @@ describe("core (asynchronous behavior)", function () {
         var tt = t.create()
         var called = false
 
-        tt.async("test", function () {
+        tt.test("test", function () {
             called = true
             return {then: function (resolve) { resolve() }}
         })
@@ -52,7 +52,7 @@ describe("core (asynchronous behavior)", function () {
         var tt = t.create()
         var called = false
 
-        tt.async("test", function () {
+        tt.test("test", function () {
             called = true
             return {
                 then: function (resolve) {
@@ -71,7 +71,7 @@ describe("core (asynchronous behavior)", function () {
         var tt = t.create()
         var called = false
 
-        tt.async("test", function () {
+        tt.test("test", function () {
             called = true
             return {
                 then: function (resolve) {
@@ -98,7 +98,7 @@ describe("core (asynchronous behavior)", function () {
 
         tt.reporter(Util.push(ret))
 
-        tt.async("test", function () {
+        tt.test("test", function () {
             called = true
             return {
                 then: function (_, reject) {
@@ -131,7 +131,7 @@ describe("core (asynchronous behavior)", function () {
 
         tt.reporter(Util.push(ret))
 
-        tt.async("test", function () {
+        tt.test("test", function () {
             called = true
             return {
                 then: function (resolve, reject) {
@@ -165,7 +165,7 @@ describe("core (asynchronous behavior)", function () {
 
         tt.reporter(Util.push(ret))
 
-        tt.async("test", function () {
+        tt.test("test", function () {
             called = true
 
             return {

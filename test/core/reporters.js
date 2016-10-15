@@ -20,13 +20,21 @@ describe("core (reporters)", function () { // eslint-disable-line max-statements
         return e
     }
 
+    function reporters(reflect) {
+        return reflect.reporters()
+    }
+
+    function activeReporters(reflect) {
+        return reflect.activeReporters()
+    }
+
     it("added individually correctly", function () {
         var tt = t.create()
 
         function plugin() {}
 
         tt.reporter(plugin)
-        assert.match(tt.reflect().reporters(), [plugin])
+        assert.match(tt.call(reporters), [plugin])
     })
 
     it("added in batches correctly", function () {
@@ -40,7 +48,7 @@ describe("core (reporters)", function () { // eslint-disable-line max-statements
 
         tt.reporter(plugin1, plugin2, plugin3, plugin4, plugin5)
         assert.match(
-            tt.reflect().reporters(),
+            tt.call(reporters),
             [plugin1, plugin2, plugin3, plugin4, plugin5])
     })
 
@@ -60,13 +68,13 @@ describe("core (reporters)", function () { // eslint-disable-line max-statements
         .reporter(plugin1, plugin2, plugin3, plugin4, plugin5)
 
         assert.match(
-            ttt.reflect().reporters(),
+            ttt.call(reporters),
             [plugin1, plugin2, plugin3, plugin4, plugin5])
 
         assert.match(
-            ttt.reflect().activeReporters(),
+            ttt.call(activeReporters),
             [plugin1, plugin2, plugin3, plugin4, plugin5])
-        assert.match(tt.reflect().reporters(), [plugin6])
+        assert.match(tt.call(reporters), [plugin6])
     })
 
     it("read on children correctly", function () {
@@ -81,10 +89,10 @@ describe("core (reporters)", function () { // eslint-disable-line max-statements
         tt.reporter(plugin1, plugin2, plugin3, plugin4, plugin5)
         var ttt = tt.test("test")
 
-        assert.match(ttt.reflect().reporters(), [])
+        assert.match(ttt.call(reporters), [])
 
         assert.match(
-            ttt.reflect().activeReporters(),
+            ttt.call(activeReporters),
             [plugin1, plugin2, plugin3, plugin4, plugin5])
     })
 
@@ -95,7 +103,7 @@ describe("core (reporters)", function () { // eslint-disable-line max-statements
 
         tt.reporter(plugin)
         tt.removeReporter(plugin)
-        assert.match(tt.reflect().reporters(), [])
+        assert.match(tt.call(reporters), [])
     })
 
     it("removed in batches correctly", function () {
@@ -109,7 +117,7 @@ describe("core (reporters)", function () { // eslint-disable-line max-statements
 
         tt.reporter(plugin1, plugin2, plugin3, plugin4, plugin5)
         tt.removeReporter(plugin1, plugin2, plugin4)
-        assert.match(tt.reflect().reporters(), [plugin3, plugin5])
+        assert.match(tt.call(reporters), [plugin3, plugin5])
     })
 
     it("removed on children correctly", function () {
@@ -129,9 +137,9 @@ describe("core (reporters)", function () { // eslint-disable-line max-statements
 
         ttt.removeReporter(plugin1, plugin2, plugin4)
 
-        assert.match(ttt.reflect().reporters(), [plugin3, plugin5])
-        assert.match(ttt.reflect().activeReporters(), [plugin3, plugin5])
-        assert.match(tt.reflect().reporters(), [plugin6])
+        assert.match(ttt.call(reporters), [plugin3, plugin5])
+        assert.match(ttt.call(activeReporters), [plugin3, plugin5])
+        assert.match(tt.call(reporters), [plugin6])
     })
 
     it("only added once", function () {
@@ -144,10 +152,10 @@ describe("core (reporters)", function () { // eslint-disable-line max-statements
         tt.reporter(plugin1, plugin2, plugin3)
         tt.reporter(plugin3, plugin1)
 
-        assert.match(tt.reflect().reporters(), [plugin1, plugin2, plugin3])
+        assert.match(tt.call(reporters), [plugin1, plugin2, plugin3])
 
         assert.match(
-            tt.reflect().activeReporters(),
+            tt.call(activeReporters),
             [plugin1, plugin2, plugin3])
     })
 
@@ -273,7 +281,7 @@ describe("core (reporters)", function () { // eslint-disable-line max-statements
 
         tt.reporter(Util.push(ret))
 
-        tt.async("test", function () { return resolve() })
+        tt.test("test", function () { return resolve() })
         tt.test("test", function () {})
 
         return tt.run().then(function () {
@@ -293,7 +301,7 @@ describe("core (reporters)", function () { // eslint-disable-line max-statements
 
         tt.reporter(Util.push(ret))
 
-        tt.async("one", function () { return reject(sentinel) })
+        tt.test("one", function () { return reject(sentinel) })
         tt.test("two", function () { throw sentinel })
 
         return tt.run().then(function () {
@@ -313,8 +321,8 @@ describe("core (reporters)", function () { // eslint-disable-line max-statements
 
         tt.reporter(Util.push(ret))
 
-        tt.async("one", function () { return reject(sentinel) })
-        tt.async("two", function () { return resolve() })
+        tt.test("one", function () { return reject(sentinel) })
+        tt.test("two", function () { return resolve() })
 
         return tt.run().then(function () {
             assert.match(ret, [
@@ -332,7 +340,7 @@ describe("core (reporters)", function () { // eslint-disable-line max-statements
 
         tt.reporter(Util.push(ret))
 
-        tt.async("test", function () { return resolve() })
+        tt.test("test", function () { return resolve() })
         tt.test("test", function () {})
 
         return tt.run().then(function () {
@@ -352,7 +360,7 @@ describe("core (reporters)", function () { // eslint-disable-line max-statements
 
         tt.reporter(Util.push(ret))
 
-        tt.async("one", function () { return reject(sentinel) })
+        tt.test("one", function () { return reject(sentinel) })
         tt.test("two", function () { throw sentinel })
 
         return tt.run().then(function () {
@@ -372,8 +380,8 @@ describe("core (reporters)", function () { // eslint-disable-line max-statements
 
         tt.reporter(Util.push(ret))
 
-        tt.async("one", function () { return reject(sentinel) })
-        tt.async("two", function () { return resolve() })
+        tt.test("one", function () { return reject(sentinel) })
+        tt.test("two", function () { return resolve() })
 
         return tt.run().then(function () {
             assert.match(ret, [
@@ -499,7 +507,7 @@ describe("core (reporters)", function () { // eslint-disable-line max-statements
                 assert.notEqual(1, 1)
             })
 
-            tt.async("bar()", function () {
+            tt.test("bar()", function () {
                 return {
                     then: function (_, reject) {
                         Util.setTimeout(function () {
@@ -509,7 +517,7 @@ describe("core (reporters)", function () { // eslint-disable-line max-statements
                 }
             })
 
-            tt.async("baz()", function () {
+            tt.test("baz()", function () {
                 return {
                     then: function (_, reject) {
                         Util.setTimeout(function () { reject(sentinel) }, 0)
@@ -653,7 +661,7 @@ describe("core (reporters)", function () { // eslint-disable-line max-statements
                 assert.notEqual(1, 1)
             })
 
-            tt.async("bar()", function () {
+            tt.test("bar()", function () {
                 return {
                     then: function (_, reject) {
                         Util.setTimeout(function () {
@@ -663,7 +671,7 @@ describe("core (reporters)", function () { // eslint-disable-line max-statements
                 }
             })
 
-            tt.async("baz()", function () {
+            tt.test("baz()", function () {
                 return {
                     then: function (_, reject) {
                         Util.setTimeout(function () { reject(sentinel) }, 0)

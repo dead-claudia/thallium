@@ -9,15 +9,17 @@
 // The observable emits the same events as the normal reporters, except "exit"
 // terminates the stream instead.
 
-export default function (t) {
-    t.reflect().wrap("reporter", (reporter, ...args) => {
+export default function (reflect) {
+    const old = reflect.methods().reporter
+
+    reflect.methods().reporter = function (...args) {
         if (args.length) {
-            return reporter(...args)
+            return old.apply(this, args)
         } else {
             return new Observable(observer => {
                 let subscribed = true
 
-                reporter(ev => {
+                old.call(this, ev => {
                     if (subscribed) {
                         if (ev.end()) observer.complete()
                         else observer.next(ev)
@@ -30,5 +32,5 @@ export default function (t) {
                 }
             })
         }
-    })
+    }
 }

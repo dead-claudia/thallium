@@ -36,7 +36,7 @@ describe("core (slow) (FLAKE)", /** @this */ function () {
 
         tt.reporter(Util.push(ret, true))
 
-        tt.async("test", function (tt) {
+        tt.test("test", function (tt) {
             // It's highly unlikely the engine will take this long to finish.
             tt.slow(10)
             return resolve()
@@ -59,7 +59,7 @@ describe("core (slow) (FLAKE)", /** @this */ function () {
 
         tt.reporter(Util.push(ret, true))
 
-        tt.async("test", function (tt) {
+        tt.test("test", function (tt) {
             // It's highly unlikely the engine will take this long to finish.
             tt.slow(100)
             return delay(60)
@@ -83,7 +83,7 @@ describe("core (slow) (FLAKE)", /** @this */ function () {
 
         tt.reporter(Util.push(ret, true))
 
-        tt.async("test", function (tt) {
+        tt.test("test", function (tt) {
             tt.slow(50)
             // It's highly unlikely the engine will take this long to finish
             return delay(200)
@@ -109,7 +109,7 @@ describe("core (slow) (FLAKE)", /** @this */ function () {
 
         tt.test("test")
         .slow(50)
-        .async("inner", function () { return resolve() })
+        .test("inner", function () { return resolve() })
 
         return tt.run().then(function () {
             assert.match(ret, [
@@ -135,7 +135,7 @@ describe("core (slow) (FLAKE)", /** @this */ function () {
 
         tt.test("test")
         .slow(50)
-        .async("inner", function () { return delay(200) })
+        .test("inner", function () { return delay(200) })
 
         return tt.run().then(function () {
             assert.match(ret, [
@@ -153,14 +153,22 @@ describe("core (slow) (FLAKE)", /** @this */ function () {
         })
     })
 
+    function slow(reflect) {
+        return reflect.slow()
+    }
+
+    function activeSlow(reflect) {
+        return reflect.activeSlow()
+    }
+
     it("gets own block slow", function () {
         var tt = t.create()
         var active, raw
 
         tt.test("test", function (tt) {
             tt.slow(50)
-            active = tt.reflect().activeSlow()
-            raw = tt.reflect().slow()
+            active = tt.call(activeSlow)
+            raw = tt.call(slow)
         })
 
         return tt.run().then(function () {
@@ -173,8 +181,8 @@ describe("core (slow) (FLAKE)", /** @this */ function () {
         var tt = t.create()
         var ttt = tt.test("test").slow(50)
 
-        assert.equal(ttt.reflect().activeSlow(), 50)
-        assert.equal(ttt.reflect().slow(), 50)
+        assert.equal(ttt.call(activeSlow), 50)
+        assert.equal(ttt.call(slow), 50)
     })
 
     it("gets inherited block slow", function () {
@@ -184,8 +192,8 @@ describe("core (slow) (FLAKE)", /** @this */ function () {
         tt.test("test")
         .slow(50)
         .test("inner", function (tt) {
-            active = tt.reflect().activeSlow()
-            raw = tt.reflect().slow()
+            active = tt.call(activeSlow)
+            raw = tt.call(slow)
         })
 
         return tt.run().then(function () {
@@ -200,8 +208,8 @@ describe("core (slow) (FLAKE)", /** @this */ function () {
         .slow(50)
         .test("inner")
 
-        assert.equal(ttt.reflect().activeSlow(), 50)
-        assert.equal(ttt.reflect().slow(), 0)
+        assert.equal(ttt.call(activeSlow), 50)
+        assert.equal(ttt.call(slow), 0)
     })
 
     it("gets default slow", function () {
@@ -209,8 +217,8 @@ describe("core (slow) (FLAKE)", /** @this */ function () {
         var active, raw
 
         tt.test("test", function (tt) {
-            active = tt.reflect().activeSlow()
-            raw = tt.reflect().slow()
+            active = tt.call(activeSlow)
+            raw = tt.call(slow)
         })
 
         return tt.run().then(function () {

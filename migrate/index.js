@@ -21,20 +21,21 @@ var AssertionError = assert.AssertionError
 var format = assert.format
 
 var Thallium = require("../lib/thallium.js")
-var Reflect = new Thallium().reflect().constructor
+var Reflect = new Thallium().call(function (r) { return r.constructor })
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- * `t.async` now only understands promises.                                  *
+ * - `t.async` -> `t.test`, which now supports promises.                     *
+ * - All tests are now async.                                                *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-var async = Thallium.prototype.async
+var test = Thallium.prototype.test
 
 function runAsync(callback, t, resolve, reject) {
     var resolved = false
     var gen = callback.call(t, t, function (err) {
         if (resolved) return
-        Common.warn("The second `done` argument of `t.async` is " +
-            "deprecated. Return a promise instead.")
+        Common.warn("`t.async` is deprecated. " +
+            "Use `t.test` and return a promise instead.")
 
         resolved = true
         if (err != null) reject(err)
@@ -49,8 +50,8 @@ function runAsync(callback, t, resolve, reject) {
         return
     }
 
-    Common.warn("t.async generator callbacks are deprecated. Return " +
-        "a promise or use `co` or ES8 `async`/`await` instead.")
+    Common.warn("`t.async` is deprecated. Use `t.test` and either return a " +
+        "promise or use `co`/ES8 async functions instead.")
 
     // This is a modified version of the async-await official, non-normative
     // desugaring helper, for better error checking and adapted to accept an
@@ -78,14 +79,23 @@ methods(Thallium, {
     async: function (name, callback) {
         if (typeof callback !== "function") {
             // Reuse the normal error handling.
-            return async.apply(this, arguments)
+            return test.apply(this, arguments)
         } else {
-            return async.call(this, name, function (t) {
+            return test.call(this, name, function (t) {
                 return new Promise(function (resolve, reject) {
                     return runAsync(callback, t, resolve, reject)
                 })
             })
         }
+    },
+
+    asyncSkip: Thallium.prototype.testSkip,
+})
+
+methods(Reflect, {
+    async: function () {
+        new Reflect(this._).checkInit()
+        return true
     },
 })
 
@@ -381,4 +391,43 @@ methods(Thallium, {
 
         return createReport.apply(this, arguments)
     },
+})
+
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ * - `t.reflect` and `t.use` -> non-caching `t.call`                         *
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+var call = Thallium.prototype.call
+
+function id(x) { return x }
+
+methods(Thallium, {
+    reflect: Common.deprecate(
+        "`t.reflect` is deprecated. Use `t.call` instead",
+        /** @this */ function () { return call.call(this, id) }),
+
+    use: Common.deprecate(
+        "`t.use` is deprecated. Use `t.call` instead",
+        /** @this */ function () {
+            var reflect = call.call(this, id)
+
+            if (!reflect.skipped()) {
+                for (var i = 0; i < arguments.length; i++) {
+                    var plugin = arguments[i]
+
+                    if (typeof plugin !== "function") {
+                        throw new TypeError(
+                            "Expected `plugin` to be a function")
+                    }
+
+                    if (this._.plugins == null) this._.plugins = []
+                    if (this._.plugins.indexOf(plugin) === -1) {
+                        // Add plugin before calling it.
+                        this._.plugins.push(plugin)
+                        plugin.call(this, this)
+                    }
+                }
+            }
+
+            return this
+        }),
 })

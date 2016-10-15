@@ -76,9 +76,9 @@ Do note that it isn't necessarily comprehensive, although I try to keep it somew
 9. ~~Remove the `thallium` and `_thallium` aliases, and rename the repo's binaries accordingly~~~
     - ~~Only `tl` is actually documented~~
 10. ~~Add more useful introspection methods (e.g. test name, test index, test's children, etc.)~~
-11. Add `t.call(plugin)`, where `plugin` accepts a `reflect` instance, and the result is returned untouched
-    - Deprecate `t.reflect()`, equivalent to `t.call(reflect => reflect)`
-    - Deprecate `t.use(...plugins)`, equivalent to the following:
+11. ~~Add `t.call(plugin)`, where `plugin` accepts a `reflect` instance, and the result is returned untouched~~
+    - ~~Deprecate `t.reflect()`, equivalent to `t.call(reflect => reflect)`~~
+    - ~~Deprecate `t.use(...plugins)`, equivalent to the following:~~
 
     ```js
     t.call(reflect => {
@@ -87,10 +87,10 @@ Do note that it isn't necessarily comprehensive, although I try to keep it somew
     })
     ```
 12. Create before/after lifecycle hooks
-13. Rename `t.async` &rarr; `t.test`, deprecate old form
+13. ~~Rename `t.async` &rarr; `t.test`, deprecate old form~~
 14. Support a `.tl.opts` file to prepend CLI arguments (and way to disable it)
 15. Add PhantomJS and OS X to the Travis build, and ~~[AppVeyor](https://www.appveyor.com/) support for Windows testing~~
-16. Move `reflect.loc`, `reflect.report`, and `reflect.parent` to their own module.
+16. Move `reflect.loc`, `reflect.report`, and `reflect.parent` to their own module and deprecate them.
 17. Complete migration utility
 18. Update existing documentation
 
@@ -98,7 +98,7 @@ Do note that it isn't necessarily comprehensive, although I try to keep it somew
 
 1. Add `reflect.current()` to get current running test as a `Reflect` (not necessarily that of the backing instance)
     - This could be difficult, but will be immensely useful for plugin authors
-    - Deprecate `reflect.methods()` and test inheritance in favor of this
+    - Deprecate test inheritance in favor of this
 2. Add diff support to all existing reporters
 3. Document all the assertions
 4. Support flaky tests via first-class retries

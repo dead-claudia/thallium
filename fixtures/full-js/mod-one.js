@@ -7,15 +7,15 @@ var assert = require("../../assert.js")
 t.test("mod-one", function (t) {
     t.test("1 === 1").try(assert.equal, 1, 1)
 
-    t.test("foo()", function (t) {
-        t.try(assert.notEqual, 1, 1)
+    t.test("foo()", function () {
+        assert.notEqual(1, 1)
     })
 
-    t.async("bar()", function () {
+    t.test("bar()", function () {
         return Promise.delay(0).throw(new Error("fail"))
     })
 
-    t.async("baz()", function () {
+    t.test("baz()", function () {
         return Promise.reject(new Error("sentinel"))
     })
 

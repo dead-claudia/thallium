@@ -31,7 +31,7 @@ describe("core (timeouts) (FLAKE)", /** @this */ function () {
 
         tt.reporter(Util.push(ret))
 
-        tt.async("test", function (tt) {
+        tt.test("test", function (tt) {
             // It's highly unlikely the engine will take this long to finish.
             tt.timeout(10)
             return resolve()
@@ -52,7 +52,7 @@ describe("core (timeouts) (FLAKE)", /** @this */ function () {
 
         tt.reporter(Util.push(ret))
 
-        tt.async("test", function (tt) {
+        tt.test("test", function (tt) {
             tt.timeout(50)
             // It's highly unlikely the engine will take this long to finish
             return delay(200)
@@ -75,7 +75,7 @@ describe("core (timeouts) (FLAKE)", /** @this */ function () {
 
         tt.test("test")
         .timeout(50)
-        .async("inner", function () { return resolve() })
+        .test("inner", function () { return resolve() })
 
         return tt.run().then(function () {
             assert.match(ret, [
@@ -96,7 +96,7 @@ describe("core (timeouts) (FLAKE)", /** @this */ function () {
 
         tt.test("test")
         .timeout(50)
-        .async("inner", function () {
+        .test("inner", function () {
             // It's highly unlikely the engine will take this long to finish.
             return delay(200)
         })
@@ -113,14 +113,22 @@ describe("core (timeouts) (FLAKE)", /** @this */ function () {
         })
     })
 
+    function timeout(reflect) {
+        return reflect.timeout()
+    }
+
+    function activeTimeout(reflect) {
+        return reflect.activeTimeout()
+    }
+
     it("gets own block timeout", function () {
         var tt = t.create()
         var active, raw
 
         tt.test("test", function (tt) {
             tt.timeout(50)
-            active = tt.reflect().activeTimeout()
-            raw = tt.reflect().timeout()
+            active = tt.call(activeTimeout)
+            raw = tt.call(timeout)
         })
 
         return tt.run().then(function () {
@@ -133,8 +141,8 @@ describe("core (timeouts) (FLAKE)", /** @this */ function () {
         var tt = t.create()
         var ttt = tt.test("test").timeout(50)
 
-        assert.equal(ttt.reflect().activeTimeout(), 50)
-        assert.equal(ttt.reflect().timeout(), 50)
+        assert.equal(ttt.call(activeTimeout), 50)
+        assert.equal(ttt.call(timeout), 50)
     })
 
     it("gets inherited block timeout", function () {
@@ -144,8 +152,8 @@ describe("core (timeouts) (FLAKE)", /** @this */ function () {
         tt.test("test")
         .timeout(50)
         .test("inner", function (tt) {
-            active = tt.reflect().activeTimeout()
-            raw = tt.reflect().timeout()
+            active = tt.call(activeTimeout)
+            raw = tt.call(timeout)
         })
 
         return tt.run().then(function () {
@@ -160,8 +168,8 @@ describe("core (timeouts) (FLAKE)", /** @this */ function () {
         .timeout(50)
         .test("inner")
 
-        assert.equal(ttt.reflect().activeTimeout(), 50)
-        assert.equal(ttt.reflect().timeout(), 0)
+        assert.equal(ttt.call(activeTimeout), 50)
+        assert.equal(ttt.call(timeout), 0)
     })
 
     it("gets default timeout", function () {
@@ -169,8 +177,8 @@ describe("core (timeouts) (FLAKE)", /** @this */ function () {
         var active, raw
 
         tt.test("test", function (tt) {
-            active = tt.reflect().activeTimeout()
-            raw = tt.reflect().timeout()
+            active = tt.call(activeTimeout)
+            raw = tt.call(timeout)
         })
 
         return tt.run().then(function () {
