@@ -1,27 +1,30 @@
 version: '{build}'
 environment:
-    matrix:
-        # Not supported due to Node.js bug with async console writes
-        # - nodejs_version: 0.10
-        - nodejs_version: 0.12
-        - nodejs_version: 1
-        - nodejs_version: 2
-        - nodejs_version: 3
-        - nodejs_version: 4
-        - nodejs_version: 5
-        - nodejs_version: 6
+  matrix:
+    # Not supported due to Node.js bug with async console writes
+    # - nodejs_version: 0.10
+    - nodejs_version: 0.12
+      task: test:node
+    - nodejs_version: 4
+      task: test:node
+    - nodejs_version: 5
+      task: test:node
+    - nodejs_version: 6
+      task: test:node
+    - nodejs_version: stable
+      task: test:phantomjs
 
 install:
-    - ps: Install-Product node stable
-    - npm install
-    - ps: Install-Product node $env:nodejs_version
+  - ps: Install-Product node stable
+  - npm install
+  - ps: Install-Product node $env:nodejs_version
 
 build: off
 
 test_script:
-    - node --version
-    - npm --version
-    - ps: Install-Product node stable
-    - node make lint
-    - ps: Install-Product node $env:nodejs_version
-    - node make test:node
+  - node --version
+  - npm --version
+  - ps: Install-Product node stable
+  - node make lint
+  - ps: Install-Product node $env:nodejs_version
+  - ps: '& node make $env:task'

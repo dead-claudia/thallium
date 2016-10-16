@@ -30,11 +30,16 @@ target.lint = function () {
 
 target.test = function () {
     target["test:chrome"]()
+    target["test:phantomjs"]()
     target["test:node"]()
 }
 
 target["test:chrome"] = function () {
     exec(c("karma") + " start --colors --single-run --browsers Chrome")
+}
+
+target["test:phantomjs"] = function () {
+    exec(c("karma") + " start --colors --single-run --browsers PhantomJS")
 }
 
 target["test:node"] = function () {
@@ -98,6 +103,10 @@ target.watch = function () {
 
 target["watch:chrome"] = function () {
     watch("test:chrome")
+}
+
+target["watch:phantomjs"] = function () {
+    watch("test:phantomjs")
 }
 
 target["watch:node"] = function () {
