@@ -163,7 +163,36 @@ function iterateSetter(test, name, func, iterator) {
     }
 }
 
-var try_ = Thallium.prototype.try
+/**
+ * @this {State}
+ * Run `func` with `...args` when assertions are run, only if the test isn't
+ * skipped. This is immediately for block and async tests, but deferred for
+ * inline tests. It's useful for inline assertions.
+ */
+function attempt(func, a, b, c/* , ...args */) {
+    if (!(this.status & Flags.Inline)) {
+        switch (arguments.length) {
+        case 0: throw new TypeError("unreachable")
+        case 1: func(); return
+        case 2: func(a); return
+        case 3: func(a, b); return
+        case 4: func(a, b, c); return
+        default: // do nothing
+        }
+    }
+
+    var args = []
+
+    for (var i = 1; i < arguments.length; i++) {
+        args.push(arguments[i])
+    }
+
+    if (this.status & Flags.Inline) {
+        this.callback.push({func: func, args: args})
+    } else {
+        func.apply(undefined, args)
+    }
+}
 
 function defineAssertion(test, name, func) {
     // Don't let native methods get overridden by assertions
@@ -185,28 +214,17 @@ function defineAssertion(test, name, func) {
         }
     }
 
-    /** @this */
-    function attempt(a, b, c, d) {
-        switch (arguments.length) {
-        case 0: return try_.call(this, run)
-        case 1: return try_.call(this, run, a)
-        case 2: return try_.call(this, run, a, b)
-        case 3: return try_.call(this, run, a, b, c)
-        case 4: return try_.call(this, run, a, b, c, d)
-        default:
+    return /** @this */ function () {
+        new Reflect(this._).checkInit()
+        if (!(this._.status & Flags.Skipped)) {
             var args = [run]
 
             for (var i = 0; i < arguments.length; i++) {
                 args.push(arguments[i])
             }
 
-            return try_.apply(this, args)
+            attempt.apply(this._, args)
         }
-    }
-
-    return /** @this */ function () {
-        new Reflect(this._).checkInit()
-        if (!(this._.status & Flags.Skipped)) attempt.apply(this, arguments)
         return this
     }
 }
@@ -312,7 +330,8 @@ methods(Thallium, {
 })
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- * - `reflect.do` -> `reflect.try`/`t.try`                                   *
+ * - `reflect.do` is deprecated, with no replacement (inline tests are also  *
+ *   deprecated).                                                            *
  * - `reflect.base` -> `internal.createBase`                                 *
  * - `reflect.AssertionError` -> `assert.AssertionError`.                    *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
@@ -320,8 +339,18 @@ methods(Thallium, {
 methods(Reflect, {
     // Deprecated aliases
     do: Common.deprecate(
-        "`reflect.do` is deprecated. Use `reflect.try` or `t.try` instead.",
-        Reflect.prototype.try),
+        "`reflect.do` is deprecated. Transition to block tests, if necessary, and run the code directly.", // eslint-disable-line max-len
+        /** @this */ function (func) {
+            if (typeof func !== "function") {
+                throw new TypeError("Expected callback to be a function")
+            }
+
+            var reflect = new Reflect(this._)
+
+            reflect.checkInit()
+            if (reflect.runnable) attempt.apply(this._, arguments)
+            return this
+        }),
     base: Common.deprecate(
         "`reflect.base` is deprecated. Use `internal.createBase` from `thallium/internal` instead.", // eslint-disable-line max-len
         Internal.createBase),

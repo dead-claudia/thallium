@@ -58,7 +58,7 @@ describe("core (reflect hooks)", function () {
                 var tt = Util.create()
 
                 _.beforeAll(tt, function () { called++ })
-                tt.test("test")
+                tt.test("test", function () {})
 
                 return tt.run().then(function () {
                     assert.equal(called, 1)
@@ -70,8 +70,8 @@ describe("core (reflect hooks)", function () {
                 var tt = Util.create()
 
                 _.beforeAll(tt, function () { called++ })
-                tt.test("test")
-                tt.test("test")
+                tt.test("test", function () {})
+                tt.test("test", function () {})
 
                 return tt.run().then(function () {
                     assert.equal(called, 1)
@@ -83,7 +83,9 @@ describe("core (reflect hooks)", function () {
                 var tt = Util.create()
 
                 _.beforeAll(tt, function () { called++ })
-                tt.test("test").test("test")
+                tt.test("test", function (tt) {
+                    tt.test("test", function () {})
+                })
 
                 return tt.run().then(function () {
                     assert.equal(called, 1)
@@ -96,7 +98,7 @@ describe("core (reflect hooks)", function () {
 
                 tt.test("test", function (tt) {
                     _.beforeAll(tt, function () { called++ })
-                    tt.test("test")
+                    tt.test("test", function () {})
                 })
 
                 return tt.run().then(function () {
@@ -111,7 +113,7 @@ describe("core (reflect hooks)", function () {
                 _.beforeAll(tt, function () { queue.push("root") })
                 tt.test("test", function (tt) {
                     _.beforeAll(tt, function () { queue.push("inner") })
-                    tt.test("test")
+                    tt.test("test", function () {})
                 })
 
                 return tt.run().then(function () {
@@ -137,7 +139,7 @@ describe("core (reflect hooks)", function () {
                 var tt = Util.create()
 
                 _.beforeEach(tt, function () { called++ })
-                tt.test("test")
+                tt.test("test", function () {})
 
                 return tt.run().then(function () {
                     assert.equal(called, 1)
@@ -149,8 +151,8 @@ describe("core (reflect hooks)", function () {
                 var tt = Util.create()
 
                 _.beforeEach(tt, function () { called++ })
-                tt.test("test")
-                tt.test("test")
+                tt.test("test", function () {})
+                tt.test("test", function () {})
 
                 return tt.run().then(function () {
                     assert.equal(called, 2)
@@ -162,7 +164,9 @@ describe("core (reflect hooks)", function () {
                 var tt = Util.create()
 
                 _.beforeEach(tt, function () { called++ })
-                tt.test("test").test("test")
+                tt.test("test", function (tt) {
+                    tt.test("test", function () {})
+                })
 
                 return tt.run().then(function () {
                     assert.equal(called, 2)
@@ -175,7 +179,7 @@ describe("core (reflect hooks)", function () {
 
                 tt.test("test", function (tt) {
                     _.beforeEach(tt, function () { called++ })
-                    tt.test("test")
+                    tt.test("test", function () {})
                 })
 
                 return tt.run().then(function () {
@@ -190,7 +194,7 @@ describe("core (reflect hooks)", function () {
                 _.beforeEach(tt, function () { queue.push("root") })
                 tt.test("test", function (tt) {
                     _.beforeEach(tt, function () { queue.push("inner") })
-                    tt.test("test")
+                    tt.test("test", function () {})
                 })
 
                 return tt.run().then(function () {
@@ -216,7 +220,7 @@ describe("core (reflect hooks)", function () {
                 var tt = Util.create()
 
                 _.afterEach(tt, function () { called++ })
-                tt.test("test")
+                tt.test("test", function () {})
 
                 return tt.run().then(function () {
                     assert.equal(called, 1)
@@ -228,8 +232,8 @@ describe("core (reflect hooks)", function () {
                 var tt = Util.create()
 
                 _.afterEach(tt, function () { called++ })
-                tt.test("test")
-                tt.test("test")
+                tt.test("test", function () {})
+                tt.test("test", function () {})
 
                 return tt.run().then(function () {
                     assert.equal(called, 2)
@@ -241,7 +245,9 @@ describe("core (reflect hooks)", function () {
                 var tt = Util.create()
 
                 _.afterEach(tt, function () { called++ })
-                tt.test("test").test("test")
+                tt.test("test", function (tt) {
+                    tt.test("test", function () {})
+                })
 
                 return tt.run().then(function () {
                     assert.equal(called, 2)
@@ -254,7 +260,7 @@ describe("core (reflect hooks)", function () {
 
                 tt.test("test", function (tt) {
                     _.afterEach(tt, function () { called++ })
-                    tt.test("test")
+                    tt.test("test", function () {})
                 })
 
                 return tt.run().then(function () {
@@ -269,7 +275,7 @@ describe("core (reflect hooks)", function () {
                 _.afterEach(tt, function () { queue.push("root") })
                 tt.test("test", function (tt) {
                     _.afterEach(tt, function () { queue.push("inner") })
-                    tt.test("test")
+                    tt.test("test", function () {})
                 })
 
                 return tt.run().then(function () {
@@ -295,7 +301,7 @@ describe("core (reflect hooks)", function () {
                 var tt = Util.create()
 
                 _.afterAll(tt, function () { called++ })
-                tt.test("test")
+                tt.test("test", function () {})
 
                 return tt.run().then(function () {
                     assert.equal(called, 1)
@@ -307,8 +313,8 @@ describe("core (reflect hooks)", function () {
                 var tt = Util.create()
 
                 _.afterAll(tt, function () { called++ })
-                tt.test("test")
-                tt.test("test")
+                tt.test("test", function () {})
+                tt.test("test", function () {})
 
                 return tt.run().then(function () {
                     assert.equal(called, 1)
@@ -320,7 +326,9 @@ describe("core (reflect hooks)", function () {
                 var tt = Util.create()
 
                 _.afterAll(tt, function () { called++ })
-                tt.test("test").test("test")
+                tt.test("test", function (tt) {
+                    tt.test("test", function () {})
+                })
 
                 return tt.run().then(function () {
                     assert.equal(called, 1)
@@ -333,7 +341,7 @@ describe("core (reflect hooks)", function () {
 
                 tt.test("test", function (tt) {
                     _.afterAll(tt, function () { called++ })
-                    tt.test("test")
+                    tt.test("test", function () {})
                 })
 
                 return tt.run().then(function () {
@@ -348,7 +356,7 @@ describe("core (reflect hooks)", function () {
                 _.afterAll(tt, function () { queue.push("root") })
                 tt.test("test", function (tt) {
                     _.afterAll(tt, function () { queue.push("inner") })
-                    tt.test("test")
+                    tt.test("test", function () {})
                 })
 
                 return tt.run().then(function () {
@@ -380,7 +388,7 @@ describe("core (reflect hooks)", function () {
                 _.beforeEach(tt, function () { queue.push("before each") })
                 _.afterEach(tt, function () { queue.push("after each") })
                 _.afterAll(tt, function () { queue.push("after all") })
-                tt.test("test")
+                tt.test("test", function () {})
 
                 return tt.run().then(function () {
                     assert.match(queue, [
@@ -400,8 +408,8 @@ describe("core (reflect hooks)", function () {
                 _.beforeEach(tt, function () { queue.push("before each") })
                 _.afterEach(tt, function () { queue.push("after each") })
                 _.afterAll(tt, function () { queue.push("after all") })
-                tt.test("test")
-                tt.test("test")
+                tt.test("test", function () {})
+                tt.test("test", function () {})
 
                 return tt.run().then(function () {
                     assert.match(queue, [
@@ -423,7 +431,9 @@ describe("core (reflect hooks)", function () {
                 _.beforeEach(tt, function () { queue.push("before each") })
                 _.afterEach(tt, function () { queue.push("after each") })
                 _.afterAll(tt, function () { queue.push("after all") })
-                tt.test("test").test("test")
+                tt.test("test", function (tt) {
+                    tt.test("test", function () {})
+                })
 
                 return tt.run().then(function () {
                     assert.match(queue, [
@@ -446,7 +456,7 @@ describe("core (reflect hooks)", function () {
                     _.beforeEach(tt, function () { queue.push("before each") }) // eslint-disable-line max-len
                     _.afterEach(tt, function () { queue.push("after each") }) // eslint-disable-line max-len
                     _.afterAll(tt, function () { queue.push("after all") })
-                    tt.test("test")
+                    tt.test("test", function () {})
                 })
 
                 return tt.run().then(function () {
@@ -472,7 +482,7 @@ describe("core (reflect hooks)", function () {
                     _.beforeEach(tt, function () { queue.push("inner before each") }) // eslint-disable-line max-len
                     _.afterEach(tt, function () { queue.push("inner after each") }) // eslint-disable-line max-len
                     _.afterAll(tt, function () { queue.push("inner after all") }) // eslint-disable-line max-len
-                    tt.test("test")
+                    tt.test("test", function () {})
                 })
 
                 return tt.run().then(function () {

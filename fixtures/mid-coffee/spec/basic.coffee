@@ -13,39 +13,47 @@ assert = require 'thallium/assert'
 t.test 'core (basic)', ->
     @test 'reflect', ->
         @test 'get parent', ->
-            tt = create()
             parent = -> @parent
 
             @test 'works on the root instance', ->
-                assert.equal tt.call(parent), undefined
+                assert.equal create().call(parent), undefined
 
             @test 'works on children', ->
-                assert.equal tt.test('test').call(parent).methods, tt
+                tt = create()
+                methods = undefined
+                tt.test 'test', -> methods = @call(parent).methods
+                tt.run().then -> assert.equal methods, tt
 
-        @test 'get count', (t) ->
+        @test 'get count', ->
             tt = create()
             count = -> @count
+            @check = (name, expected) ->
+                found = tt.call(count)
+                @test name, -> assert.equal found, expected
 
-            @test('works with 0 tests').try assert.equal, tt.call(count), 0
-            tt.test('test')
-            @test('works with 1 test').try assert.equal, tt.call(count), 1
-            tt.test('test')
-            @test('works with 2 tests').try assert.equal, tt.call(count), 2
-            tt.test('test')
-            @test('works with 3 tests').try assert.equal, tt.call(count), 3
+            @check 'works with 0 tests', 0
+            tt.test 'test', ->
+            @check 'works with 1 test', 1
+            tt.test 'test', ->
+            @check 'works with 2 tests', 2
+            tt.test 'test', ->
+            @check 'works with 3 tests', 3
 
             # Test this test itself
-            @test('works with itself').try assert.equal, @call(count), 5
+            testCount = @call count
+            @test 'works with itself', -> assert.equal testCount, 4
 
         @test 'get name', ->
-            tt = create()
             name = -> @name
 
             @test 'works with the root test', ->
-                assert.equal tt.call(name), undefined
+                assert.equal create().call(name), undefined
 
             @test 'works with child tests', ->
-                assert.equal tt.test('test').call(name), 'test'
+                tt = create()
+                child = undefined
+                tt.test 'test', -> child = @call name
+                tt.run().then -> assert.equal child, 'test'
 
             @test 'works with itself', ->
                 assert.equal @call(name), 'works with itself'
@@ -53,20 +61,23 @@ t.test 'core (basic)', ->
         @test 'get index', ->
             tt = create()
             index = -> @index
+            first = second = undefined
 
             @test 'works with the root test', ->
                 assert.equal tt.call(index), -1
 
-            first = tt.test('test')
-            @test 'works with the first child test', ->
-                assert.equal first.call(index), 0
+            tt.test 'test', -> first = @call index
+            tt.test 'test', -> second = @call index
 
-            second = tt.test('test')
-            @test 'works with the second child test', ->
-                assert.equal second.call(index), 1
+            tt.run().then =>
+                @test 'works with the first child test', ->
+                    assert.equal first, 0
 
-            @test 'works with itself', ->
-                assert.equal @call(index), 3
+                @test 'works with the second child test', ->
+                    assert.equal second, 1
+
+                @test 'works with itself', ->
+                    assert.equal @call(index), 3
 
         @test 'get children', ->
             children = -> @children
@@ -77,58 +88,41 @@ t.test 'core (basic)', ->
 
             @test 'works with 1 test', ->
                 tt = create()
-                test = tt.test('test').call -> this
-                assert.match tt.call(children), [test]
+                test = undefined
+                tt.test 'test', -> test = @call -> this
+                tt.run().then ->
+                    assert.match tt.call(children), [test]
 
             @test 'works with 2 tests', ->
                 tt = create()
-                first = tt.test('first').call -> this
-                second = tt.test('second').call -> this
-                assert.match tt.call(children), [first, second]
+                first = second = undefined
+                tt.test 'first', -> first = @call -> this
+                tt.test 'second', -> second = @call -> this
+                tt.run().then ->
+                    assert.match tt.call(children), [first, second]
 
             @test 'returns a copy', ->
                 tt = create()
                 slice = tt.call(children)
-                tt.test('test')
+                tt.test 'test', ->
                 assert.match slice, []
 
     @test 'test()', ->
-        @test('exists').try assert.function, create().test
-
-        @test 'accepts a string + function', ->
-            tt = create()
-            tt.test 'test', ->
-
-        @test 'accepts a string', ->
-            tt = create()
-            tt.test('test')
-
-        @test 'returns the current instance when given a callback', ->
+        @test 'returns the current instance', ->
             tt = create()
             test = tt.test 'test', ->
             assert.equal test, tt
 
-        @test 'returns a prototypal clone when not given a callback', ->
+        @test 'returns a prototypal clone inside', ->
             tt = create()
-            test = tt.test('test')
-
-            assert.notEqual test, tt
-            assert.equal Object.getPrototypeOf(test), tt
+            inner = undefined
+            test = tt.test 'test', -> inner = this
+            tt.run().then -> assert.equal Object.getPrototypeOf(inner), tt
 
     @test 'run()', ->
-        @test('exists').try assert.function, create().run
-
-        @test 'runs block tests within tests', ->
+        @test 'runs child tests', ->
             tt = create()
             called = 0
-
-            tt.test 'test', ->
-                @test 'foo', -> called++
-
-            tt.run().then -> assert.equal called, 1
-
-        @test 'runs successful inline tests within tests', ->
-            tt = create()
             err = undefined
 
             tt.reporter (res) ->
@@ -136,6 +130,8 @@ t.test 'core (basic)', ->
                 return
 
             tt.test 'test', ->
-                @test('foo').call ->
+                @test 'foo', -> called++
 
-            tt.run().then -> assert.notOk err
+            tt.run().then ->
+                assert.equal called, 1
+                assert.notOk err

@@ -107,9 +107,10 @@ describe("core (slow) (FLAKE)", /** @this */ function () {
 
         tt.reporter(Util.push(ret, true))
 
-        tt.test("test")
-        .slow(50)
-        .test("inner", function () { return resolve() })
+        tt.test("test", function (tt) {
+            tt.slow(50)
+            tt.test("inner", function () { return resolve() })
+        })
 
         return tt.run().then(function () {
             assert.match(ret, [
@@ -133,9 +134,10 @@ describe("core (slow) (FLAKE)", /** @this */ function () {
 
         tt.reporter(Util.push(ret, true))
 
-        tt.test("test")
-        .slow(50)
-        .test("inner", function () { return delay(200) })
+        tt.test("test", function (tt) {
+            tt.slow(50)
+            tt.test("inner", function () { return delay(200) })
+        })
 
         return tt.run().then(function () {
             assert.match(ret, [
@@ -161,7 +163,7 @@ describe("core (slow) (FLAKE)", /** @this */ function () {
         return reflect.activeSlow
     }
 
-    it("gets own block slow", function () {
+    it("gets own slow", function () {
         var tt = Util.create()
         var active, raw
 
@@ -177,39 +179,22 @@ describe("core (slow) (FLAKE)", /** @this */ function () {
         })
     })
 
-    it("gets own inline slow", function () {
-        var tt = Util.create()
-        var ttt = tt.test("test").slow(50)
-
-        assert.equal(ttt.call(activeSlow), 50)
-        assert.equal(ttt.call(slow), 50)
-    })
-
-    it("gets inherited block slow", function () {
+    it("gets inherited slow", function () {
         var tt = Util.create()
         var active, raw
 
-        tt.test("test")
-        .slow(50)
-        .test("inner", function (tt) {
-            active = tt.call(activeSlow)
-            raw = tt.call(slow)
+        tt.test("test", function (tt) {
+            tt.slow(50)
+            tt.test("inner", function (tt) {
+                active = tt.call(activeSlow)
+                raw = tt.call(slow)
+            })
         })
 
         return tt.run().then(function () {
             assert.equal(active, 50)
             assert.equal(raw, 0)
         })
-    })
-
-    it("gets inherited inline slow", function () {
-        var tt = Util.create()
-        var ttt = tt.test("test")
-        .slow(50)
-        .test("inner")
-
-        assert.equal(ttt.call(activeSlow), 50)
-        assert.equal(ttt.call(slow), 0)
     })
 
     it("gets default slow", function () {

@@ -5,7 +5,9 @@ var t = require("../../index.js")
 var assert = require("../../assert.js")
 
 t.test("mod-one", function (t) {
-    t.test("1 === 1").try(assert.equal, 1, 1)
+    t.test("1 === 1", function () {
+        assert.equal(1, 1)
+    })
 
     t.test("foo()", function () {
         assert.notEqual(1, 1)

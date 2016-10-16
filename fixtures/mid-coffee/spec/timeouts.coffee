@@ -73,9 +73,9 @@ t.test 'core (timeouts) (FLAKE)', ->
 
         tt.reporter push(ret)
 
-        tt.test 'test'
-        .timeout 50
-        .test 'inner', -> then: (resolve) -> resolve()
+        tt.test 'test', ->
+            @timeout 50
+            @test 'inner', -> then: (resolve) -> resolve()
 
         tt.run().then ->
             assert.match ret, [
@@ -92,11 +92,11 @@ t.test 'core (timeouts) (FLAKE)', ->
 
         tt.reporter push(ret)
 
-        tt.test 'test'
-        .timeout 50
-        .test 'inner', ->
-            # It's highly unlikely the engine will take this long to finish.
-            then: (resolve) -> setTimeout resolve, 200
+        tt.test 'test', ->
+            @timeout 50
+            @test 'inner', ->
+                # It's highly unlikely the engine will take this long to finish.
+                then: (resolve) -> setTimeout resolve, 200
 
         tt.run().then ->
             assert.match ret, [
@@ -108,7 +108,7 @@ t.test 'core (timeouts) (FLAKE)', ->
                 n 'end', []
             ]
 
-    @test 'gets own block timeout', ->
+    @test 'gets own timeout', ->
         tt = create()
         active = raw = undefined
 
@@ -121,36 +121,19 @@ t.test 'core (timeouts) (FLAKE)', ->
             assert.equal active, 50
             assert.equal raw, 50
 
-    @test 'gets own inline timeout', ->
-        tt = create()
-        ttt = tt.test('test').timeout 50
-
-        assert.equal ttt.call(-> @activeTimeout), 50
-        assert.equal ttt.call(-> @timeout), 50
-
-    @test 'gets inherited block timeout', ->
+    @test 'gets inherited timeout', ->
         tt = create()
         active = raw = undefined
 
-        tt.test 'test'
-        .timeout 50
-        .test 'inner', ->
-            active = @call -> @activeTimeout
-            raw = @call -> @timeout
+        tt.test 'test', ->
+            @timeout 50
+            @test 'inner', ->
+                active = @call -> @activeTimeout
+                raw = @call -> @timeout
 
         tt.run().then ->
             assert.equal active, 50
             assert.equal raw, 0
-
-    @test 'gets inherited inline timeout', ->
-        tt = create()
-
-        ttt = tt.test 'test'
-        .timeout 50
-        .test 'inner'
-
-        assert.equal ttt.call(-> @activeTimeout), 50
-        assert.equal ttt.call(-> @timeout), 0
 
     @test 'gets default timeout', ->
         tt = create()

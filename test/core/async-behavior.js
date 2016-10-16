@@ -4,28 +4,11 @@ describe("core (asynchronous behavior)", function () {
     var n = Util.n
     var p = Util.p
 
-    it("with normal tests", function () {
+    it("with sync tests", function () {
         var tt = Util.create()
         var called = false
 
         tt.test("test", function () { called = true })
-
-        var ret = tt.run().then(function () { assert.ok(called) })
-
-        assert.notOk(called)
-        return ret
-    })
-
-    it("with shorthand tests", function () {
-        var tt = Util.create()
-        var called = false
-
-        function fail() {
-            called = true
-            return assert.fail()
-        }
-
-        tt.test("test").try(fail)
 
         var ret = tt.run().then(function () { assert.ok(called) })
 

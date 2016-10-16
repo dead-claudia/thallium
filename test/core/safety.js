@@ -4,47 +4,12 @@ describe("core (safety)", function () {
     var p = Util.p
     var n = Util.n
 
-    function valueOf(value) {
-        return {valueOf: function () { return value }}
-    }
-
     function createSentinel(name) {
         var e = new Error(name)
 
         e.marker = function () {}
         return e
     }
-
-    it("disallows non-nullish non-functions as `test` impls", function () {
-        var tt = Util.create()
-
-        assert.throws(function () { tt.test("test", 1) }, TypeError)
-        assert.throws(function () { tt.test("test", 0) }, TypeError)
-        assert.throws(function () { tt.test("test", true) }, TypeError)
-        assert.throws(function () { tt.test("test", false) }, TypeError)
-        assert.throws(function () { tt.test("test", "hi") }, TypeError)
-        assert.throws(function () { tt.test("test", "") }, TypeError)
-        assert.throws(function () { tt.test("test", []) }, TypeError)
-        assert.throws(function () { tt.test("test", [1, 2, 3, 4, 5]) }, TypeError) // eslint-disable-line max-len
-        assert.throws(function () { tt.test("test", {hello: "world"}) }, TypeError) // eslint-disable-line max-len
-        assert.throws(function () { tt.test("test", {}) }, TypeError)
-        assert.throws(function () { tt.test("test", valueOf(false)) }, TypeError) // eslint-disable-line max-len
-        assert.throws(function () { tt.test("test", valueOf(undefined)) }, TypeError) // eslint-disable-line max-len
-
-        /* eslint-disable no-unused-vars */
-
-        tt.test("test")
-        tt.test("test", undefined)
-        tt.test("test", null)
-        tt.test("test", function () {})
-        tt.test("test", function (t) {})
-        tt.test("test", function (t, why) {}) // too many arguments
-        tt.test("test", function () {
-            return {next: function () { return {done: true} }}
-        })
-
-        /* eslint-enable no-unused-vars */
-    })
 
     it("catches unsafe access", function () {
         var tt = Util.create()

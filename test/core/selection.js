@@ -15,12 +15,12 @@ describe("core (selection)", function () {
 
             tt.test("one", function (tt) {
                 tt.testSkip("inner", function () { assert.fail("fail") })
-                tt.test("other")
+                tt.test("other", function () {})
             })
 
             tt.test("two", function (tt) {
-                tt.test("inner")
-                tt.test("other")
+                tt.test("inner", function () {})
+                tt.test("other", function () {})
             })
 
             return tt.run().then(function () {
@@ -46,13 +46,13 @@ describe("core (selection)", function () {
             tt.reporter(Util.push(ret))
 
             tt.test("one", function (tt) {
-                tt.testSkip("inner").try(assert.fail, "fail")
-                tt.test("other")
+                tt.testSkip("inner", function () { assert.fail("fail") })
+                tt.test("other", function () {})
             })
 
             tt.test("two", function (tt) {
-                tt.test("inner")
-                tt.test("other")
+                tt.test("inner", function () {})
+                tt.test("other", function () {})
             })
 
             return tt.run().then(function () {
@@ -109,13 +109,13 @@ describe("core (selection)", function () {
             tt.only(["one", "inner"])
 
             tt.test("one", function (tt) {
-                tt.test("inner")
-                tt.test("other").try(assert.fail, "fail")
+                tt.test("inner", function () {})
+                tt.test("other", function () { assert.fail("fail") })
             })
 
             tt.test("two", function (tt) {
-                tt.test("inner").try(assert.fail, "fail")
-                tt.test("other").try(assert.fail, "fail")
+                tt.test("inner", function () { assert.fail("fail") })
+                tt.test("other", function () { assert.fail("fail") })
             })
 
             return tt.run().then(function () {
@@ -138,12 +138,12 @@ describe("core (selection)", function () {
 
             tt.test("0", function (tt) {
                 tt.test("inner", function () {})
-                tt.test("other").try(assert.fail, "fail")
+                tt.test("other", function () { assert.fail("fail") })
             })
 
             tt.test("1", function (tt) {
-                tt.test("inner").try(assert.fail, "fail")
-                tt.test("other").try(assert.fail, "fail")
+                tt.test("inner", function () { assert.fail("fail") })
+                tt.test("other", function () { assert.fail("fail") })
             })
 
             return tt.run().then(function () {
@@ -162,13 +162,13 @@ describe("core (selection)", function () {
             tt.only(["one", "inner"])
 
             tt.test("0", function (tt) {
-                tt.test("inner")
-                tt.test("other").try(assert.fail, "fail")
+                tt.test("inner", function () {})
+                tt.test("other", function () { assert.fail("fail") })
             })
 
             tt.test("1", function (tt) {
-                tt.test("inner").try(assert.fail, "fail")
-                tt.test("other").try(assert.fail, "fail")
+                tt.test("inner", function () { assert.fail("fail") })
+                tt.test("other", function () { assert.fail("fail") })
             })
 
             return tt.run().then(function () {

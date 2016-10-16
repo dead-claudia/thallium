@@ -117,11 +117,11 @@ describe("cli runner", function () {
                             },
 
                             "one.js": function () {
-                                t.test("test 1")
+                                t.test("test 1", function () {})
                             },
 
                             "two.js": function () {
-                                t.test("test 2")
+                                t.test("test 2", function () {})
                             },
                         },
                     }
@@ -150,11 +150,11 @@ describe("cli runner", function () {
                             },
 
                             "one": function () {
-                                t.test("test 1")
+                                t.test("test 1", function () {})
                             },
 
                             "two.js": function () {
-                                t.test("test 2")
+                                t.test("test 2", function () {})
                             },
                         },
                     }
@@ -182,11 +182,11 @@ describe("cli runner", function () {
                             },
 
                             "one.js": function () {
-                                t.test("test 1")
+                                t.test("test 1", function () {})
                             },
 
                             "two.coffee": function () {
-                                t.test("test 2")
+                                t.test("test 2", function () {})
                             },
                         },
                     }
@@ -215,11 +215,13 @@ describe("cli runner", function () {
                             },
 
                             "one.js": function () {
-                                t.test("test 1")
+                                t.test("test 1", function () {})
                             },
 
                             "two.js": function () {
-                                t.test("test 2").try(assert.fail, "oops")
+                                t.test("test 2", function () {
+                                    assert.fail("oops")
+                                })
                             },
                         },
                     }
@@ -256,7 +258,9 @@ describe("cli runner", function () {
 
             function modOne(t) {
                 t.test("mod-one", function (t) {
-                    t.test("1 === 1").try(assert.equal, 1, 1)
+                    t.test("1 === 1", function () {
+                        assert.equal(1, 1)
+                    })
 
                     t.test("foo()", function () {
                         assert.notEqual(1, 1)
@@ -280,13 +284,17 @@ describe("cli runner", function () {
 
             function modTwo(t) {
                 t.test("mod-two", function (t) {
-                    t.test("1 === 2").try(assert.equal, 1, 2)
+                    t.test("1 === 2", function () {
+                        assert.equal(1, 2)
+                    })
 
                     t.test("expandos don't transfer", function (t) {
                         assert.notHasKey(t, "foo")
                     })
 
-                    t.test("what a fail...").try(isNope, "yep")
+                    t.test("what a fail...", function () {
+                        isNope("yep")
+                    })
                 })
             }
 
@@ -333,8 +341,6 @@ describe("cli runner", function () {
             var ret = []
             var custom = Util.create()
 
-            function noop() {}
-
             return run({
                 args: "",
                 tree: function () {
@@ -357,13 +363,13 @@ describe("cli runner", function () {
 
                         "totally-not-a-test": {
                             "test.coffee": function () {
-                                custom.test("test").try(noop)
+                                custom.test("test", function () {})
                             },
                         },
 
                         "whatever": {
                             "other.js": function () {
-                                custom.test("other").try(noop)
+                                custom.test("other", function () {})
                             },
                         },
                     }
