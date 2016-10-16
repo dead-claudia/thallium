@@ -17,9 +17,20 @@ if (global.process != null && global.process.env != null) {
     if (!settings.release) global.process.env.NODE_ENV = "development"
 } else if (!settings.release) {
     // Set up Bluebird's dev warnings
-    Promise.config({ // eslint-disable-line global-require
+    Promise.config({
         warnings: true,
         longStackTraces: true,
+    })
+}
+
+// PhantomJS has engine issues preventing Bluebird from detecting non-errors
+// correctly when printing long stack traces in warnings:
+// https://github.com/petkaantonov/bluebird/issues/942
+if (global.window != null && global.window.navigator != null &&
+        /phantomjs/i.test(global.window.navigator.userAgent)) {
+    Promise.config({
+        warnings: false,
+        longStackTraces: false,
     })
 }
 

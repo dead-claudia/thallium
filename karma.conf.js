@@ -7,7 +7,7 @@ module.exports = function (config) {
         basePath: __dirname,
         restartOnFileChange: true,
 
-        // browsers: ["Chrome", "Firefox"]
+        // browsers: ["Chrome", "Firefox", "PhantomJS"]
         frameworks: ["browserify", "mocha"],
         reporters: ["dots"],
 
@@ -15,6 +15,11 @@ module.exports = function (config) {
             ChromeTravisCI: {
                 base: "Chrome",
                 flags: ["--no-sandbox"],
+            },
+
+            PhantomJSDebug: {
+                base: "PhantomJS",
+                debug: true,
             },
         },
 

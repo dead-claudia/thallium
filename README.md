@@ -3,7 +3,7 @@
 [![Travis Build Status](https://travis-ci.org/isiahmeadows/thallium.svg?branch=master)](https://travis-ci.org/isiahmeadows/thallium) [![AppVeyor Build status](https://ci.appveyor.com/api/projects/status/f9lhn8ivfwj39k7k?svg=true)](https://ci.appveyor.com/project/isiahmeadows/thallium)
 [![Join the chat at https://gitter.im/isiahmeadows/thallium](https://badges.gitter.im/isiahmeadows/thallium.svg)](https://gitter.im/isiahmeadows/thallium?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
-A simple, unopinionated, modular test framework meant to simplify your tests. It supports Node v0.10 and later, as well as browsers (although it's not as well tested).
+A simple, unopinionated, modular test framework meant to simplify your tests. It supports Node v0.10 and later, as well as browsers (tested in Chrome, Firefox, and PhantomJS 2).
 
 *Note that this is a huge work in progress, and is probably not suited for production projects.*
 
@@ -90,11 +90,12 @@ Do note that it isn't necessarily comprehensive, although I try to keep it somew
 13. ~~Rename `t.async` &rarr; `t.test`, deprecate old form~~
 14. ~~Support a `.tl.opts` file to prepend CLI arguments (and way to disable it)~~
 15. ~~Add [AppVeyor](https://www.appveyor.com/) support for Windows testing~~
-16. Add PhantomJS 2 to the Travis build
+16. ~~Add PhantomJS 2 to the Travis build~~
 17. Drop support for Node pre-4
-    - This doesn't happen until I get PhantomJS 2 running
+    - ES6 goodies now available in the CLI
+    - ~~This doesn't happen until I get PhantomJS 2 running~~
 18. ~~Move `reflect.loc` and `reflect.report` to their own module and deprecate them~~
-19. Complete migration utility
+19. ~~Complete migration utility~~
 20. Update existing documentation
 
 **0.3.1:**
