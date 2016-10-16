@@ -62,13 +62,12 @@ I personally frequently use `node make watch:node` when working on this, so I ha
 
 This is tested in [Travis CI](https://travis-ci.org/isiahmeadows/thallium) on Ubuntu against the following runtimes:
 
-- Node starting from the oldest maintenance release (0.10 at the time of writing), except for 0.11.
-- Chrome Stable
-- Firefox Stable, ESR, and Beta
+- Node 4 and later on both Windows and Linux (OS X is planned)
+- PhantomJS 2 on Windows and Linux (OS X is planned)
+- Chrome Stable on Linux
+- Firefox Stable, ESR, and Beta on Linux
 
-I plan to eventually test more browsers with [Sauce Labs](https://saucelabs.com/), and eventually Windows with [AppVeyor](https://www.appveyor.com/) and OSX with Travis.
-
-For similar reasons, this is written in pure ES5, and there isn't much of an option to support ES6 because of compatibility concerns. Some features still need polyfilled for older browsers, and the way this is written doesn't really need many ES6 features. See the tips and tricks later on for some workarounds I've created for this.
+For similar reasons, this is written in pure ES5 due to compatibility concerns. Some features still need polyfilled for older browsers, and the way this is written doesn't really need many ES6 features. See the tips and tricks later on for some workarounds I've created for this.
 
 ### Documentation
 

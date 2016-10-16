@@ -44,26 +44,15 @@ var bufferSupport = (function () {
     return BufferNative
 })()
 
-function isPolyfilledFastBuffer(object) {
-    var Buffer = object.constructor
-
-    if (typeof Buffer !== "function") return false
-    if (typeof Buffer.isBuffer !== "function") return false
-    return Buffer.isBuffer(object)
-}
-
 function isBuffer(object) {
     if (bufferSupport === BufferNative && Buffer.isBuffer(object)) return true
     if (bufferSupport === BufferSafari && object._isBuffer) return true
-    if (isPolyfilledFastBuffer(object)) return true
 
-    // Node v0.10 support
-    if (typeof object.readFloatLE !== "function") return false
-    if (typeof object.slice !== "function") return false
+    var B = object.constructor
 
-    var slice = object.slice(0, 0)
-
-    return slice != null && isPolyfilledFastBuffer(slice)
+    if (typeof B !== "function") return false
+    if (typeof B.isBuffer !== "function") return false
+    return B.isBuffer(object)
 }
 
 var objectToString = Object.prototype.toString

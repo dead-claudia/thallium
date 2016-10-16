@@ -13,10 +13,6 @@ script:
 
 matrix:
   include:
-    - node_js: "0.10"
-      env: ENV=node
-    - node_js: "0.12"
-      env: ENV=node
     - node_js: "4"
       env: ENV=node
     - node_js: "5"

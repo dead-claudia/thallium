@@ -11,7 +11,7 @@
 
 node make lint || exit $?
 
-for i in 0.10 0.12 1 2 3 4 5 6; do
+for i in 4 5 6; do
     nvm which $i > /dev/null 2>&1 || nvm install $i || exit $?
     nvm exec $i mocha $@ || exit $?
 done

@@ -1,10 +1,6 @@
 version: '{build}'
 environment:
   matrix:
-    # Not supported due to Node.js bug with async console writes
-    # - nodejs_version: 0.10
-    - nodejs_version: 0.12
-      task: test:node
     - nodejs_version: 4
       task: test:node
     - nodejs_version: 5
