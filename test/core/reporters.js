@@ -28,7 +28,7 @@ describe("core (reporters)", function () { // eslint-disable-line max-statements
         return reflect.activeReporters
     }
 
-    it("added individually correctly", function () {
+    it("added to root correctly", function () {
         var tt = Util.create()
 
         function plugin() {}
@@ -37,22 +37,7 @@ describe("core (reporters)", function () { // eslint-disable-line max-statements
         assert.match(tt.call(reporters), [plugin])
     })
 
-    it("added in batches correctly", function () {
-        var tt = Util.create()
-
-        function plugin1() {}
-        function plugin2() {}
-        function plugin3() {}
-        function plugin4() {}
-        function plugin5() {}
-
-        tt.reporter(plugin1, plugin2, plugin3, plugin4, plugin5)
-        assert.match(
-            tt.call(reporters),
-            [plugin1, plugin2, plugin3, plugin4, plugin5])
-    })
-
-    it("added on children correctly", function () {
+    it("added to children correctly", function () {
         var tt = Util.create()
         var child
 
@@ -66,7 +51,11 @@ describe("core (reporters)", function () { // eslint-disable-line max-statements
         tt.reporter(plugin6)
 
         tt.test("test", function (tt) {
-            tt.reporter(plugin1, plugin2, plugin3, plugin4, plugin5)
+            tt.reporter(plugin1)
+            tt.reporter(plugin2)
+            tt.reporter(plugin3)
+            tt.reporter(plugin4)
+            tt.reporter(plugin5)
             child = tt.call(function (r) { return r })
         })
 
@@ -93,7 +82,11 @@ describe("core (reporters)", function () { // eslint-disable-line max-statements
         function plugin4() {}
         function plugin5() {}
 
-        tt.reporter(plugin1, plugin2, plugin3, plugin4, plugin5)
+        tt.reporter(plugin1)
+        tt.reporter(plugin2)
+        tt.reporter(plugin3)
+        tt.reporter(plugin4)
+        tt.reporter(plugin5)
 
         tt.test("test", function (tt) {
             child = tt.call(function (r) { return r })
@@ -118,21 +111,7 @@ describe("core (reporters)", function () { // eslint-disable-line max-statements
         assert.match(tt.call(reporters), [])
     })
 
-    it("removed in batches correctly", function () {
-        var tt = Util.create()
-
-        function plugin1() {}
-        function plugin2() {}
-        function plugin3() {}
-        function plugin4() {}
-        function plugin5() {}
-
-        tt.reporter(plugin1, plugin2, plugin3, plugin4, plugin5)
-        tt.removeReporter(plugin1, plugin2, plugin4)
-        assert.match(tt.call(reporters), [plugin3, plugin5])
-    })
-
-    it("removed on children correctly", function () {
+    it("removed from children correctly", function () {
         var tt = Util.create()
         var child
 
@@ -146,8 +125,15 @@ describe("core (reporters)", function () { // eslint-disable-line max-statements
         tt.reporter(plugin6)
 
         tt.test("test", function (tt) {
-            tt.reporter(plugin1, plugin2, plugin3, plugin4, plugin5)
-            tt.removeReporter(plugin1, plugin2, plugin4)
+            tt.reporter(plugin1)
+            tt.reporter(plugin2)
+            tt.reporter(plugin3)
+            tt.reporter(plugin4)
+            tt.reporter(plugin5)
+
+            tt.removeReporter(plugin1)
+            tt.removeReporter(plugin2)
+            tt.removeReporter(plugin4)
             child = tt.call(function (r) { return r })
         })
 
@@ -165,8 +151,12 @@ describe("core (reporters)", function () { // eslint-disable-line max-statements
         function plugin2() {}
         function plugin3() {}
 
-        tt.reporter(plugin1, plugin2, plugin3)
-        tt.reporter(plugin3, plugin1)
+        tt.reporter(plugin1)
+        tt.reporter(plugin2)
+        tt.reporter(plugin3)
+
+        tt.reporter(plugin3)
+        tt.reporter(plugin1)
 
         assert.match(tt.call(reporters), [plugin1, plugin2, plugin3])
 

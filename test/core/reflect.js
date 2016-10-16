@@ -42,6 +42,29 @@ describe("core (reflect)", function () {
     })
 
     describe("checkInit()", function () {
+        it("passes in the root", function () {
+            Util.create().call(function (reflect) {
+                reflect.checkInit()
+            })
+        })
+
+        it("passes in subtests", function () {
+            var tt = Util.create()
+            var err
+
+            tt.reporter(function (ev) {
+                if (ev.fail) err = ev.value
+            })
+
+            tt.test("test", function (tt) {
+                tt.call(function (reflect) { reflect.checkInit() })
+            })
+
+            return tt.run().then(function () {
+                assert.notOk(err)
+            })
+        })
+
         it("catches errors correctly", function () {
             var tt = Util.create()
             var inner
@@ -52,72 +75,6 @@ describe("core (reflect)", function () {
 
             return tt.run().then(function () {
                 assert.throws(function () { inner.checkInit() }, ReferenceError)
-            })
-        })
-    })
-
-    describe("get runnable", function () {
-        // TODO: detect this while executing tests (i.e. this property will
-        // become useless).
-        function runnable(reflect) { return reflect.runnable }
-
-        it("checks roots", function () {
-            assert.equal(Util.create().call(runnable), true)
-        })
-
-        it("checks normal tests", function () {
-            var tt = Util.create()
-            var inner
-
-            tt.test("test", function (tt) {
-                inner = tt.call(runnable)
-            })
-
-            return tt.run().then(function () {
-                assert.equal(inner, true)
-            })
-        })
-
-        it("misses skipped tests", function () {
-            var tt = Util.create()
-            var inner
-
-            tt.testSkip("test", function (tt) {
-                inner = tt.call(runnable)
-            })
-
-            return tt.run().then(function () {
-                assert.equal(inner, undefined)
-            })
-        })
-
-        it("checks whitelisted `.only()` tests", function () {
-            var tt = Util.create()
-            var inner
-
-            tt.only(["test"])
-
-            tt.test("test", function (tt) {
-                inner = tt.call(runnable)
-            })
-
-            return tt.run().then(function () {
-                assert.equal(inner, true)
-            })
-        })
-
-        it("misses non-whitelisted `.only()` tests", function () {
-            var tt = Util.create()
-            var inner
-
-            tt.only(["nope"])
-
-            tt.test("test", function (tt) {
-                inner = tt.call(runnable)
-            })
-
-            return tt.run().then(function () {
-                assert.equal(inner, undefined)
             })
         })
     })

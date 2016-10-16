@@ -39,7 +39,7 @@ t.test 'core (timeouts) (FLAKE)', ->
 
         tt.test 'test', ->
             # It's highly unlikely the engine will take this long to finish.
-            @timeout 10
+            @timeout = 10
             then: (resolve) -> resolve()
 
         tt.run().then ->
@@ -56,7 +56,7 @@ t.test 'core (timeouts) (FLAKE)', ->
         tt.reporter push(ret)
 
         tt.test 'test', ->
-            @timeout 50
+            @timeout = 50
             # It's highly unlikely the engine will take this long to finish
             then: (resolve) -> setTimeout resolve, 200
 
@@ -74,7 +74,7 @@ t.test 'core (timeouts) (FLAKE)', ->
         tt.reporter push(ret)
 
         tt.test 'test', ->
-            @timeout 50
+            @timeout = 50
             @test 'inner', -> then: (resolve) -> resolve()
 
         tt.run().then ->
@@ -93,7 +93,7 @@ t.test 'core (timeouts) (FLAKE)', ->
         tt.reporter push(ret)
 
         tt.test 'test', ->
-            @timeout 50
+            @timeout = 50
             @test 'inner', ->
                 # It's highly unlikely the engine will take this long to finish.
                 then: (resolve) -> setTimeout resolve, 200
@@ -113,7 +113,7 @@ t.test 'core (timeouts) (FLAKE)', ->
         active = raw = undefined
 
         tt.test 'test', ->
-            @timeout 50
+            @timeout = 50
             active = @call -> @activeTimeout
             raw = @call -> @timeout
 
@@ -126,7 +126,7 @@ t.test 'core (timeouts) (FLAKE)', ->
         active = raw = undefined
 
         tt.test 'test', ->
-            @timeout 50
+            @timeout = 50
             @test 'inner', ->
                 active = @call -> @activeTimeout
                 raw = @call -> @timeout

@@ -66,18 +66,9 @@ var Util = global.Util = {
     methods: require("../lib/methods.js"),
     R: require("../lib/reporter.js"),
     inspect: require("../lib/replaced/inspect.js"),
-    silenceEmptyInlineWarnings: function () {
-        require("../lib/tests.js").silenceEmptyInlineWarnings()
-    },
 
     /* eslint-enable global-require */
 }
-
-// We need to set the environment to not warn on inline tests not having
-// children, because they're used so extensively in testing. It remains an
-// external function since if the module gets reloaded, it may need
-// re-suppressed.
-Util.silenceEmptyInlineWarnings()
 
 // Inject a no-op into browsers (so the relevant tests actually run), but not
 // into older Node versions unsupported by jsdom and JS environments that don't

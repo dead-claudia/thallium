@@ -14,7 +14,6 @@ var methods = require("../lib/methods.js")
 var Promise = require("../lib/bluebird.js")
 
 var Tests = require("../lib/tests.js")
-var Flags = Tests.Flags
 var Report = Tests.Report
 
 var assert = require("../assert.js")
@@ -94,7 +93,7 @@ methods(Thallium, {
 })
 
 methods(Reflect, {
-    async: function () {
+    get async() {
         new Reflect(this._).checkInit()
         return true
     },
@@ -134,7 +133,6 @@ function getEnumerableSymbols(keys, object) {
 // This handles name + func vs object with methods.
 function iterateSetter(test, name, func, iterator) {
     new Reflect(test).checkInit()
-    if (test.status & Flags.Skipped) return
 
     // Check both the name and function, so ES6 symbol polyfills (which use
     // objects since it's impossible to fully polyfill primitives) work.
@@ -170,26 +168,19 @@ function iterateSetter(test, name, func, iterator) {
  * inline tests. It's useful for inline assertions.
  */
 function attempt(func, a, b, c/* , ...args */) {
-    if (!(this.status & Flags.Inline)) {
-        switch (arguments.length) {
-        case 0: throw new TypeError("unreachable")
-        case 1: func(); return
-        case 2: func(a); return
-        case 3: func(a, b); return
-        case 4: func(a, b, c); return
-        default: // do nothing
+    switch (arguments.length) {
+    case 0: throw new TypeError("unreachable")
+    case 1: func(); return
+    case 2: func(a); return
+    case 3: func(a, b); return
+    case 4: func(a, b, c); return
+    default:
+        var args = []
+
+        for (var i = 1; i < arguments.length; i++) {
+            args.push(arguments[i])
         }
-    }
 
-    var args = []
-
-    for (var i = 1; i < arguments.length; i++) {
-        args.push(arguments[i])
-    }
-
-    if (this.status & Flags.Inline) {
-        this.callback.push({func: func, args: args})
-    } else {
         func.apply(undefined, args)
     }
 }
@@ -216,15 +207,10 @@ function defineAssertion(test, name, func) {
 
     return /** @this */ function () {
         new Reflect(this._).checkInit()
-        if (!(this._.status & Flags.Skipped)) {
-            var args = [run]
+        var args = [run]
 
-            for (var i = 0; i < arguments.length; i++) {
-                args.push(arguments[i])
-            }
-
-            attempt.apply(this._, args)
-        }
+        args.push.apply(args, arguments)
+        attempt.apply(this._, args)
         return this
     }
 }
@@ -371,10 +357,10 @@ Object.defineProperty(Reflect.prototype, "AssertionError", {
     configurable: true,
     enumerable: false,
     get: Common.deprecate(
-        "`reflect.AssertionError` is deprecated. Use `assert.AssertionError` from `thallium/assert` instead", // eslint-disable-line max-len
+        "`reflect.AssertionError` is deprecated. Use `assert.AssertionError` from `thallium/assert` instead.", // eslint-disable-line max-len
         function () { return lockError(AssertionError) }),
     set: Common.deprecate(
-        "`reflect.AssertionError` is deprecated. Use `assert.AssertionError` from `thallium/assert` instead", // eslint-disable-line max-len
+        "`reflect.AssertionError` is deprecated. Use `assert.AssertionError` from `thallium/assert` instead.", // eslint-disable-line max-len
         lockError),
 })
 
@@ -382,7 +368,7 @@ Object.defineProperty(Reflect.prototype, "AssertionError", {
 
 methods(Thallium, {
     base: Common.deprecate(
-        "`t.base` is deprecated. Use `t.create` instead",
+        "`t.base` is deprecated. Use `t.create` instead.",
         function () { return new Thallium() }),
 })
 
@@ -415,11 +401,11 @@ function id(x) { return x }
 
 methods(Thallium, {
     reflect: Common.deprecate(
-        "`t.reflect` is deprecated. Use `t.call` instead",
+        "`t.reflect` is deprecated. Use `t.call` instead.",
         /** @this */ function () { return call.call(this, id) }),
 
     use: Common.deprecate(
-        "`t.use` is deprecated. Use `t.call` instead",
+        "`t.use` is deprecated. Use `t.call` instead.",
         /** @this */ function () {
             var reflect = call.call(this, id)
 
@@ -453,14 +439,38 @@ methods(Thallium, {
 
 methods(Reflect, {
     report: Common.deprecate(
-        "`reflect.report` is deprecated. Use `internal.createReport` from `thallium/internal` instead", // eslint-disable-line max-len
+        "`reflect.report` is deprecated. Use `internal.createReport` from `thallium/internal` instead.", // eslint-disable-line max-len
         Internal.createReport),
 
     loc: Common.deprecate(
-        "`reflect.loc` is deprecated. Use `internal.createLocation` from `thallium/internal` instead", // eslint-disable-line max-len
+        "`reflect.loc` is deprecated. Use `internal.createLocation` from `thallium/internal` instead.", // eslint-disable-line max-len
         Internal.createLocation),
 
     scheduler: Common.deprecate(
-        "`reflect.scheduler` is deprecated. Use `internal.setScheduler` from `thallium/internal` instead", // eslint-disable-line max-len
+        "`reflect.scheduler` is deprecated. Use `internal.setScheduler` from `thallium/internal` instead.", // eslint-disable-line max-len
         Internal.setScheduler),
+})
+
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ * Inline tests are deprecated. This is "fixed" by just throwing, since it's *
+ * hard to patch back in and easy to fix on the user's end.                  *
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+methods(Thallium, {
+    test: function (name, func) {
+        if (func == null) {
+            // Catch this particular case, to throw with a more informative
+            // messsage.
+            throw new TypeError(
+                "Inline tests are deprecated. Use block tests instead.")
+        }
+
+        return test.apply(this, arguments)
+    },
+})
+
+methods(Reflect, {
+    get inline() {
+        new Reflect(this._).checkInit()
+        return false
+    },
 })

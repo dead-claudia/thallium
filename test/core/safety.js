@@ -20,23 +20,28 @@ describe("core (safety)", function () {
         // This is not exactly elegant...
         var error = (function () {
             var inner
-            var tt = Util.create().test("test", function (tt) { inner = tt })
+            var tt = Util.create()
+
+            tt.test("test", function (tt) { inner = tt })
 
             return tt.run().then(function () {
-                try { inner.call(function () {}) } catch (e) { return e }
-                return assert.fail("Expected an error to be thrown")
+                return inner.call(function (r) {
+                    try { r.checkInit() } catch (e) { return e }
+                    return assert.fail("Expected an error to be thrown")
+                })
             })
         })()
 
-        tt.test("one", function () { tt.test("hi") })
-        tt.test("two", function () { tt.try(function () {}) })
-        tt.test("three", function () { tt.call(function () {}) })
+        function id(r) { return r }
 
-        tt.test("four", function (tt) {
-            tt.test("inner", function () { tt.call(function () {}) })
+        tt.test("one", function () { tt.test("hi", function () {}) })
+        tt.test("two", function () { tt.call(id).checkInit() })
+
+        tt.test("three", function (tt) {
+            tt.test("inner", function () { tt.call(id).checkInit() })
         })
 
-        tt.test("five", function (tt) {
+        tt.test("four", function (tt) {
             tt.test("inner", function () { tt.reporter(function () {}) })
         })
 
@@ -45,13 +50,12 @@ describe("core (safety)", function () {
                 n("start", []),
                 n("fail", [p("one", 0)], error),
                 n("fail", [p("two", 1)], error),
-                n("fail", [p("three", 2)], error),
+                n("enter", [p("three", 2)]),
+                n("fail", [p("three", 2), p("inner", 0)], error),
+                n("leave", [p("three", 2)]),
                 n("enter", [p("four", 3)]),
                 n("fail", [p("four", 3), p("inner", 0)], error),
                 n("leave", [p("four", 3)]),
-                n("enter", [p("five", 4)]),
-                n("fail", [p("five", 4), p("inner", 0)], error),
-                n("leave", [p("five", 4)]),
                 n("end", []),
             ])
         })
@@ -63,14 +67,6 @@ describe("core (safety)", function () {
 
         assert.throws(function () { tt.run() }, Error)
         return res
-    })
-
-    it("catches concurrent runs when given a callback", function () {
-        var tt = Util.create()
-        var p = tt.run()
-
-        assert.throws(function () { tt.run() }, Error)
-        return p
     })
 
     it("allows non-concurrent runs with reporter error", function () {

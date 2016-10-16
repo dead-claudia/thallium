@@ -83,10 +83,6 @@ describe("cli runner", function () {
          * Most of these are integration tests.
          */
 
-        // When Mocha reloads this module, the module defining the tests also
-        // gets reloaded, so the warnings need re-suppressed.
-        Util.silenceEmptyInlineWarnings()
-
         function run(opts) {
             var tt = Util.create()
             var tree = opts.tree(tt)

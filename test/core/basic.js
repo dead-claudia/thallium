@@ -179,13 +179,6 @@ describe("core (basic)", function () {
     })
 
     describe("test()", function () {
-        it("returns the current instance when given a callback", function () {
-            var tt = Util.create()
-            var test = tt.test("test", function () {})
-
-            assert.equal(test, tt)
-        })
-
         it("returns a prototypal clone inside", function () {
             var tt = Util.create()
             var test
