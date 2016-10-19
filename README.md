@@ -13,6 +13,8 @@ A simple, unopinionated, modular test framework meant to simplify your tests. It
 npm install --save-dev thallium
 ```
 
+Also, this will require a Promise polyfill of some sort in older browsers and runtimes (e.g. [es6-promise](https://github.com/stefanpenner/es6-promise)). It is tested with es6-promise in PhantomJS 2, though.
+
 ## Usage and API
 
 Check out the [documentation](http://github.com/isiahmeadows/thallium/blob/master/docs/README.md).
@@ -91,18 +93,15 @@ Do note that it isn't necessarily comprehensive, although I try to keep it somew
 14. ~~Support a `.tl.opts` file to prepend CLI arguments (and way to disable it)~~
 15. ~~Add [AppVeyor](https://www.appveyor.com/) support for Windows testing~~
 16. ~~Add PhantomJS 2 to the Travis build~~
-17. Drop support for Node pre-4
-    - ES6 goodies now available in the CLI
+17. ~~Drop support for Node pre-4~~
+    - ~~ES6 goodies now available in the CLI~~
     - ~~This doesn't happen until I get PhantomJS 2 running~~
 18. ~~Move `reflect.loc` and `reflect.report` to their own module and deprecate them~~
 19. ~~Complete migration utility~~
-20. Update existing documentation
-
-**0.3.1:**
-
-1. Add `reflect.current()` to get current running test as a `Reflect` (not necessarily that of the backing instance)
-    - This could potentially be difficult, but will be immensely useful for plugin authors
-    - Deprecate first `t` argument in favor of this + function scoping
+20. ~~Add `reflect.current` to get current running test as a `Reflect` (not necessarily that of the backing instance)~~
+    - ~~This could potentially be difficult, but will be immensely useful for plugin authors~~
+    - ~~Deprecate first `t` argument and `reflect.methods` in favor of this + function scoping~~
+21. Update existing documentation
 
 **0.3.x:** (after 0.3.0)
 

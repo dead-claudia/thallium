@@ -70,8 +70,7 @@ describe("reporter dot", function () {
                     },
                 })
 
-                return Util.Promise.each(opts.input, reporter)
-                .then(function () {
+                return Util.peach(opts.input, reporter).then(function () {
                     assert.match(list, opts.output)
                 })
             })

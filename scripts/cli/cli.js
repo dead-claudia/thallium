@@ -1,13 +1,11 @@
 "use strict"
 
-/* eslint-env node */
-
 var path = require("path")
 var minimatch = require("minimatch")
 var interpret = require("interpret")
-var Promise = require("../lib/bluebird.js")
-var parse = require("../lib/cli/parse.js")
-var State = require("../lib/cli/run.js").State
+var peach = require("../../lib/util.js").peach
+var parse = require("../../lib/cli/parse.js")
+var State = require("../../lib/cli/run.js").State
 
 var hasOwn = Object.prototype.hasOwnProperty
 
@@ -16,7 +14,7 @@ exports.fixture = function (dir) {
 
     if (trailing) dir = dir.slice(0, -1)
 
-    var ret = path.resolve(__dirname, "../fixtures", dir)
+    var ret = path.resolve(__dirname, "../../fixtures", dir)
 
     return trailing ? ret + path.sep : ret
 }
@@ -144,23 +142,26 @@ exports.mock = function (tree) {
         } else if (typeof entry === "string") {
             // Node tries to execute unknown extensions as JS, but this is
             // better.
-            files[file] = Promise.method(function (load) {
-                if (!load) return entry
-                throw new Error(file + " is not executable!")
-            })
+            files[file] = function (load) {
+                if (!load) return Promise.resolve(entry)
+                return Promise.reject(new Error(file + " is not executable!"))
+            }
             listing.push(file)
         } else if (typeof entry === "function") {
             // Cache the load, like Node.
             var value
 
-            files[file] = Promise.method(function (load) {
-                if (!load) throw new Error(file + " shouldn't be read!")
+            files[file] = function (load) {
+                if (!load) {
+                    return Promise.reject(
+                        new Error(file + " shouldn't be read!"))
+                }
                 if (entry != null) {
                     value = {exports: entry()}
                     entry = null
                 }
-                return value
-            })
+                return Promise.resolve(value)
+            }
             listing.push(file)
         } else {
             var keys = Object.keys(entry)
@@ -260,7 +261,7 @@ exports.mock = function (tree) {
                 matcher = multiMatcher(resolve, globs)
             }
 
-            return Promise.filter(listing, matcher).each(load)
+            return Promise.resolve(peach(listing.filter(matcher), load))
         },
 
         readdir: function (dir) {

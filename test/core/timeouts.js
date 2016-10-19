@@ -31,7 +31,7 @@ describe("core (timeouts) (FLAKE)", /** @this */ function () {
 
         tt.reporter(Util.push(ret))
 
-        tt.test("test", function (tt) {
+        tt.test("test", function () {
             // It's highly unlikely the engine will take this long to finish
             tt.timeout = 10
             return resolve()
@@ -52,7 +52,7 @@ describe("core (timeouts) (FLAKE)", /** @this */ function () {
 
         tt.reporter(Util.push(ret))
 
-        tt.test("test", function (tt) {
+        tt.test("test", function () {
             tt.timeout = 50
             // It's highly unlikely the engine will take this long to finish
             return delay(200)
@@ -73,7 +73,7 @@ describe("core (timeouts) (FLAKE)", /** @this */ function () {
 
         tt.reporter(Util.push(ret))
 
-        tt.test("test", function (tt) {
+        tt.test("test", function () {
             tt.timeout = 50
             tt.test("inner", function () { return resolve() })
         })
@@ -95,7 +95,7 @@ describe("core (timeouts) (FLAKE)", /** @this */ function () {
 
         tt.reporter(Util.push(ret))
 
-        tt.test("test", function (tt) {
+        tt.test("test", function () {
             tt.timeout = 50
             // It's highly unlikely the engine will take this long to finish
             tt.test("inner", function () { return delay(200) })
@@ -125,7 +125,7 @@ describe("core (timeouts) (FLAKE)", /** @this */ function () {
         var tt = Util.create()
         var active, raw
 
-        tt.test("test", function (tt) {
+        tt.test("test", function () {
             tt.timeout = 50
             active = tt.call(activeTimeout)
             raw = tt.call(timeout)
@@ -141,9 +141,9 @@ describe("core (timeouts) (FLAKE)", /** @this */ function () {
         var tt = Util.create()
         var active, raw
 
-        tt.test("test", function (tt) {
+        tt.test("test", function () {
             tt.timeout = 50
-            tt.test("inner", function (tt) {
+            tt.test("inner", function () {
                 active = tt.call(activeTimeout)
                 raw = tt.call(timeout)
             })
@@ -159,7 +159,7 @@ describe("core (timeouts) (FLAKE)", /** @this */ function () {
         var tt = Util.create()
         var active, raw
 
-        tt.test("test", function (tt) {
+        tt.test("test", function () {
             active = tt.call(activeTimeout)
             raw = tt.call(timeout)
         })

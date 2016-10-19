@@ -3,13 +3,9 @@
 var t = require("../../index.js")
 var assert = require("../../assert.js")
 
-t.test("mod-two", function (t) {
+t.test("mod-two", function () {
     t.test("1 === 2", function () {
         assert.equal(1, 2)
-    })
-
-    t.test("expandos don't transfer", function (t) {
-        assert.notHasKey(t, "foo")
     })
 
     function isNope(str) {

@@ -3,7 +3,7 @@
 /* eslint max-nested-callbacks: [2, 5] */
 
 var through2 = require("through2")
-var fixture = require("../../scripts/cli.js").fixture
+var fixture = require("../../scripts/cli/cli.js").fixture
 var GS = require("../../lib/cli/glob-stream.js")
 
 describe("cli glob stream", function () {
@@ -170,7 +170,7 @@ describe("cli glob stream", function () {
         })
 
         function read(globs) {
-            return new Util.Promise(function (resolve, reject) {
+            return new Promise(function (resolve, reject) {
                 var stream = GS.create(globs)
                 var list = []
 

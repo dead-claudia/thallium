@@ -38,8 +38,7 @@ describe("reporter tap", function () { // eslint-disable-line max-statements
                 reset: function () {},
             })
 
-            return Util.Promise.each(opts.input, reporter)
-            .then(function () {
+            return Util.peach(opts.input, reporter).then(function () {
                 assert.match(list, opts.output)
             })
         })

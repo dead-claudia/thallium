@@ -1,7 +1,5 @@
 "use strict"
 
-/* eslint-env node */
-
 /**
  * Helper script for logging FS calls. It logs calls in the form of this:
  *

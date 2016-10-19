@@ -13,12 +13,12 @@ describe("core (selection)", function () {
 
             tt.reporter(Util.push(ret))
 
-            tt.test("one", function (tt) {
+            tt.test("one", function () {
                 tt.testSkip("inner", function () { assert.fail("fail") })
                 tt.test("other", function () {})
             })
 
-            tt.test("two", function (tt) {
+            tt.test("two", function () {
                 tt.test("inner", function () {})
                 tt.test("other", function () {})
             })
@@ -48,12 +48,12 @@ describe("core (selection)", function () {
             tt.reporter(Util.push(ret))
             tt.only(["one", "inner"])
 
-            tt.test("one", function (tt) {
+            tt.test("one", function () {
                 tt.test("inner", function () {})
                 tt.test("other", function () { assert.fail("fail") })
             })
 
-            tt.test("two", function (tt) {
+            tt.test("two", function () {
                 tt.test("inner", function () { assert.fail("fail") })
                 tt.test("other", function () { assert.fail("fail") })
             })
@@ -76,12 +76,12 @@ describe("core (selection)", function () {
             tt.reporter(Util.push(ret))
             tt.only([/^one$/, "inner"])
 
-            tt.test("one", function (tt) {
+            tt.test("one", function () {
                 tt.test("inner", function () {})
                 tt.test("other", function () { assert.fail("fail") })
             })
 
-            tt.test("two", function (tt) {
+            tt.test("two", function () {
                 tt.test("inner", function () { assert.fail("fail") })
                 tt.test("other", function () { assert.fail("fail") })
             })

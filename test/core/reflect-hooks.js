@@ -83,7 +83,7 @@ describe("core (reflect hooks)", function () {
                 var tt = Util.create()
 
                 _.beforeAll(tt, function () { called++ })
-                tt.test("test", function (tt) {
+                tt.test("test", function () {
                     tt.test("test", function () {})
                 })
 
@@ -96,7 +96,7 @@ describe("core (reflect hooks)", function () {
                 var called = 0
                 var tt = Util.create()
 
-                tt.test("test", function (tt) {
+                tt.test("test", function () {
                     _.beforeAll(tt, function () { called++ })
                     tt.test("test", function () {})
                 })
@@ -111,7 +111,7 @@ describe("core (reflect hooks)", function () {
                 var tt = Util.create()
 
                 _.beforeAll(tt, function () { queue.push("root") })
-                tt.test("test", function (tt) {
+                tt.test("test", function () {
                     _.beforeAll(tt, function () { queue.push("inner") })
                     tt.test("test", function () {})
                 })
@@ -164,7 +164,7 @@ describe("core (reflect hooks)", function () {
                 var tt = Util.create()
 
                 _.beforeEach(tt, function () { called++ })
-                tt.test("test", function (tt) {
+                tt.test("test", function () {
                     tt.test("test", function () {})
                 })
 
@@ -177,7 +177,7 @@ describe("core (reflect hooks)", function () {
                 var called = 0
                 var tt = Util.create()
 
-                tt.test("test", function (tt) {
+                tt.test("test", function () {
                     _.beforeEach(tt, function () { called++ })
                     tt.test("test", function () {})
                 })
@@ -192,7 +192,7 @@ describe("core (reflect hooks)", function () {
                 var tt = Util.create()
 
                 _.beforeEach(tt, function () { queue.push("root") })
-                tt.test("test", function (tt) {
+                tt.test("test", function () {
                     _.beforeEach(tt, function () { queue.push("inner") })
                     tt.test("test", function () {})
                 })
@@ -245,7 +245,7 @@ describe("core (reflect hooks)", function () {
                 var tt = Util.create()
 
                 _.afterEach(tt, function () { called++ })
-                tt.test("test", function (tt) {
+                tt.test("test", function () {
                     tt.test("test", function () {})
                 })
 
@@ -258,7 +258,7 @@ describe("core (reflect hooks)", function () {
                 var called = 0
                 var tt = Util.create()
 
-                tt.test("test", function (tt) {
+                tt.test("test", function () {
                     _.afterEach(tt, function () { called++ })
                     tt.test("test", function () {})
                 })
@@ -273,7 +273,7 @@ describe("core (reflect hooks)", function () {
                 var tt = Util.create()
 
                 _.afterEach(tt, function () { queue.push("root") })
-                tt.test("test", function (tt) {
+                tt.test("test", function () {
                     _.afterEach(tt, function () { queue.push("inner") })
                     tt.test("test", function () {})
                 })
@@ -326,7 +326,7 @@ describe("core (reflect hooks)", function () {
                 var tt = Util.create()
 
                 _.afterAll(tt, function () { called++ })
-                tt.test("test", function (tt) {
+                tt.test("test", function () {
                     tt.test("test", function () {})
                 })
 
@@ -339,7 +339,7 @@ describe("core (reflect hooks)", function () {
                 var called = 0
                 var tt = Util.create()
 
-                tt.test("test", function (tt) {
+                tt.test("test", function () {
                     _.afterAll(tt, function () { called++ })
                     tt.test("test", function () {})
                 })
@@ -354,7 +354,7 @@ describe("core (reflect hooks)", function () {
                 var tt = Util.create()
 
                 _.afterAll(tt, function () { queue.push("root") })
-                tt.test("test", function (tt) {
+                tt.test("test", function () {
                     _.afterAll(tt, function () { queue.push("inner") })
                     tt.test("test", function () {})
                 })
@@ -431,7 +431,7 @@ describe("core (reflect hooks)", function () {
                 _.beforeEach(tt, function () { queue.push("before each") })
                 _.afterEach(tt, function () { queue.push("after each") })
                 _.afterAll(tt, function () { queue.push("after all") })
-                tt.test("test", function (tt) {
+                tt.test("test", function () {
                     tt.test("test", function () {})
                 })
 
@@ -451,7 +451,7 @@ describe("core (reflect hooks)", function () {
                 var queue = []
                 var tt = Util.create()
 
-                tt.test("test", function (tt) {
+                tt.test("test", function () {
                     _.beforeAll(tt, function () { queue.push("before all") }) // eslint-disable-line max-len
                     _.beforeEach(tt, function () { queue.push("before each") }) // eslint-disable-line max-len
                     _.afterEach(tt, function () { queue.push("after each") }) // eslint-disable-line max-len
@@ -477,7 +477,7 @@ describe("core (reflect hooks)", function () {
                 _.beforeEach(tt, function () { queue.push("root before each") }) // eslint-disable-line max-len
                 _.afterEach(tt, function () { queue.push("root after each") }) // eslint-disable-line max-len
                 _.afterAll(tt, function () { queue.push("root after all") }) // eslint-disable-line max-len
-                tt.test("test", function (tt) {
+                tt.test("test", function () {
                     _.beforeAll(tt, function () { queue.push("inner before all") }) // eslint-disable-line max-len
                     _.beforeEach(tt, function () { queue.push("inner before each") }) // eslint-disable-line max-len
                     _.afterEach(tt, function () { queue.push("inner after each") }) // eslint-disable-line max-len

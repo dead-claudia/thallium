@@ -2,7 +2,7 @@
 
 // This is a basic TAP-generating reporter.
 
-var Promise = require("../lib/bluebird.js")
+var peach = require("../lib/util.js").peach
 var R = require("../lib/reporter.js")
 var inspect = require("../lib/replaced/inspect.js")
 
@@ -22,9 +22,7 @@ function printLines(r, value, skipFirst) {
     var lines = value.split(/\r?\n/g)
 
     if (skipFirst) lines.shift()
-    return Promise.each(lines, function (line) {
-        return r.print("    " + line)
-    })
+    return peach(lines, function (line) { return r.print("    " + line) })
 }
 
 function printRaw(r, key, str) {

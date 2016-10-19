@@ -4,7 +4,7 @@
 
 var parse = require("../../lib/cli/parse.js")
 var Run = require("../../lib/cli/run.js")
-var Cli = require("../../scripts/cli.js")
+var Cli = require("../../scripts/cli/cli.js")
 
 describe("cli runner", function () {
     var n = Util.n
@@ -17,7 +17,7 @@ describe("cli runner", function () {
         }
 
         function execute(reporter, type) {
-            return Util.Promise.resolve(
+            return Promise.resolve(
                 reporter(n(type, [p("test", 0)], map[type])))
         }
 
@@ -263,11 +263,15 @@ describe("cli runner", function () {
                     })
 
                     t.test("bar()", function () {
-                        return Util.Promise.delay(0).throw(new Error("fail"))
+                        return new Promise(function (_, reject) {
+                            global.setTimeout(function () {
+                                reject(new Error("fail"))
+                            }, 0)
+                        })
                     })
 
                     t.test("baz()", function () {
-                        return Util.Promise.reject(sentinel)
+                        return Promise.reject(sentinel)
                     })
 
                     t.test("nested", function (t) {

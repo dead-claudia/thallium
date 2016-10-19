@@ -31,7 +31,7 @@ t.test 'core (timeouts) (FLAKE)', ->
             ev.slow = 0
         ret.push(ev)
 
-    @test 'succeeds with own', ->
+    t.test 'succeeds with own', ->
         tt = create()
         ret = []
 
@@ -39,7 +39,7 @@ t.test 'core (timeouts) (FLAKE)', ->
 
         tt.test 'test', ->
             # It's highly unlikely the engine will take this long to finish.
-            @timeout = 10
+            tt.timeout = 10
             then: (resolve) -> resolve()
 
         tt.run().then ->
@@ -49,14 +49,14 @@ t.test 'core (timeouts) (FLAKE)', ->
                 n 'end', []
             ]
 
-    @test 'fails with own', ->
+    t.test 'fails with own', ->
         tt = create()
         ret = []
 
         tt.reporter push(ret)
 
         tt.test 'test', ->
-            @timeout = 50
+            tt.timeout = 50
             # It's highly unlikely the engine will take this long to finish
             then: (resolve) -> setTimeout resolve, 200
 
@@ -67,15 +67,15 @@ t.test 'core (timeouts) (FLAKE)', ->
                 n 'end', []
             ]
 
-    @test 'succeeds with inherited', ->
+    t.test 'succeeds with inherited', ->
         tt = create()
         ret = []
 
         tt.reporter push(ret)
 
         tt.test 'test', ->
-            @timeout = 50
-            @test 'inner', -> then: (resolve) -> resolve()
+            tt.timeout = 50
+            tt.test 'inner', -> then: (resolve) -> resolve()
 
         tt.run().then ->
             assert.match ret, [
@@ -86,15 +86,15 @@ t.test 'core (timeouts) (FLAKE)', ->
                 n 'end', []
             ]
 
-    @test 'fails with inherited', ->
+    t.test 'fails with inherited', ->
         tt = create()
         ret = []
 
         tt.reporter push(ret)
 
         tt.test 'test', ->
-            @timeout = 50
-            @test 'inner', ->
+            tt.timeout = 50
+            tt.test 'inner', ->
                 # It's highly unlikely the engine will take this long to finish.
                 then: (resolve) -> setTimeout resolve, 200
 
@@ -108,40 +108,40 @@ t.test 'core (timeouts) (FLAKE)', ->
                 n 'end', []
             ]
 
-    @test 'gets own timeout', ->
+    t.test 'gets own timeout', ->
         tt = create()
         active = raw = undefined
 
         tt.test 'test', ->
-            @timeout = 50
-            active = @call -> @activeTimeout
-            raw = @call -> @timeout
+            tt.timeout = 50
+            active = tt.call -> @activeTimeout
+            raw = tt.call -> @timeout
 
         tt.run().then ->
             assert.equal active, 50
             assert.equal raw, 50
 
-    @test 'gets inherited timeout', ->
+    t.test 'gets inherited timeout', ->
         tt = create()
         active = raw = undefined
 
         tt.test 'test', ->
-            @timeout = 50
-            @test 'inner', ->
-                active = @call -> @activeTimeout
-                raw = @call -> @timeout
+            tt.timeout = 50
+            tt.test 'inner', ->
+                active = tt.call -> @activeTimeout
+                raw = tt.call -> @timeout
 
         tt.run().then ->
             assert.equal active, 50
             assert.equal raw, 0
 
-    @test 'gets default timeout', ->
+    t.test 'gets default timeout', ->
         tt = create()
         active = raw = undefined
 
         tt.test 'test', ->
-            active = @call -> @activeTimeout
-            raw = @call -> @timeout
+            active = tt.call -> @activeTimeout
+            raw = tt.call -> @timeout
 
         tt.run().then ->
             assert.equal active, 2000

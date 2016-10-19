@@ -1,7 +1,5 @@
 "use strict"
 
-/* eslint-env node */
-
 // Much easier to use a concise DSL than for serialization to compare in
 // assertions. Short description:
 //

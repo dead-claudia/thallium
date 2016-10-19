@@ -1,17 +1,17 @@
 "use strict"
 
 /**
- * Backport wrapper to warn about the major breaking changes from the last major
- * version, and to help me keep track of all the changes.
+ * Backport wrapper to warn about most of the major breaking changes from the
+ * last major version, and to help me keep track of all the changes.
  *
  * It consists of solely internal monkey patching to revive support of previous
- * versions.
+ * versions, although I tried to limit how much knowledge of the internals this
+ * requires.
  */
 
 var Common = require("./common.js")
 var Internal = require("../internal.js")
 var methods = require("../lib/methods.js")
-var Promise = require("../lib/bluebird.js")
 
 var Tests = require("../lib/tests.js")
 var Report = Tests.Report
@@ -22,6 +22,24 @@ var format = assert.format
 
 var Thallium = require("../lib/thallium.js")
 var Reflect = new Thallium().call(function (r) { return r.constructor })
+
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ * - `reflect.checkInit()` is deprecated in favor of `reflect.locked` and    *
+ *   either complaining yourself or just using `reflect.current` to add      *
+ *   things.                                                                 *
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+methods(Reflect, {
+    checkInit: Common.deprecate(
+        "`reflect.checkInit` is deprecated. Use `reflect.current` for the " +
+        "current test or use `reflect.locked` and create and throw the error " +
+        "yourself.",
+        /** @this */ function () {
+            if (this.locked) {
+                throw new ReferenceError("It is only safe to call test " +
+                    "methods during initialization")
+            }
+        }),
+})
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * - `t.async` -> `t.test`, which now supports promises.                     *
@@ -89,12 +107,15 @@ methods(Thallium, {
         }
     },
 
-    asyncSkip: Thallium.prototype.testSkip,
+    asyncSkip: Common.deprecate(
+        "`t.asyncSkip` is deprecated. Use `t.testSkip` instead.",
+        Thallium.prototype.testSkip),
 })
 
 methods(Reflect, {
     get async() {
-        new Reflect(this._).checkInit()
+        Common.warn("Tests are now always async. You no longer need to " +
+            "handle the other case")
         return true
     },
 })
@@ -132,8 +153,6 @@ function getEnumerableSymbols(keys, object) {
 
 // This handles name + func vs object with methods.
 function iterateSetter(test, name, func, iterator) {
-    new Reflect(test).checkInit()
-
     // Check both the name and function, so ES6 symbol polyfills (which use
     // objects since it's impossible to fully polyfill primitives) work.
     if (typeof name === "object" && name != null && func == null) {
@@ -206,11 +225,10 @@ function defineAssertion(test, name, func) {
     }
 
     return /** @this */ function () {
-        new Reflect(this._).checkInit()
         var args = [run]
 
         args.push.apply(args, arguments)
-        attempt.apply(this._, args)
+        attempt.apply(undefined, args)
         return this
     }
 }
@@ -279,7 +297,6 @@ function addAssertion(test, name, func) {
     }
 
     return /** @this */ function () {
-        new Reflect(this._).checkInit()
         var ret = apply.apply(this, arguments)
 
         return ret !== undefined ? ret : this
@@ -290,19 +307,19 @@ methods(Reflect, {
     define: Common.deprecate(
         "`reflect.define` is deprecated. Use external methods or direct assignment instead.", // eslint-disable-line max-len
         /** @this */ function (name, func) {
-            iterateSetter(this._, name, func, defineAssertion)
+            iterateSetter(this._.current.value, name, func, defineAssertion)
         }),
 
     wrap: Common.deprecate(
         "`reflect.wrap` is deprecated. Use external methods or direct assignment instead.", // eslint-disable-line max-len
         /** @this */ function (name, func) {
-            iterateSetter(this._, name, func, wrapAssertion)
+            iterateSetter(this._.current.value, name, func, wrapAssertion)
         }),
 
     add: Common.deprecate(
         "`reflect.add` is deprecated. Use external methods or direct assignment instead.", // eslint-disable-line max-len
         /** @this */ function (name, func) {
-            iterateSetter(this._, name, func, addAssertion)
+            iterateSetter(this._.current.value, name, func, addAssertion)
         }),
 })
 
@@ -310,7 +327,7 @@ methods(Thallium, {
     define: Common.deprecate(
         "`t.define` is deprecated. Use external methods or direct assignment instead.", // eslint-disable-line max-len
         /** @this */ function (name, func) {
-            iterateSetter(this._, name, func, defineAssertion)
+            iterateSetter(this._.current.value, name, func, defineAssertion)
             return this
         }),
 })
@@ -331,10 +348,10 @@ methods(Reflect, {
                 throw new TypeError("Expected callback to be a function")
             }
 
-            var reflect = new Reflect(this._)
+            if (new Reflect(this._.current.value).runnable) {
+                attempt.apply(undefined, arguments)
+            }
 
-            reflect.checkInit()
-            if (reflect.runnable) attempt.apply(this._, arguments)
             return this
         }),
     base: Common.deprecate(
@@ -410,6 +427,8 @@ methods(Thallium, {
             var reflect = call.call(this, id)
 
             if (!reflect.skipped) {
+                var test = this._.current.value
+
                 for (var i = 0; i < arguments.length; i++) {
                     var plugin = arguments[i]
 
@@ -418,10 +437,10 @@ methods(Thallium, {
                             "Expected `plugin` to be a function")
                     }
 
-                    if (this._.plugins == null) this._.plugins = []
-                    if (this._.plugins.indexOf(plugin) === -1) {
+                    if (test.plugins == null) test.plugins = []
+                    if (test.plugins.indexOf(plugin) === -1) {
                         // Add plugin before calling it.
-                        this._.plugins.push(plugin)
+                        test.plugins.push(plugin)
                         plugin.call(this, this)
                     }
                 }
@@ -434,7 +453,7 @@ methods(Thallium, {
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * - `reflect.report` -> `internal.createReport`                             *
  * - `reflect.loc` -> `internal.createLocation`                              *
- * - `reflect.scheduler` -> `internal.setScheduler`                          *
+ * - `reflect.scheduler` obsoleted.                                          *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 methods(Reflect, {
@@ -447,8 +466,8 @@ methods(Reflect, {
         Internal.createLocation),
 
     scheduler: Common.deprecate(
-        "`reflect.scheduler` is deprecated. Use `internal.setScheduler` from `thallium/internal` instead.", // eslint-disable-line max-len
-        Internal.setScheduler),
+        "`reflect.scheduler` is deprecated. It is no longer useful to the library, and can be safely removed.", // eslint-disable-line max-len
+        function () {}),
 })
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -470,7 +489,8 @@ methods(Thallium, {
 
 methods(Reflect, {
     get inline() {
-        new Reflect(this._).checkInit()
+        Common.warn("Tests are now never inline. You no longer need to " +
+            "handle this case")
         return false
     },
 })

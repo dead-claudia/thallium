@@ -50,8 +50,7 @@ describe("reporter spec", function () {
                     reset: function () {},
                 })
 
-                return Util.Promise.each(opts.input, reporter)
-                .then(function () {
+                return Util.peach(opts.input, reporter).then(function () {
                     assert.match(opts.output, list)
                 })
             })

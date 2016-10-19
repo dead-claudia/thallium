@@ -341,7 +341,7 @@ describe("cli common", function () {
         function load(opts) {
             return function (name) {
                 assert.equal(name, "thallium")
-                return Util.Promise.resolve({exports: opts.thallium || {}})
+                return Promise.resolve({exports: opts.thallium || {}})
             }
         }
 

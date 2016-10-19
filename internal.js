@@ -1,6 +1,5 @@
 "use strict"
 
-var Promise = require("./lib/bluebird.js")
 var Thallium = require("./lib/thallium.js")
 var Tests = require("./lib/tests.js")
 var Types = Tests.Types
@@ -83,16 +82,4 @@ exports.createLocation = function (name, index) {
     }
 
     return {name: name, index: index|0}
-}
-
-/**
- * Sets the global scheduler. Note that this *should not* be called when
- * tests are running, and mainly exists for compatibility with runtimes that
- * don't have the normal timing constructs.
- *
- * Also, note that the scheduler *must* execute the function asynchronously,
- * or this framework *will* break.
- */
-exports.setScheduler = function (func) {
-    Promise.setScheduler(func)
 }

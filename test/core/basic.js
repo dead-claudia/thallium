@@ -21,7 +21,7 @@ describe("core (basic)", function () {
                 var tt = Util.create()
                 var methods
 
-                tt.test("test", function (tt) {
+                tt.test("test", function () {
                     methods = tt.call(parent).methods
                 })
 
@@ -31,7 +31,7 @@ describe("core (basic)", function () {
             })
         })
 
-        describe("count", function () {
+        describe("get count", function () {
             function count(reflect) { return reflect.count }
 
             it("works with 0 tests", function () {
@@ -81,7 +81,7 @@ describe("core (basic)", function () {
                 var tt = Util.create()
                 var child
 
-                tt.test("test", function (tt) {
+                tt.test("test", function () {
                     child = tt.call(name)
                 })
 
@@ -104,7 +104,7 @@ describe("core (basic)", function () {
                 var tt = Util.create()
                 var first
 
-                tt.test("test", function (tt) {
+                tt.test("test", function () {
                     first = tt.call(index)
                 })
 
@@ -118,7 +118,7 @@ describe("core (basic)", function () {
                 var second
 
                 tt.test("test", function () {})
-                tt.test("test", function (tt) {
+                tt.test("test", function () {
                     second = tt.call(index)
                 })
 
@@ -142,7 +142,7 @@ describe("core (basic)", function () {
                 var tt = Util.create()
                 var test
 
-                tt.test("test", function (tt) {
+                tt.test("test", function () {
                     test = tt.call(identity)
                 })
 
@@ -155,11 +155,11 @@ describe("core (basic)", function () {
                 var tt = Util.create()
                 var first, second
 
-                tt.test("first", function (tt) {
+                tt.test("first", function () {
                     first = tt.call(identity)
                 })
 
-                tt.test("second", function (tt) {
+                tt.test("second", function () {
                     second = tt.call(identity)
                 })
 
@@ -178,6 +178,9 @@ describe("core (basic)", function () {
         })
     })
 
+    /**
+     * TODO: This is deprecated
+     */
     describe("test()", function () {
         it("returns a prototypal clone inside", function () {
             var tt = Util.create()
@@ -202,13 +205,44 @@ describe("core (basic)", function () {
                 if (res.fail) err = res.value
             })
 
-            tt.test("test", function (tt) {
+            tt.test("test", function () {
                 tt.test("foo", function () { called++ })
             })
 
             return tt.run().then(function () {
                 assert.equal(called, 1)
                 assert.notOk(err)
+            })
+        })
+
+        function createSentinel(name) {
+            var e = new Error(name)
+
+            e.marker = function () {}
+            return e
+        }
+
+        it("catches concurrent runs", function () {
+            var tt = Util.create()
+            var res = tt.run()
+
+            assert.throws(function () { tt.run() }, Error)
+            return res
+        })
+
+        it("allows non-concurrent runs with reporter error", function () {
+            var tt = Util.create()
+            var sentinel = createSentinel("fail")
+
+            tt.reporter(function () { throw sentinel })
+
+            return tt.run().then(
+                function () { assert.fail("Expected a rejection") },
+                function (err) { assert.equal(err, sentinel) })
+            .then(function () {
+                return tt.run().then(
+                    function () { assert.fail("Expected a rejection") },
+                    function (err) { assert.equal(err, sentinel) })
             })
         })
     })

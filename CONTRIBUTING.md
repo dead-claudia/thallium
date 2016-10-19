@@ -160,7 +160,7 @@ Note that I don't actually test the documentation's code, but please ensure it o
 
 ### Tips and idioms
 
-- I use [Bluebird](http://bluebirdjs.com) extensively for promises, as it makes code much easier to handle. It provides many features not present in ES6, and it is far faster.
+- I use ES6 promises extensively, as it makes code much easier to handle.
 
 - There is a class-ish `methods` helper [here](http://github.com/isiahmeadows/thallium/blob/master/lib/methods.js) used throughout. This is one of the main reasons why I don't really need ES6 - it even handles inheritance and non-enumerability of methods. It's used to define the API, simplify the internal DSL for the core reporters, and decouple script loading in the CLI. Here's an example:
 

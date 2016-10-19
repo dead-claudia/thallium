@@ -8,7 +8,7 @@
 
 var path = require("path")
 var cp = require("child_process")
-var fixture = require("../../scripts/cli.js").fixture
+var fixture = require("../../scripts/cli/cli.js").fixture
 
 describe("cli end-to-end (FLAKE)", /** @this */ function () {
     this.retries(3)
@@ -42,20 +42,20 @@ describe("cli end-to-end (FLAKE)", /** @this */ function () {
             child.stdout.setEncoding("utf-8")
             child.stdout.on("data", function (data) { output += data })
 
-            return Util.Promise.all([
-                new Util.Promise(function (resolve, reject) {
+            return Promise.all([
+                new Promise(function (resolve, reject) {
                     child.on("error", reject)
                     child.stdout.on("error", reject)
                     child.stdout.on("end", resolve)
                 }),
-                new Util.Promise(function (resolve, reject) {
+                new Promise(function (resolve, reject) {
                     child.on("close", function (code, signal) {
                         if (signal == null) return resolve(code)
                         return reject(
                             new Error("terminated with signal " + signal))
                     })
                 }),
-                new Util.Promise(function (resolve, reject) {
+                new Promise(function (resolve, reject) {
                     child.on("exit", function (code, signal) {
                         if (signal == null) return resolve(code)
                         return reject(
@@ -103,8 +103,7 @@ describe("cli end-to-end (FLAKE)", /** @this */ function () {
             "leave [0: mod-one] = undefined",
             "enter [1: mod-two] = undefined",
             "fail [1: mod-two] > [0: 1 === 2] = \"AssertionError: Expected 1 to equal 2\"",
-            "pass [1: mod-two] > [1: expandos don't transfer] = undefined",
-            "fail [1: mod-two] > [2: what a fail...] = \"AssertionError: Expected 'yep' to be a nope\"",
+            "fail [1: mod-two] > [1: what a fail...] = \"AssertionError: Expected 'yep' to be a nope\"",
             "leave [1: mod-two] = undefined",
             "end = undefined",
         ],

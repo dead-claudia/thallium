@@ -1,2 +1,4 @@
 root: true
 extends: isiahmeadows/commonjs
+globals:
+    Promise: false

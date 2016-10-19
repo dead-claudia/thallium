@@ -3,6 +3,7 @@ extends: isiahmeadows
 env:
     mocha: true
 globals:
+    Promise: false
     t: false
     Util: false
     assert: false

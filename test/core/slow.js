@@ -36,7 +36,7 @@ describe("core (slow) (FLAKE)", /** @this */ function () {
 
         tt.reporter(Util.push(ret, true))
 
-        tt.test("test", function (tt) {
+        tt.test("test", function () {
             // It's highly unlikely the engine will take this long to finish.
             tt.slow = 10
             return resolve()
@@ -59,7 +59,7 @@ describe("core (slow) (FLAKE)", /** @this */ function () {
 
         tt.reporter(Util.push(ret, true))
 
-        tt.test("test", function (tt) {
+        tt.test("test", function () {
             // It's highly unlikely the engine will take this long to finish.
             tt.slow = 100
             return delay(60)
@@ -83,7 +83,7 @@ describe("core (slow) (FLAKE)", /** @this */ function () {
 
         tt.reporter(Util.push(ret, true))
 
-        tt.test("test", function (tt) {
+        tt.test("test", function () {
             tt.slow = 50
             // It's highly unlikely the engine will take this long to finish
             return delay(200)
@@ -107,7 +107,7 @@ describe("core (slow) (FLAKE)", /** @this */ function () {
 
         tt.reporter(Util.push(ret, true))
 
-        tt.test("test", function (tt) {
+        tt.test("test", function () {
             tt.slow = 50
             tt.test("inner", function () { return resolve() })
         })
@@ -134,7 +134,7 @@ describe("core (slow) (FLAKE)", /** @this */ function () {
 
         tt.reporter(Util.push(ret, true))
 
-        tt.test("test", function (tt) {
+        tt.test("test", function () {
             tt.slow = 50
             tt.test("inner", function () { return delay(200) })
         })
@@ -167,7 +167,7 @@ describe("core (slow) (FLAKE)", /** @this */ function () {
         var tt = Util.create()
         var active, raw
 
-        tt.test("test", function (tt) {
+        tt.test("test", function () {
             tt.slow = 50
             active = tt.call(activeSlow)
             raw = tt.call(slow)
@@ -183,9 +183,9 @@ describe("core (slow) (FLAKE)", /** @this */ function () {
         var tt = Util.create()
         var active, raw
 
-        tt.test("test", function (tt) {
+        tt.test("test", function () {
             tt.slow = 50
-            tt.test("inner", function (tt) {
+            tt.test("inner", function () {
                 active = tt.call(activeSlow)
                 raw = tt.call(slow)
             })
@@ -201,7 +201,7 @@ describe("core (slow) (FLAKE)", /** @this */ function () {
         var tt = Util.create()
         var active, raw
 
-        tt.test("test", function (tt) {
+        tt.test("test", function () {
             active = tt.call(activeSlow)
             raw = tt.call(slow)
         })

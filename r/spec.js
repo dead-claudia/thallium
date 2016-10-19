@@ -2,7 +2,7 @@
 
 // This is a reporter that mimics Mocha's `spec` reporter.
 
-var Promise = require("../lib/bluebird.js")
+var peach = require("../lib/util.js").peach
 var R = require("../lib/reporter.js")
 var c = R.color
 
@@ -17,15 +17,17 @@ function getName(level, ev) {
     return ev.path[level - 1].name
 }
 
+function printInner(r, init) {
+    r.state.lastIsNested = false
+    return r.print(indent(r.state.level) + init())
+}
+
 function printReport(r, ev, init) {
-    return Promise.try(function () {
-        if (r.state.lastIsNested && r.state.level === 1) return r.print()
-        else return undefined
-    })
-    .then(function () {
-        r.state.lastIsNested = false
-        return r.print(indent(r.state.level) + init())
-    })
+    if (r.state.lastIsNested && r.state.level === 1) {
+        return r.print().then(function () { return printInner(r, init) })
+    } else {
+        return printInner(r, init)
+    }
 }
 
 module.exports = R.on({
@@ -43,8 +45,10 @@ module.exports = R.on({
         if (ev.start) {
             if (ev.path.length === 0) return r.print()
 
-            return r.print().return(ev.path).each(function (entry) {
-                return r.print(indent(r.state.level++) + entry.name)
+            return r.print().then(function () {
+                return peach(ev.path, function (entry) {
+                    return r.print(indent(r.state.level++) + entry.name)
+                })
             })
         } else if (ev.enter) {
             return printReport(r, ev, function () {

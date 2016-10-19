@@ -1,6 +1,5 @@
 "use strict"
 
-var Promise = require("../lib/bluebird.js")
 var R = require("../lib/reporter.js")
 var getType = require("../lib/util.js").getType
 

@@ -10,28 +10,12 @@ var settings = {
     release: false,
 }
 
-var Promise = require("../lib/bluebird.js")
-
 if (global.process != null && global.process.env != null) {
     if (!settings.migrate) settings.migrate = !!global.process.env.MIGRATE
     if (!settings.release) global.process.env.NODE_ENV = "development"
-} else if (!settings.release) {
-    // Set up Bluebird's dev warnings
-    Promise.config({
-        warnings: true,
-        longStackTraces: true,
-    })
-}
-
-// PhantomJS has engine issues preventing Bluebird from detecting non-errors
-// correctly when printing long stack traces in warnings:
-// https://github.com/petkaantonov/bluebird/issues/942
-if (global.window != null && global.window.navigator != null &&
-        /phantomjs/i.test(global.window.navigator.userAgent)) {
-    Promise.config({
-        warnings: false,
-        longStackTraces: false,
-    })
+} else {
+    // Polyfill Promise
+    require("es6-promise/auto") // eslint-disable-line global-require
 }
 
 /**
@@ -40,7 +24,6 @@ if (global.window != null && global.window.navigator != null &&
 var Thallium = require("../lib/browser-bundle.js")
 var Tests = require("../lib/tests.js")
 
-var t = global.t = Thallium.t
 var assert = global.assert = Thallium.assert
 var Util = global.Util = {
     match: Thallium.match,
@@ -56,7 +39,7 @@ var Util = global.Util = {
     // easier to inject them into this bundle rather than to try to implement a
     // module loader.
 
-    Promise: Promise,
+    peach: require("../lib/util.js").peach,
 
     // Chrome complains of an illegal invocation without a bound `this`.
     setTimeout: function (func, duration) {
@@ -196,7 +179,7 @@ Util.fail = function (name) {
     // Silently swallowing exceptions is bad, so we can't use traditional
     // Thallium assertions to test.
     try {
-        assert[name].apply(t, args)
+        assert[name].apply(undefined, args)
     } catch (e) {
         if (e instanceof AssertionError) return
         throw e

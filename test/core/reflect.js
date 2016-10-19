@@ -3,6 +3,8 @@
 /* eslint max-nested-callbacks: [2, 5] */
 
 describe("core (reflect)", function () {
+    function identity(r) { return r }
+
     describe("get methods", function () {
         function methods(reflect) { return reflect.methods }
 
@@ -31,7 +33,7 @@ describe("core (reflect)", function () {
             var inner, reflect
 
             tt.test("test", function (tt) {
-                reflect = tt.call(function (r) { return r })
+                reflect = tt.call(identity)
                 inner = tt
             })
 
@@ -41,40 +43,26 @@ describe("core (reflect)", function () {
         })
     })
 
-    describe("checkInit()", function () {
-        it("passes in the root", function () {
-            Util.create().call(function (reflect) {
-                reflect.checkInit()
-            })
+    describe("get current", function () {
+        function current(reflect) { return reflect.current }
+
+        it("returns the correct methods", function () {
+            var tt = Util.create()
+
+            assert.equal(tt.call(current).methods, tt)
         })
 
-        it("passes in subtests", function () {
+        it("returns the correct methods in a child test", function () {
             var tt = Util.create()
-            var err
-
-            tt.reporter(function (ev) {
-                if (ev.fail) err = ev.value
-            })
+            var inner, found
 
             tt.test("test", function (tt) {
-                tt.call(function (reflect) { reflect.checkInit() })
+                inner = tt
+                found = tt.call(current)
             })
 
             return tt.run().then(function () {
-                assert.notOk(err)
-            })
-        })
-
-        it("catches errors correctly", function () {
-            var tt = Util.create()
-            var inner
-
-            tt.test("foo", function (tt) {
-                inner = tt.call(function (reflect) { return reflect })
-            })
-
-            return tt.run().then(function () {
-                assert.throws(function () { inner.checkInit() }, ReferenceError)
+                assert.equal(found.methods, inner)
             })
         })
     })
