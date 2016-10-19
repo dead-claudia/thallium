@@ -9,11 +9,16 @@ A simple, unopinionated, modular test framework meant to simplify your tests. It
 
 ## Installation
 
-```
+First, install [Node and npm](https://nodejs.org/en/download/).
+
+```sh
 npm install --save-dev thallium
+
+# If you would like it globally installed, that works, too.
+npm install --global thallium
 ```
 
-Also, this will require a Promise polyfill of some sort in older browsers and runtimes (e.g. [es6-promise](https://github.com/stefanpenner/es6-promise)). It is tested with es6-promise in PhantomJS 2, though.
+Also, if you target older runtimes like PhantomJS or Internet Explorer, this will require a Promise polyfill, such as [es6-promise](https://github.com/stefanpenner/es6-promise). That polyfill in particular is used in this library to test PhantomJS 2.
 
 ## Usage and API
 
@@ -25,33 +30,18 @@ tl
 
 Couple specific notes:
 
-1. You can use the framework without the built-in assertions. Use `thallium/core`, which has none of them preloaded, and implement your own assertions. Matter of fact, the built-in ones are actually themselves a plugin, `thallium/assertions`.
+1. You can use the framework without the built-in assertions. They're there just to make this a little more batteries-included (install one thing, and you're ready to go).
 
-2. Any test properties you define in your tests are scoped per-test. These include assertions. Example:
+2. Not much configuration is required to get started. Just write your tests in a `test` folder (in JavaScript, of course), and everything just works with that command. I aim for simplicity and convention over configuration, but I also aim for as much flexibility as you need, so the configuration is mostly procedural code.
 
-    ```js
-    t.test("test", t => {
-        t.foo = 1
-        t.hasOwn(t, "foo")
-
-        t.test("inner", t => {
-            t.hasOwn(t, "foo")
-        })
-
-        const tt = t.test("inner 2")
-
-        tt.hasOwn(tt, "foo")
-    })
-
-    t.notHasOwn(t, "foo")
-    ```
+    - You can also just create a single file, and run `tl test.js`.
 
 ## Versioning
 
-As soon as it's 1.0, I'll stick to [SemVer](https://semver.org). Until then, here's how I'll aim for new versions:
+As soon as it's 1.0, I'll stick to [semver](https://semver.org). Until then, here's how I'll aim for new versions:
 
-- Minor versions (`0.*`) represent larger breaking changes or larger new features. This includes much of the primary roadmap below.
-- Patch versions (`0.1.*`, etc.) represent bug fixes and smaller breaking changes/new features. This includes some of the nice-to-haves I've listed below the roadmap.
+- Minor versions (`0.x`) represent larger breaking changes or larger new features. This includes much of the primary roadmap below.
+- Patch versions (`0.1.x`, `0.2.x`, etc.) represent bug fixes and smaller breaking changes/new features. This includes some of the nice-to-haves I've listed below the roadmap.
 
 I will try to avoid breaking changes on patch updates, but it's not guaranteed, particularly if it's because a bug fix.
 
@@ -108,17 +98,20 @@ Do note that it isn't necessarily comprehensive, although I try to keep it somew
 1. Add OS X to the Travis build
     - Travis has been having OSX issues lately, making debugging these errors a little harder.
 2. Add diff support to all existing reporters
-3. Document all the assertions
-4. Support flaky tests via first-class retries
+3. Create DOM reporter
+4. Document all the assertions
+5. Support flaky tests via first-class retries
     - This is a requirement to self-host the runner
+6. Move `thallium/match` and `thallium/assert` implementations out of core
 
 **0.4:**
 
 1. Remove all the previously deprecated methods/etc.
 2. Transition to TypeScript
-    - I'm having enough of the highly uninformative `TypeError: foo has no method bar`, `TypeError: Cannot read property 'bar' of undefined`, and `TypeError: object #<Object> is not a function` (At least Node 6 gives the variable name...)
+    - I'm having enough of the highly uninformative `TypeError: foo has no method bar`, `TypeError: Cannot read property 'bar' of undefined`, `TypeError: object #<Object> is not a function`, etc. (At least Node 6 gives the variable name...)
     - I get arrow functions and classes for free, without having to deal with Babel's monstrosity
-3. Create DOM reporter
+3. Add parallel testing support.
+    - This will be based on a beast created and managed separately from core.
 4. Add some promise-aware assertions
 
 **0.4.x:** (after 0.4.0)
@@ -130,10 +123,9 @@ Do note that it isn't necessarily comprehensive, although I try to keep it somew
 
 **0.5:**
 
-1. Move `thallium/match` and `thallium/assert` out of core
-2. Reimplement [`util-inspect`](https://www.npmjs.com/package/util-inspect) for browsers based on Node's current [`util.inspect`](https://nodejs.org/api/util.html#util_util_inspect_object_options), since that is completely untested and completely unaware of ES6. :worried:
+1. Reimplement [`util-inspect`](https://www.npmjs.com/package/util-inspect) for browsers based on Node's current [`util.inspect`](https://nodejs.org/api/util.html#util_util_inspect_object_options), since that is completely untested and completely unaware of ES6. :worried:
     - This will be published out of core
-3. Create a nice REPL driver for Node, in addition to the CLI.\*
+2. Create a nice REPL driver for Node, in addition to the CLI.\*
     - This will just be a module + sugar binary, so you can use it with any language
 
 \* *That's something from Lisp-land I really wish was here...*
@@ -146,17 +138,18 @@ Here's the nice-to-haves, and so these are in no particular order:
     - This will include more reporters as well
 
 - Write lots of blog posts. :smile:
-    - Why another testing framework
-    - Why this uses code *for* configuration
-    - Why this tries to infer so much (it's not as magical as it seems)
+    - Why another testing framework (we already have [Mocha](http://mochajs.org/), [Jasmine](http://jasmine.github.io/), [QUnit](https://qunitjs.com/), [AVA](https://github.com/avajs/ava), [Tape](https://github.com/substack/tape) [and](https://www.npmjs.com/package/tap) [friends](https://www.npmjs.com/package/tt), [Nodeunit](https://github.com/caolan/nodeunit), [among](http://docs.busterjs.org/en/latest/overview/) [others](https://www.npmjs.com/package/ospec))
+    - Why this uses code *for* configuration (Gulp vs Grunt, Browserify vs Webpack, ESLint vs JSHint+JSCS, etc.)
+    - Why this tries to infer so much (it's not as magical as it seems, and magic isn't inherently evil)
     - Why such a high focus on flexibility
     - etc.
 
 - Write an alternative matching algorithm to be based off of the ES2015 Iterable (`Symbol.iterator`) protocol, etc.
     - This may likely also include the [proposed async iteration protocol](https://github.com/tc39/proposal-async-iteration#async-iterators-and-async-iterables).
+    - This will be out of core
 
 - Use the patience diff for larger data sets, since it deals with those a little more readably, a plus for data-heavy integration/end-to-end tests (this repo has some of those)
-    - There doesn't appear to be a JS port yet, and algorithm documentation is scarce, so I'd have to write it myself, and it could be challenging.
+    - There doesn't appear to be a JS port yet, and algorithm documentation is scarce, so I'd have to write it myself, and it will likely be challenging.
 
 ## Contributing
 
