@@ -2,7 +2,7 @@
 
 var t = require("../../index.js")
 
-t.test("core (timeouts) (FLAKE)", function (t) {
+t.test("core (timeouts) (FLAKE)", function () {
     t.test("succeeds with own", function () {})
     t.test("fails with own", function () {})
     t.test("succeeds with inherited", function () {})

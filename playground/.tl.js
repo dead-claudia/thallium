@@ -9,7 +9,7 @@
 
 // Set the reporter and options below:
 var reporter = {
-    module: "../r/dot.js",
+    module: "../r/spec.js",
     opts: {},
 }
 

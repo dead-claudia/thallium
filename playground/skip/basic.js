@@ -2,7 +2,7 @@
 
 var t = require("../../index.js")
 
-t.test("core (basic)", function (t) {
+t.test("core (basic)", function () {
     t.testSkip("has `base()`")
     t.testSkip("has `test()`")
     t.testSkip("has `parent()`")

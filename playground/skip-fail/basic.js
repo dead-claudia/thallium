@@ -6,7 +6,7 @@ function fail(t) {
     t.fail("fail")
 }
 
-t.test("core (basic)", function (t) {
+t.test("core (basic)", function () {
     t.testSkip("has `base()`")
     t.testSkip("has `test()`")
     t.testSkip("has `parent()`")
