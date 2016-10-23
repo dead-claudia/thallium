@@ -1,133 +1,132 @@
 "use strict"
 
 describe("core (internal)", function () {
-    describe("createReport()", function () {
-        var Report = Util.Tests.Report
-        var Types = Util.Tests.Types
-        var create = Util.n
+    describe("reports", function () {
+        var Reports = Util.Tests.Reports
+        var n = Util.n
 
         it("correctly creates `start` reports", function () {
-            var report = create("start", [], {value: "hello"})
-            var expected = new Report(Types.Start, [], undefined, -1, 0)
+            var report = n.start()
+            var expected = new Reports.Start()
 
             assert.match(report, expected)
         })
 
         it("correctly creates `enter` reports", function () {
-            var report = create("enter", [], {value: "hello"})
-            var expected = new Report(Types.Enter, [], undefined, 10, 75)
+            var report = n.enter([])
+            var expected = new Reports.Enter([], 10, 75)
 
             assert.match(report, expected)
         })
 
         it("correctly creates `enter` reports with duration", function () {
-            var report = create("enter", [], {value: "hello"}, 20)
-            var expected = new Report(Types.Enter, [], undefined, 20, 75)
+            var report = n.enter([], 20)
+            var expected = new Reports.Enter([], 20, 75)
 
             assert.match(report, expected)
         })
 
         it("correctly creates `enter` reports with slow", function () {
-            var report = create("enter", [], {value: "hello"}, null, 10) // eslint-disable-line max-len
-            var expected = new Report(Types.Enter, [], undefined, 10, 10)
+            var report = n.enter([], undefined, 10)
+            var expected = new Reports.Enter([], 10, 10)
 
             assert.match(report, expected)
         })
 
         it("correctly creates `enter` reports with duration + slow", function () { // eslint-disable-line max-len
-            var report = create("enter", [], {value: "hello"}, null, 10) // eslint-disable-line max-len
-            var expected = new Report(Types.Enter, [], undefined, 10, 10)
+            var report = n.enter([], 20, 10)
+            var expected = new Reports.Enter([], 20, 10)
 
             assert.match(report, expected)
         })
 
         it("correctly creates `leave` reports", function () {
-            var report = create("leave", [], {value: "hello"})
-            var expected = new Report(Types.Leave, [], undefined, -1, 0)
+            var report = n.leave([])
+            var expected = new Reports.Leave([])
 
             assert.match(report, expected)
         })
 
         it("correctly creates `pass` reports", function () {
-            var report = create("pass", [], {value: "hello"})
-            var expected = new Report(Types.Pass, [], undefined, 10, 75)
+            var report = n.pass([])
+            var expected = new Reports.Pass([], 10, 75)
 
             assert.match(report, expected)
         })
 
         it("correctly creates `pass` reports with duration", function () {
-            var report = create("pass", [], {value: "hello"}, 20)
-            var expected = new Report(Types.Pass, [], undefined, 20, 75)
+            var report = n.pass([], 20)
+            var expected = new Reports.Pass([], 20, 75)
 
             assert.match(report, expected)
         })
 
         it("correctly creates `pass` reports with slow", function () {
-            var report = create("pass", [], {value: "hello"}, null, 10) // eslint-disable-line max-len
-            var expected = new Report(Types.Pass, [], undefined, 10, 10)
+            var report = n.pass([], null, 10)
+            var expected = new Reports.Pass([], 10, 10)
 
             assert.match(report, expected)
         })
 
         it("correctly creates `pass` reports with duration + slow", function () { // eslint-disable-line max-len
-            var report = create("pass", [], {value: "hello"}, null, 10) // eslint-disable-line max-len
-            var expected = new Report(Types.Pass, [], undefined, 10, 10)
+            var report = n.pass([], 20, 10)
+            var expected = new Reports.Pass([], 20, 10)
 
             assert.match(report, expected)
         })
 
         it("correctly creates `fail` reports", function () {
-            var report = create("fail", [], {value: "hello"})
-            var expected = new Report(Types.Fail, [], {value: "hello"}, 10, 75)
+            var report = n.fail([], {value: "hello"})
+            var expected = new Reports.Fail([], {value: "hello"}, 10, 75)
 
             assert.match(report, expected)
         })
 
         it("correctly creates `fail` reports with duration", function () {
-            var report = create("fail", [], {value: "hello"}, 20)
-            var expected = new Report(Types.Fail, [], {value: "hello"}, 20, 75)
+            var report = n.fail([], {value: "hello"}, 20)
+            var expected = new Reports.Fail([], {value: "hello"}, 20, 75)
 
             assert.match(report, expected)
         })
 
         it("correctly creates `fail` reports with slow", function () {
-            var report = create("fail", [], {value: "hello"}, null, 10) // eslint-disable-line max-len
-            var expected = new Report(Types.Fail, [], {value: "hello"}, 10, 10)
+            var report = n.fail([], {value: "hello"}, null, 10)
+            var expected = new Reports.Fail([], {value: "hello"}, 10, 10)
 
             assert.match(report, expected)
         })
 
         it("correctly creates `fail` reports with duration + slow", function () { // eslint-disable-line max-len
-            var report = create("fail", [], {value: "hello"}, null, 10) // eslint-disable-line max-len
-            var expected = new Report(Types.Fail, [], {value: "hello"}, 10, 10)
+            var report = n.fail([], {value: "hello"}, 20, 10)
+            var expected = new Reports.Fail([], {value: "hello"}, 20, 10)
 
             assert.match(report, expected)
         })
 
         it("correctly creates `skip` reports", function () {
-            var report = create("skip", [], {value: "hello"})
-            var expected = new Report(Types.Skip, [], undefined, -1, 0)
+            var report = n.skip([])
+            var expected = new Reports.Skip([])
 
             assert.match(report, expected)
         })
 
         it("correctly creates `end` reports", function () {
-            var report = create("end", [], {value: "hello"})
-            var expected = new Report(Types.End, [], undefined, -1, 0)
+            var report = n.end()
+            var expected = new Reports.End()
 
             assert.match(report, expected)
         })
 
         it("correctly creates `error` reports", function () {
-            var report = create("error", [], {value: "hello"})
-            var expected = new Report(Types.Error, [], {value: "hello"}, -1, 0)
+            var report = n.error({value: "hello"})
+            var expected = new Reports.Error({value: "hello"})
 
             assert.match(report, expected)
         })
 
         context("type checkers", function () {
             it("correctly identifies `start` reports", function () {
-                var report = create("start", [])
+                var report = n.start()
 
                 assert.equal(report.start, true)
                 assert.equal(report.enter, false)
@@ -140,7 +139,7 @@ describe("core (internal)", function () {
             })
 
             it("correctly identifies `enter` reports", function () {
-                var report = create("enter", [])
+                var report = n.enter([])
 
                 assert.equal(report.start, false)
                 assert.equal(report.enter, true)
@@ -153,7 +152,7 @@ describe("core (internal)", function () {
             })
 
             it("correctly identifies `leave` reports", function () {
-                var report = create("leave", [])
+                var report = n.leave([])
 
                 assert.equal(report.start, false)
                 assert.equal(report.enter, false)
@@ -166,7 +165,7 @@ describe("core (internal)", function () {
             })
 
             it("correctly identifies `pass` reports", function () {
-                var report = create("pass", [])
+                var report = n.pass([])
 
                 assert.equal(report.start, false)
                 assert.equal(report.enter, false)
@@ -179,7 +178,7 @@ describe("core (internal)", function () {
             })
 
             it("correctly identifies `fail` reports", function () {
-                var report = create("fail", [])
+                var report = n.fail([])
 
                 assert.equal(report.start, false)
                 assert.equal(report.enter, false)
@@ -192,7 +191,7 @@ describe("core (internal)", function () {
             })
 
             it("correctly identifies `skip` reports", function () {
-                var report = create("skip", [])
+                var report = n.skip([])
 
                 assert.equal(report.start, false)
                 assert.equal(report.enter, false)
@@ -205,7 +204,7 @@ describe("core (internal)", function () {
             })
 
             it("correctly identifies `end` reports", function () {
-                var report = create("end", [])
+                var report = n.end()
 
                 assert.equal(report.start, false)
                 assert.equal(report.enter, false)
@@ -218,7 +217,7 @@ describe("core (internal)", function () {
             })
 
             it("correctly identifies `error` reports", function () {
-                var report = create("error", [])
+                var report = n.error()
 
                 assert.equal(report.start, false)
                 assert.equal(report.enter, false)
@@ -233,35 +232,35 @@ describe("core (internal)", function () {
 
         context("type()", function () {
             it("returns correct value for `start` reports", function () {
-                assert.match(create("start", []).type, "start")
+                assert.match(n.start().type, "start")
             })
 
             it("returns correct value for `enter` reports", function () {
-                assert.match(create("enter", []).type, "enter")
+                assert.match(n.enter([]).type, "enter")
             })
 
             it("returns correct value for `leave` reports", function () {
-                assert.match(create("leave", []).type, "leave")
+                assert.match(n.leave([]).type, "leave")
             })
 
             it("returns correct value for `pass` reports", function () {
-                assert.match(create("pass", []).type, "pass")
+                assert.match(n.pass([]).type, "pass")
             })
 
             it("returns correct value for `fail` reports", function () {
-                assert.match(create("fail", []).type, "fail")
+                assert.match(n.fail([]).type, "fail")
             })
 
             it("returns correct value for `skip` reports", function () {
-                assert.match(create("skip", []).type, "skip")
+                assert.match(n.skip([]).type, "skip")
             })
 
             it("returns correct value for `end` reports", function () {
-                assert.match(create("end", []).type, "end")
+                assert.match(n.end().type, "end")
             })
 
             it("returns correct value for `error` reports", function () {
-                assert.match(create("error", []).type, "error")
+                assert.match(n.error().type, "error")
             })
         })
     })

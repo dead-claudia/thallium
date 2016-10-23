@@ -14,7 +14,11 @@ function template(_, report, tmpl, skip) {
     if (!skip) _.state.counter++
     var path = R.joinPath(report).replace(/\$/g, "$$$$")
 
-    if (report.hook) path += " (" + report.value.stage + ")"
+    if (report.hook) {
+        path += " (" + report.stage
+        if (report.name) path += " ‒ " + report.name
+        path += ")"
+    }
 
     return _.print(
         tmpl.replace(/%c/g, _.state.counter)
@@ -46,7 +50,7 @@ function printLine(p, _, line) {
 }
 
 function printError(_, report) {
-    var err = report.hook ? report.value.value : report.value
+    var err = report.value
 
     if (!(err instanceof Error)) {
         return printValue(_, "value", err)

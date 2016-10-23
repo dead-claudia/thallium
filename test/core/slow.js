@@ -44,9 +44,9 @@ describe("core (slow) (FLAKE)", /** @this */ function () {
 
         return tt.run().then(function () {
             assert.match(ret, [
-                n("start", [], undefined, -1, 75),
-                n("pass", [p("test", 0)], undefined, ret[1].duration, ret[1].slow), // eslint-disable-line max-len
-                n("end", [], undefined, -1, 75),
+                n.start(),
+                n.pass([p("test", 0)], ret[1].duration, ret[1].slow),
+                n.end(),
             ])
 
             speed(ret[1], "fast")
@@ -67,9 +67,9 @@ describe("core (slow) (FLAKE)", /** @this */ function () {
 
         return tt.run().then(function () {
             assert.match(ret, [
-                n("start", [], undefined, -1, 75),
-                n("pass", [p("test", 0)], undefined, ret[1].duration, ret[1].slow), // eslint-disable-line max-len
-                n("end", [], undefined, -1, 75),
+                n.start(),
+                n.pass([p("test", 0)], ret[1].duration, ret[1].slow),
+                n.end(),
             ])
 
             assert.equal(ret[1].slow, 100)
@@ -91,9 +91,9 @@ describe("core (slow) (FLAKE)", /** @this */ function () {
 
         return tt.run().then(function () {
             assert.match(ret, [
-                n("start", [], undefined, -1, 75),
-                n("pass", [p("test", 0)], undefined, ret[1].duration, ret[1].slow), // eslint-disable-line max-len
-                n("end", [], undefined, -1, 75),
+                n.start(),
+                n.pass([p("test", 0)], ret[1].duration, ret[1].slow),
+                n.end(),
             ])
 
             assert.equal(ret[1].slow, 50)
@@ -114,11 +114,11 @@ describe("core (slow) (FLAKE)", /** @this */ function () {
 
         return tt.run().then(function () {
             assert.match(ret, [
-                n("start", [], undefined, -1, 75),
-                n("enter", [p("test", 0)], undefined, ret[1].duration, ret[1].slow), // eslint-disable-line max-len
-                n("pass", [p("test", 0), p("inner", 0)], undefined, ret[2].duration, ret[2].slow), // eslint-disable-line max-len
-                n("leave", [p("test", 0)], undefined, -1, 50),
-                n("end", [], undefined, -1, 75),
+                n.start(),
+                n.enter([p("test", 0)], ret[1].duration, ret[1].slow),
+                n.pass([p("test", 0), p("inner", 0)], ret[2].duration, ret[2].slow), // eslint-disable-line max-len
+                n.leave([p("test", 0)]),
+                n.end(),
             ])
 
             assert.equal(ret[1].slow, 50)
@@ -141,11 +141,11 @@ describe("core (slow) (FLAKE)", /** @this */ function () {
 
         return tt.run().then(function () {
             assert.match(ret, [
-                n("start", [], undefined, -1, 75),
-                n("enter", [p("test", 0)], undefined, ret[1].duration, ret[1].slow), // eslint-disable-line max-len
-                n("pass", [p("test", 0), p("inner", 0)], undefined, ret[2].duration, ret[2].slow), // eslint-disable-line max-len
-                n("leave", [p("test", 0)], undefined, -1, 50),
-                n("end", [], undefined, -1, 75),
+                n.start(),
+                n.enter([p("test", 0)], ret[1].duration, ret[1].slow),
+                n.pass([p("test", 0), p("inner", 0)], ret[2].duration, ret[2].slow), // eslint-disable-line max-len
+                n.leave([p("test", 0)]),
+                n.end(),
             ])
 
             assert.equal(ret[1].slow, 50)

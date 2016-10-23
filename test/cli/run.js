@@ -18,7 +18,7 @@ describe("cli runner", function () {
 
         function execute(reporter, type) {
             return Promise.resolve(
-                reporter(n(type, [p("test", 0)], map[type])))
+                reporter(n[type]([p("test", 0)], map[type])))
         }
 
         ["start", "enter", "leave", "pass", "skip", "end"]
@@ -125,10 +125,10 @@ describe("cli runner", function () {
             }).then(function (code) {
                 assert.equal(code, 0)
                 assert.match(ret, [
-                    n("start", []),
-                    n("pass", [p("test 1", 0)]),
-                    n("pass", [p("test 2", 1)]),
-                    n("end", []),
+                    n.start(),
+                    n.pass([p("test 1", 0)]),
+                    n.pass([p("test 2", 1)]),
+                    n.end(),
                 ])
             })
         })
@@ -158,9 +158,9 @@ describe("cli runner", function () {
             }).then(function (code) {
                 assert.equal(code, 0)
                 assert.match(ret, [
-                    n("start", []),
-                    n("pass", [p("test 2", 0)]),
-                    n("end", []),
+                    n.start(),
+                    n.pass([p("test 2", 0)]),
+                    n.end(),
                 ])
             })
         })
@@ -190,9 +190,9 @@ describe("cli runner", function () {
             }).then(function (code) {
                 assert.equal(code, 0)
                 assert.match(ret, [
-                    n("start", []),
-                    n("pass", [p("test 2", 0)]),
-                    n("end", []),
+                    n.start(),
+                    n.pass([p("test 2", 0)]),
+                    n.end(),
                 ])
             })
         })
@@ -225,10 +225,10 @@ describe("cli runner", function () {
             }).then(function (code) {
                 assert.equal(code, 1)
                 assert.match(ret, [
-                    n("start", []),
-                    n("pass", [p("test 1", 0)]),
-                    n("fail", [p("test 2", 1)], new AssertionError("oops")),
-                    n("end", []),
+                    n.start(),
+                    n.pass([p("test 1", 0)]),
+                    n.fail([p("test 2", 1)], new AssertionError("oops")),
+                    n.end(),
                 ])
             })
         })
@@ -299,22 +299,22 @@ describe("cli runner", function () {
             }
 
             var expected = [
-                n("start", []),
-                n("enter", [p("mod-one", 0)]),
-                n("pass", [p("mod-one", 0), p("1 === 1", 0)]),
-                n("fail", [p("mod-one", 0), p("foo()", 1)], fail),
-                n("fail", [p("mod-one", 0), p("bar()", 2)], new Error("fail")),
-                n("fail", [p("mod-one", 0), p("baz()", 3)], sentinel),
-                n("enter", [p("mod-one", 0), p("nested", 4)]),
-                n("pass", [p("mod-one", 0), p("nested", 4), p("nested 2", 0)]),
-                n("leave", [p("mod-one", 0), p("nested", 4)]),
-                n("leave", [p("mod-one", 0)]),
-                n("enter", [p("mod-two", 1)]),
-                n("fail", [p("mod-two", 1), p("1 === 2", 0)], fail2),
-                n("pass", [p("mod-two", 1), p("expandos don't transfer", 1)]),
-                n("fail", [p("mod-two", 1), p("what a fail...", 2)], fail3),
-                n("leave", [p("mod-two", 1)]),
-                n("end", []),
+                n.start(),
+                n.enter([p("mod-one", 0)]),
+                n.pass([p("mod-one", 0), p("1 === 1", 0)]),
+                n.fail([p("mod-one", 0), p("foo()", 1)], fail),
+                n.fail([p("mod-one", 0), p("bar()", 2)], new Error("fail")),
+                n.fail([p("mod-one", 0), p("baz()", 3)], sentinel),
+                n.enter([p("mod-one", 0), p("nested", 4)]),
+                n.pass([p("mod-one", 0), p("nested", 4), p("nested 2", 0)]),
+                n.leave([p("mod-one", 0), p("nested", 4)]),
+                n.leave([p("mod-one", 0)]),
+                n.enter([p("mod-two", 1)]),
+                n.fail([p("mod-two", 1), p("1 === 2", 0)], fail2),
+                n.pass([p("mod-two", 1), p("expandos don't transfer", 1)]),
+                n.fail([p("mod-two", 1), p("what a fail...", 2)], fail3),
+                n.leave([p("mod-two", 1)]),
+                n.end(),
             ]
 
             return run({
@@ -376,10 +376,10 @@ describe("cli runner", function () {
                 },
             }).then(function () {
                 assert.match(ret, [
-                    n("start", []),
-                    n("pass", [p("test", 0)]),
-                    n("pass", [p("other", 1)]),
-                    n("end", []),
+                    n.start(),
+                    n.pass([p("test", 0)]),
+                    n.pass([p("other", 1)]),
+                    n.end(),
                 ])
             })
         })

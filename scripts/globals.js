@@ -28,8 +28,8 @@ var assert = global.assert = Thallium.assert
 var Util = global.Util = {
     match: Thallium.match,
     r: Thallium.r,
-    create: Thallium.createBase,
-    n: Thallium.createReport,
+    create: Thallium.createRoot,
+    n: Thallium.reports,
     p: Thallium.createLocation,
     Tests: Tests,
 
@@ -148,22 +148,25 @@ Util.jsdom = (function () {
 })()
 
 Util.push = function (ret, keep) {
-    return function push(ev) {
+    return function push(report) {
         // Any equality tests on either of these are inherently flaky.
-        assert.hasOwn(ev, "duration")
-        assert.hasOwn(ev, "slow")
-        assert.number(ev.duration)
-        assert.number(ev.slow)
-        if (!keep) {
-            if (ev.pass || ev.fail || ev.enter) {
-                ev.duration = 10
-                ev.slow = 75
-            } else {
-                ev.duration = -1
-                ev.slow = 0
+        // Only add the relevant properties
+        if (report.fail || report.error || report.hook) {
+            assert.hasOwn(report, "value")
+        }
+
+        if (report.enter || report.pass || report.fail) {
+            assert.hasOwn(report, "duration")
+            assert.hasOwn(report, "slow")
+            assert.number(report.duration)
+            assert.number(report.slow)
+            if (!keep) {
+                report.duration = 10
+                report.slow = 75
             }
         }
-        ret.push(ev)
+
+        ret.push(report)
     }
 }
 

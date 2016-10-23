@@ -25,16 +25,16 @@ describe("core (selection)", function () {
 
             return tt.run().then(function () {
                 assert.match(ret, [
-                    n("start", []),
-                    n("enter", [p("one", 0)]),
-                    n("skip", [p("one", 0), p("inner", 0)]),
-                    n("pass", [p("one", 0), p("other", 1)]),
-                    n("leave", [p("one", 0)]),
-                    n("enter", [p("two", 1)]),
-                    n("pass", [p("two", 1), p("inner", 0)]),
-                    n("pass", [p("two", 1), p("other", 1)]),
-                    n("leave", [p("two", 1)]),
-                    n("end", []),
+                    n.start(),
+                    n.enter([p("one", 0)]),
+                    n.skip([p("one", 0), p("inner", 0)]),
+                    n.pass([p("one", 0), p("other", 1)]),
+                    n.leave([p("one", 0)]),
+                    n.enter([p("two", 1)]),
+                    n.pass([p("two", 1), p("inner", 0)]),
+                    n.pass([p("two", 1), p("other", 1)]),
+                    n.leave([p("two", 1)]),
+                    n.end(),
                 ])
             })
         })
@@ -60,11 +60,11 @@ describe("core (selection)", function () {
 
             return tt.run().then(function () {
                 assert.match(ret, [
-                    n("start", []),
-                    n("enter", [p("one", 0)]),
-                    n("pass", [p("one", 0), p("inner", 0)]),
-                    n("leave", [p("one", 0)]),
-                    n("end", []),
+                    n.start(),
+                    n.enter([p("one", 0)]),
+                    n.pass([p("one", 0), p("inner", 0)]),
+                    n.leave([p("one", 0)]),
+                    n.end(),
                 ])
             })
         })
@@ -88,11 +88,11 @@ describe("core (selection)", function () {
 
             return tt.run().then(function () {
                 assert.match(ret, [
-                    n("start", []),
-                    n("enter", [p("one", 0)]),
-                    n("pass", [p("one", 0), p("inner", 0)]),
-                    n("leave", [p("one", 0)]),
-                    n("end", []),
+                    n.start(),
+                    n.enter([p("one", 0)]),
+                    n.pass([p("one", 0), p("inner", 0)]),
+                    n.leave([p("one", 0)]),
+                    n.end(),
                 ])
             })
         })

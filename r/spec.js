@@ -2,7 +2,6 @@
 
 // This is a reporter that mimics Mocha's `spec` reporter.
 
-var peach = require("../lib/util.js").peach
 var R = require("../lib/reporter.js")
 var c = R.color
 
@@ -42,13 +41,7 @@ module.exports = R.on({
 
     report: function (_, report) {
         if (report.start) {
-            if (report.path.length === 0) return _.print()
-
-            return _.print().then(function () {
-                return peach(report.path, function (entry) {
-                    return _.print(indent(_.state.level++) + entry.name)
-                })
-            })
+            return _.print()
         } else if (report.enter) {
             return printReport(_, function () {
                 return getName(_.state.level++, report)
@@ -76,7 +69,12 @@ module.exports = R.on({
                 _.pushError(report)
                 var name = getName(_.state.level, report)
 
-                if (report.hook) name += " (" + report.value.stage + ")"
+                if (report.hook) {
+                    name += " (" + report.stage
+                    if (report.name) name += " ‒ " + report.name
+                    name += ")"
+                }
+
                 return c("fail", _.errors.length + ") " + name)
             })
         } else if (report.skip) {

@@ -2,71 +2,96 @@
 
 var Thallium = require("./lib/thallium.js")
 var Tests = require("./lib/tests.js")
-var Types = Tests.Types
-var Report = Tests.Report
+var Reports = Tests.Reports
+var HookError = Tests.HookError
+var Stage = Tests.Stage
 
-/**
- * Convert a stringified type to an internal numeric enum member.
- */
-function toReportType(type) {
-    switch (type) {
-    case "start": return Types.Start
-    case "enter": return Types.Enter
-    case "leave": return Types.Leave
-    case "pass": return Types.Pass
-    case "fail": return Types.Fail
-    case "skip": return Types.Skip
-    case "end": return Types.End
-    case "error": return Types.Error
-    case "hook": return Types.Hook
-    default: throw new RangeError("Unknown report `type`: " + type)
-    }
-}
-
-exports.createBase = function () {
+exports.createRoot = function () {
     return new Thallium()
 }
 
+function d(duration) {
+    if (duration == null) return 10
+    if (typeof duration === "number") return duration|0
+    throw new TypeError("Expected `duration` to be a number if it exists")
+}
+
+function s(slow) {
+    if (slow == null) return 75
+    if (typeof slow === "number") return slow|0
+    throw new TypeError("Expected `slow` to be a number if it exists")
+}
+
+function p(path) {
+    if (Array.isArray(path)) return path
+    throw new TypeError("Expected `path` to be an array of locations")
+}
+
+function h(value) {
+    if (value != null && typeof value._ === "number") return value
+    throw new TypeError("Expected `value` to be a hook error")
+}
+
 /**
- * Creates a new report, mainly for testing reporters.
+ * Create a new report, mainly for testing reporters.
  */
-exports.createReport = function (type, path, value, duration, slow) { // eslint-disable-line max-params, max-len
-    if (typeof type !== "string") {
-        throw new TypeError("Expected `type` to be a string")
-    }
+exports.reports = {
+    start: function () {
+        return new Reports.Start()
+    },
 
-    if (!Array.isArray(path)) {
-        throw new TypeError("Expected `path` to be an array of locations")
-    }
+    enter: function (path, duration, slow) {
+        return new Reports.Enter(p(path), d(duration), s(slow))
+    },
 
-    var converted = toReportType(type)
+    leave: function (path) {
+        return new Reports.Leave(p(path))
+    },
 
-    if (converted === Types.Pass ||
-            converted === Types.Fail ||
-            converted === Types.Enter) {
-        if (duration == null) {
-            duration = 10
-        } else if (typeof duration !== "number") {
-            throw new TypeError(
-                "Expected `duration` to be a number if it exists")
-        }
+    pass: function (path, duration, slow) {
+        return new Reports.Pass(p(path), d(duration), s(slow))
+    },
 
-        if (slow == null) {
-            slow = 75
-        } else if (typeof slow !== "number") {
-            throw new TypeError("Expected `slow` to be a number if it exists")
-        }
+    fail: function (path, value, duration, slow) {
+        return new Reports.Fail(p(path), value, d(duration), s(slow))
+    },
 
-        if (converted === Types.Fail) {
-            return new Report(converted, path, value, duration|0, slow|0)
-        } else {
-            return new Report(converted, path, undefined, duration|0, slow|0)
-        }
-    } else if (converted === Types.Error || converted === Types.Hook) {
-        return new Report(converted, path, value, -1, 0)
-    } else {
-        return new Report(converted, path, undefined, -1, 0)
-    }
+    skip: function (path) {
+        return new Reports.Skip(p(path))
+    },
+
+    end: function () {
+        return new Reports.End()
+    },
+
+    error: function (value) {
+        return new Reports.Error(value)
+    },
+
+    hook: function (path, value) {
+        return new Reports.Hook(p(path), h(value))
+    },
+}
+
+/**
+ * Create a new hook error, mainly for testing reporters.
+ */
+exports.hookError = {
+    beforeAll: function (func, value) {
+        return new HookError(Stage.BeforeAll, func, value)
+    },
+
+    beforeEach: function (func, value) {
+        return new HookError(Stage.BeforeEach, func, value)
+    },
+
+    afterEach: function (func, value) {
+        return new HookError(Stage.AfterEach, func, value)
+    },
+
+    afterAll: function (func, value) {
+        return new HookError(Stage.AfterAll, func, value)
+    },
 }
 
 /**

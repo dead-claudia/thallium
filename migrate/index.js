@@ -335,7 +335,7 @@ methods(Thallium, {
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * - `reflect.do` is deprecated, with no replacement (inline tests are also  *
  *   deprecated).                                                            *
- * - `reflect.base` -> `internal.createBase`                                 *
+ * - `reflect.base` -> `internal.createRoot`                                 *
  * - `reflect.AssertionError` -> `assert.AssertionError`.                    *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
@@ -355,8 +355,8 @@ methods(Reflect, {
             return this
         }),
     base: Common.deprecate(
-        "`reflect.base` is deprecated. Use `internal.createBase` from `thallium/internal` instead.", // eslint-disable-line max-len
-        Internal.createBase),
+        "`reflect.base` is deprecated. Use `internal.createRoot` from `thallium/internal` instead.", // eslint-disable-line max-len
+        Internal.createRoot),
 })
 
 // ESLint oddly can't tell these are shadowed.
@@ -451,15 +451,34 @@ methods(Thallium, {
 })
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- * - `reflect.report` -> `internal.createReport`                             *
+ * - `reflect.report` -> `internal.report.*`                                 *
  * - `reflect.loc` -> `internal.createLocation`                              *
  * - `reflect.scheduler` obsoleted.                                          *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
+var reports = Internal.reports
+
 methods(Reflect, {
     report: Common.deprecate(
-        "`reflect.report` is deprecated. Use `internal.createReport` from `thallium/internal` instead.", // eslint-disable-line max-len
-        Internal.createReport),
+        "`reflect.report` is deprecated. Use `internal.report.*` from `thallium/internal` instead.", // eslint-disable-line max-len
+        function (type, path, value, duration, slow) { // eslint-disable-line max-params, max-len
+            if (typeof type !== "string") {
+                throw new TypeError("Expected `type` to be a string")
+            }
+
+            switch (type) {
+            case "start": return reports.start()
+            case "enter": return reports.enter(path, duration, slow)
+            case "leave": return reports.leave(path)
+            case "pass": return reports.pass(path, duration, slow)
+            case "fail": return reports.fail(path, value, duration, slow)
+            case "skip": return reports.skip(path)
+            case "end": return reports.end()
+            case "error": return reports.error(value)
+            case "hook": return reports.hook(path, value)
+            default: throw new RangeError("Unknown report `type`: " + type)
+            }
+        }),
 
     loc: Common.deprecate(
         "`reflect.loc` is deprecated. Use `internal.createLocation` from `thallium/internal` instead.", // eslint-disable-line max-len

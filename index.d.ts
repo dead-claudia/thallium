@@ -32,12 +32,8 @@ export type Report =
     ErrorReport |
     HookReport;
 
-interface TestReport<T extends ReportType, U> {
+interface ReportBase<T extends ReportType> {
     type: T;
-    path: Location[];
-    value: U;
-    duration: number;
-    slow: number;
 
     start: this is StartReport;
     enter: this is EnterReport;
@@ -48,112 +44,65 @@ interface TestReport<T extends ReportType, U> {
     end: this is EndReport;
     error: this is ErrorReport;
     hook: this is HookReport;
+    inspect(): Object;
 }
 
-export interface StartReport extends TestReport<"start", void> {
-    inspect(): {
-        type: "start";
-        path: Location[];
-    };
+export interface StartReport extends ReportBase<"start"> {}
+
+export interface EnterReport extends ReportBase<"enter"> {
+    path: Location[];
+    duration: number;
+    slow: number;
 }
 
-export interface EnterReport extends TestReport<"enter", void> {
-    inspect(): {
-        type: "enter";
-        path: Location[];
-        duration: number;
-        slow: number;
-    };
+export interface LeaveReport extends ReportBase<"leave"> {
+    path: Location[];
 }
 
-export interface LeaveReport extends TestReport<"leave", void> {
-    inspect(): {
-        type: "leave";
-        path: Location[];
-    };
+export interface PassReport extends ReportBase<"pass"> {
+    path: Location[];
+    duration: number;
+    slow: number;
 }
 
-export interface PassReport extends TestReport<"pass", void> {
-    inspect(): {
-        type: "pass";
-        path: Location[];
-        duration: number;
-        slow: number;
-    };
+export interface FailReport extends ReportBase<"fail"> {
+    path: Location[];
+    value: any;
+    duration: number;
+    slow: number;
 }
 
-export interface FailReport extends TestReport<"fail", any> {
-    inspect(): {
-        type: "fail";
-        path: Location[];
-        value: any;
-        duration: number;
-        slow: number;
-    };
+export interface SkipReport extends ReportBase<"skip"> {
+    path: Location[];
 }
 
-export interface SkipReport extends TestReport<"skip", void> {
-    inspect(): {
-        type: "skip";
-        path: Location[];
-    };
+export interface EndReport extends ReportBase<"end"> {}
+
+export interface ErrorReport extends ReportBase<"error"> {
+    value: any;
 }
 
-export interface EndReport extends TestReport<"end", void> {
-    inspect(): {
-        type: "end";
-        path: Location[];
-    };
-}
-
-export interface ErrorReport extends TestReport<"error", void> {
-    inspect(): {
-        type: "error";
-        path: Location[];
-        value: any;
-    };
-}
-
-export type HookInfoStage =
+export type HookStage =
     "before all" |
     "before each" |
     "after each" |
     "after all";
 
-export type HookInfo =
-    BeforeAllHook |
-    BeforeEachHook |
-    AfterEachHook |
-    AfterAllHook;
-
-interface HookInfoBase<S extends HookInfoStage> {
+export interface HookError<S extends HookStage> {
     stage: S;
+    name: string;
     value: any;
-    beforeAll: this is BeforeAllHook;
-    beforeEach: this is BeforeEachHook;
-    afterEach: this is AfterEachHook;
-    afterAll: this is AfterAllHook;
-
-    inspect(): {
-        stage: S;
-        value: any;
-    };
 }
 
-export interface BeforeAllHook extends HookInfoBase<"before all"> {}
-export interface BeforeEachHook extends HookInfoBase<"before each"> {}
-export interface AfterEachHook extends HookInfoBase<"after each"> {}
-export interface AfterAllHook extends HookInfoBase<"after all"> {}
-
-export interface HookReport extends TestReport<"hook", HookInfo> {
-    inspect(): {
-        type: "hook";
-        path: Location[];
-        value: {
-            stage: HookInfoStage;
-            value: any;
-        };
-    };
+export interface HookReport<S extends HookStage> extends ReportBase<"hook"> {
+    stage: S;
+    path: Location[];
+    name: string;
+    value: any;
+    beforeAll: this is HookReport<"before all">;
+    beforeEach: this is HookReport<"before each">;
+    afterEach: this is HookReport<"after each">;
+    afterAll: this is HookReport<"after all">;
 }
 
 /**
@@ -162,13 +111,6 @@ export interface HookReport extends TestReport<"hook", HookInfo> {
  * in case they need it.
  */
 export interface Reflect {
-    /**
-     * A reference to the test's state, purely for internal use.
-     *
-     * @internal
-     */
-    _: Object;
-
     /**
      * Get the currently executing test.
      */
@@ -327,13 +269,6 @@ export interface Reflect {
 }
 
 export interface Test {
-    /**
-     * A reference to the test's state, purely for internal use.
-     *
-     * @internal
-     */
-    _: Object;
-
     /**
      * Friendly alias for ES6 module transpilers.
      */

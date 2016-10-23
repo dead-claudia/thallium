@@ -94,9 +94,9 @@ describe("core (asynchronous behavior)", function () {
 
         var result = tt.run().then(function () {
             assert.match(ret, [
-                n("start", []),
-                n("fail", [p("test", 0)], sentinel),
-                n("end", []),
+                n.start(),
+                n.fail([p("test", 0)], sentinel),
+                n.end(),
             ])
         })
 
@@ -128,9 +128,9 @@ describe("core (asynchronous behavior)", function () {
 
         var result = tt.run().then(function () {
             assert.match(ret, [
-                n("start", []),
-                n("pass", [p("test", 0)]),
-                n("end", []),
+                n.start(),
+                n.pass([p("test", 0)]),
+                n.end(),
             ])
         })
 
@@ -163,9 +163,9 @@ describe("core (asynchronous behavior)", function () {
 
         var result = tt.run().then(function () {
             assert.match(ret, [
-                n("start", []),
-                n("fail", [p("test", 0)], sentinel),
-                n("end", []),
+                n.start(),
+                n.fail([p("test", 0)], sentinel),
+                n.end(),
             ])
         })
 

@@ -39,9 +39,9 @@ describe("core (timeouts) (FLAKE)", /** @this */ function () {
 
         return tt.run().then(function () {
             assert.match(ret, [
-                n("start", []),
-                n("pass", [p("test", 0)]),
-                n("end", []),
+                n.start(),
+                n.pass([p("test", 0)]),
+                n.end(),
             ])
         })
     })
@@ -60,9 +60,9 @@ describe("core (timeouts) (FLAKE)", /** @this */ function () {
 
         return tt.run().then(function () {
             assert.match(ret, [
-                n("start", []),
-                n("fail", [p("test", 0)], new Error("Timeout of 50 reached")),
-                n("end", []),
+                n.start(),
+                n.fail([p("test", 0)], new Error("Timeout of 50 reached")),
+                n.end(),
             ])
         })
     })
@@ -80,11 +80,11 @@ describe("core (timeouts) (FLAKE)", /** @this */ function () {
 
         return tt.run().then(function () {
             assert.match(ret, [
-                n("start", []),
-                n("enter", [p("test", 0)]),
-                n("pass", [p("test", 0), p("inner", 0)]),
-                n("leave", [p("test", 0)]),
-                n("end", []),
+                n.start(),
+                n.enter([p("test", 0)]),
+                n.pass([p("test", 0), p("inner", 0)]),
+                n.leave([p("test", 0)]),
+                n.end(),
             ])
         })
     })
@@ -103,12 +103,12 @@ describe("core (timeouts) (FLAKE)", /** @this */ function () {
 
         return tt.run().then(function () {
             assert.match(ret, [
-                n("start", []),
-                n("enter", [p("test", 0)]),
-                n("fail", [p("test", 0), p("inner", 0)],
+                n.start(),
+                n.enter([p("test", 0)]),
+                n.fail([p("test", 0), p("inner", 0)],
                     new Error("Timeout of 50 reached")),
-                n("leave", [p("test", 0)]),
-                n("end", []),
+                n.leave([p("test", 0)]),
+                n.end(),
             ])
         })
     })
