@@ -13,38 +13,51 @@ function c(cmd) {
 }
 
 function exec(str, cb) {
+    echo("exec: " + str)
     return global.exec(str, {stdio: "inherit"}, cb)
+}
+
+function task(name, callback) {
+    target[name] = function () {
+        if (callback.length) {
+            echo("=== Task `" + name + "`, args: " +
+                arguments[0].join(" ") + " ===")
+        } else {
+            echo("=== Task `" + name + "` ===")
+        }
+        return callback.apply(undefined, arguments)
+    }
 }
 
 config.fatal = true
 
-target.all = function () {
+task("all", function () {
     target.lint()
     target.test()
-}
+})
 
-target.lint = function () {
+task("lint", function () {
     exec(c("eslint") + " . --cache --color")
     exec(c("coffeelint") + " . --cache --color=always")
-}
+})
 
-target.test = function () {
+task("test", function () {
     target["test:chrome"]()
     target["test:phantomjs"]()
     target["test:node"]()
-}
+})
 
-target["test:chrome"] = function () {
+task("test:chrome", function () {
     exec(c("karma") + " start --colors --single-run --browsers Chrome")
-}
+})
 
-target["test:phantomjs"] = function () {
+task("test:phantomjs", function () {
     exec(c("karma") + " start --colors --single-run --browsers PhantomJS")
-}
+})
 
-target["test:node"] = function () {
+task("test:node", function () {
     exec(c("mocha") + " --colors")
-}
+})
 
 var patterns = [
     "{bin,fixtures,helpers,lib,r,scripts,test,migrate}/**/{.,}*.js",
@@ -97,48 +110,49 @@ function watch(task) {
     })
 }
 
-target.watch = function () {
+task("watch", function () {
     watch("test")
-}
+})
 
-target["watch:chrome"] = function () {
+task("watch:chrome", function () {
     watch("test:chrome")
-}
+})
 
-target["watch:phantomjs"] = function () {
+task("watch:phantomjs", function () {
     watch("test:phantomjs")
-}
+})
 
-target["watch:node"] = function () {
+task("watch:node", function () {
     watch("test:node")
-}
+})
 
-target.bundle = function () {
+task("bundle", function () {
     exec(c("browserify") +
         " -dr ./lib/browser-bundle.js:thallium -o thallium.js")
-}
+    exec(c("browserify") +
+        " -dr ./migrate/bundle.js:thallium -o thallium-migrate.js")
+})
 
-target.release = function (args) { // eslint-disable-line max-statements
+task("release", function (args) {
     var force = false
     var increment
 
-    for (var i = 0; i < args.length; i++) {
-        switch (args[i]) {
+    args.forEach(function (arg) {
+        switch (arg) {
         case "major": case "minor": case "patch":
         case "premajor": case "preminor": case "prepatch": case "prerelease":
             if (increment != null) {
-                console.error(
-                    "Unexpected additional increment parameter: " + args[i])
+                console.error("Unexpected additional increment: " + arg)
                 exit(1)
             }
-            increment = args[i]
+            increment = arg
             break
 
         case "--force": case "-f": force = true; break
         case "--no-force": force = false; break
         default: // ignore
         }
-    }
+    })
 
     if (increment == null) {
         console.error([
@@ -191,4 +205,4 @@ target.release = function (args) { // eslint-disable-line max-statements
     exec("git tag v" + pkg.version)
     exec("git push")
     exec("git push --tags")
-}
+})

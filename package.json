@@ -18,11 +18,13 @@
     "core.js",
     "index.d.ts",
     "index.js",
+    "thallium-migrate.js",
     "thallium.js",
     "thallium.d.ts",
     "lib",
     "bin",
     "r",
+    "migrate",
     "docs"
   ],
   "bin": {
