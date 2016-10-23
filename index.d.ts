@@ -214,13 +214,13 @@ export interface Reflect {
      * Get a list of all own reporters. If none were added, an empty list is
      * returned.
      */
-    reporters: ((ev: Report) => any | Thenable<any>)[];
+    reporters: ((report: Report) => any | Thenable<any>)[];
 
     /**
      * Get a list of all active reporters, either on this instance or on the
      * closest parent.
      */
-    activeReporters: ((ev: Report) => any | Thenable<any>)[];
+    activeReporters: ((report: Report) => any | Thenable<any>)[];
 
     /**
      * Get the own, not necessarily active, timeout. 0 means inherit the
@@ -308,12 +308,12 @@ export interface Reflect {
     /**
      * Add a reporter.
      */
-    addReporter(reporter: (ev: Report) => any | Thenable<any>, blocking?: boolean): void;
+    addReporter(reporter: (report: Report) => any | Thenable<any>, blocking?: boolean): void;
 
     /**
      * Remove a reporter.
      */
-    removeReporter(reporter: (ev: Report) => any | Thenable<any>): void;
+    removeReporter(reporter: (report: Report) => any | Thenable<any>): void;
 
     /**
      * Add a block or inline test.
@@ -361,7 +361,7 @@ export interface Test {
      * is having multiple console reporters, in which you probably want to make
      * at least all but one block.
      */
-    reporter(reporter: (ev: Report) => any | Thenable<any>, block?: boolean): void;
+    reporter(reporter: (report: Report) => any | Thenable<any>, block?: boolean): void;
 
     /**
      * Get the current timeout. 0 means inherit the parent's, and `Infinity`

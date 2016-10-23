@@ -29,10 +29,12 @@ function fix(value) {
     return value
 }
 
-module.exports = function (ev) {
-    var path = ev.path
+module.exports = function (report) {
+    var path = report.path
     .map(function (x) { return "[" + x.index + ": " + x.name + "]" })
     .join(" > ")
 
-    console.log(ev.type + " " + (path ? path + " = " : "= ") + fix(ev.value))
+    console.log(report.type + " " +
+        (path ? path + " = " : "= ") +
+        fix(report.value))
 }

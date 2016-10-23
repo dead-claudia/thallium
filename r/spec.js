@@ -13,20 +13,19 @@ function indent(level) {
     return ret
 }
 
-function getName(level, ev) {
-    return ev.path[level - 1].name
+function getName(level, report) {
+    return report.path[level - 1].name
 }
 
-function printInner(r, init) {
-    r.state.lastIsNested = false
-    return r.print(indent(r.state.level) + init())
-}
-
-function printReport(r, init) {
-    if (r.state.lastIsNested && r.state.level === 1) {
-        return r.print().then(function () { return printInner(r, init) })
+function printReport(_, init) {
+    if (_.state.lastIsNested && _.state.level === 1) {
+        return _.print().then(function () {
+            _.state.lastIsNested = false
+            return _.print(indent(_.state.level) + init())
+        })
     } else {
-        return printInner(r, init)
+        _.state.lastIsNested = false
+        return _.print(indent(_.state.level) + init())
     }
 }
 
@@ -41,53 +40,53 @@ module.exports = R.on({
         state.lastIsNested = false
     },
 
-    report: function (r, ev) {
-        if (ev.start) {
-            if (ev.path.length === 0) return r.print()
+    report: function (_, report) {
+        if (report.start) {
+            if (report.path.length === 0) return _.print()
 
-            return r.print().then(function () {
-                return peach(ev.path, function (entry) {
-                    return r.print(indent(r.state.level++) + entry.name)
+            return _.print().then(function () {
+                return peach(report.path, function (entry) {
+                    return _.print(indent(_.state.level++) + entry.name)
                 })
             })
-        } else if (ev.enter) {
-            return printReport(r, function () {
-                return getName(r.state.level++, ev)
+        } else if (report.enter) {
+            return printReport(_, function () {
+                return getName(_.state.level++, report)
             })
-        } else if (ev.leave) {
-            r.state.level--
-            r.state.lastIsNested = true
+        } else if (report.leave) {
+            _.state.level--
+            _.state.lastIsNested = true
             return undefined
-        } else if (ev.pass) {
-            return printReport(r, function () {
+        } else if (report.pass) {
+            return printReport(_, function () {
                 var str =
                     c("checkmark", R.symbols().Pass + " ") +
-                    c("pass", getName(r.state.level, ev))
+                    c("pass", getName(_.state.level, report))
 
-                var speed = R.speed(ev)
+                var speed = R.speed(report)
 
                 if (speed !== "fast") {
-                    str += c(speed, " (" + ev.duration + "ms)")
+                    str += c(speed, " (" + report.duration + "ms)")
                 }
 
                 return str
             })
-        } else if (ev.hook || ev.fail) {
-            return printReport(r, function () {
-                r.pushError(ev)
-                var name = getName(r.state.level, ev)
+        } else if (report.hook || report.fail) {
+            return printReport(_, function () {
+                _.pushError(report)
+                var name = getName(_.state.level, report)
 
-                if (ev.hook) name += " (" + ev.value.stage + ")"
-                return c("fail", r.errors.length + ") " + name)
+                if (report.hook) name += " (" + report.value.stage + ")"
+                return c("fail", _.errors.length + ") " + name)
             })
-        } else if (ev.skip) {
-            return printReport(r, function () {
-                return c("skip", "- " + getName(r.state.level, ev))
+        } else if (report.skip) {
+            return printReport(_, function () {
+                return c("skip", "- " + getName(_.state.level, report))
             })
         }
 
-        if (ev.end) return r.printResults()
-        if (ev.error) return r.printError(ev)
+        if (report.end) return _.printResults()
+        if (report.error) return _.printError(report)
         return undefined
     },
 })

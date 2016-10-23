@@ -10,64 +10,64 @@ function shouldBreak(minLength, str) {
     return str.length > R.windowWidth() - minLength || /\r?\n|[:?-]/.test(str)
 }
 
-function template(r, ev, tmpl, skip) {
-    if (!skip) r.state.counter++
-    var path = R.joinPath(ev).replace(/\$/g, "$$$$")
+function template(_, report, tmpl, skip) {
+    if (!skip) _.state.counter++
+    var path = R.joinPath(report).replace(/\$/g, "$$$$")
 
-    if (ev.hook) path += " (" + ev.value.stage + ")"
+    if (report.hook) path += " (" + report.value.stage + ")"
 
-    return r.print(
-        tmpl.replace(/%c/g, r.state.counter)
+    return _.print(
+        tmpl.replace(/%c/g, _.state.counter)
             .replace(/%p/g, path))
 }
 
-function printLines(r, value, skipFirst) {
+function printLines(_, value, skipFirst) {
     var lines = value.split(/\r?\n/g)
 
     if (skipFirst) lines.shift()
-    return peach(lines, function (line) { return r.print("    " + line) })
+    return peach(lines, function (line) { return _.print("    " + line) })
 }
 
-function printRaw(r, key, str) {
+function printRaw(_, key, str) {
     if (shouldBreak(key.length, str)) {
-        return r.print("  " + key + ": |-")
-        .then(function () { return printLines(r, str, false) })
+        return _.print("  " + key + ": |-")
+        .then(function () { return printLines(_, str, false) })
     } else {
-        return r.print("  " + key + ": " + str)
+        return _.print("  " + key + ": " + str)
     }
 }
 
-function printValue(r, key, value) {
-    return printRaw(r, key, inspect(value))
+function printValue(_, key, value) {
+    return printRaw(_, key, inspect(value))
 }
 
-function printLine(p, r, line) {
-    return p.then(function () { return r.print(line) })
+function printLine(p, _, line) {
+    return p.then(function () { return _.print(line) })
 }
 
-function printError(r, ev) {
-    var err = ev.hook ? ev.value.value : ev.value
+function printError(_, report) {
+    var err = report.hook ? report.value.value : report.value
 
     if (!(err instanceof Error)) {
-        return printValue(r, "value", err)
+        return printValue(_, "value", err)
     }
 
     // Let's *not* depend on the constructor being Thallium's...
     if (err.name !== "AssertionError") {
-        return r.print("  stack: |-").then(function () {
-            return printLines(r, R.getStack(err), false)
+        return _.print("  stack: |-").then(function () {
+            return printLines(_, R.getStack(err), false)
         })
     }
 
-    return printValue(r, "expected", err.expected)
-    .then(function () { return printValue(r, "actual", err.actual) })
-    .then(function () { return printRaw(r, "message", err.message) })
-    .then(function () { return r.print("  stack: |-") })
+    return printValue(_, "expected", err.expected)
+    .then(function () { return printValue(_, "actual", err.actual) })
+    .then(function () { return printRaw(_, "message", err.message) })
+    .then(function () { return _.print("  stack: |-") })
     .then(function () {
         var message = err.message
 
         err.message = ""
-        return printLines(r, R.getStack(err), true)
+        return printLines(_, R.getStack(err), true)
         .then(function () { err.message = message })
     })
 }
@@ -77,35 +77,35 @@ module.exports = R.on({
     create: R.consoleReporter,
     init: function (state) { state.counter = 0 },
 
-    report: function (r, ev) {
-        if (ev.start) {
-            return r.print("TAP version 13")
-        } else if (ev.enter) {
+    report: function (_, report) {
+        if (report.start) {
+            return _.print("TAP version 13")
+        } else if (report.enter) {
             // Print a leading comment, to make some TAP formatters prettier.
-            return template(r, ev, "# %p", true)
-            .then(function () { return template(r, ev, "ok %c") })
-        } else if (ev.pass) {
-            return template(r, ev, "ok %c %p")
-        } else if (ev.fail || ev.hook) {
-            return template(r, ev, "not ok %c %p")
-            .then(function () { return r.print("  ---") })
-            .then(function () { return printError(r, ev) })
-            .then(function () { return r.print("  ...") })
-        } else if (ev.skip) {
-            return template(r, ev, "ok %c # skip %p")
-        } else if (ev.end) {
-            var p = r.print("1.." + r.state.counter)
-            .then(function () { return r.print("# tests " + r.tests) })
+            return template(_, report, "# %p", true)
+            .then(function () { return template(_, report, "ok %c") })
+        } else if (report.pass) {
+            return template(_, report, "ok %c %p")
+        } else if (report.fail || report.hook) {
+            return template(_, report, "not ok %c %p")
+            .then(function () { return _.print("  ---") })
+            .then(function () { return printError(_, report) })
+            .then(function () { return _.print("  ...") })
+        } else if (report.skip) {
+            return template(_, report, "ok %c # skip %p")
+        } else if (report.end) {
+            var p = _.print("1.." + _.state.counter)
+            .then(function () { return _.print("# tests " + _.tests) })
 
-            if (r.pass) p = printLine(p, r, "# pass " + r.pass)
-            if (r.fail) p = printLine(p, r, "# fail " + r.fail)
-            if (r.skip) p = printLine(p, r, "# skip " + r.skip)
-            return printLine(p, r, "# duration " + R.formatTime(r.duration))
-        } else if (ev.error) {
-            return r.print("Bail out!")
-            .then(function () { return r.print("  ---") })
-            .then(function () { return printError(r, ev) })
-            .then(function () { return r.print("  ...") })
+            if (_.pass) p = printLine(p, _, "# pass " + _.pass)
+            if (_.fail) p = printLine(p, _, "# fail " + _.fail)
+            if (_.skip) p = printLine(p, _, "# skip " + _.skip)
+            return printLine(p, _, "# duration " + R.formatTime(_.duration))
+        } else if (report.error) {
+            return _.print("Bail out!")
+            .then(function () { return _.print("  ---") })
+            .then(function () { return printError(_, report) })
+            .then(function () { return _.print("  ...") })
         } else {
             return undefined
         }
