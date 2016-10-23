@@ -31,12 +31,12 @@ function fix(value) {
 
 module.exports = function (report) {
     if (report.path == null) {
-        console.log(report.type + " = " + fix(report.value))
+        console.log(report.type + " = " + fix(report.error))
     } else {
         var path = report.path
         .map(function (x) { return "[" + x.index + ": " + x.name + "]" })
         .join(" > ")
 
-        console.log(report.type + " " + path + " = " + fix(report.value))
+        console.log(report.type + " " + path + " = " + fix(report.error))
     }
 }

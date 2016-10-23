@@ -13,7 +13,7 @@ import * as match from "./match";
 import * as r from "./r";
 export {assert, match, r};
 
-export {createRoot, createReport, createLocation} from "./internal";
+export {root, reports, hookErrors, location} from "./internal";
 
 export namespace settings {
     export interface Setting<T> {

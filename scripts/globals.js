@@ -28,9 +28,9 @@ var assert = global.assert = Thallium.assert
 var Util = global.Util = {
     match: Thallium.match,
     r: Thallium.r,
-    create: Thallium.createRoot,
+    create: Thallium.root,
     n: Thallium.reports,
-    p: Thallium.createLocation,
+    p: Thallium.location,
     Tests: Tests,
 
     /* eslint-disable global-require */
@@ -151,11 +151,11 @@ Util.push = function (ret, keep) {
     return function push(report) {
         // Any equality tests on either of these are inherently flaky.
         // Only add the relevant properties
-        if (report.fail || report.error || report.hook) {
-            assert.hasOwn(report, "value")
+        if (report.isFail || report.isError || report.isHook) {
+            assert.hasOwn(report, "error")
         }
 
-        if (report.enter || report.pass || report.fail) {
+        if (report.isEnter || report.isPass || report.isFail) {
             assert.hasOwn(report, "duration")
             assert.hasOwn(report, "slow")
             assert.number(report.duration)

@@ -284,20 +284,23 @@ module.exports = R.on({
     },
 
     report: function (_, report) {
-        if (report.start) {
+        if (report.isStart) {
             initFirstTest(_, report)
-        } else if (report.enter || report.pass || report.fail || report.skip) {
+        } else if (report.isEnter ||
+                report.isPass ||
+                report.isFail ||
+                report.isSkip) {
             showTestResult(_, report)
             updateStats(_)
-        } else if (report.error) {
+        } else if (report.isError) {
             if (_.opts.window.console) {
                 var console = _.opts.window.conosle
 
-                if (console.error) console.error(report.value)
-                else if (console.log) console.log(report.value)
-                else onNextRepaint(_, function () { throw report.value })
+                if (console.error) console.error(report.error)
+                else if (console.log) console.log(report.error)
+                else onNextRepaint(_, function () { throw report.error })
             } else {
-                onNextRepaint(_, function () { throw report.value })
+                onNextRepaint(_, function () { throw report.error })
             }
         }
     },

@@ -335,7 +335,7 @@ methods(Thallium, {
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * - `reflect.do` is deprecated, with no replacement (inline tests are also  *
  *   deprecated).                                                            *
- * - `reflect.base` -> `internal.createRoot`                                 *
+ * - `reflect.base` -> `internal.root`                                       *
  * - `reflect.AssertionError` -> `assert.AssertionError`.                    *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
@@ -355,8 +355,8 @@ methods(Reflect, {
             return this
         }),
     base: Common.deprecate(
-        "`reflect.base` is deprecated. Use `internal.createRoot` from `thallium/internal` instead.", // eslint-disable-line max-len
-        Internal.createRoot),
+        "`reflect.base` is deprecated. Use `internal.root` from `thallium/internal` instead.", // eslint-disable-line max-len
+        Internal.root),
 })
 
 // ESLint oddly can't tell these are shadowed.
@@ -452,7 +452,7 @@ methods(Thallium, {
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * - `reflect.report` -> `internal.report.*`                                 *
- * - `reflect.loc` -> `internal.createLocation`                              *
+ * - `reflect.loc` -> `internal.location`                                    *
  * - `reflect.scheduler` obsoleted.                                          *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
@@ -481,8 +481,8 @@ methods(Reflect, {
         }),
 
     loc: Common.deprecate(
-        "`reflect.loc` is deprecated. Use `internal.createLocation` from `thallium/internal` instead.", // eslint-disable-line max-len
-        Internal.createLocation),
+        "`reflect.loc` is deprecated. Use `internal.location` from `thallium/internal` instead.", // eslint-disable-line max-len
+        Internal.location),
 
     scheduler: Common.deprecate(
         "`reflect.scheduler` is deprecated. It is no longer useful to the library, and can be safely removed.", // eslint-disable-line max-len

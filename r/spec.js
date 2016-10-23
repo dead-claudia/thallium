@@ -40,17 +40,17 @@ module.exports = R.on({
     },
 
     report: function (_, report) {
-        if (report.start) {
+        if (report.isStart) {
             return _.print()
-        } else if (report.enter) {
+        } else if (report.isEnter) {
             return printReport(_, function () {
                 return getName(_.state.level++, report)
             })
-        } else if (report.leave) {
+        } else if (report.isLeave) {
             _.state.level--
             _.state.lastIsNested = true
             return undefined
-        } else if (report.pass) {
+        } else if (report.isPass) {
             return printReport(_, function () {
                 var str =
                     c("checkmark", R.symbols().Pass + " ") +
@@ -64,27 +64,21 @@ module.exports = R.on({
 
                 return str
             })
-        } else if (report.hook || report.fail) {
+        } else if (report.isHook || report.isFail) {
             return printReport(_, function () {
                 _.pushError(report)
-                var name = getName(_.state.level, report)
-
-                if (report.hook) {
-                    name += " (" + report.stage
-                    if (report.name) name += " ‒ " + report.name
-                    name += ")"
-                }
-
-                return c("fail", _.errors.length + ") " + name)
+                return c("fail",
+                    _.errors.length + ") " + getName(_.state.level, report) +
+                    R.formatRest(report))
             })
-        } else if (report.skip) {
+        } else if (report.isSkip) {
             return printReport(_, function () {
                 return c("skip", "- " + getName(_.state.level, report))
             })
         }
 
-        if (report.end) return _.printResults()
-        if (report.error) return _.printError(report)
+        if (report.isEnd) return _.printResults()
+        if (report.isError) return _.printError(report)
         return undefined
     },
 })

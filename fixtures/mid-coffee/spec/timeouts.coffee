@@ -7,11 +7,7 @@ is trying to represent more real-world usage.
 
 t = require 'thallium'
 assert = require 'thallium/assert'
-{
-    reports: n
-    createLocation: p
-    createRoot: create
-} = require 'thallium/internal'
+{reports: n, location: p, root: create} = require 'thallium/internal'
 
 # Note that this entire section may be flaky on slower machines. Thankfully,
 # these have been tested against a slower machine, so it should hopefully not
@@ -20,10 +16,10 @@ t.test 'core (timeouts) (FLAKE)', ->
     push = (ret) -> (report) ->
         # Any equality tests on either of these are inherently flaky.
         # Only add the relevant properties
-        if report.fail || report.error || report.hook
-            assert.hasOwn report, 'value'
+        if report.isFail || report.isError || report.isHook
+            assert.hasOwn report, 'error'
 
-        if report.enter || report.pass || report.fail
+        if report.isEnter || report.isPass || report.isFail
             assert.hasOwn report, 'duration'
             assert.hasOwn report, 'slow'
             assert.number report.duration

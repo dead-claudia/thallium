@@ -35,15 +35,15 @@ export type Report =
 interface ReportBase<T extends ReportType> {
     type: T;
 
-    start: this is StartReport;
-    enter: this is EnterReport;
-    leave: this is LeaveReport;
-    pass: this is PassReport;
-    fail: this is FailReport;
-    skip: this is SkipReport;
-    end: this is EndReport;
-    error: this is ErrorReport;
-    hook: this is HookReport;
+    isStart: this is StartReport;
+    isEnter: this is EnterReport;
+    isLeave: this is LeaveReport;
+    isPass: this is PassReport;
+    isFail: this is FailReport;
+    isSkip: this is SkipReport;
+    isEnd: this is EndReport;
+    isError: this is ErrorReport;
+    isHook: this is HookReport;
     inspect(): Object;
 }
 
@@ -67,7 +67,7 @@ export interface PassReport extends ReportBase<"pass"> {
 
 export interface FailReport extends ReportBase<"fail"> {
     path: Location[];
-    value: any;
+    error: any;
     duration: number;
     slow: number;
 }
@@ -79,7 +79,7 @@ export interface SkipReport extends ReportBase<"skip"> {
 export interface EndReport extends ReportBase<"end"> {}
 
 export interface ErrorReport extends ReportBase<"error"> {
-    value: any;
+    error: any;
 }
 
 export type HookStage =
@@ -91,18 +91,28 @@ export type HookStage =
 export interface HookError<S extends HookStage> {
     stage: S;
     name: string;
-    value: any;
+    error: any;
 }
 
 export interface HookReport<S extends HookStage> extends ReportBase<"hook"> {
     stage: S;
     path: Location[];
     name: string;
-    value: any;
-    beforeAll: this is HookReport<"before all">;
-    beforeEach: this is HookReport<"before each">;
-    afterEach: this is HookReport<"after each">;
-    afterAll: this is HookReport<"after all">;
+    error: any;
+
+    hookError: HookError<S>;
+    isBeforeAll: this is HookReport<"before all">;
+    isBeforeEach: this is HookReport<"before each">;
+    isAfterEach: this is HookReport<"after each">;
+    isAfterAll: this is HookReport<"after all">;
+}
+
+interface Reporter {
+    (report: Report): any | Thenable<any>;
+}
+
+interface Callback {
+    (): any | Thenable<any>;
 }
 
 /**
@@ -156,13 +166,13 @@ export interface Reflect {
      * Get a list of all own reporters. If none were added, an empty list is
      * returned.
      */
-    reporters: ((report: Report) => any | Thenable<any>)[];
+    reporters: Reporter[];
 
     /**
      * Get a list of all active reporters, either on this instance or on the
      * closest parent.
      */
-    activeReporters: ((report: Report) => any | Thenable<any>)[];
+    activeReporters: Reporter[];
 
     /**
      * Get the own, not necessarily active, timeout. 0 means inherit the
@@ -201,46 +211,46 @@ export interface Reflect {
      * Add a hook to be run before each subtest, including their subtests and so
      * on.
      */
-    addBeforeEach(func: () => any | Thenable<any>): void;
+    addBeforeEach(func: Callback): void;
 
     /**
      * Add a hook to be run once before all subtests are run.
      */
-    addBeforeAll(func: () => any | Thenable<any>): void;
+    addBeforeAll(func: Callback): void;
 
    /**
     * Add a hook to be run after each subtest, including their subtests and so
     * on.
     */
-    addAfterEach(func: () => any | Thenable<any>): void;
+    addAfterEach(func: Callback): void;
 
     /**
      * Add a hook to be run once after all subtests are run.
      */
-    addAfterAll(func: () => any | Thenable<any>): void;
+    addAfterAll(func: Callback): void;
 
     /**
      * Remove a hook previously added with `t.before` or
      * `reflect.addBeforeEach`.
      */
-    removeBeforeEach(func: () => any | Thenable<any>): void;
+    removeBeforeEach(func: Callback): void;
 
     /**
      * Remove a hook previously added with `t.beforeAll` or
      * `reflect.addBeforeAll`.
      */
-    removeBeforeAll(func: () => any | Thenable<any>): void;
+    removeBeforeAll(func: Callback): void;
 
     /**
      * Remove a hook previously added with `t.after` or`reflect.addAfterEach`.
      */
-    removeAfterEach(func: () => any | Thenable<any>): void;
+    removeAfterEach(func: Callback): void;
 
     /**
      * Remove a hook previously added with `t.afterAll` or
      * `reflect.addAfterAll`.
      */
-    removeAfterAll(func: () => any | Thenable<any>): void;
+    removeAfterAll(func: Callback): void;
 
     /**
      * Thallium API methods made available on reflect objects, so they don't
@@ -250,22 +260,22 @@ export interface Reflect {
     /**
      * Add a reporter.
      */
-    addReporter(reporter: (report: Report) => any | Thenable<any>, blocking?: boolean): void;
+    addReporter(reporter: Reporter, blocking?: boolean): void;
 
     /**
      * Remove a reporter.
      */
-    removeReporter(reporter: (report: Report) => any | Thenable<any>): void;
+    removeReporter(reporter: Reporter): void;
 
     /**
      * Add a block or inline test.
      */
-    test(name: string, callback: () => any | Thenable<any>): void;
+    test(name: string, callback: Callback): void;
 
     /**
      * Add a skipped block or inline test.
      */
-    testSkip(name: string, callback: () => any | Thenable<any>): void;
+    testSkip(name: string, callback: Callback): void;
 }
 
 export interface Test {
@@ -296,7 +306,7 @@ export interface Test {
      * is having multiple console reporters, in which you probably want to make
      * at least all but one block.
      */
-    reporter(reporter: (report: Report) => any | Thenable<any>, block?: boolean): void;
+    reporter(reporter: Reporter, block?: boolean): void;
 
     /**
      * Get the current timeout. 0 means inherit the parent's, and `Infinity`
@@ -326,12 +336,12 @@ export interface Test {
     /**
      * Add a test.
      */
-    test(name: string, body: () => any | Thenable<any>): this;
+    test(name: string, body: Callback): this;
 
     /**
      * Add a skipped test.
      */
-    testSkip(name: string, body: () => any | Thenable<any>): this;
+    testSkip(name: string, body: Callback): this;
 }
 
 declare const t: Test;

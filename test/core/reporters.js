@@ -640,8 +640,8 @@ describe("core (reporters)", function () { // eslint-disable-line max-statements
         var reported
 
         tt.reporter(function (report) {
-            if (report.error) reported = report.value
-            if (report.start) throw sentinel
+            if (report.isError) reported = report.error
+            if (report.isStart) throw sentinel
         })
 
         return tt.run().then(
@@ -660,7 +660,7 @@ describe("core (reporters)", function () { // eslint-disable-line max-statements
         var reported
 
         tt.reporter(function (report) {
-            if (report.error) reported = report.value
+            if (report.isError) reported = report.error
         })
 
         tt.test("test", function () {

@@ -7,7 +7,7 @@ is trying to represent more real-world usage.
 
 t = require 'thallium'
 assert = require 'thallium/assert'
-{createRoot: create} = require 'thallium/internal'
+{root: create} = require 'thallium/internal'
 
 t.test 'core (basic)', ->
     t.test 'reflect', ->
@@ -120,7 +120,7 @@ t.test 'core (basic)', ->
             err = undefined
 
             tt.reporter (res) ->
-                err = res.value if res.fail
+                err = res.error if res.isFail
                 return
 
             tt.test 'test', ->

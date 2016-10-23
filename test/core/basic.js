@@ -202,7 +202,7 @@ describe("core (basic)", function () {
             var err
 
             tt.reporter(function (res) {
-                if (res.fail) err = res.value
+                if (res.isFail) err = res.error
             })
 
             tt.test("test", function () {

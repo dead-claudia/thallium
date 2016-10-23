@@ -6,7 +6,7 @@ var Reports = Tests.Reports
 var HookError = Tests.HookError
 var Stage = Tests.Stage
 
-exports.createRoot = function () {
+exports.root = function () {
     return new Thallium()
 }
 
@@ -76,7 +76,7 @@ exports.reports = {
 /**
  * Create a new hook error, mainly for testing reporters.
  */
-exports.hookError = {
+exports.hookErrors = {
     beforeAll: function (func, value) {
         return new HookError(Stage.BeforeAll, func, value)
     },
@@ -97,7 +97,7 @@ exports.hookError = {
 /**
  * Creates a new location, mainly for testing reporters.
  */
-exports.createLocation = function (name, index) {
+exports.location = function (name, index) {
     if (typeof name !== "string") {
         throw new TypeError("Expected `name` to be a string")
     }
