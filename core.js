@@ -4,7 +4,7 @@
  * Main entry point, for those wanting to use this framework without the core
  * assertions.
  */
-var Thallium = require("./lib/thallium.js")
+var Thallium = require("./lib/api.js").Thallium
 
 require("./migrate/common.js").deprecate(
     "`thallium/core` is deprecated. Use `thallium` + `thallium/assert` instead.", // eslint-disable-line max-len
