@@ -12,9 +12,6 @@ Map, Set */
  * - This does pack a *lot* of features. There's a reason why this is so long.
  * - Some of the duplication is intentional. It's generally commented, but it's
  *   mainly for performance, since the engine needs its type info.
- * - Arguments objects aren't handled specially, mainly because they extend
- *   `Object.prototype`, all the indices are keys, and they're rarely compared
- *   to begin with.
  * - Polyfilled core-js Symbols from cross-origin contexts will never register
  *   as being actual Symbols.
  *
