@@ -22,7 +22,7 @@ function printInner(r, init) {
     return r.print(indent(r.state.level) + init())
 }
 
-function printReport(r, ev, init) {
+function printReport(r, init) {
     if (r.state.lastIsNested && r.state.level === 1) {
         return r.print().then(function () { return printInner(r, init) })
     } else {
@@ -51,7 +51,7 @@ module.exports = R.on({
                 })
             })
         } else if (ev.enter) {
-            return printReport(r, ev, function () {
+            return printReport(r, function () {
                 return getName(r.state.level++, ev)
             })
         } else if (ev.leave) {
@@ -59,7 +59,7 @@ module.exports = R.on({
             r.state.lastIsNested = true
             return undefined
         } else if (ev.pass) {
-            return printReport(r, ev, function () {
+            return printReport(r, function () {
                 var str =
                     c("checkmark", R.symbols().Pass + " ") +
                     c("pass", getName(r.state.level, ev))
@@ -72,14 +72,16 @@ module.exports = R.on({
 
                 return str
             })
-        } else if (ev.fail) {
-            return printReport(r, ev, function () {
-                r.pushError(ev, false)
-                return c("fail", r.errors.length + ") " +
-                    getName(r.state.level, ev))
+        } else if (ev.hook || ev.fail) {
+            return printReport(r, function () {
+                r.pushError(ev)
+                var name = getName(r.state.level, ev)
+
+                if (ev.hook) name += " (" + ev.value.stage + ")"
+                return c("fail", r.errors.length + ") " + name)
             })
         } else if (ev.skip) {
-            return printReport(r, ev, function () {
+            return printReport(r, function () {
                 return c("skip", "- " + getName(r.state.level, ev))
             })
         }

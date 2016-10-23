@@ -12,10 +12,13 @@ function shouldBreak(minLength, str) {
 
 function template(r, ev, tmpl, skip) {
     if (!skip) r.state.counter++
+    var path = R.joinPath(ev).replace(/\$/g, "$$$$")
+
+    if (ev.hook) path += " (" + ev.value.stage + ")"
 
     return r.print(
         tmpl.replace(/%c/g, r.state.counter)
-            .replace(/%p/g, R.joinPath(ev).replace(/\$/g, "$$$$")))
+            .replace(/%p/g, path))
 }
 
 function printLines(r, value, skipFirst) {
@@ -43,7 +46,7 @@ function printLine(p, r, line) {
 }
 
 function printError(r, ev) {
-    var err = ev.value
+    var err = ev.hook ? ev.value.value : ev.value
 
     if (!(err instanceof Error)) {
         return printValue(r, "value", err)
@@ -83,7 +86,7 @@ module.exports = R.on({
             .then(function () { return template(r, ev, "ok %c") })
         } else if (ev.pass) {
             return template(r, ev, "ok %c %p")
-        } else if (ev.fail) {
+        } else if (ev.fail || ev.hook) {
             return template(r, ev, "not ok %c %p")
             .then(function () { return r.print("  ---") })
             .then(function () { return printError(r, ev) })

@@ -27,7 +27,7 @@ module.exports = R.on({
     report: function (r, ev) {
         if (ev.enter || ev.pass) {
             return printDot(r, R.speed(ev))
-        } else if (ev.fail) {
+        } else if (ev.hook || ev.fail) {
             r.pushError(ev)
             return printDot(r, "fail")
         } else if (ev.skip) {
