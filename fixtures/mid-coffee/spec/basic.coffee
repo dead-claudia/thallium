@@ -63,7 +63,7 @@ t.test 'core (basic)', ->
             first = second = undefined
 
             t.test 'works with the root test', ->
-                assert.equal tt.call(index), -1
+                assert.equal tt.call(index), undefined
 
             tt.test 'test', -> first = tt.call index
             tt.test 'test', -> second = tt.call index

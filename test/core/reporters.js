@@ -28,10 +28,6 @@ describe("core (reporters)", function () { // eslint-disable-line max-statements
         return reflect.reporters
     }
 
-    function activeReporters(reflect) {
-        return reflect.activeReporters
-    }
-
     function checkBasic(_) {
         it("added to root correctly", function () {
             var tt = Util.create()
@@ -42,9 +38,20 @@ describe("core (reporters)", function () { // eslint-disable-line max-statements
             assert.match(tt.call(reporters), [plugin])
         })
 
-        it("added to children correctly", function () {
+        it("errors if added to children", function () {
             var tt = Util.create()
-            var child
+            var successful
+
+            function check(tt, plugin) {
+                if (successful) return
+                try {
+                    _.addReporter(tt, plugin)
+                    successful = true
+                } catch (e) {
+                    if (Object.getPrototypeOf(e) !== Error.prototype) throw e
+                    successful = false
+                }
+            }
 
             function plugin1() {}
             function plugin2() {}
@@ -56,53 +63,16 @@ describe("core (reporters)", function () { // eslint-disable-line max-statements
             _.addReporter(tt, plugin6)
 
             tt.test("test", function () {
-                _.addReporter(tt, plugin1)
-                _.addReporter(tt, plugin2)
-                _.addReporter(tt, plugin3)
-                _.addReporter(tt, plugin4)
-                _.addReporter(tt, plugin5)
-                child = tt.call(identity)
+                check(tt, plugin1)
+                check(tt, plugin2)
+                check(tt, plugin3)
+                check(tt, plugin4)
+                check(tt, plugin5)
             })
 
             return tt.run().then(function () {
-                assert.match(
-                    child.reporters,
-                    [plugin1, plugin2, plugin3, plugin4, plugin5])
-
-                assert.match(
-                    child.activeReporters,
-                    [plugin1, plugin2, plugin3, plugin4, plugin5])
-
+                assert.equal(successful, false)
                 assert.match(tt.call(reporters), [plugin6])
-            })
-        })
-
-        it("read on children correctly", function () {
-            var tt = Util.create()
-            var child
-
-            function plugin1() {}
-            function plugin2() {}
-            function plugin3() {}
-            function plugin4() {}
-            function plugin5() {}
-
-            _.addReporter(tt, plugin1)
-            _.addReporter(tt, plugin2)
-            _.addReporter(tt, plugin3)
-            _.addReporter(tt, plugin4)
-            _.addReporter(tt, plugin5)
-
-            tt.test("test", function () {
-                child = tt.call(identity)
-            })
-
-            return tt.run().then(function () {
-                assert.match(child.reporters, [])
-
-                assert.match(
-                    child.activeReporters,
-                    [plugin1, plugin2, plugin3, plugin4, plugin5])
             })
         })
 
@@ -117,9 +87,9 @@ describe("core (reporters)", function () { // eslint-disable-line max-statements
                 assert.match(tt.call(reporters), [])
             })
 
-            it("removed from children correctly", function () {
+            it("errors if \"removed\" from children", function () {
                 var tt = Util.create()
-                var child
+                var successful
 
                 function plugin1() {}
                 function plugin2() {}
@@ -128,24 +98,48 @@ describe("core (reporters)", function () { // eslint-disable-line max-statements
                 function plugin5() {}
                 function plugin6() {}
 
+                function checkAdd(tt, plugin) {
+                    if (successful) return
+                    try {
+                        _.addReporter(tt, plugin)
+                        successful = true
+                    } catch (e) {
+                        if (Object.getPrototypeOf(e) !== Error.prototype) {
+                            throw e
+                        }
+                        successful = false
+                    }
+                }
+
+                function checkRemove(tt, plugin) {
+                    if (successful) return
+                    try {
+                        _.addReporter(tt, plugin)
+                        successful = true
+                    } catch (e) {
+                        if (Object.getPrototypeOf(e) !== Error.prototype) {
+                            throw e
+                        }
+                        successful = false
+                    }
+                }
+
                 _.addReporter(tt, plugin6)
 
                 tt.test("test", function () {
-                    _.addReporter(tt, plugin1)
-                    _.addReporter(tt, plugin2)
-                    _.addReporter(tt, plugin3)
-                    _.addReporter(tt, plugin4)
-                    _.addReporter(tt, plugin5)
+                    checkAdd(tt, plugin1)
+                    checkAdd(tt, plugin2)
+                    checkAdd(tt, plugin3)
+                    checkAdd(tt, plugin4)
+                    checkAdd(tt, plugin5)
 
-                    _.removeReporter(tt, plugin1)
-                    _.removeReporter(tt, plugin2)
-                    _.removeReporter(tt, plugin4)
-                    child = tt.call(identity)
+                    checkRemove(tt, plugin1)
+                    checkRemove(tt, plugin2)
+                    checkRemove(tt, plugin4)
                 })
 
                 return tt.run().then(function () {
-                    assert.match(child.reporters, [plugin3, plugin5])
-                    assert.match(child.activeReporters, [plugin3, plugin5])
+                    assert.equal(successful, false)
                     assert.match(tt.call(reporters), [plugin6])
                 })
             })
@@ -166,10 +160,6 @@ describe("core (reporters)", function () { // eslint-disable-line max-statements
             _.addReporter(tt, plugin1)
 
             assert.match(tt.call(reporters), [plugin1, plugin2, plugin3])
-
-            assert.match(
-                tt.call(activeReporters),
-                [plugin1, plugin2, plugin3])
         })
     }
 

@@ -112,8 +112,8 @@ t.test 'core (timeouts) (FLAKE)', ->
 
         tt.test 'test', ->
             tt.timeout = 50
-            active = tt.call -> @activeTimeout
-            raw = tt.call -> @timeout
+            active = tt.call -> @timeout
+            raw = tt.call -> @ownTimeout
 
         tt.run().then ->
             assert.equal active, 50
@@ -126,8 +126,8 @@ t.test 'core (timeouts) (FLAKE)', ->
         tt.test 'test', ->
             tt.timeout = 50
             tt.test 'inner', ->
-                active = tt.call -> @activeTimeout
-                raw = tt.call -> @timeout
+                active = tt.call -> @timeout
+                raw = tt.call -> @ownTimeout
 
         tt.run().then ->
             assert.equal active, 50
@@ -138,8 +138,8 @@ t.test 'core (timeouts) (FLAKE)', ->
         active = raw = undefined
 
         tt.test 'test', ->
-            active = tt.call -> @activeTimeout
-            raw = tt.call -> @timeout
+            active = tt.call -> @timeout
+            raw = tt.call -> @ownTimeout
 
         tt.run().then ->
             assert.equal active, 2000

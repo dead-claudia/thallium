@@ -97,7 +97,7 @@ describe("core (basic)", function () {
             it("works with the root test", function () {
                 var tt = Util.create()
 
-                assert.equal(tt.call(index), -1)
+                assert.equal(tt.call(index), undefined)
             })
 
             it("works with the first child test", function () {

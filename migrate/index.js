@@ -20,8 +20,9 @@ var assert = require("../assert.js")
 var AssertionError = assert.AssertionError
 var format = assert.format
 
-var Thallium = require("../lib/thallium.js")
-var Reflect = new Thallium().call(function (r) { return r.constructor })
+var Api = require("../lib/api.js")
+var Reflect = Api.Reflect
+var Thallium = Api.Thallium
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * - `reflect.checkInit()` is deprecated in favor of `reflect.locked` and    *
@@ -113,7 +114,7 @@ methods(Thallium, {
 })
 
 methods(Reflect, {
-    get async() {
+    get isAsync() {
         Common.warn("Tests are now always async. You no longer need to " +
             "handle the other case")
         return true
@@ -348,10 +349,7 @@ methods(Reflect, {
                 throw new TypeError("Expected callback to be a function")
             }
 
-            if (new Reflect(this._.current.value).runnable) {
-                attempt.apply(undefined, arguments)
-            }
-
+            attempt.apply(undefined, arguments)
             return this
         }),
     base: Common.deprecate(
@@ -404,9 +402,11 @@ Common.showDeprecation()
  * `extra` events are no longer a thing.                                     *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 methods(Report, {
-    extra: Common.deprecate(
-        "`extra` events no longer exist. You no longer need to handle them",
-        function () { return false }),
+    get isInline() {
+        Common.warn("`extra` events no longer exist. You no longer need to " +
+            "handle them")
+        return false
+    },
 })
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -507,7 +507,7 @@ methods(Thallium, {
 })
 
 methods(Reflect, {
-    get inline() {
+    get isInline() {
         Common.warn("Tests are now never inline. You no longer need to " +
             "handle this case")
         return false

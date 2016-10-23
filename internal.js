@@ -1,6 +1,6 @@
 "use strict"
 
-var Thallium = require("./lib/thallium.js")
+var Thallium = require("./lib/api.js").Thallium
 var Tests = require("./lib/tests.js")
 var Reports = Tests.Reports
 var HookError = Tests.HookError

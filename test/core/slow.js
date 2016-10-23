@@ -155,12 +155,12 @@ describe("core (slow) (FLAKE)", /** @this */ function () {
         })
     })
 
-    function slow(reflect) {
-        return reflect.slow
+    function ownSlow(reflect) {
+        return reflect.ownSlow
     }
 
-    function activeSlow(reflect) {
-        return reflect.activeSlow
+    function slow(reflect) {
+        return reflect.slow
     }
 
     it("gets own slow", function () {
@@ -169,8 +169,8 @@ describe("core (slow) (FLAKE)", /** @this */ function () {
 
         tt.test("test", function () {
             tt.slow = 50
-            active = tt.call(activeSlow)
-            raw = tt.call(slow)
+            active = tt.call(slow)
+            raw = tt.call(ownSlow)
         })
 
         return tt.run().then(function () {
@@ -186,8 +186,8 @@ describe("core (slow) (FLAKE)", /** @this */ function () {
         tt.test("test", function () {
             tt.slow = 50
             tt.test("inner", function () {
-                active = tt.call(activeSlow)
-                raw = tt.call(slow)
+                active = tt.call(slow)
+                raw = tt.call(ownSlow)
             })
         })
 
@@ -202,8 +202,8 @@ describe("core (slow) (FLAKE)", /** @this */ function () {
         var active, raw
 
         tt.test("test", function () {
-            active = tt.call(activeSlow)
-            raw = tt.call(slow)
+            active = tt.call(slow)
+            raw = tt.call(ownSlow)
         })
 
         return tt.run().then(function () {

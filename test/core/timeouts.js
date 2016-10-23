@@ -113,12 +113,12 @@ describe("core (timeouts) (FLAKE)", /** @this */ function () {
         })
     })
 
-    function timeout(reflect) {
-        return reflect.timeout
+    function ownTimeout(reflect) {
+        return reflect.ownTimeout
     }
 
-    function activeTimeout(reflect) {
-        return reflect.activeTimeout
+    function timeout(reflect) {
+        return reflect.timeout
     }
 
     it("gets own timeout", function () {
@@ -127,8 +127,8 @@ describe("core (timeouts) (FLAKE)", /** @this */ function () {
 
         tt.test("test", function () {
             tt.timeout = 50
-            active = tt.call(activeTimeout)
-            raw = tt.call(timeout)
+            active = tt.call(timeout)
+            raw = tt.call(ownTimeout)
         })
 
         return tt.run().then(function () {
@@ -144,8 +144,8 @@ describe("core (timeouts) (FLAKE)", /** @this */ function () {
         tt.test("test", function () {
             tt.timeout = 50
             tt.test("inner", function () {
-                active = tt.call(activeTimeout)
-                raw = tt.call(timeout)
+                active = tt.call(timeout)
+                raw = tt.call(ownTimeout)
             })
         })
 
@@ -160,8 +160,8 @@ describe("core (timeouts) (FLAKE)", /** @this */ function () {
         var active, raw
 
         tt.test("test", function () {
-            active = tt.call(activeTimeout)
-            raw = tt.call(timeout)
+            active = tt.call(timeout)
+            raw = tt.call(ownTimeout)
         })
 
         return tt.run().then(function () {

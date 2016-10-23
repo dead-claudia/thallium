@@ -120,16 +120,13 @@ interface Callback {
  * but give plenty of access to details for plugin/reporter/etc. developers,
  * in case they need it.
  */
-export interface Reflect {
+export type Reflect = ReflectRoot | ReflectCommon;
+
+interface ReflectCommon {
     /**
      * Get the currently executing test.
      */
     current: Reflect;
-
-    /**
-     * Get the global root.
-     */
-    global: Reflect;
 
     /**
      * Get the current total test count.
@@ -143,69 +140,38 @@ export interface Reflect {
     children: Reflect[];
 
     /**
-     * Get the test name, or `undefined` if it's the root test.
-     */
-    name: String | void;
-
-    /**
-     * Get the test index, or `-1` if it's the root test.
-     */
-    index: number;
-
-    /**
      * Is this test the root, i.e. top level?
      */
-    root: boolean;
+    isRoot: this is ReflectRoot;
 
     /**
      * Is this locked (i.e. unsafe to modify)?
      */
-    locked: boolean;
-
-    /**
-     * Get a list of all own reporters. If none were added, an empty list is
-     * returned.
-     */
-    reporters: Reporter[];
-
-    /**
-     * Get a list of all active reporters, either on this instance or on the
-     * closest parent.
-     */
-    activeReporters: Reporter[];
+    isLocked: boolean;
 
     /**
      * Get the own, not necessarily active, timeout. 0 means inherit the
      * parent's, and `Infinity` means it's disabled.
      */
-    timeout: number;
+    ownTimeout: number;
 
     /**
      * Get the active timeout in milliseconds, not necessarily own, or the
      * framework default of 2000, if none was set.
      */
-    activeTimeout: number;
+    timeout: number;
 
     /**
      * Get the own, not necessarily active, slow threshold. 0 means inherit the
      * parent's, and `Infinity` means it's disabled.
      */
-    slow: number;
+    ownSlow: number;
 
     /**
      * Get the active slow threshold in milliseconds, not necessarily own, or
      * the framework default of 75, if none was set.
      */
-    activeSlow: number;
-
-    /**
-     * Get the parent test as a Reflect.
-     */
-    parent: Reflect | void;
-
-    /**
-     * Before/after hooks, for initialization and cleanup.
-     */
+    slow: number;
 
     /**
      * Add a hook to be run before each subtest, including their subtests and so
@@ -218,10 +184,10 @@ export interface Reflect {
      */
     addBeforeAll(func: Callback): void;
 
-   /**
-    * Add a hook to be run after each subtest, including their subtests and so
-    * on.
-    */
+    /**
+     * Add a hook to be run after each subtest, including their subtests and so
+     * on.
+     */
     addAfterEach(func: Callback): void;
 
     /**
@@ -253,9 +219,21 @@ export interface Reflect {
     removeAfterAll(func: Callback): void;
 
     /**
-     * Thallium API methods made available on reflect objects, so they don't
-     * need a test instance to wrap everything.
+     * Add a block or inline test.
      */
+    test(name: string, callback: Callback): void;
+
+    /**
+     * Add a skipped block or inline test.
+     */
+    testSkip(name: string, callback: Callback): void;
+}
+
+export interface ReflectRoot extends ReflectCommon {
+    /**
+     * Get a copy of the list of all reporters.
+     */
+    reporters: Reporter[];
 
     /**
      * Add a reporter.
@@ -266,16 +244,23 @@ export interface Reflect {
      * Remove a reporter.
      */
     removeReporter(reporter: Reporter): void;
+}
+
+export interface ReflectChild extends ReflectCommon {
+    /**
+     * Get the test name.
+     */
+    name: String;
 
     /**
-     * Add a block or inline test.
+     * Get the test index.
      */
-    test(name: string, callback: Callback): void;
+    index: number;
 
     /**
-     * Add a skipped block or inline test.
+     * Get the parent test as a Reflect.
      */
-    testSkip(name: string, callback: Callback): void;
+    parent: Reflect;
 }
 
 export interface Test {
@@ -305,6 +290,8 @@ export interface Test {
      * async access to a resource, but there's no lock available. A good example
      * is having multiple console reporters, in which you probably want to make
      * at least all but one block.
+     *
+     * Throws an error if this isn't the root test.
      */
     reporter(reporter: Reporter, block?: boolean): void;
 
