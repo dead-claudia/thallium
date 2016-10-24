@@ -29,7 +29,7 @@ function printReport(_, init) {
 }
 
 module.exports = R.on({
-    accepts: ["print", "reset", "colors"],
+    accepts: ["write", "reset", "colors"],
     create: R.consoleReporter,
     before: R.setColor,
     after: R.unsetColor,

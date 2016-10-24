@@ -44,16 +44,6 @@ describe("reporter dot", function () {
                 var reporter = Util.r.dot({
                     colors: colors,
 
-                    print: function (line) {
-                        if (acc !== "") {
-                            line += acc
-                            acc = ""
-                        }
-
-                        // So lines are printed consistently.
-                        list.push.apply(list, line.split(/\r?\n/g))
-                    },
-
                     write: function (str) {
                         // So lines are printed consistently.
                         var lines = (acc + str).split(/\r?\n/g)

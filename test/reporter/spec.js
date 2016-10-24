@@ -44,9 +44,16 @@ describe("reporter spec", function () {
         return function (name, opts) {
             it(name, function () {
                 var list = []
+                var acc = ""
                 var reporter = Util.r.spec({
                     colors: colors,
-                    print: function (arg) { list.push(arg) },
+                    write: function (str) {
+                        // So lines are printed consistently.
+                        var lines = (acc + str).split(/\r?\n/g)
+
+                        acc = lines.pop()
+                        list.push.apply(list, lines)
+                    },
                     reset: function () {},
                 })
 

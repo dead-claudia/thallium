@@ -71,7 +71,7 @@ function printError(_, report) {
 }
 
 module.exports = R.on({
-    accepts: ["print", "reset"],
+    accepts: ["write", "reset"],
     create: R.consoleReporter,
     init: function (state) { state.counter = 0 },
 
