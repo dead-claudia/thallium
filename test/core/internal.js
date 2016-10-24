@@ -2,7 +2,7 @@
 
 describe("core (internal)", function () {
     describe("reports", function () {
-        var Reports = Util.Tests.Reports
+        var Reports = Util.Reports
         var n = Util.n
 
         it("correctly creates `start` reports", function () {

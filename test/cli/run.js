@@ -4,7 +4,7 @@
 
 var parse = require("../../lib/cli/parse.js")
 var Run = require("../../lib/cli/run.js")
-var Cli = require("../../scripts/cli/cli.js")
+var Cli = require("../../test-util/cli/cli.js")
 
 describe("cli runner", function () {
     var n = Util.n

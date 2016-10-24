@@ -1,6 +1,6 @@
 /* tslint:disable */
 
-import {Test} from "./core";
+import {Test} from "../index";
 
 export type Key = string | number | symbol;
 export type ObjectMap<T> = {[key: Key]: T};
@@ -45,18 +45,6 @@ export function notExists(object: any): void;
 
 export function array(object: any): void;
 export function notArray(object: any): void;
-
-export type TypeofValue =
-    "boolean" |
-    "function" |
-    "number" |
-    "object" |
-    "string" |
-    "symbol" |
-    "undefined";
-
-export function type(object: any, type: TypeofValue): void;
-export function notType(object: any, type: TypeofValue): void;
 
 export function inherits(object: any, Type: new (...args: any[]) => any): void;
 export function notInherits(object: any, Type: new (...args: any[]) => any): void;

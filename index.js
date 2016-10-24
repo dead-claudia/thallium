@@ -4,6 +4,6 @@
  * Main entry point, for those wanting to use this framework with the core
  * assertions.
  */
-var Thallium = require("./lib/api.js").Thallium
+var Thallium = require("./lib/api/thallium.js")
 
 module.exports = new Thallium()

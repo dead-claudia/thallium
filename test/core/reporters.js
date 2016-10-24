@@ -48,7 +48,6 @@ describe("core (reporters)", function () { // eslint-disable-line max-statements
                     _.addReporter(tt, plugin)
                     successful = true
                 } catch (e) {
-                    if (Object.getPrototypeOf(e) !== Error.prototype) throw e
                     successful = false
                 }
             }
@@ -104,9 +103,6 @@ describe("core (reporters)", function () { // eslint-disable-line max-statements
                         _.addReporter(tt, plugin)
                         successful = true
                     } catch (e) {
-                        if (Object.getPrototypeOf(e) !== Error.prototype) {
-                            throw e
-                        }
                         successful = false
                     }
                 }
@@ -117,9 +113,6 @@ describe("core (reporters)", function () { // eslint-disable-line max-statements
                         _.addReporter(tt, plugin)
                         successful = true
                     } catch (e) {
-                        if (Object.getPrototypeOf(e) !== Error.prototype) {
-                            throw e
-                        }
                         successful = false
                     }
                 }
@@ -654,7 +647,7 @@ describe("core (reporters)", function () { // eslint-disable-line max-statements
         })
 
         tt.test("test", function () {
-            Object.defineProperty(tt.call(identity)._, "status", {
+            Object.defineProperty(tt.call(identity)._, "locked", {
                 get: function () { throw sentinel },
                 set: function () { throw sentinel },
             })

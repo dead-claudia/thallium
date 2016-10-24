@@ -35,6 +35,8 @@ var Util = global.Util = {
 
     /* eslint-disable global-require */
 
+    Reports: require("../lib/reports.js"),
+
     // Various dependencies used throughout the tests, minus the CLI tests. It's
     // easier to inject them into this bundle rather than to try to implement a
     // module loader.

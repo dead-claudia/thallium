@@ -59,9 +59,14 @@ task("test:node", function () {
     exec(c("mocha") + " --colors")
 })
 
+var dirs = [
+    "bin", "fixtures", "helpers", "lib", "r", "scripts", "test", "migrate",
+    "assert", "match",
+].join(",")
+
 var patterns = [
-    "{bin,fixtures,helpers,lib,r,scripts,test,migrate}/**/{.,}*.js",
-    "{bin,fixtures,helpers,lib,r,scripts,test,migrate}/**/{.,}*.coffee",
+    "{" + dirs + "}/**/{.,}*.js",
+    "{" + dirs + "}/**/{.,}*.coffee",
     "{.,}*.js",
     "{.,}*.coffee",
 ]
@@ -76,7 +81,7 @@ function watch(task) {
 
     function execute() {
         for (var i = 0; i < queue.length; i++) {
-            console.error(queue[i].event, queue[i].path)
+            echo(queue[i].event + " " + queue[i].path)
         }
 
         queue = []

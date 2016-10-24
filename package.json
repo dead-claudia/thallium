@@ -12,20 +12,20 @@
     "jsdom": "empty/object"
   },
   "files": [
-    "assertions.d.ts",
+    "assert",
     "assertions.js",
+    "bin",
     "core.d.ts",
     "core.js",
+    "docs",
     "index.d.ts",
     "index.js",
-    "thallium-migrate.js",
-    "thallium.js",
-    "thallium.d.ts",
     "lib",
-    "bin",
-    "r",
     "migrate",
-    "docs"
+    "r",
+    "thallium-migrate.js",
+    "thallium.d.ts",
+    "thallium.js"
   ],
   "bin": {
     "tl": "bin/tl.js"

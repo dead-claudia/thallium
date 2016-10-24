@@ -129,6 +129,11 @@ interface ReflectCommon {
     current: Reflect;
 
     /**
+     * Get the root test.
+     */
+    root: ReflectRoot;
+
+    /**
      * Get the current total test count.
      */
     count: number;
@@ -137,7 +142,7 @@ interface ReflectCommon {
      * Get a copy of the current test list, as a Reflect collection. This is
      * intentionally a slice, so you can't mutate the real children.
      */
-    children: Reflect[];
+    children: ReflectChild[];
 
     /**
      * Is this test the root, i.e. top level?
@@ -329,6 +334,28 @@ export interface Test {
      * Add a skipped test.
      */
     testSkip(name: string, body: Callback): this;
+
+    /**
+     * Add a hook to be run before each subtest, including their subtests and so
+     * on.
+     */
+    before(func: Callback): void;
+
+    /**
+     * Add a hook to be run once before all subtests are run.
+     */
+    beforeAll(func: Callback): void;
+
+    /**
+     * Add a hook to be run after each subtest, including their subtests and so
+     * on.
+     */
+    after(func: Callback): void;
+
+    /**
+     * Add a hook to be run once after all subtests are run.
+     */
+    afterAll(func: Callback): void;
 }
 
 declare const t: Test;

@@ -3,7 +3,6 @@
 /* global Map, Set, Buffer, Symbol, Int8Array, Int16Array, Int32Array,
 Uint8Array, Uint16Array, Uint32Array, Float32Array, Float64Array,
 Uint8ClampedArray, DataView */
-/* eslint-env node */
 
 var match = require("../match.js")
 var newline = require("os").EOL

@@ -1,10 +1,8 @@
 "use strict"
 
-var Thallium = require("./lib/api.js").Thallium
-var Tests = require("./lib/tests.js")
-var Reports = Tests.Reports
-var HookError = Tests.HookError
-var Stage = Tests.Stage
+var Thallium = require("./lib/api/thallium.js")
+var Reports = require("./lib/reports.js")
+var Types = Reports.Types
 
 exports.root = function () {
     return new Thallium()
@@ -78,19 +76,19 @@ exports.reports = {
  */
 exports.hookErrors = {
     beforeAll: function (func, value) {
-        return new HookError(Stage.BeforeAll, func, value)
+        return new Reports.HookError(Types.BeforeAll, func, value)
     },
 
     beforeEach: function (func, value) {
-        return new HookError(Stage.BeforeEach, func, value)
+        return new Reports.HookError(Types.BeforeEach, func, value)
     },
 
     afterEach: function (func, value) {
-        return new HookError(Stage.AfterEach, func, value)
+        return new Reports.HookError(Types.AfterEach, func, value)
     },
 
     afterAll: function (func, value) {
-        return new HookError(Stage.AfterAll, func, value)
+        return new Reports.HookError(Types.AfterAll, func, value)
     },
 }
 

@@ -24,7 +24,7 @@ module.exports = function (config) {
         },
 
         files: [
-            "./scripts/globals.js",
+            "./test-util/globals.js",
             {pattern: "./test/**/*.js", nocache: true},
             {pattern: "./lib/**/*.js", included: false, served: false},
             {pattern: "./scripts/**/*.js", included: false, served: false},
@@ -34,7 +34,7 @@ module.exports = function (config) {
         exclude: ["./test/cli/**"],
 
         preprocessors: {
-            "./scripts/globals.js": ["browserify"],
+            "./test-util/globals.js": ["browserify"],
         },
 
         browserify: {

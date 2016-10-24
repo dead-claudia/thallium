@@ -12,17 +12,13 @@
 var Common = require("./common.js")
 var Internal = require("../internal.js")
 var methods = require("../lib/methods.js")
+var Report = require("../lib/reports.js").Report
+var Reflect = require("../lib/api/reflect.js")
+var Thallium = require("../lib/api/thallium.js")
 
-var Tests = require("../lib/tests.js")
-var Report = Tests.Report
-
-var assert = require("../assert.js")
+var assert = require("../assert/index.js")
 var AssertionError = assert.AssertionError
 var format = assert.format
-
-var Api = require("../lib/api.js")
-var Reflect = Api.Reflect
-var Thallium = Api.Thallium
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * - `reflect.checkInit()` is deprecated in favor of `reflect.locked` and    *
@@ -70,7 +66,7 @@ function runAsync(callback, t, resolve, reject) {
     }
 
     Common.warn("`t.async` is deprecated. Use `t.test` and either return a " +
-        "promise or use `co`/ES8 async functions instead.")
+        "promise or use `co`/ES2017 async functions instead.")
 
     // This is a modified version of the async-await official, non-normative
     // desugaring helper, for better error checking and adapted to accept an
