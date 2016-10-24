@@ -385,8 +385,8 @@ methods(Thallium, {
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * - assertions defined on main export                                       *
- * - `t.instanceof` -> `assert.inherits`                                     *
- * - `t.notInstanceof` -> `assert.notInherits`                               *
+ * - `t.instanceof` -> `assert.is`                                           *
+ * - `t.notInstanceof` -> `assert.notIs`                                     *
  * - `t.*` -> `assert.*` from `thallium/assert` for assertions               *
  * - `t.true`/etc. are gone (except `t.undefined` -> `assert.undefined`)     *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
@@ -507,5 +507,17 @@ methods(Reflect, {
         Common.warn("Tests are now never inline. You no longer need to " +
             "handle this case")
         return false
+    },
+})
+
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ * `reflect.methods` -> `reflect.current` and using new `reflect` methods    *
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+methods(Reflect, {
+    get methods() {
+        Common.warn("`reflect.methods` is deprecated. Use `reflect.current`, " +
+            "the return value of `t.call`, and the appropriate new `reflect` " +
+            "methods instead")
+        return this._.methods
     },
 })

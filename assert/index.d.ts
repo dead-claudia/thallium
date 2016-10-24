@@ -46,8 +46,8 @@ export function notExists(object: any): void;
 export function array(object: any): void;
 export function notArray(object: any): void;
 
-export function inherits(object: any, Type: new (...args: any[]) => any): void;
-export function notInherits(object: any, Type: new (...args: any[]) => any): void;
+export function is(object: any, Type: new (...args: any[]) => any): void;
+export function notIs(object: any, Type: new (...args: any[]) => any): void;
 
 export function equal<T>(a: T, b: T): void;
 export function notEqual<T>(a: T, b: T): void;

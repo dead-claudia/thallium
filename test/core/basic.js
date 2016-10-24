@@ -7,6 +7,8 @@
 // real-world usage.
 
 describe("core (basic)", function () {
+    function identity(reflect) { return reflect }
+
     describe("reflect", function () {
         describe("get parent", function () {
             function parent(reflect) { return reflect.parent }
@@ -19,14 +21,14 @@ describe("core (basic)", function () {
 
             it("works on children", function () {
                 var tt = Util.create()
-                var methods
+                var inner
 
                 tt.test("test", function () {
-                    methods = tt.call(parent).methods
+                    inner = tt.call(parent)
                 })
 
                 return tt.run().then(function () {
-                    assert.equal(methods, tt)
+                    assert.equal(inner, tt.call(identity))
                 })
             })
         })
@@ -130,7 +132,6 @@ describe("core (basic)", function () {
 
         describe("get children", function () {
             function children(reflect) { return reflect.children }
-            function identity(reflect) { return reflect }
 
             it("works with 0 tests", function () {
                 var tt = Util.create()

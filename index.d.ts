@@ -182,44 +182,41 @@ interface ReflectCommon {
      * Add a hook to be run before each subtest, including their subtests and so
      * on.
      */
-    addBeforeEach(func: Callback): void;
+    before(func: Callback): void;
 
     /**
      * Add a hook to be run once before all subtests are run.
      */
-    addBeforeAll(func: Callback): void;
+    beforeAll(func: Callback): void;
 
     /**
      * Add a hook to be run after each subtest, including their subtests and so
      * on.
      */
-    addAfterEach(func: Callback): void;
+    after(func: Callback): void;
 
     /**
      * Add a hook to be run once after all subtests are run.
      */
-    addAfterAll(func: Callback): void;
+    afterAll(func: Callback): void;
 
     /**
-     * Remove a hook previously added with `t.before` or
-     * `reflect.addBeforeEach`.
+     * Remove a hook previously added with `t.before` or `reflect.before`.
      */
-    removeBeforeEach(func: Callback): void;
+    removeBefore(func: Callback): void;
 
     /**
-     * Remove a hook previously added with `t.beforeAll` or
-     * `reflect.addBeforeAll`.
+     * Remove a hook previously added with `t.beforeAll` or `reflect.beforeAll`.
      */
     removeBeforeAll(func: Callback): void;
 
     /**
-     * Remove a hook previously added with `t.after` or`reflect.addAfterEach`.
+     * Remove a hook previously added with `t.after` or`reflect.after`.
      */
-    removeAfterEach(func: Callback): void;
+    removeAfter(func: Callback): void;
 
     /**
-     * Remove a hook previously added with `t.afterAll` or
-     * `reflect.addAfterAll`.
+     * Remove a hook previously added with `t.afterAll` or `reflect.afterAll`.
      */
     removeAfterAll(func: Callback): void;
 
@@ -243,7 +240,7 @@ export interface ReflectRoot extends ReflectCommon {
     /**
      * Add a reporter.
      */
-    addReporter(reporter: Reporter, blocking?: boolean): void;
+    reporter(reporter: Reporter): void;
 
     /**
      * Remove a reporter.

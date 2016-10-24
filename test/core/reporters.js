@@ -34,7 +34,7 @@ describe("core (reporters)", function () { // eslint-disable-line max-statements
 
             function plugin() {}
 
-            _.addReporter(tt, plugin)
+            _.reporter(tt, plugin)
             assert.match(tt.call(reporters), [plugin])
         })
 
@@ -45,7 +45,7 @@ describe("core (reporters)", function () { // eslint-disable-line max-statements
             function check(tt, plugin) {
                 if (successful) return
                 try {
-                    _.addReporter(tt, plugin)
+                    _.reporter(tt, plugin)
                     successful = true
                 } catch (e) {
                     successful = false
@@ -59,7 +59,7 @@ describe("core (reporters)", function () { // eslint-disable-line max-statements
             function plugin5() {}
             function plugin6() {}
 
-            _.addReporter(tt, plugin6)
+            _.reporter(tt, plugin6)
 
             tt.test("test", function () {
                 check(tt, plugin1)
@@ -81,7 +81,7 @@ describe("core (reporters)", function () { // eslint-disable-line max-statements
 
                 function plugin() {}
 
-                _.addReporter(tt, plugin)
+                _.reporter(tt, plugin)
                 _.removeReporter(tt, plugin)
                 assert.match(tt.call(reporters), [])
             })
@@ -100,7 +100,7 @@ describe("core (reporters)", function () { // eslint-disable-line max-statements
                 function checkAdd(tt, plugin) {
                     if (successful) return
                     try {
-                        _.addReporter(tt, plugin)
+                        _.reporter(tt, plugin)
                         successful = true
                     } catch (e) {
                         successful = false
@@ -110,14 +110,14 @@ describe("core (reporters)", function () { // eslint-disable-line max-statements
                 function checkRemove(tt, plugin) {
                     if (successful) return
                     try {
-                        _.addReporter(tt, plugin)
+                        _.reporter(tt, plugin)
                         successful = true
                     } catch (e) {
                         successful = false
                     }
                 }
 
-                _.addReporter(tt, plugin6)
+                _.reporter(tt, plugin6)
 
                 tt.test("test", function () {
                     checkAdd(tt, plugin1)
@@ -145,25 +145,25 @@ describe("core (reporters)", function () { // eslint-disable-line max-statements
             function plugin2() {}
             function plugin3() {}
 
-            _.addReporter(tt, plugin1)
-            _.addReporter(tt, plugin2)
-            _.addReporter(tt, plugin3)
+            _.reporter(tt, plugin1)
+            _.reporter(tt, plugin2)
+            _.reporter(tt, plugin3)
 
-            _.addReporter(tt, plugin3)
-            _.addReporter(tt, plugin1)
+            _.reporter(tt, plugin3)
+            _.reporter(tt, plugin1)
 
             assert.match(tt.call(reporters), [plugin1, plugin2, plugin3])
         })
     }
 
     context("normal", function () {
-        checkBasic({addReporter: function (tt, func) { tt.reporter(func) }})
+        checkBasic({reporter: function (tt, func) { tt.reporter(func) }})
     })
 
     context("reflect", function () {
         checkBasic({
-            addReporter: function (tt, func) {
-                tt.call(function (reflect) { reflect.addReporter(func) })
+            reporter: function (tt, func) {
+                tt.call(function (reflect) { reflect.reporter(func) })
             },
 
             removeReporter: function (tt, func) {
@@ -497,16 +497,20 @@ describe("core (reporters)", function () { // eslint-disable-line max-statements
         })
     })
 
-    it("called correctly with subtest run", function () {
+    it("locks itself when running", function () {
         var tt = Util.create()
-        var child
+        var err
+
+        tt.reporter(function (report) {
+            if (report.isFail) err = report.error
+        })
 
         tt.test("test", function () {
-            child = tt.call(function (r) { return r.current.methods })
+            tt.run()
         })
 
         return tt.run().then(function () {
-            assert.throws(function () { child.run() }, Error)
+            assert.is(err, Error)
         })
     })
 

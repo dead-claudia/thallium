@@ -19,9 +19,9 @@ t.test 'core (basic)', ->
 
             t.test 'works on children', ->
                 tt = create()
-                methods = undefined
-                tt.test 'test', -> methods = tt.call(parent).methods
-                tt.run().then -> assert.equal methods, tt
+                inner = undefined
+                tt.test 'test', -> inner = tt.call(parent)
+                tt.run().then -> assert.equal inner, tt.call(-> this)
 
         t.test 'get count', ->
             tt = create()
@@ -51,7 +51,7 @@ t.test 'core (basic)', ->
             t.test 'works with child tests', ->
                 tt = create()
                 child = undefined
-                tt.test 'test', -> child = tt.call name
+                tt.test 'test', -> child = tt.call(name)
                 tt.run().then -> assert.equal child, 'test'
 
             t.test 'works with itself', ->
@@ -65,8 +65,8 @@ t.test 'core (basic)', ->
             t.test 'works with the root test', ->
                 assert.equal tt.call(index), undefined
 
-            tt.test 'test', -> first = tt.call index
-            tt.test 'test', -> second = tt.call index
+            tt.test 'test', -> first = tt.call(index)
+            tt.test 'test', -> second = tt.call(index)
 
             tt.run().then ->
                 t.test 'works with the first child test', ->
@@ -88,15 +88,15 @@ t.test 'core (basic)', ->
             t.test 'works with 1 test', ->
                 tt = create()
                 test = undefined
-                tt.test 'test', -> test = tt.call -> this
+                tt.test 'test', -> test = tt.call(-> this)
                 tt.run().then ->
                     assert.match tt.call(children), [test]
 
             t.test 'works with 2 tests', ->
                 tt = create()
                 first = second = undefined
-                tt.test 'first', -> first = tt.call -> this
-                tt.test 'second', -> second = tt.call -> this
+                tt.test 'first', -> first = tt.call(-> this)
+                tt.test 'second', -> second = tt.call(-> this)
                 tt.run().then ->
                     assert.match tt.call(children), [first, second]
 

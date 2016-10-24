@@ -106,7 +106,7 @@ exports.notArray = function (x) {
     }
 }
 
-exports.inherits = function (object, Type) {
+exports.is = function (object, Type) {
     if (typeof Type !== "function") {
         throw new TypeError("`Type` must be a function")
     }
@@ -120,7 +120,7 @@ exports.inherits = function (object, Type) {
     }
 }
 
-exports.notInherits = function (object, Type) {
+exports.notIs = function (object, Type) {
     if (typeof Type !== "function") {
         throw new TypeError("`Type` must be a function")
     }

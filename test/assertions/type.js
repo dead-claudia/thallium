@@ -159,33 +159,33 @@ describe("assertions (type)", function () {
         if (typeof Symbol === "function") not(Symbol())
     })
 
-    Util.basic("inherits()", function () {
+    Util.basic("is()", function () {
         function A() {}
-        assert.inherits(new A(), A)
-        assert.inherits(new A(), Object)
+        assert.is(new A(), A)
+        assert.is(new A(), Object)
 
         function B() {}
         Util.methods(B, A)
 
-        assert.inherits(new B(), B)
-        assert.inherits(new B(), A)
+        assert.is(new B(), B)
+        assert.is(new B(), A)
 
-        Util.fail("inherits", new A(), B)
-        Util.fail("inherits", [], RegExp)
+        Util.fail("is", new A(), B)
+        Util.fail("is", [], RegExp)
     })
 
-    Util.basic("notInherits()", function () {
+    Util.basic("notIs()", function () {
         function A() {}
-        Util.fail("notInherits", new A(), A)
-        Util.fail("notInherits", new A(), Object)
+        Util.fail("notIs", new A(), A)
+        Util.fail("notIs", new A(), Object)
 
         function B() {}
         Util.methods(B, A)
 
-        Util.fail("notInherits", new B(), B)
-        Util.fail("notInherits", new B(), A)
+        Util.fail("notIs", new B(), B)
+        Util.fail("notIs", new B(), A)
 
-        assert.notInherits(new A(), B)
-        assert.notInherits([], RegExp)
+        assert.notIs(new A(), B)
+        assert.notIs([], RegExp)
     })
 })

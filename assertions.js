@@ -93,8 +93,8 @@ var aliases = []
 
 function getAssertionDeprecation(name) {
     switch (name) {
-    case "instanceof": return getAssertionDeprecation("inherits")
-    case "notInstanceof": return getAssertionDeprecation("notInherits")
+    case "instanceof": return getAssertionDeprecation("is")
+    case "notInstanceof": return getAssertionDeprecation("notIs")
     default:
         return "`t." + name + "()` is deprecated. Use `assert." + name +
             "()` from the `thallium/assert` module instead."
