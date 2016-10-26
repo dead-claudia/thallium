@@ -8,3 +8,4 @@
 
 # The bundle is likely to fail, anyways.
 /thallium.js
+/thallium-migrate.js

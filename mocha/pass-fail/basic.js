@@ -2,10 +2,6 @@
 
 var fail = require("../../assert").fail
 
-function fail() {
-    t.fail("fail")
-}
-
 describe("core (basic)", function () {
     it("has `base()`", function () {})
     it("has `test()`", function () {})

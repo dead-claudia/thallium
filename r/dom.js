@@ -227,7 +227,8 @@ function showTestResult(_, report) {
         className += " " + R.speed(report)
         var duration = document.createElement("span")
 
-        duration.appendChild(document.createTextNode(R.formatTime(report.duration)))
+        duration.appendChild(document.createTextNode(
+            R.formatTime(report.duration)))
         inner.appendChild(duration)
     }
 
