@@ -1,7 +1,7 @@
 "use strict"
 
-var t = require("../../index.js")
-var assert = require("../../assert.js")
+var t = require("../..")
+var assert = require("../../assert")
 
 t.test("mod-two", function () {
     t.test("1 === 2", function () {

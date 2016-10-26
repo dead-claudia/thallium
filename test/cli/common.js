@@ -6,8 +6,8 @@
 // over.
 
 var path = require("path")
-var Common = require("../../lib/cli/common.js")
-var gp = require("../../lib/cli/glob-parent.js")
+var Common = require("../../lib/cli/common")
+var gp = require("../../lib/cli/glob-parent")
 
 describe("cli common", function () {
     var p = path.normalize

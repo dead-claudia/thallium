@@ -2,9 +2,9 @@
 
 // This is a basic TAP-generating reporter.
 
-var peach = require("../lib/util.js").peach
-var R = require("../lib/reporter/index.js")
-var inspect = require("../lib/replaced/inspect.js")
+var peach = require("../lib/util").peach
+var R = require("../lib/reporter")
+var inspect = require("../lib/replaced/inspect")
 
 function shouldBreak(minLength, str) {
     return str.length > R.windowWidth() - minLength || /\r?\n|[:?-]/.test(str)

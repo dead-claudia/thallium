@@ -2,7 +2,7 @@
 
 /* eslint-disable max-len */
 
-var t = require("../../../index.js")
+var t = require("../../..")
 
 t.testSkip("cli common isObjectLike() passes for objects and functions")
 t.testSkip("cli common isObjectLike() fails for other things")

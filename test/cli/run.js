@@ -2,9 +2,9 @@
 
 /* eslint max-nested-callbacks: [2, 5] */
 
-var parse = require("../../lib/cli/parse.js")
-var Run = require("../../lib/cli/run.js")
-var Cli = require("../../test-util/cli/cli.js")
+var parse = require("../../lib/cli/parse")
+var Run = require("../../lib/cli/run")
+var Cli = require("../../test-util/cli/cli")
 
 describe("cli runner", function () {
     var n = Util.n

@@ -1,6 +1,6 @@
 "use strict"
 
-var t = require("../../../index.js")
+var t = require("../../..")
 
 t.test("core (timeouts) (FLAKE) succeeds with own", function () {})
 t.test("core (timeouts) (FLAKE) fails with own", function () {})

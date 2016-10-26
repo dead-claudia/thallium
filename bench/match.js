@@ -4,7 +4,7 @@
 Uint8Array, Uint16Array, Uint32Array, Float32Array, Float64Array,
 Uint8ClampedArray, DataView */
 
-var match = require("../match.js")
+var match = require("../match")
 var newline = require("os").EOL
 
 // Note: updates to this should also be reflected in test/assert/match.js,

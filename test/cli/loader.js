@@ -2,8 +2,8 @@
 
 var path = require("path")
 var interpret = require("interpret")
-var Loader = require("../../lib/cli/loader.js")
-var Cli = require("../../test-util/cli/cli.js")
+var Loader = require("../../lib/cli/loader")
+var Cli = require("../../test-util/cli/cli")
 
 describe("cli loader", function () {
     var hasOwn = Object.prototype.hasOwnProperty

@@ -3,9 +3,9 @@
 var path = require("path")
 var minimatch = require("minimatch")
 var interpret = require("interpret")
-var peach = require("../../lib/util.js").peach
-var parse = require("../../lib/cli/parse.js")
-var State = require("../../lib/cli/run.js").State
+var peach = require("../../lib/util").peach
+var parse = require("../../lib/cli/parse")
+var State = require("../../lib/cli/run").State
 
 var hasOwn = Object.prototype.hasOwnProperty
 

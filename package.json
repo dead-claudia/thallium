@@ -7,9 +7,9 @@
     "test": "node make"
   },
   "browser": {
-    "./lib/replaced/inspect.js": "util-inspect",
+    "./lib/replaced/inspect.js": "./node_modules/util-inspect/index.js",
     "./lib/replaced/console.js": "./lib/replaced/console-browser.js",
-    "jsdom": "empty/object"
+    "jsdom": "./node_modules/empty/object.js"
   },
   "files": [
     "assert",

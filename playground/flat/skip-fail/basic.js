@@ -2,11 +2,8 @@
 
 /* eslint-disable max-len */
 
-var t = require("../../../index.js")
-
-function fail(t) {
-    t.fail("fail")
-}
+var t = require("../../..")
+var fail = require("../../../assert").fail
 
 t.testSkip("core (basic) has `base()`")
 t.testSkip("core (basic) has `test()`")

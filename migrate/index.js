@@ -9,14 +9,14 @@
  * requires.
  */
 
-var Common = require("./common.js")
-var Internal = require("../internal.js")
-var methods = require("../lib/methods.js")
-var Report = require("../lib/core/reports.js").Report
-var Reflect = require("../lib/api/reflect.js")
-var Thallium = require("../lib/api/thallium.js")
+var Common = require("./common")
+var Internal = require("../internal")
+var methods = require("../lib/methods")
+var Report = require("../lib/core/reports").Report
+var Reflect = require("../lib/api/reflect")
+var Thallium = require("../lib/api/thallium")
 
-var assert = require("../assert.js")
+var assert = require("../assert")
 var AssertionError = assert.AssertionError
 var format = assert.format
 
@@ -389,7 +389,7 @@ methods(Thallium, {
  * - `t.true`/etc. are gone (except `t.undefined` -> `assert.undefined`)     *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 Common.hideDeprecation()
-require("../assertions.js")(require("../index.js"))
+require("../assertions")(require("../index"))
 Common.showDeprecation()
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *

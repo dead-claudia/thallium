@@ -6,7 +6,7 @@ require("shelljs/make")
 var path = require("path")
 var chokidar = require("chokidar")
 var semver = require("semver")
-var pkg = require("./package.json")
+var pkg = require("./package")
 
 function c(cmd) {
     return path.resolve(__dirname, "./node_modules/.bin", cmd)
@@ -95,7 +95,7 @@ function watch(task) {
 
     chokidar.watch(patterns, {
         cwd: __dirname,
-        ignored: ["**/test-bundle.js"],
+        ignored: ["./thallium{,-migrate}.js"],
     })
     .on("all", function (event, path) {
         // Give time for the file changes to settle by delaying and debouncing
@@ -204,7 +204,7 @@ task("release", function (args) {
 
     // Increment the package version and get the printed version
     pkg.version = semver.inc(pkg.version, increment)
-    JSON.stringify(pkg).to(require.resolve("../package.json"))
+    JSON.stringify(pkg).to(require.resolve("../package"))
 
     exec("git commit --message=v" + pkg.version)
     exec("git tag v" + pkg.version)

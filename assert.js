@@ -6,13 +6,13 @@
  * keep the file size manageable.
  */
 
-var Util = require("./lib/assert/util.js")
-var Type = require("./lib/assert/type.js")
-var Equal = require("./lib/assert/equal.js")
-var Throws = require("./lib/assert/throws.js")
-var Has = require("./lib/assert/has.js")
-var Includes = require("./lib/assert/includes.js")
-var HasKeys = require("./lib/assert/has-keys.js")
+var Util = require("./lib/assert/util")
+var Type = require("./lib/assert/type")
+var Equal = require("./lib/assert/equal")
+var Throws = require("./lib/assert/throws")
+var Has = require("./lib/assert/has")
+var Includes = require("./lib/assert/includes")
+var HasKeys = require("./lib/assert/has-keys")
 
 exports.AssertionError = Util.AssertionError
 exports.assert = Util.assert

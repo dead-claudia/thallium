@@ -5,8 +5,8 @@
  * there is *so* much repetition.
  */
 
-var match = require("./match.js")
-var deprecate = require("./migrate/common.js").deprecate
+var match = require("./match")
+var deprecate = require("./migrate/common").deprecate
 
 var toString = Object.prototype.toString
 var hasOwn = Object.prototype.hasOwnProperty

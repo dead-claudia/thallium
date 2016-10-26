@@ -1,10 +1,7 @@
 "use strict"
 
-var t = require("../../index.js")
-
-function fail(t) {
-    t.fail("fail")
-}
+var t = require("../..")
+var fail = require("../../assert").fail
 
 t.test("cli common", function () {
     t.test("isObjectLike()", function () {

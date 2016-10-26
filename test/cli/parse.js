@@ -1,7 +1,7 @@
 "use strict"
 
 var path = require("path")
-var parse = require("../../lib/cli/parse.js")
+var parse = require("../../lib/cli/parse")
 
 describe("cli args parsing", function () {
     function alias(description, str, opts) {

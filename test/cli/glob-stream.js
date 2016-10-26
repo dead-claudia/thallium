@@ -3,8 +3,8 @@
 /* eslint max-nested-callbacks: [2, 5] */
 
 var through2 = require("through2")
-var fixture = require("../../test-util/cli/cli.js").fixture
-var GS = require("../../lib/cli/glob-stream.js")
+var fixture = require("../../test-util/cli/cli").fixture
+var GS = require("../../lib/cli/glob-stream")
 
 describe("cli glob stream", function () {
     describe("addStream()", function () {
