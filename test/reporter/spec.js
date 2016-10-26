@@ -11,13 +11,13 @@ describe("reporter spec", function () {
     it("is not itself a reporter", function () {
         var spec = Util.r.spec
 
-        assert.throws(function () { spec(n.start()) }, TypeError)
-        assert.throws(function () { spec(n.enter([p("test", 0)])) }, TypeError) // eslint-disable-line max-len
-        assert.throws(function () { spec(n.leave([p("test", 0)])) }, TypeError) // eslint-disable-line max-len
-        assert.throws(function () { spec(n.pass([p("test", 0)])) }, TypeError) // eslint-disable-line max-len
-        assert.throws(function () { spec(n.fail([p("test", 0)])) }, TypeError) // eslint-disable-line max-len
-        assert.throws(function () { spec(n.skip([p("test", 0)])) }, TypeError) // eslint-disable-line max-len
-        assert.throws(function () { spec(n.end()) }, TypeError)
+        assert.throws(TypeError, function () { spec(n.start()) })
+        assert.throws(TypeError, function () { spec(n.enter([p("test", 0)])) })
+        assert.throws(TypeError, function () { spec(n.leave([p("test", 0)])) })
+        assert.throws(TypeError, function () { spec(n.pass([p("test", 0)])) })
+        assert.throws(TypeError, function () { spec(n.fail([p("test", 0)])) })
+        assert.throws(TypeError, function () { spec(n.skip([p("test", 0)])) })
+        assert.throws(TypeError, function () { spec(n.end()) })
     })
 
     function stack(e) {

@@ -7,7 +7,7 @@ Uint8ClampedArray, DataView */
 // Note: updates to this should also be reflected in bench/match.js, so that
 // benchmark doesn't throw errors.
 
-describe("assertions (match)", function () { // eslint-disable-line max-statements, max-len
+describe("assert (match)", function () { // eslint-disable-line max-statements, max-len
     function check(name, a, b, opts) {
         function m(key) {
             return opts[key] ? key : "not" + key[0].toUpperCase() + key.slice(1)
@@ -20,10 +20,10 @@ describe("assertions (match)", function () { // eslint-disable-line max-statemen
     }
 
     it("exists", function () {
-        assert.function(assert.match)
-        assert.function(assert.notMatch)
-        assert.function(assert.deepEqual)
-        assert.function(assert.notDeepEqual)
+        assert.isFunction(assert.match)
+        assert.isFunction(assert.notMatch)
+        assert.isFunction(assert.deepEqual)
+        assert.isFunction(assert.notDeepEqual)
     })
 
     var obj1 = {}

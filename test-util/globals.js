@@ -22,7 +22,7 @@ if (global.process != null && global.process.env != null) {
  * This exports everything as globals, and it is Browserified as well.
  */
 var Thallium = require("../lib/browser-bundle.js")
-var Tests = require("../lib/tests.js")
+var Tests = require("../lib/core/tests.js")
 
 var assert = global.assert = Thallium.assert
 var Util = global.Util = {
@@ -35,7 +35,7 @@ var Util = global.Util = {
 
     /* eslint-disable global-require */
 
-    Reports: require("../lib/reports.js"),
+    Reports: require("../lib/core/reports.js"),
 
     // Various dependencies used throughout the tests, minus the CLI tests. It's
     // easier to inject them into this bundle rather than to try to implement a
@@ -49,7 +49,7 @@ var Util = global.Util = {
     },
 
     methods: require("../lib/methods.js"),
-    R: require("../lib/reporter.js"),
+    R: require("../lib/reporter/index.js"),
     inspect: require("../lib/replaced/inspect.js"),
 
     /* eslint-enable global-require */
@@ -160,8 +160,8 @@ Util.push = function (ret, keep) {
         if (report.isEnter || report.isPass || report.isFail) {
             assert.hasOwn(report, "duration")
             assert.hasOwn(report, "slow")
-            assert.number(report.duration)
-            assert.number(report.slow)
+            assert.isNumber(report.duration)
+            assert.isNumber(report.slow)
             if (!keep) {
                 report.duration = 10
                 report.slow = 75

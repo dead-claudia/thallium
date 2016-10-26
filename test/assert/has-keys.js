@@ -1,6 +1,6 @@
 "use strict"
 
-describe("assertions (has keys)", function () {
+describe("assert (has keys)", function () {
     // It"s much easier to find problems when the tests are generated.
     function shallow(name, opts) {
         function run(succeed) {
@@ -19,7 +19,7 @@ describe("assertions (has keys)", function () {
 
         describe(name + "()", function () {
             it("exists", function () {
-                assert.function(assert[name])
+                assert.isFunction(assert[name])
             })
 
             if (opts.keys) {
@@ -109,8 +109,8 @@ describe("assertions (has keys)", function () {
     }
 
     shallow("hasKeys", {keys: true, all: true})
-    shallow("notHasAllKeys", {keys: true, all: true, invert: true})
-    shallow("hasAnyKeys", {keys: true})
+    shallow("notHasKeysAll", {keys: true, all: true, invert: true})
+    shallow("hasKeysAny", {keys: true})
     shallow("notHasKeys", {keys: true, invert: true})
 
     /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
@@ -132,7 +132,7 @@ describe("assertions (has keys)", function () {
 
         describe(name + "()", function () {
             it("exists", function () {
-                assert.function(assert[name])
+                assert.isFunction(assert[name])
             })
 
             it("checks numbers", function () {
@@ -214,12 +214,12 @@ describe("assertions (has keys)", function () {
         })
     }
 
-    deep("hasDeepKeys", {all: true})
-    deep("notHasDeepAllKeys", {invert: true, all: true})
-    deep("hasDeepAnyKeys", {})
-    deep("notHasDeepKeys", {invert: true})
-    deep("hasMatchKeys", {match: true, all: true})
-    deep("notHasMatchAllKeys", {match: true, invert: true, all: true})
-    deep("hasMatchAnyKeys", {match: true})
-    deep("notHasMatchKeys", {match: true, invert: true})
+    deep("hasKeysDeep", {all: true})
+    deep("notHasKeysAllDeep", {invert: true, all: true})
+    deep("hasKeysAnyDeep", {})
+    deep("notHasKeysDeep", {invert: true})
+    deep("hasKeysMatch", {match: true, all: true})
+    deep("notHasKeysAllMatch", {match: true, invert: true, all: true})
+    deep("hasKeysAnyMatch", {match: true})
+    deep("notHasKeysMatch", {match: true, invert: true})
 })

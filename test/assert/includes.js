@@ -1,6 +1,6 @@
 "use strict"
 
-describe("assertions (includes)", function () {
+describe("assert (includes)", function () {
     describe("includes()", function () {
         it("checks numbers", function () {
             assert.includes([1, 2, 3, 4, 5], 1)
@@ -167,188 +167,6 @@ describe("assertions (includes)", function () {
 
     /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-    describe("includesLoose()", function () {
-        it("checks numbers", function () {
-            assert.includesLoose([1, 2, 3, 4, 5], 1)
-            assert.includesLoose([1, 2, 3, 4, 5], [1])
-        })
-
-        it("is loose", function () {
-            assert.includesLoose(["1", 2, 3, 4, 5], 1)
-            assert.includesLoose(["1", 2, 3, 4, 5], [1])
-        })
-
-        it("checks objects", function () {
-            var obj1 = {}
-            var obj2 = {}
-            var obj3 = {}
-
-            assert.includesLoose([obj1, 3, obj3, "foo"], [obj1, obj3])
-            assert.includesLoose([obj1, obj2, obj3], [obj1, obj2, obj3])
-            Util.fail("includesLoose",
-                [obj1, 3, obj3, "foo"],
-                [obj1, obj2, obj3])
-        })
-
-        it("checks nothing", function () {
-            assert.includesLoose([{}, {}], [])
-        })
-
-        it("checks missing numbers", function () {
-            Util.fail("includesLoose", [1, 2, 3, 4, 5], 10)
-            Util.fail("includesLoose", [1, 2, 3, 4, 5], [10])
-        })
-
-        it("checks missing objects", function () {
-            var obj1 = {}
-            var obj2 = {}
-            var obj3 = {}
-
-            Util.fail("includesLoose", [obj1, obj2, 3, "foo", {}], [{}])
-            Util.fail("includesLoose", [obj1, obj2, obj3], [{}])
-            Util.fail("includesLoose", [obj1, obj2, obj3], [[]])
-        })
-    })
-
-    describe("notIncludesLooseAll()", function () {
-        it("checks numbers", function () {
-            Util.fail("notIncludesLooseAll", [1, 2, 3, 4, 5], 1)
-            Util.fail("notIncludesLooseAll", [1, 2, 3, 4, 5], [1])
-        })
-
-        it("is loose", function () {
-            Util.fail("notIncludesLooseAll", ["1", 2, 3, 4, 5], 1)
-            Util.fail("notIncludesLooseAll", ["1", 2, 3, 4, 5], [1])
-        })
-
-        it("checks objects", function () {
-            var obj1 = {}
-            var obj2 = {}
-            var obj3 = {}
-
-            Util.fail("notIncludesLooseAll",
-                [obj1, 3, obj3, "foo"],
-                [obj1, obj3])
-
-            Util.fail("notIncludesLooseAll",
-                [obj1, obj2, obj3],
-                [obj1, obj2, obj3])
-
-            assert.notIncludesLooseAll(
-                [obj1, 3, obj3, "foo"],
-                [obj1, obj2, obj3])
-        })
-
-        it("checks nothing", function () {
-            assert.notIncludesLooseAll([{}, {}], [])
-        })
-
-        it("checks missing numbers", function () {
-            assert.notIncludesLooseAll([1, 2, 3, 4, 5], 10)
-            assert.notIncludesLooseAll([1, 2, 3, 4, 5], [10])
-        })
-
-        it("checks missing objects", function () {
-            var obj1 = {}
-            var obj2 = {}
-            var obj3 = {}
-
-            assert.notIncludesLooseAll([obj1, obj2, 3, "foo", {}], [{}])
-            assert.notIncludesLooseAll([obj1, obj2, obj3], [{}])
-            assert.notIncludesLooseAll([obj1, obj2, obj3], [[]])
-        })
-    })
-
-    describe("includesLooseAny()", function () {
-        it("checks numbers", function () {
-            assert.includesLooseAny([1, 2, 3, 4, 5], 1)
-            assert.includesLooseAny([1, 2, 3, 4, 5], [1])
-        })
-
-        it("is loose", function () {
-            assert.includesLooseAny(["1", 2, 3, 4, 5], 1)
-            assert.includesLooseAny(["1", 2, 3, 4, 5], [1])
-        })
-
-        it("checks objects", function () {
-            var obj1 = {}
-            var obj2 = {}
-            var obj3 = {}
-
-            assert.includesLooseAny([obj1, 3, obj3, "foo"], [obj1, obj3])
-            assert.includesLooseAny([obj1, obj2, obj3], [obj1, obj2, obj3])
-            assert.includesLooseAny([obj1, 3, obj3, "foo"], [obj1, obj2, obj3])
-        })
-
-        it("checks nothing", function () {
-            assert.includesLooseAny([{}, {}], [])
-        })
-
-        it("checks missing numbers", function () {
-            Util.fail("includesLooseAny", [1, 2, 3, 4, 5], 10)
-            Util.fail("includesLooseAny", [1, 2, 3, 4, 5], [10])
-        })
-
-        it("checks missing objects", function () {
-            var obj1 = {}
-            var obj2 = {}
-            var obj3 = {}
-
-            Util.fail("includesLooseAny", [obj1, obj2, 3, "foo", {}], [{}])
-            Util.fail("includesLooseAny", [obj1, obj2, obj3], [{}])
-            Util.fail("includesLooseAny", [obj1, obj2, obj3], [[]])
-        })
-    })
-
-    describe("notIncludesLoose()", function () {
-        it("checks numbers", function () {
-            Util.fail("notIncludesLoose", [1, 2, 3, 4, 5], 1)
-            Util.fail("notIncludesLoose", [1, 2, 3, 4, 5], [1])
-        })
-
-        it("is loose", function () {
-            Util.fail("notIncludesLoose", ["1", 2, 3, 4, 5], 1)
-            Util.fail("notIncludesLoose", ["1", 2, 3, 4, 5], [1])
-        })
-
-        it("checks objects", function () {
-            var obj1 = {}
-            var obj2 = {}
-            var obj3 = {}
-
-            Util.fail("notIncludesLoose", [obj1, 3, obj3, "foo"], [obj1, obj3])
-
-            Util.fail("notIncludesLoose",
-                [obj1, obj2, obj3],
-                [obj1, obj2, obj3])
-
-            Util.fail("notIncludesLoose",
-                [obj1, 3, obj3, "foo"],
-                [obj1, obj2, obj3])
-        })
-
-        it("checks nothing", function () {
-            assert.notIncludesLoose([{}, {}], [])
-        })
-
-        it("checks missing numbers", function () {
-            assert.notIncludesLoose([1, 2, 3, 4, 5], 10)
-            assert.notIncludesLoose([1, 2, 3, 4, 5], [10])
-        })
-
-        it("checks missing objects", function () {
-            var obj1 = {}
-            var obj2 = {}
-            var obj3 = {}
-
-            assert.notIncludesLoose([obj1, obj2, 3, "foo", {}], [{}])
-            assert.notIncludesLoose([obj1, obj2, obj3], [{}])
-            assert.notIncludesLoose([obj1, obj2, obj3], [[]])
-        })
-    })
-
-    /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-
     describe("includesDeep()", function () {
         it("checks numbers", function () {
             assert.includesDeep([1, 2, 3, 4, 5], 1)
@@ -389,73 +207,73 @@ describe("assertions (includes)", function () {
         })
     })
 
-    describe("notIncludesDeepAll()", function () {
+    describe("notIncludesAllDeep()", function () {
         it("checks numbers", function () {
-            Util.fail("notIncludesDeepAll", [1, 2, 3, 4, 5], 1)
-            Util.fail("notIncludesDeepAll", [1, 2, 3, 4, 5], [1])
+            Util.fail("notIncludesAllDeep", [1, 2, 3, 4, 5], 1)
+            Util.fail("notIncludesAllDeep", [1, 2, 3, 4, 5], [1])
         })
 
         it("is strict", function () {
-            assert.notIncludesDeepAll(["1", 2, 3, 4, 5], 1)
-            assert.notIncludesDeepAll(["1", 2, 3, 4, 5], [1])
+            assert.notIncludesAllDeep(["1", 2, 3, 4, 5], 1)
+            assert.notIncludesAllDeep(["1", 2, 3, 4, 5], [1])
         })
 
         it("checks objects", function () {
-            assert.notIncludesDeepAll([{foo: 1}, 3, "foo"], ["foo", 1])
+            assert.notIncludesAllDeep([{foo: 1}, 3, "foo"], ["foo", 1])
 
-            assert.notIncludesDeepAll(
+            assert.notIncludesAllDeep(
                 [{foo: 1}, {bar: 2}],
                 [{foo: 1}, {bar: 1}])
 
-            Util.fail("notIncludesDeepAll",
+            Util.fail("notIncludesAllDeep",
                 [{foo: 1}, {bar: 2}],
                 [{foo: 1}, {bar: 2}])
         })
 
         it("checks nothing", function () {
-            assert.notIncludesDeepAll([{}, {}], [])
+            assert.notIncludesAllDeep([{}, {}], [])
         })
 
         it("checks missing numbers", function () {
-            assert.notIncludesDeepAll([1, 2, 3, 4, 5], 10)
-            assert.notIncludesDeepAll([1, 2, 3, 4, 5], [10])
+            assert.notIncludesAllDeep([1, 2, 3, 4, 5], 10)
+            assert.notIncludesAllDeep([1, 2, 3, 4, 5], [10])
         })
 
         it("checks missing objects", function () {
-            assert.notIncludesDeepAll([{foo: 1}, {bar: 2}, {}], [[]])
-            assert.notIncludesDeepAll([{foo: 1}, {bar: 2}, {}], [[], {foo: 1}])
+            assert.notIncludesAllDeep([{foo: 1}, {bar: 2}, {}], [[]])
+            assert.notIncludesAllDeep([{foo: 1}, {bar: 2}, {}], [[], {foo: 1}])
         })
     })
 
-    describe("includesDeepAny()", function () {
+    describe("includesAnyDeep()", function () {
         it("checks numbers", function () {
-            assert.includesDeepAny([1, 2, 3, 4, 5], 1)
-            assert.includesDeepAny([1, 2, 3, 4, 5], [1])
+            assert.includesAnyDeep([1, 2, 3, 4, 5], 1)
+            assert.includesAnyDeep([1, 2, 3, 4, 5], [1])
         })
 
         it("is strict", function () {
-            Util.fail("includesDeepAny", ["1", 2, 3, 4, 5], 1)
-            Util.fail("includesDeepAny", ["1", 2, 3, 4, 5], [1])
+            Util.fail("includesAnyDeep", ["1", 2, 3, 4, 5], 1)
+            Util.fail("includesAnyDeep", ["1", 2, 3, 4, 5], [1])
         })
 
         it("checks objects", function () {
-            assert.includesDeepAny([{foo: 1}, 3, "foo"], ["foo", 1])
-            assert.includesDeepAny([{foo: 1}, {bar: 2}], [{foo: 1}, {bar: 1}])
-            assert.includesDeepAny([{foo: 1}, {bar: 2}], [{foo: 1}, {bar: 2}])
+            assert.includesAnyDeep([{foo: 1}, 3, "foo"], ["foo", 1])
+            assert.includesAnyDeep([{foo: 1}, {bar: 2}], [{foo: 1}, {bar: 1}])
+            assert.includesAnyDeep([{foo: 1}, {bar: 2}], [{foo: 1}, {bar: 2}])
         })
 
         it("checks nothing", function () {
-            assert.includesDeepAny([{}, {}], [])
+            assert.includesAnyDeep([{}, {}], [])
         })
 
         it("checks missing numbers", function () {
-            Util.fail("includesDeepAny", [1, 2, 3, 4, 5], 10)
-            Util.fail("includesDeepAny", [1, 2, 3, 4, 5], [10])
+            Util.fail("includesAnyDeep", [1, 2, 3, 4, 5], 10)
+            Util.fail("includesAnyDeep", [1, 2, 3, 4, 5], [10])
         })
 
         it("checks missing objects", function () {
-            Util.fail("includesDeepAny", [{foo: 1}, {bar: 2}, {}], [[]])
-            assert.includesDeepAny([{foo: 1}, {bar: 2}, {}], [[], {foo: 1}])
+            Util.fail("includesAnyDeep", [{foo: 1}, {bar: 2}, {}], [[]])
+            assert.includesAnyDeep([{foo: 1}, {bar: 2}, {}], [[], {foo: 1}])
         })
     })
 
@@ -542,73 +360,73 @@ describe("assertions (includes)", function () {
         })
     })
 
-    describe("notIncludesMatchAll()", function () {
+    describe("notIncludesAllMatch()", function () {
         it("checks numbers", function () {
-            Util.fail("notIncludesMatchAll", [1, 2, 3, 4, 5], 1)
-            Util.fail("notIncludesMatchAll", [1, 2, 3, 4, 5], [1])
+            Util.fail("notIncludesAllMatch", [1, 2, 3, 4, 5], 1)
+            Util.fail("notIncludesAllMatch", [1, 2, 3, 4, 5], [1])
         })
 
         it("is strict", function () {
-            assert.notIncludesMatchAll(["1", 2, 3, 4, 5], 1)
-            assert.notIncludesMatchAll(["1", 2, 3, 4, 5], [1])
+            assert.notIncludesAllMatch(["1", 2, 3, 4, 5], 1)
+            assert.notIncludesAllMatch(["1", 2, 3, 4, 5], [1])
         })
 
         it("checks objects", function () {
-            assert.notIncludesMatchAll([{foo: 1}, 3, "foo"], ["foo", 1])
+            assert.notIncludesAllMatch([{foo: 1}, 3, "foo"], ["foo", 1])
 
-            assert.notIncludesMatchAll(
+            assert.notIncludesAllMatch(
                 [{foo: 1}, {bar: 2}],
                 [{foo: 1}, {bar: 1}])
 
-            Util.fail("notIncludesMatchAll",
+            Util.fail("notIncludesAllMatch",
                 [{foo: 1}, {bar: 2}],
                 [{foo: 1}, {bar: 2}])
         })
 
         it("checks nothing", function () {
-            assert.notIncludesMatchAll([{}, {}], [])
+            assert.notIncludesAllMatch([{}, {}], [])
         })
 
         it("checks missing numbers", function () {
-            assert.notIncludesMatchAll([1, 2, 3, 4, 5], 10)
-            assert.notIncludesMatchAll([1, 2, 3, 4, 5], [10])
+            assert.notIncludesAllMatch([1, 2, 3, 4, 5], 10)
+            assert.notIncludesAllMatch([1, 2, 3, 4, 5], [10])
         })
 
         it("checks missing objects", function () {
-            assert.notIncludesMatchAll([{foo: 1}, {bar: 2}, {}], [[]])
-            assert.notIncludesMatchAll([{foo: 1}, {bar: 2}, {}], [[], {foo: 1}])
+            assert.notIncludesAllMatch([{foo: 1}, {bar: 2}, {}], [[]])
+            assert.notIncludesAllMatch([{foo: 1}, {bar: 2}, {}], [[], {foo: 1}])
         })
     })
 
-    describe("includesMatchAny()", function () {
+    describe("includesAnyMatch()", function () {
         it("checks numbers", function () {
-            assert.includesMatchAny([1, 2, 3, 4, 5], 1)
-            assert.includesMatchAny([1, 2, 3, 4, 5], [1])
+            assert.includesAnyMatch([1, 2, 3, 4, 5], 1)
+            assert.includesAnyMatch([1, 2, 3, 4, 5], [1])
         })
 
         it("is strict", function () {
-            Util.fail("includesMatchAny", ["1", 2, 3, 4, 5], 1)
-            Util.fail("includesMatchAny", ["1", 2, 3, 4, 5], [1])
+            Util.fail("includesAnyMatch", ["1", 2, 3, 4, 5], 1)
+            Util.fail("includesAnyMatch", ["1", 2, 3, 4, 5], [1])
         })
 
         it("checks objects", function () {
-            assert.includesMatchAny([{foo: 1}, 3, "foo"], ["foo", 1])
-            assert.includesMatchAny([{foo: 1}, {bar: 2}], [{foo: 1}, {bar: 1}])
-            assert.includesMatchAny([{foo: 1}, {bar: 2}], [{foo: 1}, {bar: 2}])
+            assert.includesAnyMatch([{foo: 1}, 3, "foo"], ["foo", 1])
+            assert.includesAnyMatch([{foo: 1}, {bar: 2}], [{foo: 1}, {bar: 1}])
+            assert.includesAnyMatch([{foo: 1}, {bar: 2}], [{foo: 1}, {bar: 2}])
         })
 
         it("checks nothing", function () {
-            assert.includesMatchAny([{}, {}], [])
+            assert.includesAnyMatch([{}, {}], [])
         })
 
         it("checks missing numbers", function () {
-            Util.fail("includesMatchAny", [1, 2, 3, 4, 5], 10)
-            Util.fail("includesMatchAny", [1, 2, 3, 4, 5], [10])
+            Util.fail("includesAnyMatch", [1, 2, 3, 4, 5], 10)
+            Util.fail("includesAnyMatch", [1, 2, 3, 4, 5], [10])
         })
 
         it("checks missing objects", function () {
-            Util.fail("includesMatchAny", [{foo: 1}, {bar: 2}, {}], [[]])
-            assert.includesMatchAny([{foo: 1}, {bar: 2}, {}], [[], {foo: 1}])
+            Util.fail("includesAnyMatch", [{foo: 1}, {bar: 2}, {}], [[]])
+            assert.includesAnyMatch([{foo: 1}, {bar: 2}, {}], [[], {foo: 1}])
         })
     })
 

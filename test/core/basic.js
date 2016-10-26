@@ -227,7 +227,7 @@ describe("core (basic)", function () {
             var tt = Util.create()
             var res = tt.run()
 
-            assert.throws(function () { tt.run() }, Error)
+            assert.throws(Error, function () { tt.run() })
             return res
         })
 

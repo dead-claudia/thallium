@@ -83,7 +83,7 @@ describe("cli args parsing", function () {
             var args = str ? str.split(/\s+/g) : []
 
             it("fails with missing argument for " + str, function () {
-                assert.throws(function () { parse(args) }, Error)
+                assert.throws(Error, function () { parse(args) })
             })
         }
 

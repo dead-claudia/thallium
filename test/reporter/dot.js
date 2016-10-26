@@ -11,13 +11,13 @@ describe("reporter dot", function () {
     it("is not itself a reporter", function () {
         var dot = Util.r.dot
 
-        assert.throws(function () { dot(n.start()) }, TypeError)
-        assert.throws(function () { dot(n.enter([p("test", 0)])) }, TypeError)
-        assert.throws(function () { dot(n.leave([p("test", 0)])) }, TypeError)
-        assert.throws(function () { dot(n.pass([p("test", 0)])) }, TypeError)
-        assert.throws(function () { dot(n.fail([p("test", 0)])) }, TypeError)
-        assert.throws(function () { dot(n.skip([p("test", 0)])) }, TypeError)
-        assert.throws(function () { dot(n.end()) }, TypeError)
+        assert.throws(TypeError, function () { dot(n.start()) })
+        assert.throws(TypeError, function () { dot(n.enter([p("test", 0)])) })
+        assert.throws(TypeError, function () { dot(n.leave([p("test", 0)])) })
+        assert.throws(TypeError, function () { dot(n.pass([p("test", 0)])) })
+        assert.throws(TypeError, function () { dot(n.fail([p("test", 0)])) })
+        assert.throws(TypeError, function () { dot(n.skip([p("test", 0)])) })
+        assert.throws(TypeError, function () { dot(n.end()) })
     })
 
     function stack(e) {

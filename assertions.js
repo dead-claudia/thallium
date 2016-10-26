@@ -92,13 +92,42 @@ var methods = []
 var aliases = []
 
 function getAssertionDeprecation(name) {
+    var replacement = name
+
     switch (name) {
-    case "instanceof": return getAssertionDeprecation("is")
-    case "notInstanceof": return getAssertionDeprecation("notIs")
-    default:
-        return "`t." + name + "()` is deprecated. Use `assert." + name +
-            "()` from the `thallium/assert` module instead."
+    case "boolean": replacement = "isBoolean"; break
+    case "function": replacement = "isFunction"; break
+    case "number": replacement = "isNumber"; break
+    case "object": replacement = "isObject"; break
+    case "string": replacement = "isString"; break
+    case "symbol": replacement = "isSymbol"; break
+    case "instanceof": replacement = "is"; break
+    case "notInstanceof": replacement = "not"; break
+    case "hasLength": replacement = "equal"; break
+    case "notLength": replacement = "notEqual"; break
+    case "lengthAtLeast": replacement = "atLeast"; break
+    case "lengthAtMost": replacement = "atMost"; break
+    case "lengthAbove": replacement = "above"; break
+    case "lengthBelow": replacement = "below"; break
+    case "notIncludesAll": replacement = "notIncludesAll"; break
+    case "notIncludesLooseAll": replacement = "notIncludesAll"; break
+    case "notIncludesDeepAll": replacement = "notIncludesAllDeep"; break
+    case "notIncludesMatchAll": replacement = "notIncludesAllMatch"; break
+    case "includesAny": replacement = "includesAny"; break
+    case "includesLooseAny": replacement = "includesAny"; break
+    case "includesDeepAny": replacement = "includesAnyDeep"; break
+    case "includesMatchAny": replacement = "includesAnyMatch"; break
+    case "undefined":
+        return "`t.undefined()` is deprecated. Use " +
+            "`assert.equal(undefined, value)`. from `thallium/assert` instead."
+    case "type":
+        return "`t.type()` is deprecated. Use `assert.isBoolean()`/etc. from " +
+            "`thallium/assert` instead."
+    default: // ignore
     }
+
+    return "`t." + name + "()` is deprecated. Use `assert." + replacement +
+        "()` from `thallium/assert` instead."
 }
 
 /**
@@ -632,7 +661,7 @@ define("notCloseTo", function (actual, expected, delta) {
  *               | strict shallow  |    loose shallow     |     strict deep     |     structural deep
  * --------------|-----------------|----------------------|---------------------|-------------------------
  * includes all  | `hasKeys`       | `hasLooseKeys`       | `hasDeepKeys`       | `hasMatchKeys`
- * includes some | `hasAnyKeys`    | `hasLooseAnyKeys`    | `hasDeepAnyKeys`    | `hasMatchKeys`
+ * includes some | `hasAnyKeys`    | `hasLooseAnyKeys`    | `hasDeepAnyKeys`    | `hasMatchAnyKeys`
  * missing some  | `notHasAllKeys` | `notHasLooseAllKeys` | `notHasDeepAllKeys` | `notHasMatchAllKeys`
  * missing all   | `notHasKeys`    | `notHasLooseKeys`    | `notHasDeepKeys`    | `notHasMatchKeys`
  *

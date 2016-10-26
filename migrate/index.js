@@ -12,11 +12,11 @@
 var Common = require("./common.js")
 var Internal = require("../internal.js")
 var methods = require("../lib/methods.js")
-var Report = require("../lib/reports.js").Report
+var Report = require("../lib/core/reports.js").Report
 var Reflect = require("../lib/api/reflect.js")
 var Thallium = require("../lib/api/thallium.js")
 
-var assert = require("../assert/index.js")
+var assert = require("../assert.js")
 var AssertionError = assert.AssertionError
 var format = assert.format
 
@@ -385,9 +385,7 @@ methods(Thallium, {
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * - assertions defined on main export                                       *
- * - `t.instanceof` -> `assert.is`                                           *
- * - `t.notInstanceof` -> `assert.notIs`                                     *
- * - `t.*` -> `assert.*` from `thallium/assert` for assertions               *
+ * - `t.*` assertions -> `assert.*` (some renamed) from `thallium/assert`    *
  * - `t.true`/etc. are gone (except `t.undefined` -> `assert.undefined`)     *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 Common.hideDeprecation()

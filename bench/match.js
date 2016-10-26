@@ -7,7 +7,7 @@ Uint8ClampedArray, DataView */
 var match = require("../match.js")
 var newline = require("os").EOL
 
-// Note: updates to this should also be reflected in test/assertions/match.js,
+// Note: updates to this should also be reflected in test/assert/match.js,
 // so this doesn't throw errors.
 
 function loop(list) {

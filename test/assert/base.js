@@ -2,7 +2,7 @@
 
 /* global Map, Symbol */
 
-describe("assertions (base)", function () { // eslint-disable-line max-len, max-statements
+describe("assert (base)", function () {
     describe("assert()", function () {
         it("works", function () {
             function fail(arg, message) {

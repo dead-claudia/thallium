@@ -10,13 +10,13 @@ describe("reporter tap", function () { // eslint-disable-line max-statements
     it("is not itself a reporter", function () {
         var tap = Util.r.tap
 
-        assert.throws(function () { tap(n.start()) }, TypeError)
-        assert.throws(function () { tap(n.enter([p("test", 0)])) }, TypeError) // eslint-disable-line max-len
-        assert.throws(function () { tap(n.leave([p("test", 0)])) }, TypeError) // eslint-disable-line max-len
-        assert.throws(function () { tap(n.pass([p("test", 0)])) }, TypeError)
-        assert.throws(function () { tap(n.fail([p("test", 0)])) }, TypeError)
-        assert.throws(function () { tap(n.skip([p("test", 0)])) }, TypeError)
-        assert.throws(function () { tap(n.end()) }, TypeError)
+        assert.throws(TypeError, function () { tap(n.start()) })
+        assert.throws(TypeError, function () { tap(n.enter([p("test", 0)])) })
+        assert.throws(TypeError, function () { tap(n.leave([p("test", 0)])) })
+        assert.throws(TypeError, function () { tap(n.pass([p("test", 0)])) })
+        assert.throws(TypeError, function () { tap(n.fail([p("test", 0)])) })
+        assert.throws(TypeError, function () { tap(n.skip([p("test", 0)])) })
+        assert.throws(TypeError, function () { tap(n.end()) })
     })
 
     function stack(err) {

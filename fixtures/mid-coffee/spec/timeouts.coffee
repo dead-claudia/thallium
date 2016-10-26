@@ -22,8 +22,8 @@ t.test 'core (timeouts) (FLAKE)', ->
         if report.isEnter || report.isPass || report.isFail
             assert.hasOwn report, 'duration'
             assert.hasOwn report, 'slow'
-            assert.number report.duration
-            assert.number report.slow
+            assert.isNumber report.duration
+            assert.isNumber report.slow
             report.duration = 10
             report.slow = 75
 

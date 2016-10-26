@@ -301,7 +301,7 @@ describe("cli common", function () {
 
         function invalid(name, config) {
             it(name + " is invalid", function () {
-                assert.throws(function () { Common.validate(config) }, TypeError) // eslint-disable-line max-len
+                assert.throws(TypeError, function () { Common.validate(config) }) // eslint-disable-line max-len
             })
         }
 

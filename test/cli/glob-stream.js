@@ -12,9 +12,11 @@ describe("cli glob stream", function () {
             var stream = through2.obj()
             var list = [{readable: false}]
 
-            assert.throwsMatch(function () {
-                GS.addStream(Object.create(null), stream, list, list[0])
-            }, "All input streams must be readable")
+            assert.throwsMatch(
+                "All input streams must be readable",
+                function () {
+                    GS.addStream(Object.create(null), stream, list, list[0])
+                })
         })
 
         it("emits data from all streams", function (done) {
@@ -309,23 +311,23 @@ describe("cli glob stream", function () {
         })
 
         it("throws on invalid glob argument", function () {
-            assert.throwsMatch(function () {
+            assert.throwsMatch(/Invalid glob .* 0/, function () {
                 GS.create([42])
-            }, /Invalid glob .* 0/)
+            })
 
-            assert.throwsMatch(function () {
+            assert.throwsMatch(/Invalid glob .* 1/, function () {
                 GS.create([".", 42])
-            }, /Invalid glob .* 1/)
+            })
         })
 
         it("throws on missing positive glob", function () {
-            assert.throwsMatch(function () {
+            assert.throwsMatch(/Missing positive glob/, function () {
                 GS.create(["!c"])
-            }, /Missing positive glob/)
+            })
 
-            assert.throwsMatch(function () {
+            assert.throwsMatch(/Missing positive glob/, function () {
                 GS.create(["!a", "!b"])
-            }, /Missing positive glob/)
+            })
         })
 
         it("warns on singular glob when file not found", function (done) {
@@ -335,7 +337,7 @@ describe("cli glob stream", function () {
             stream.on("data", function () {})
             stream.on("warn", function (str) {
                 warned = true
-                assert.string(str)
+                assert.isString(str)
             })
             stream.on("error", done)
             stream.on("end", function () {
@@ -353,7 +355,7 @@ describe("cli glob stream", function () {
             stream.on("data", function () {})
             stream.on("warn", function (str) {
                 warned = true
-                assert.string(str)
+                assert.isString(str)
             })
             stream.on("error", done)
             stream.on("end", function () {
@@ -371,7 +373,7 @@ describe("cli glob stream", function () {
             stream.on("data", function () {})
             stream.on("warn", function (str) {
                 warned = true
-                assert.string(str)
+                assert.isString(str)
             })
             stream.on("error", done)
             stream.on("end", function () {

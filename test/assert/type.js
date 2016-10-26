@@ -2,20 +2,21 @@
 
 /* global Symbol */
 
-describe("assertions (type)", function () {
-    function testType(name, callback) {
-        Util.basic(name + "()", function () {
-            callback(assert[name], Util.fail.bind(undefined, name))
-        })
+describe("assert (type)", function () {
+    function testType(name, callback, raw) {
+        var positive = raw ? name.toLowerCase() : "is" + name
+        var negated = raw ? "not" + name : "not" + name
 
-        var negated = "not" + name[0].toUpperCase() + name.slice(1)
+        Util.basic(positive + "()", function () {
+            callback(assert[positive], Util.fail.bind(undefined, positive))
+        })
 
         Util.basic(negated + "()", function () {
             callback(Util.fail.bind(undefined, negated), assert[negated])
         })
     }
 
-    testType("boolean", function (is, not) {
+    testType("Boolean", function (is, not) {
         is(true)
         is(false)
         not(0)
@@ -33,7 +34,7 @@ describe("assertions (type)", function () {
         if (typeof Symbol === "function") not(Symbol())
     })
 
-    testType("number", function (is, not) {
+    testType("Number", function (is, not) {
         not(true)
         not(false)
         is(0)
@@ -51,7 +52,7 @@ describe("assertions (type)", function () {
         if (typeof Symbol === "function") not(Symbol())
     })
 
-    testType("function", function (is, not) {
+    testType("Function", function (is, not) {
         not(true)
         not(false)
         not(0)
@@ -69,7 +70,7 @@ describe("assertions (type)", function () {
         if (typeof Symbol === "function") not(Symbol())
     })
 
-    testType("object", function (is, not) {
+    testType("Object", function (is, not) {
         not(true)
         not(false)
         not(0)
@@ -87,7 +88,7 @@ describe("assertions (type)", function () {
         if (typeof Symbol === "function") not(Symbol())
     })
 
-    testType("string", function (is, not) {
+    testType("String", function (is, not) {
         not(true)
         not(false)
         not(0)
@@ -105,7 +106,7 @@ describe("assertions (type)", function () {
         if (typeof Symbol === "function") not(Symbol())
     })
 
-    testType("symbol", function (is, not) {
+    testType("Symbol", function (is, not) {
         not(true)
         not(false)
         not(0)
@@ -123,7 +124,7 @@ describe("assertions (type)", function () {
         if (typeof Symbol === "function") is(Symbol())
     })
 
-    testType("exists", function (is, not) {
+    testType("Exists", function (is, not) {
         is(true)
         is(false)
         is(0)
@@ -139,9 +140,9 @@ describe("assertions (type)", function () {
         not(undefined)
         not()
         if (typeof Symbol === "function") is(Symbol())
-    })
+    }, true)
 
-    testType("array", function (is, not) {
+    testType("Array", function (is, not) {
         not(true)
         not(false)
         not(0)
@@ -161,31 +162,31 @@ describe("assertions (type)", function () {
 
     Util.basic("is()", function () {
         function A() {}
-        assert.is(new A(), A)
-        assert.is(new A(), Object)
+        assert.is(A, new A())
+        assert.is(Object, new A())
 
         function B() {}
         Util.methods(B, A)
 
-        assert.is(new B(), B)
-        assert.is(new B(), A)
+        assert.is(B, new B())
+        assert.is(A, new B())
 
-        Util.fail("is", new A(), B)
-        Util.fail("is", [], RegExp)
+        Util.fail("is", B, new A())
+        Util.fail("is", RegExp, [])
     })
 
-    Util.basic("notIs()", function () {
+    Util.basic("not()", function () {
         function A() {}
-        Util.fail("notIs", new A(), A)
-        Util.fail("notIs", new A(), Object)
+        Util.fail("not", A, new A())
+        Util.fail("not", Object, new A())
 
         function B() {}
         Util.methods(B, A)
 
-        Util.fail("notIs", new B(), B)
-        Util.fail("notIs", new B(), A)
+        Util.fail("not", B, new B())
+        Util.fail("not", A, new B())
 
-        assert.notIs(new A(), B)
-        assert.notIs([], RegExp)
+        assert.not(B, new A())
+        assert.not(RegExp, [])
     })
 })

@@ -1,7 +1,7 @@
 "use strict"
 
 var Thallium = require("./lib/api/thallium.js")
-var Reports = require("./lib/reports.js")
+var Reports = require("./lib/core/reports.js")
 var Types = Reports.Types
 
 exports.root = function () {

@@ -14,13 +14,13 @@ describe("reporter dom", function () {
     it("is not itself a reporter", function () {
         var dom = Util.r.dom
 
-        assert.throws(function () { dom(n.start()) }, TypeError)
-        assert.throws(function () { dom(n.enter([p("test", 0)])) }, TypeError)
-        assert.throws(function () { dom(n.leave([p("test", 0)])) }, TypeError)
-        assert.throws(function () { dom(n.pass([p("test", 0)])) }, TypeError)
-        assert.throws(function () { dom(n.fail([p("test", 0)])) }, TypeError)
-        assert.throws(function () { dom(n.skip([p("test", 0)])) }, TypeError)
-        assert.throws(function () { dom(n.end()) }, TypeError)
+        assert.throws(TypeError, function () { dom(n.start()) })
+        assert.throws(TypeError, function () { dom(n.enter([p("test", 0)])) })
+        assert.throws(TypeError, function () { dom(n.leave([p("test", 0)])) })
+        assert.throws(TypeError, function () { dom(n.pass([p("test", 0)])) })
+        assert.throws(TypeError, function () { dom(n.fail([p("test", 0)])) })
+        assert.throws(TypeError, function () { dom(n.skip([p("test", 0)])) })
+        assert.throws(TypeError, function () { dom(n.end()) })
     })
 
     function test(name, opts) { // eslint-disable-line no-unused-vars

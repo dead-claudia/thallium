@@ -510,7 +510,7 @@ describe("core (reporters)", function () { // eslint-disable-line max-statements
         })
 
         return tt.run().then(function () {
-            assert.is(err, Error)
+            assert.is(Error, err)
         })
     })
 
@@ -557,7 +557,7 @@ describe("core (reporters)", function () { // eslint-disable-line max-statements
         })
 
         var fail = new AssertionError("Expected 1 to not equal 1", 1, 1)
-        var fail2 = new AssertionError("Expected 1 to equal 2", 2, 1)
+        var fail2 = new AssertionError("Expected 2 to equal 1", 1, 2)
 
         return tt.run().then(function () {
             assert.match(ret, [
@@ -708,7 +708,7 @@ describe("core (reporters)", function () { // eslint-disable-line max-statements
         })
 
         var fail = new AssertionError("Expected 1 to not equal 1", 1, 1)
-        var fail2 = new AssertionError("Expected 1 to equal 2", 2, 1)
+        var fail2 = new AssertionError("Expected 2 to equal 1", 1, 2)
 
         return tt.run().then(function () {
             assert.match(ret, [

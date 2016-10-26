@@ -10,7 +10,7 @@ describe("cli loader", function () {
 
     describe("keysToRegExp()", function () { // eslint-disable-line max-statements, max-len
         it("exists", function () {
-            assert.function(Loader.keysToRegExp)
+            assert.isFunction(Loader.keysToRegExp)
         })
 
         function makeRegExp(items) {
@@ -130,7 +130,7 @@ describe("cli loader", function () {
 
     describe("makeSimple()", function () {
         it("exists", function () {
-            assert.function(Loader.makeSimple)
+            assert.isFunction(Loader.makeSimple)
         })
 
         it("loads a normal module", function () {
@@ -164,7 +164,7 @@ describe("cli loader", function () {
 
             return Loader.load(loader).then(function () {
                 assert.equal(spy1.called, 1)
-                assert.length(spy1.args[0], 2)
+                assert.equal(spy1.args[0].length, 2)
                 assert.equal(spy2.called, 1)
                 assert.match(spy2.args[0], [])
             })
@@ -201,7 +201,7 @@ describe("cli loader", function () {
 
             return Loader.load(loader).then(function () {
                 assert.equal(spy1.called, 1)
-                assert.length(spy1.args[0], 2)
+                assert.equal(spy1.args[0].length, 2)
                 assert.equal(spy2.called, 1)
                 assert.match(spy2.args[0], [])
             })
@@ -225,7 +225,7 @@ describe("cli loader", function () {
             return Loader.load(loader).then(function () {
                 assert.equal(spy1.called, 0)
                 assert.equal(spy2.called, 1)
-                assert.length(spy2.args[0], 2)
+                assert.equal(spy2.args[0].length, 2)
                 assert.equal(spy3.called, 1)
                 assert.match(spy3.args[0], [])
             })
@@ -249,7 +249,7 @@ describe("cli loader", function () {
             return Loader.load(loader).then(function () {
                 assert.equal(spy1.called, 0)
                 assert.equal(spy2.called, 1)
-                assert.length(spy2.args[0], 2)
+                assert.equal(spy2.args[0].length, 2)
                 assert.equal(spy3.called, 1)
                 assert.match(spy3.args[0], [])
             })
@@ -258,7 +258,7 @@ describe("cli loader", function () {
 
     describe("makeInterpret()", function () {
         it("exists", function () {
-            assert.function(Loader.makeInterpret)
+            assert.isFunction(Loader.makeInterpret)
         })
 
         function throwMissing() {
@@ -536,7 +536,7 @@ describe("cli loader", function () {
 
     describe("initialize()", function () {
         it("exists", function () {
-            assert.function(Loader.initialize)
+            assert.isFunction(Loader.initialize)
         })
 
         function S(mod) {

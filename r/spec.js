@@ -2,7 +2,7 @@
 
 // This is a reporter that mimics Mocha's `spec` reporter.
 
-var R = require("../lib/reporter.js")
+var R = require("../lib/reporter/index.js")
 var c = R.color
 
 function indent(level) {

@@ -2,7 +2,7 @@
 
 // This is a reporter that mimics Mocha's `dot` reporter
 
-var R = require("../lib/reporter.js")
+var R = require("../lib/reporter/index.js")
 
 function width() {
     return R.windowWidth() * 4 / 3 | 0

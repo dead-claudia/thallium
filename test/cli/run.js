@@ -237,7 +237,7 @@ describe("cli runner", function () {
             var AssertionError = assert.AssertionError
             var ret = []
             var fail = new AssertionError("Expected 1 to not equal 1", 1, 1)
-            var fail2 = new AssertionError("Expected 1 to equal 2", 2, 1)
+            var fail2 = new AssertionError("Expected 2 to equal 1", 1, 2)
             var fail3 = new AssertionError("Expected 'yep' to be a nope",
                 undefined, "yep")
             var sentinel = new Error("sentinel")
@@ -246,9 +246,7 @@ describe("cli runner", function () {
 
             function isNope(x) {
                 if (x !== "nope") {
-                    assert.failFormat(
-                        "Expected {actual} to be a nope",
-                        {actual: x})
+                    assert.fail("Expected {actual} to be a nope", {actual: x})
                 }
             }
 

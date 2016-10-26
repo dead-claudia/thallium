@@ -102,7 +102,7 @@ describe("cli end-to-end (FLAKE)", /** @this */ function () {
             "leave [0: mod-one] > [4: nested] = undefined",
             "leave [0: mod-one] = undefined",
             "enter [1: mod-two] = undefined",
-            "fail [1: mod-two] > [0: 1 === 2] = \"AssertionError: Expected 1 to equal 2\"",
+            "fail [1: mod-two] > [0: 1 === 2] = \"AssertionError: Expected 2 to equal 1\"",
             "fail [1: mod-two] > [1: what a fail...] = \"AssertionError: Expected 'yep' to be a nope\"",
             "leave [1: mod-two] = undefined",
             "end = undefined",

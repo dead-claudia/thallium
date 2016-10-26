@@ -1,7 +1,7 @@
 "use strict"
 
 var t = require("../../index.js")
-var assert = require("../../assert/index.js")
+var assert = require("../../assert.js")
 
 t.test("mod-two", function () {
     t.test("1 === 2", function () {
@@ -10,7 +10,7 @@ t.test("mod-two", function () {
 
     function isNope(str) {
         if (str !== "nope") {
-            assert.failFormat("Expected {actual} to be a nope", {actual: str})
+            assert.fail("Expected {actual} to be a nope", {actual: str})
         }
     }
 

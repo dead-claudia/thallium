@@ -1,6 +1,6 @@
 "use strict"
 
-var R = require("../lib/reporter.js")
+var R = require("../lib/reporter/index.js")
 var getType = require("../lib/util.js").getType
 
 // TODO: make a stylesheet for this
