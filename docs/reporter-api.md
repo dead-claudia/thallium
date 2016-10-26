@@ -4,28 +4,47 @@ If you want to create your own reporter, it's relatively straightforward to do s
 
 Reporters are called with an event and return possibly a thenable resolved on completion.
 
-Note that when you create a reporter, especially a standalone one, it should *not* itself depend on Thallium, but merely be a function of report &rarr; update state &rarr; print (if necessary) &rarr; return. If you feel you need to depend on Thallium, you should consider wrapping the reporter in a [plugin](./plugins.md) and exposing that.
+Note that when you create a reporter, especially a standalone one, it should *not* itself depend on Thallium, but merely be a function of report &rarr; update state &rarr; print (if necessary) &rarr; return. If you feel you need to depend on Thallium's state, you should consider wrapping the reporter in a [plugin](./plugins.md) and exposing that.
 
 ## Events
 
-There are nine types of events. You can check for these using `ev.start()`, `ev.enter()`, and so on, which return `true` if the event is of that respective type or `false` otherwise. Note that an event only has one type, so `ev.pass()` and `ev.fail()` cannot both be `true`.
+There are nine types of events. You can check for these using `report.isStart`, `report.isEnter`, and so on, which return `true` if the event is of that respective type or `false` otherwise. You may also check for it with `report.type`, which returns a string name of the type below. Note that an event only has one type, so `report.isPass` and `report.isFail` cannot both be `true`.
 
 - `start` - Marks the start of all running tests, and is the first event fired.
 - `enter` - Marks the start of all child tests within a single test block.
 - `leave` - Marks the end of all child tests within a single test block.
 - `pass` - Marks a passing test block with no children.
 - `fail` - Marks a failing test block with no children. The `value` is the error that was thrown, untouched.
-- `skip` - Marks a skipped test block with no children, via `t.testSkip()` or `t.asyncSkip()`.
+- `skip` - Marks a skipped test block with no children, via `t.testSkip()`.
 - `end` - Marks the end of all running tests, and is the last event fired.
 - `error` - An internal/reporter error `value`, provided for pretty-printing and the ability to close resources.
+- `hook` - A hook error info `value`, provided for pretty-printing and the ability to close resources.
 
-Each event also has the following properties:
+Here's the properties for each event:
 
-- `_` - A property reserved for internal (ab)use. Please leave this alone, and don't rely on anything other than its existence.
+- `start` has no other properties
+- `enter` also has `path`, `duration`, and `slow`
+- `leave` also has `path`
+- `pass` also has `path`, `duration`, and `slow`
+- `fail` also has `path`, `duration`, `slow`, and `value` (the thrown/rejected error)
+- `skip` also has `path`
+- `end` has no other properties
+- `error` has `value` (the thrown/rejected error)
+- `hook` has `value` (the thrown/rejected error), `path`, and the following properties:
+
+    - `stage` - A string representing the type of hook that failed.
+    - `name` - The name of the function called by the hook
+    - `isBeforeAll` - Whether this is a `beforeAll` hook that failed
+    - `isBeforeEach` - Whether this is a `beforeEach` hook that failed
+    - `isBfterEach` - Whether this is a `afterEach` hook that failed
+    - `isBfterAll` - Whether this is a `afterAll` hook that failed
+
+Here's what each of the common properties above represent (most events have only some of these):
+
 - `value` - The value associated with the event, or `undefined` if none was specified above for the event's type.
-- `path` - The path to the test, from the top-most parent to the current test. For the base test, this is an empty array. Each entry of this array is a location object with `name` representing the name of the associated test and `index` representing the 0-based index of the test.
-- `slow` - The active slow duration for the test. This is positive for `pass`, `fail`, and `enter` events, and 0 for all others.
-- `duration` - The time it took for this test to complete. This is either 0 or positive for `pass`, `fail`, and `enter` events, and -1 for all others.
+- `path` - The path to the test, from the top-most parent to the current test. Each entry of this array is a location object with `name` representing the name of the associated test and `index` representing the 0-based index of the test.
+- `duration` - The time it took for this test to complete.
+- `slow` - The active slow threshold for the test.
 
 The `error` event is for handling errors either thrown from Thallium or the reporter itself. At this point, it's recommended to close the reporter, as it's no longer safe to continue. As an exception, errors from handling `extra` reports are silently ignored for practical reasons (it's an exceptionally complex problem, where I'd have to roll my own async abstraction), and errors from handling `error` reports are fatal. If you would prefer to just propagate those errors, you can simply rethrow the event's `value`.
 
@@ -39,6 +58,10 @@ Events are called in the following order:
     2. Events for each child test
     3. `end` to end the stream
 
+- Preceding hooks failing:
+
+    1. `hook` with the relevant hook info.
+
 - Test passing and with children:
 
     1. `enter` to denote start of children
@@ -48,14 +71,30 @@ Events are called in the following order:
 - Any other test:
 
     - `pass` if all assertions passed
-    - `skip` if it was skipped via `t.testSkip()` or `t.asyncSkip()`
+    - `skip` if it was skipped via `t.testSkip()`
     - `fail` if any assertion failed
+
+- Successive hooks failing:
+
+    1. `hook` with the relevant hook info.
 
 ## Calling behavior
 
-Normally, reporters are all called at the same time on each event, to speed up calling asynchronous reporters.
+Reporters are all called at the same time on each event, to speed up calling asynchronous reporters. If you have to force reporters to not go simultaneously (e.g. for console output), you can use this function to make those work one-at-a-time per set:
 
-If your reporter is async *and* needs to be the only one running for some reason (like multiple reporters working with a poorly written server or printing diagnostics to the console along with another console reporter), you should add a truthy `block` property to your reporter. It's not preferred, because if you want to, for example, use a reporter that logs to a file, that will have to wait until after the blocking reporter finishes.
+```js
+function combine(...reporters) {
+    function clone(report) {
+        return Object.assign(
+            Object.create(Object.getPrototypeOf(report)),
+            report)
+    }
+
+    return report => reporters.reduce(
+        (p, reporter) => p.then(() => reporter(clone(report))),
+        Promise.resolve())
+}
+```
 
 ## Options and Internal State
 
@@ -65,7 +104,7 @@ If you need to take various options, or if you need special internal state, just
 module.exports = opts => {
     // process your opts and set up initial state here
 
-    return ev => {
+    return report => {
         // do reporter magic here
     }
 }
@@ -76,7 +115,7 @@ The built-in reporters do this as well, and it's recommended to wrap the reporte
 If you want to guard against your reporter being erroneously not called first, you can use this helper, also used internally, to make it much easier.
 
 ```js
-var hasOwn = Object.prototype.hasOwnProperty
+const hasOwn = Object.prototype.hasOwnProperty
 
 function isReport(object) {
     // `_` is an identifier reserved for internal use.
@@ -99,31 +138,13 @@ module.exports = opts => {
 
     // set up things...
 
-    return ev => {
+    return report => {
         // do things...
     }
 }
 ```
 
-Note that you still shouldn't depend on Thallium and check if it's a [`Report`](./api/reflect.md#report) instance.
-
-## `extra` events after `end`
-
-If you can't handle them after the exit, you can drop a lock like this, so you can avoid processing to keep out of an invalid state. Note that after the `end` event, only two possible events can occur: `extra`, since Thallium has already moved on by then, and `start`, which means the tests are being run again with the same reporter, within the same Node process.
-
-```js
-module.exports = () => {
-    let ignore = false
-
-    return (ev) => {
-        if (ev.extra() && ignore) return undefined
-        if (ev.start()) ignore = false
-        if (ev.end()) ignore = true
-
-        // do whatever you would normally
-    }
-}
-```
+Note that you still shouldn't depend on Thallium and check if it's a [`Report`](./api/other.md#internal-reports) instance.
 
 ## Why not event emitters? Why not observables?
 

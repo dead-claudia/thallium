@@ -2,7 +2,7 @@
 
 # Bundle API
 
-The Thallium browser bundle works similarly to the browser API, but it's all in one nicely packaged script ready for use in the browser or wherever. It's tested in browsers and Node, and although untested, it should even work on Rhino or Nashorn (although you'll have to pass some reporter options so you can see the output). Here's an example of a really simple setup:
+The Thallium browser bundle works similarly to the browser API, but it's all in one nicely packaged script ready for use in the browser or wherever, in `thallium.js`. It's tested in browsers and Node, and although untested, it should even work on Rhino or Nashorn (although you'll have to pass some reporter options so you can see the output). Here's an example of a really simple setup:
 
 ```html
 <!DOCTYPE html>
@@ -60,15 +60,25 @@ t.use(function (t) {
 
 ## API Details
 
-- `tl.t` - The main module export. This is equivalent to the normal `require("thallium")` in Node, with the [primary API](./thallium.md) and [assertions](../assertions.md) loaded.
-- `tl.create()` - A shorthand for [`t.create`](./thallium.md#create) and [`reflect.create`](./reflect.md#create) to create a new instance.
+- `tl.t` - The primary API, from `require("thallium")`.
+- `tl.assert` - The assertions namespace, from `require("thallium/assert")`.
+- `tl.match` - The `match` namespace, from `require("thallium/match")`.
 - `tl.r` - Each of the reporters live here. You can find more details on these [here](../reporters.md).
 - `tl.r.dot` - The dot reporter, same as `require("thallium/r/dot")`.
 - `tl.r.spec` - The spec reporter, same as `require("thallium/r/spec")`.
 - `tl.r.tap` - The tap reporter, same as `require("thallium/r/tap")`.
-- `tl.colorSupport({supported, forced})` - In case, for some reason, you're running it in something like Rhino or Nashorn, which supports colors by default. In this case, you may also probably want to pass appropriate options to the reporters as well, but especially if the environment is configurable (e.g. you've created your own CLI), you'll want to set this.
+- `tl.root` - `internal.root` from `require("thallium/internal")`
+- `tl.reports` - `internal.reports` from `require("thallium/internal")`
+- `tl.hookErrors` - `internal.hookErrors` from `require("thallium/internal")`
+- `tl.location` - `internal.location` from `require("thallium/internal")`
+- `tl.settings` - Various settings to toggle. Each setting has a `setting.get()` and `setting.set(value)` method to get and set the setting, respectively.
 
-You can also find the definitions for this module in `thallium.d.ts` next to the bundle, in case you're using TypeScript with this. Here are a couple specific notes for that:
+    - `tl.settings.windowWidth: number` - The terminal window width as an integer, for reporters.
+    - `tl.settings.newline: string` - The newline character to use, for reporters.
+    - `tl.settings.symbols: {Pass, Fail, Dot}` - The string symbol to use for each of these, for reporters.
+    - `tl.settings.defaultOpts: {print, write, reset}` - The default options to use. See the [reporter options](../reporters.md#options) for more details.
+    - `tl.settings.colorSupport: {supported, forced}` - Set the default color support, in case you're using Rhino, Nashorn, etc., and wish to print terminal colors. Note that this is technically unsupported, but I would at least leave the door open for it.
 
-- The interfaces for `tl.r.dot`, `tl.r.spec`, etc. are exported respectively in `tl.r.Dot`, `tl.r.Spec`, etc. The difference is because of the default export, which I didn't want to export as `tl.r.dot.default`.
-- The `Test` interface from the `thallium/core` interfaces is exported as `CoreTest`.
+You can also find the definitions for this module in `thallium.d.ts` next to the bundle, in case you're using TypeScript with this.
+
+You can also use `thallium-migrate.js` in the root, which has most of the old API monkey-patched back in with deprecation warnings, to ease test migration. It also re-adds the old `assertions` and `create` functions to the exports.

@@ -1,26 +1,29 @@
 'use strict'
 
 # An example of an adapter for using event emitters as reporters. The events
-# are identical to the API events, except some of the names are changed to be a
-# little more idiomatic for event emitters.
+# are identical to the API events.
 #
 # API:
 #
-# t.reporter(...ee: EventEmitter | Reporter)
+# reporter.add(ee: EventEmitter | Reporter, block?: boolean): void
+# reporter.remove(ee: EventEmitter | Reporter): void
 #
-# Events are the same as what's in the API.
-# Each event is called the `value` and `path` properties as arguments.
+# Events are the same as what's in the API, and each event handler is called
+# with the event as the sole argument.
+emitters = new WeakMap
 
-module.exports = ->
-    old = @methods.reporter
-    @methods.reporter = ->
-        old.apply this, (
-            for reporter in arguments
-                if typeof reporter is 'object' and reporter?
-                    do (reporter) -> (ev) ->
-                        reporter.emit ev.type, ev
-                        return
-                else
-                    # Don't fix reporter
-                    reporter
-        )
+unwrap = (reporter) ->
+    unless typeof reporter is 'object' and reporter?
+        reporter
+    else
+        wrapper = emitters.get(reporter)
+        unless wrapper?
+            wrapper = (report) ->
+                reporter.emit(report.type, report)
+                return
+            emitters.set(reporter, wrapper)
+        wrapper
+
+module.exports = (reflect) ->
+    add: (reporter) -> reflect.reporter unwrap(reporter)
+    remove: (reporter) -> reflect.removeReporter unwrap(reporter)

@@ -77,15 +77,21 @@ Note that I don't actually test the documentation's code, but please ensure it o
 
 ### Code organization
 
-- `bin/` - The executables live here. Note that the binaries should also be directly linked to from the `package.json`.
+- `bin` - The executables live here. Note that the binaries should also be directly linked to from the `package.json`.
 
 - `r` - The home of all reporters. Nothing goes here except for reporter modules part of the public API.
 
-- `lib/` - The core of this project. Many public API modules are just thin wrappers for something in here, including the main export.
+- `lib` - The core of this project. Many public API modules are just thin wrappers for something in here, including the main export.
 
-- `lib/cli` - This contains 90% of the logic for the CLI. Dependency injection is heavily used for testing.
+- `lib/assert` - The built-in assertions. Most of these are re-exported under the same name.
 
-- `lib/reporter.js` - This contains common logic for the reporters.
+- `lib/api` - The core API. Both the primary `t` and `reflect` APIs are defined here.
+
+- `lib/core` - The core test state and execution logic. Handle with care, since it's probably the most heavily used. Bugs in this can and often will affect seemingly unrelated tests. Also, the report types are defined here.
+
+- `lib/cli` - This contains 90% of the logic for the CLI. Dependency injection is heavily used so I don't have to create dozens of file system fixtures and use `proxyquire` extensively.
+
+- `lib/reporter` - This contains common logic for the reporters.
 
 - `lib/replaced` - This contains anything replaced going from Node to Browserify.
 
@@ -100,10 +106,12 @@ Note that I don't actually test the documentation's code, but please ensure it o
 - `fixtures` - This contains the fixtures for the various tests.
     - Some of the `test` files are mirrored in [CoffeeScript](http://coffeescript.org/) within `fixtures/large-coffee` to help aid in more real-world usage. These are very explicitly and clearly labeled on the top, so it should be very hard to miss if you're looking at those files.
 
-- `scripts` - This contains various development/test-related utilities, including the mocks. Here's a few globals exported from `scripts/globals.js` you might appreciate knowing about:
+- `scripts` - This contains various development scripts. It's generally uninteresting unless you like looking at shell scripts.
+
+- `test-util` - This contains various test-related utilities, including the mocks. Here's a few globals exported from `test-util/globals` you might appreciate knowing about:
 
     - `Util.push(array, keep = false)` - A Thallium reporter that accepts an array destination to push its reports into. Set `keep` to `true` if you want to retain the original `duration` and `slow` speeds.
-    - `Util.n(type, path, value, {duration, slow})` - Create a reporter node of a given type, path, value, duration, and slow time. The latter is an object because they're almost always either not there or both there, treated as a pair.
+    - `Util.n.*` - Create a report node of a given type.
     - `Util.p(name, index)` - Create a path node with a given name and index.
 
     These are most frequently used for testing reporter output for whatever reason, and the latter two are usually locally aliased.
@@ -113,6 +121,8 @@ Note that I don't actually test the documentation's code, but please ensure it o
 - This is linted with ESLint, and uses my [`isiahmeadows/commonjs` preset](https://npmjs.com/package/eslint-config-isiahmeadows) for the main code base and `isiahmeadows/es6` for the examples.
 
 - [CoffeeLint](http://www.coffeelint.org/) is used to lint the few CoffeeScript files littered around, mostly there for testing and examples.
+
+- When requiring a file, don't include the extension or `/index`, except for explicitly `./index` and `../index` (which avoids an ambiguity with Node, and `./.` is not very obvious). It also helps keep the `require` calls a little cleaner.
 
 - Classes are used, but mostly as C-like structs. Inheritance is minimized. They are usually used for ADTs and grouping state, and functions are preferred for callbacks and one-off things that don't involve delaying execution.
 
@@ -131,13 +141,11 @@ Note that I don't actually test the documentation's code, but please ensure it o
     }
 
     exports.timeout = function (test) {
-        var ctx = test
-
-        while (ctx.timeout === 0 && !(ctx.status & Flags.Root)) {
-            ctx = ctx.parent
+        while (!test.timeout && test.root !== test) {
+            test = test.parent
         }
 
-        return ctx.timeout || 2000 // ms - default timeout
+        return test.timeout || 2000 // ms - default timeout
     }
 
     // Bad
@@ -148,59 +156,21 @@ Note that I don't actually test the documentation's code, but please ensure it o
     }
 
     Test.timeout = function (test) {
-        var ctx = test
-
-        while (ctx.timeout === 0 && !(ctx.status & Flags.Root)) {
-            ctx = ctx.parent
+        while (!test.timeout && test.root !== test) {
+            test = test.parent
         }
 
-        return ctx.timeout || 2000 // ms - default timeout
+        return test.timeout || 2000 // ms - default timeout
     }
     ```
+
+- All non-deterministic tests/groups of tests are suffixed with `(FLAKE)`. This includes part of one of the end-to-end fixtures. This helps me know at a glance whether rerunning it is an option, since they might fail even when working otherwise as intended (e.g. a timer taking 20 milliseconds longer than expected, or a `readdir` returning files in a different order than usual).
 
 ### Tips and idioms
 
 - I use ES6 promises extensively, as it makes code much easier to handle.
 
-- There is a class-ish `methods` helper [here](http://github.com/isiahmeadows/thallium/blob/master/lib/methods.js) used throughout. This is one of the main reasons why I don't really need ES6 - it even handles inheritance and non-enumerability of methods. It's used to define the API, simplify the internal DSL for the core reporters, and decouple script loading in the CLI. Here's an example:
-
-    ```js
-    // This is purely an academic example. Please prefer if-else + enumerated types
-    // over object hierarchies in pull requests, because it's both faster and easier
-    // to maintain.
-    function SumComputer(a, b) {
-        this.a = a
-        this.b = b
-    }
-
-    methods(SumComputer, {
-        compute: function () {
-            var sum = 0
-
-            for (var i = this.a; i < this.b; i++) {
-                sum += this.transform(i)
-            }
-
-            return sum
-        },
-    })
-
-    function SquareSumComputer(a, b) {
-        SumComputer.call(this, a, b)
-    }
-
-    methods(SquareSumComputer, SumComputer, {
-        transform: function (x) { return x * x },
-    })
-
-    function CubeSumComputer(a, b) {
-        SumComputer.call(this, a, b)
-    }
-
-    methods(CubeSumComputer, SumComputer, {
-        transform: function (x) { return x * x * x },
-    })
-    ```
+- There is a class-ish `methods` ~~swiss army knife~~ helper [here](http://github.com/isiahmeadows/thallium/blob/master/lib/methods.js) which is used throughout. This is one of the main reasons why I don't really need ES6 - it even handles inheritance and non-enumerability of methods. It's used to define the API, simplify the internal DSL for the core reporters, and decouple script loading in the CLI. The [report types](http://github.com/isiahmeadows/thallium/blob/master/lib/core/reports.js) are a good example on how this can be used, since it covers most ways you can use this. Don't overuse it, though, mainly because ESLint doesn't catch undefined properties, and object oriented code itself often drives up the boilerplate unnecessarily.
 
 - Lazy iteration of a list can be done by taking a callback and calling it when you're ready with a value. This is done in one of the functions in [the arguments parser](http://github.com/isiahmeadows/thallium/blob/master/lib/methods.js):
 
@@ -242,8 +212,6 @@ Note that I don't actually test the documentation's code, but please ensure it o
         // do things...
     }
     ```
-
-- All non-deterministic tests/groups of tests are suffixed with `(FLAKE)`. This includes part of one of the end-to-end fixtures. This helps me know at a glance whether rerunning it is an option, since they might fail even when working otherwise as intended (e.g. a timer taking 20 milliseconds longer than expected, or a `readdir` returning files in a different order than usual).
 
 - If you're on Linux and have [`nvm`](https://github.com/creationix/nvm) installed, there's a little `scripts/test.sh` script in the root you can run, which will test everything Travis will on your local machine, installing versions that don't exist if necessary. Note that it doesn't actually update existing installations for you, though. It's not quite *that* magical, and I don't suspect you'd want that, either.
 

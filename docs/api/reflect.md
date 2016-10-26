@@ -4,239 +4,213 @@
 
 Most of these are probably only interesting if you're writing [plugins](./plugins.md). They permit some more low-level introspection of individual tests, and make it easier to do some of the other things you need to do.
 
-You can use `t.reflect()` to get a Reflect instance for access into the various introspection APIs.
+This is what's passed into the callback of `t.call(plugin)`.
 
-- [`reflect.activeReporters()`](#activereporters)
-- [`reflect.activeTimeout()`](#activetimeout)
-- [`reflect.add(method, callback)`](#add)
-- [`class reflect.AssertionError`](#assertion-error)
-- [`reflect.async()`](#async)
-- [`reflect.checkInit`](#checkinit)
-- [`reflect.define(assertion, callback)`](#define)
-- [`reflect.try(func)`](#try)
-- [`reflect.extra(count, value, stack)`](#extracount)
-- [`reflect.inline()`](#inline)
-- [`reflect.loc(name, index)`](#loc)
-- [`reflect.methods()`](#methods)
-- [`reflect.parent()`](#parent)
-- [`reflect.report(type, path, value, duration, slow)`](#report)
-- [`reflect.reporters()`](#reporters)
-- [`reflect.root()`](#root)
-- [`reflect.runnable()`](#runnable)
-- [`reflect.scheduler(defer)`](#scheduler)
-- [`reflect.skipped()`](#skipped)
-- [`reflect.timeout()`](#timeout)
-- [`reflect.wrap(method, callback)`](#wrap)
+Also note that `reflect` instances are persistent and tied to the backing test instance. What does this mean? It means as long as you access the same backing test, you get the same `reflect` instance. And because subtests are cleared after running, previous `reflect` instances won't carry over to the next `t.run()`.
 
-<a id="activereporters"></a>
-## reflect.activeReporters()
+- [`reflect.current`](#current)
+- [`reflect.count`](#count)
+- [`reflect.children`](#children)
+- [`reflect.root`](#root)
+- [`reflect.isRoot`](#isroot)
+- [`reflect.isLocked`](#islocked)
+- [`reflect.ownTimeout`](#owntimeout)
+- [`reflect.timeout`](#timeout)
+- [`reflect.ownSlow`](#ownslow)
+- [`reflect.slow`](#slow)
+- [`reflect` test hooks](#test-hooks)
+- [Tests with `reflect.test("name", callback)` and `reflect.testSkip("name", callback)`](#tests)
+- [Reporter management with `reflect.reporter(reporter)` and `reflect.removeReporter(reporter)`](#reporters)
+- [`reflect.name`](#name)
+- [`reflect.index`](#index)
+- [`reflect.parent`](#parent)
+
+<a id="current"></a>
+## reflect.current
 
 ```js
-reflect.activeReporters()
+reflect.current // getter
 ```
 
-Get the currently active reporter list.
+Get the currently initializing test. If nothing is running, this is the root, but if you're currently in a child test, this is a `reflect` for that child test.
 
-<a id="activetimeout"></a>
-## reflect.activeTimeout()
+<a id="count"></a>
+## reflect.count
 
 ```js
-reflect.activeTimeout()
+reflect.count // getter
+```
+
+Get the current number of child tests for this test.
+
+<a id="children"></a>
+## reflect.children
+
+```js
+reflect.children // getter
+```
+
+Get the list of `reflect` instances for this test's children.
+
+<a id="root"></a>
+## reflect.root
+
+```js
+reflect.root // getter
+```
+
+Get the `reflect` instance for the root test.
+
+<a id="isroot"></a>
+## reflect.isRoot
+
+```js
+reflect.isRoot // getter
+```
+
+Whether or not this is the root test.
+
+<a id="islocked"></a>
+## reflect.isLocked
+
+```js
+reflect.isLocked // getter
+```
+
+Whether or not this test is locked (i.e. unsafe to modify). Modification includes adding tests and before/after hooks, and those methods will throw when this test is locked.
+
+<a id="owntimeout"></a>
+## reflect.ownTimeout
+
+```js
+reflect.ownTimeout // getter
+```
+
+Get the own timeout, `0` if it's inherited, or `Infinity` if it was disabled.
+
+<a id="timeout"></a>
+## reflect.timeout
+
+```js
+reflect.timeout // getter
 ```
 
 Get the currently active timeout, or the framework default of 2000 ms.
 
-<a id="add"></a>
-## reflect.add(method, callback)
+<a id="ownslow"></a>
+## reflect.ownSlow
 
 ```js
-reflect.add("method", callback)
-reflect.add({method: callback})
+reflect.ownSlow // getter
 ```
 
-Add one or more methods to this Thallium instance. It either accepts a string `name` and a callback or an object with various methods. Either style is equivalent.
+Get the own slow threshold, `0` if it's inherited, or `Infinity` if it was disabled.
 
-When the method is called, the callback is called with the instance it was called from (which is also passed as `this`) followed by whatever arguments were passed to the original function, unmodified.
-
-Note that this throws an error early if the method already exists (even if it's inherited), or if it's either `reflect` or `_`.
-
-<a id="assertion-error"></a>
-## class reflect.AssertionError
+<a id="slow"></a>
+## reflect.slow
 
 ```js
-new reflect.AssertionError(message, expected, actual)
+reflect.slow // getter
 ```
 
-This is a reference to the base AssertionError constructor, largely derived from [`assertion-error`](http://npm.im/assertion-error), but specialized for this module. Unlike that version, this does not have any special `toJSON` method.
+Get the currently active slow threshold, or the framework default of 2000 ms.
 
-<a id="async"></a>
-## reflect.async()
+<a id="test-hooks"></a>
+## Reflect test hooks
 
 ```js
-reflect.async()
+// Add
+reflect.before(func)
+reflect.beforeAll(func)
+reflect.after(func)
+reflect.afterAll(func)
+
+// Remove
+reflect.removeBefore(func)
+reflect.removeBeforeAll(func)
+reflect.removeAfter(func)
+reflect.removeAfterAll(func)
 ```
 
-Check if this is an async test (i.e. defined as `t.async("test", callback)`).
+Schedule a callback to run on every test. They work [exactly like the main API methods do](./thallium.md#test-hooks), just you can also remove them with the second variants.
 
-<a id="checkinit"></a>
-## reflect.checkInit()
+<a id="tests"></a>
+## Tests
+
+```
+t.test("name", callback)
+t.testSkip("name", callback)
+```
+
+Just like [how you would normally define tests](./thallium.md#tests), you can also add tests via plugins, in case you want to create a test wrapper. This might be useful for, say, a wrapper that enables you to define tests with `co` generator bodies.
 
 ```js
-reflect.checkInit()
+"use strict"
+
+const t = require("thallium");
+const assert = require("thallium/assert");
+const co = require("co");
+const myModule = require("./index.js");
+
+// Create your wrapper
+const test = t.call(reflect => (name, body) => {
+    if ({}.toString.call(body) === "[object GeneratorFunction]") {
+        return reflect.test(name, co.wrap(body));
+    } else {
+        return reflect.test(name, body);
+    }
+});
+
+// And have some async fun!
+function asyncComputation() {
+    return new Promise(resolve => {
+        setTimeout(() => resolve(myModule.value), 10)
+    });
+}
+
+test("testing", function *() {
+    test("things work", function *() {
+        const myValue = yield asyncComputation()
+        const yourValue = "string";
+
+        assert.equal(myValue, yourValue);
+    });
+});
 ```
-
-Assert that this test is currently being initialized. If you are doing an operation that is affected by test state, you *must* check this so your users don't get surprised by their tests accidentally getting in an invalid state. If you're using [`reflect.add`](#add) or [`reflect.define`](#define)/[`t.define`](./thallium.md#define), this is already done for you, so you probably won't be calling this directly very often.
-
-<a id="define"></a>
-# reflect.define(assertion, callback)
-
-```js
-reflect.define("assertion", callback)
-reflect.define({assertion: callback})
-```
-
-This is pretty much the same as calling [`t.define`](./thallium.md#define) with the same arguments, but if `t.define()` was changed at any point, this will always work like it's supposed to. Also, this returns `undefined`, so it's unsuitable for chaining.
-
-<a id="try"></a>
-## reflect.try(func)
-
-```js
-reflect.try(func)
-t.try(func)
-```
-
-These run a function when the assertions are being run, and is guaranteed to report errors thrown as within that test. This is probably mostly useful for plugin authors dealing with inline tests, for simple setup and/or cleanup within those. Note that it isn't safe to call API methods within this, though.
-
-```js
-t.test("test")
-.try(() => foo.initValue())
-.equal(foo.getValue(), "something")
-```
-
-Note that the callback is called with `undefined` as `this` and no arguments. The callback is *not* a plugin, and won't be treated as such.
-
-<a id="extra"></a>
-## reflect.extra(count, value, stack)
-
-```js
-reflect.extra(count, value, stack)
-```
-
-This creates an extra call data object. It mainly exists to test [reporters](./reporter-api.md). `count` is the number of times, including this time, `done` was called, `value` is the value passed this time, and `stack` is the stack trace at the site of the call.
-
-
-<a id="inline"></a>
-## reflect.inline()
-
-```js
-reflect.inline()
-```
-
-Check if this is an inline test (i.e. defined as `t.test("test").equal(1, 1)`).
-
-
-<a id="loc"></a>
-## reflect.loc(name, index)
-
-```js
-reflect.loc(name, index)
-```
-
-This creates a raw location. It mainly exists to test [reporters](./reporter-api.md). `name` is the name of the test the location points to, and `index` is the index of that location.
-
-<a id="methods"></a>
-## reflect.methods()
-
-```js
-reflect.methods()
-```
-
-Get the associated methods of this instance, as in where the reflect instance came from.
-
-<a id="parent"></a>
-## reflect.parent()
-
-```js
-reflect.parent()
-```
-
-Get the parent instance of this instance. If this is the base Thallium instance (i.e. the result of [`t.create()`](./thallium.md#create) or Thallium's main export), then this will return `undefined`.
-
-<a id="report"></a>
-## reflect.report(type, path, value, duration, slow)
-
-```js
-reflect.report(type, path, value, duration, slow)
-```
-
-This creates a raw report. It mainly exists to test [reporters](./reporter-api.md).
 
 <a id="reporters"></a>
-## reflect.reporters()
+## Reporter management
 
 ```js
-reflect.reporters()
+reflect.reporter(reporter)
+reflect.removeReporter(reporter)
 ```
 
-Get a list of all own reporters, or an empty list if there were none.
+Add or remove a [reporter](../reporters.md). Note that this only exists on the root `reflect`, and not any children.
 
-<a id="root"></a>
-## reflect.root()
+<a id="name"></a>
+## reflect.name
 
 ```js
-reflect.root()
+reflect.name // getter
 ```
 
-Check if this is a root test. This is true at the global scope and for any result of `t.create()`, but false elsewhere.
+Get the test's name. This getter does not exist on the root `reflect`.
 
-<a id="runnable"></a>
-## reflect.runnable()
+<a id="index"></a>
+## reflect.index
 
 ```js
-reflect.runnable()
+reflect.index // getter
 ```
 
-Check if this is a runnable test (i.e. not blacklisted by `t.only()` or skipped).
+Get the test's index. This getter does not exist on the root `reflect`.
 
-<a id="scheduler"></a>
-## reflect.scheduler(defer)
+<a id="parent"></a>
+## reflect.parent
 
 ```js
-reflect.scheduler(invoke => defer(invoke))
+reflect.parent // getter
 ```
 
-Set the async scheduler used internally by Thallium (and Bluebird, which it uses under the hood). Note that Thallium uses a fresh copy of Bluebird under the hood, so setting this won't affect your existing Bluebird installation if you use it yourself.
-
-It mainly exists in case you're running Thallium on a platform without the normal timing constructs such as `process.nextTick` or `setTimeout`, such as Nashorn or Rhino (without ES6 support).
-
-<a id="skipped"></a>
-## reflect.skipped()
-
-```js
-reflect.skipped()
-```
-
-Check if this is a skipped test (i.e. defined by `t.testSkip("test")`, etc.).
-
-<a id="timeout"></a>
-## reflect.timeout()
-
-```js
-reflect.timeout()
-```
-
-Get the own timeout, or 0 if it's inherited or `Infinity` if it was disabled.
-
-<a id="wrap"></a>
-## reflect.wrap(method, callback)
-
-```js
-reflect.wrap("method", callback)
-reflect.wrap({method: callback})
-```
-
-Wrap one or more existing methods on this Thallium instance. It either accepts a name and a callback or an object with various methods. Either style is equivalent.
-
-When the method is called, the callback is called with the original function bound to the current instance and whatever arguments were passed to the original function, unmodified. `this` in the callback is the instance the wrapped method was called on.
-
-Note that this throws an error early if the method doesn't already exist, or if it's either `reflect` or `_`.
+Get the test's parent. This getter does not exist on the root `reflect`.

@@ -70,14 +70,7 @@ Do note that it isn't necessarily comprehensive, although I try to keep it somew
 10. ~~Add more useful introspection methods (e.g. test name, test index, test's children, etc.)~~
 11. ~~Add `t.call(plugin)`, where `plugin` accepts a `reflect` instance, and the result is returned untouched~~
     - ~~Deprecate `t.reflect()`, equivalent to `t.call(reflect => reflect)`~~
-    - ~~Deprecate `t.use(...plugins)`, equivalent to the following:~~
-
-    ```js
-    t.call(reflect => {
-        const t = reflect.methods
-        plugins.forEach(plugin => { plugin.call(t, t) })
-    })
-    ```
+    - ~~Deprecate `t.use(...plugins)`~~
 12. ~~Create before/after lifecycle hooks~~
 13. ~~Rename `t.async` &rarr; `t.test`, deprecate old form~~
 14. ~~Support a `.tl.opts` file to prepend CLI arguments (and way to disable it)~~
@@ -91,7 +84,8 @@ Do note that it isn't necessarily comprehensive, although I try to keep it somew
 20. ~~Add `reflect.current` to get current running test as a `Reflect` (not necessarily that of the backing instance)~~
     - ~~This could potentially be difficult, but will be immensely useful for plugin authors~~
     - ~~Deprecate first `t` argument and `reflect.methods` in favor of this + function scoping~~
-21. Update existing documentation
+21. ~~Update existing documentation~~
+22. ~~Document all the assertions~~
 
 **0.3.x:** (after 0.3.0)
 
@@ -99,10 +93,9 @@ Do note that it isn't necessarily comprehensive, although I try to keep it somew
     - Travis has been having OSX issues lately, making debugging these errors a little harder.
 2. Add diff support to all existing reporters
 3. Create DOM reporter
-4. Document all the assertions
-5. Support flaky tests via first-class retries
+4. Support flaky tests via first-class retries
     - This is a requirement to self-host the runner
-6. Move `thallium/match` and `thallium/assert` implementations out of core
+5. Move `thallium/match` and `thallium/assert` implementations out of core
 
 **0.4:**
 

@@ -5,106 +5,114 @@
 tty = require 'tty'
 {inspect} = require 'util'
 
-windowWidth = unless tty.isatty(1) and tty.isatty(2)
-    75
-else if process.stdout.columns?
-    process.stdout.columns
-else if process.stdout.getWindowSize?
-    process.stdout.getWindowSize(1)[0]
-else if tty.getWindowSize?
-    tty.getWindowSize()[1]
-else
-    75
+windowWidth = do ->
+    if tty.isatty(1) and tty.isatty(2)
+        if process.stdout.columns?
+            return process.stdout.columns
+        if process.stdout.getWindowSize?
+            return process.stdout.getWindowSize(1)[0]
+        if tty.getWindowSize?
+            return tty.getWindowSize()[1]
 
-_ = reset: ->
-    @counter = @tests = @pass = @fail = @skip = 0
-_.reset()
+    return 75
 
-joinPath = (ev) ->
-    (i.name for i in ev.path).join ' '
+print = (text) ->
+    new Promise (resolve, reject) ->
+        process.stdout.write text, (err) ->
+            if err? then reject(err) else resolve()
 
-template = (ev, tmpl, skip) ->
-    _.counter++ unless skip
-
-    console.log tmpl.replace(/%c/g, _.counter)
-                    .replace(/%p/g, joinPath(ev).replace(/\$/g, '$$$$'))
+joinPath = (report) ->
+    report.path.map((i) -> i.name).join ' '
 
 printLines = (value, skipFirst) ->
-    lines = value.replace(/^/gm, '    ').split(/\r?\n/g)
+    lines = value.replace(/^/gm, '    ').split(/\report?\n/g)
+    rest = if skipFirst then lines.slice(1) else lines
 
-    for line in (if skipFirst then lines[1..] else lines)
-        console.log line
+    rest.reduce ((p, line) -> p.then -> print(line)), Promise.resolve()
 
 printRaw = (key, str) ->
-    if str.length > windowWidth - key.length or /\r?\n|[:?-]/.test(str)
-        console.log "  #{key}: |-"
-        printLines str, no
+    if str.length > windowWidth - key.length or /\report?\n|[:?-]/.test(str)
+        print("  #{key}: |-")
+        .then -> printLines(str, no)
     else
-        console.log "  #{key}: #{str}"
+        print("  #{key}: #{str}")
 
-printError = ({value: err}) ->
-    unless err instanceof Error
-        printRaw 'value', inspect(err)
-    else if err.name isnt 'AssertionError'
-        # Let's *not* depend on the constructor being Thallium's...
-        console.log '  stack: |-'
-        printLines err.stack, no
-    else
-        printRaw 'expected', inspect(err.expected)
-        printRaw 'actual', inspect(err.actual)
-        printRaw 'message', err.message
-        console.log '  stack: |-'
-
-        message = err.message
-        err.message = ''
-        printLines err.stack, yes
-        err.message = message
-
-module.exports = (ev) ->
+printError = ({error: err}) ->
     switch
-        when ev.start
-            console.log 'TAP version 13'
+        when err not instanceof Error
+            printRaw 'value', inspect(err)
+        when err.name isnt 'AssertionError'
+            # Let's *not* depend on the constructor being Thallium's...
+            print('  stack: |-')
+            .then -> printLines(err.stack, no)
+        else
+            printRaw 'expected', inspect(err.expected)
+            .then -> printRaw 'actual', inspect(err.actual)
+            .then -> printRaw 'message', err.message
+            .then -> print('  stack: |-')
+            .then ->
+                message = err.message
+                err.message = ''
+                printLines(err.stack, yes).then ->
+                    err.message = message
+                    return
 
-        when ev.enter
-            _.tests++
-            _.pass++
-            # Print a leading comment, to make some TAP formatters prettier.
-            template ev, '# %p', yes
-            template ev, 'ok %c'
+module.exports = ->
+    counter = tests = pass = fail = skip = 0
 
-        # This is meaningless for the output.
-        when ev.leave then
+    template = (report, tmpl, skip) ->
+        counter++ unless skip
+        path = joinPath(report).replace(/\$/g, '$$$$')
+        if report.hook
+            path += if report.name
+                " (#{report.stage})"
+            else
+                " (#{report.stage} ‒ #{report.name})"
 
-        when ev.pass
-            _.tests++
-            _.pass++
-            template ev, 'ok %c %p'
+        print(
+            tmpl.replace(/%c/g, counter)
+                .replace(/%p/g, path))
 
-        when ev.fail
-            _.tests++
-            _.fail++
-            template ev, 'not ok %c %p'
-            console.log '  ---'
-            printError ev
-            console.log '  ...'
+    (report) ->
+        switch
+            when report.isStart
+                counter = tests = pass = fail = skip = 0
+                print('TAP version 13')
 
-        when ev.skip
-            _.skip++
-            template ev, 'ok %c # skip %p'
+            when report.isEnter
+                tests++
+                pass++
+                # Print a leading comment, to make some TAP formatters prettier.
+                template(report, '# %p', true)
+                .then -> template(report, 'ok %c')
 
-        when ev.end
-            console.log "1..#{_.counter}"
-            console.log "# tests #{_.tests}"
-            console.log "# pass #{_.pass}" if _.pass
-            console.log "# fail #{_.fail}" if _.fail
-            console.log "# skip #{_.skip}" if _.skip
-            _.reset()
+            when report.isPass
+                tests++
+                pass++
+                template(report, 'ok %c %p')
 
-        when ev.error
-            console.log 'Bail out!'
-            console.log '  ---'
-            printError ev
-            console.log '  ...'
-            _.reset()
+            when report.isFail, report.isHook
+                tests++
+                fail++
+                template(report, 'not ok %c %p')
+                .then -> print('  ---')
+                .then -> printError(report)
+                .then -> print('  ...')
 
-    return
+            when report.isSkip
+                skip++
+                template(report, 'ok %c # skip %p')
+
+            when report.isEnd
+                p = print("1..#{counter}")
+                .then -> print("# tests #{tests}")
+                if pass then p = p.then -> print("# pass #{pass}")
+                if fail then p = p.then -> print("# fail #{fail}")
+                if skip then p = p.then -> print("# skip #{skip}")
+                p
+
+            when report.isError
+                return print('Bail out!')
+                .then -> print('  ---')
+                .then -> printError(report)
+                .then -> print('  ...')

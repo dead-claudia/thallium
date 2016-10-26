@@ -1,5 +1,3 @@
 # The examples are in ES6.
 root: true
-extends: isiahmeadows/es6
-parserOptions:
-    ecmaVersion: 8
+extends: isiahmeadows/node-4
