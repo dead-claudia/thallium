@@ -20,39 +20,34 @@ describe("cli fs utils", function () {
 
     describe("load()", function () {
         it("works", function () {
-            process.chdir(__dirname)
-            return FSUtil.load(fixture("util/test-module.js"))
-            .then(function (result) {
-                assert.match(result, {exports: "hi!"})
-            })
+            assert.equal(
+                FSUtil.load("./test-module.js", fixture("util")),
+                "hi!")
         })
     })
 
     describe("stat()", function () {
         it("checks files", function () {
             process.chdir(__dirname)
-            return FSUtil.stat(fixture("util/test-module.js"))
-            .then(function (stat) {
-                assert.ok(stat.isFile())
-                assert.notOk(stat.isDirectory())
-            })
+            var stat = FSUtil.stat(fixture("util/test-module.js"))
+
+            assert.ok(stat.isFile())
+            assert.notOk(stat.isDirectory())
         })
 
         it("checks directories", function () {
             process.chdir(__dirname)
-            return FSUtil.stat(fixture("util"))
-            .then(function (stat) {
-                assert.notOk(stat.isFile())
-                assert.ok(stat.isDirectory())
-            })
+            var stat = FSUtil.stat(fixture("util"))
+
+            assert.notOk(stat.isFile())
+            assert.ok(stat.isDirectory())
         })
 
         it("checks things that don't exist", function () {
             process.chdir(__dirname)
-            return FSUtil.stat(fixture("util/nope.js"))
-            .then(function (stat) {
-                assert.notOk(stat.isFile())
-                assert.notOk(stat.isDirectory())
+
+            assert.throwsMatch({code: "ENOENT"}, function () {
+                FSUtil.stat(fixture("util/nope.js"))
             })
         })
     })

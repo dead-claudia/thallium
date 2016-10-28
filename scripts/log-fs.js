@@ -25,8 +25,8 @@ function printEnd(str, hrtime) {
 
     var end = process.hrtime(hrtime)
 
-    console.error("[" + new Date().toISOString() + "]: " + str +
-        " (" + (end[0] * 1e6 + end[1] / 1e3) + " µs)")
+    console.error("[" + new Date().toISOString() + "]: " + str + " (" +
+        (end[0] * 1e6 + end[1] / 1e3) + " µs)")
 }
 
 function printStack(source) {
@@ -129,6 +129,10 @@ function move(name) {
     }
 }
 
+function read(fd) {
+    return typeof fd === "number" ? "read fd " + fd : ""
+}
+
 patch(fs, "access", simple("access"), false)
 patch(fs, "accessSync", simple("access"), true)
 patch(fs, "appendFile", simple("appendFile"), false)
@@ -171,12 +175,8 @@ patch(fs, "mkdtemp", simple("mkdtemp"), false)
 patch(fs, "mkdtempSync", simple("mkdtemp"), true)
 patch(fs, "open", simple("open"), false)
 patch(fs, "openSync", simple("open"), true)
-patch(fs, "read", function (fd) {
-    return typeof fd === "number" ? "read fd " + fd : ""
-}, false)
-patch(fs, "readSync", function (fd) {
-    return typeof fd === "number" ? "read fd " + fd : ""
-}, true)
+patch(fs, "read", read, false)
+patch(fs, "readSync", read, true)
 patch(fs, "readdir", simple("readdir"), false)
 patch(fs, "readdirSync", simple("readdir"), true)
 patch(fs, "readFile", simple("readFile"), false)
@@ -224,7 +224,5 @@ if (require.main === module) {
 
     process.argv[1] = moduleName
     process.argv.splice(2, 1)
-    return Module._load(moduleName, null, true)
+    Module._load(moduleName, null, true)
 }
-
-return undefined

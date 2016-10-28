@@ -2,6 +2,7 @@
 
 var path = require("path")
 var parse = require("../../lib/cli/parse")
+var Warning = require("../../lib/cli/init-common").Warning
 
 describe("cli args parsing", function () {
     function alias(description, str, opts) {
@@ -83,7 +84,7 @@ describe("cli args parsing", function () {
             var args = str ? str.split(/\s+/g) : []
 
             it("fails with missing argument for " + str, function () {
-                assert.throws(Error, function () { parse(args) })
+                assert.throws(Warning, function () { parse(args) })
             })
         }
 

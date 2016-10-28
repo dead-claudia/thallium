@@ -30,13 +30,13 @@ function fix(value) {
 }
 
 module.exports = function (report) {
-    if (report.path == null) {
-        console.log(report.type + " = " + fix(report.error))
-    } else {
-        var path = report.path
-        .map(function (x) { return "[" + x.index + ": " + x.name + "]" })
-        .join(" > ")
+    var path = report.type
 
-        console.log(report.type + " " + path + " = " + fix(report.error))
+    if (report.path != null) {
+        path += report.path
+            .map(function (x) { return " [" + x.index + ": " + x.name + "]" })
+            .join(" >")
     }
+
+    console.log(path + " = " + fix(report.error))
 }

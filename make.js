@@ -9,23 +9,23 @@ var semver = require("semver")
 var pkg = require("./package")
 
 function c(cmd) {
-    return path.resolve(__dirname, "./node_modules/.bin", cmd)
+    return path.resolve(__dirname, "node_modules/.bin", cmd)
 }
 
 function exec(str, cb) {
+    if (Array.isArray(str)) str = str.join(" ")
     echo("exec: " + str)
     return global.exec(str, {stdio: "inherit"}, cb)
 }
 
 function task(name, callback) {
-    target[name] = function () {
+    target[name] = function (arg) {
         if (callback.length) {
-            echo("=== Task `" + name + "`, args: " +
-                arguments[0].join(" ") + " ===")
+            echo("=== Task `" + name + "`, args: " + arg.join(" ") + " ===")
         } else {
             echo("=== Task `" + name + "` ===")
         }
-        return callback.apply(undefined, arguments)
+        return callback(arg)
     }
 }
 
@@ -60,16 +60,11 @@ task("test:node", function () {
 })
 
 var dirs = [
-    "bin", "fixtures", "helpers", "lib", "r", "scripts", "test", "migrate",
+    "bin", "fixtures", "helpers", "lib", "r", "test", "test-util", "migrate",
     "assert", "match",
 ].join(",")
 
-var patterns = [
-    "{" + dirs + "}/**/{.,}*.js",
-    "{" + dirs + "}/**/{.,}*.coffee",
-    "{.,}*.js",
-    "{.,}*.coffee",
-]
+var patterns = ["{" + dirs + "}/**/{.,}*.{js,coffee}", "{.,}*.{js,coffee}"]
 
 // This creates a closure with `onchange` to not use the memoized versions
 // ShellJS replaces them with after the initial tick.
@@ -80,9 +75,9 @@ function watch(task) {
     var timeout
 
     function execute() {
-        for (var i = 0; i < queue.length; i++) {
-            echo(queue[i].event + " " + queue[i].path)
-        }
+        queue.forEach(function (event) {
+            echo(event.name + " " + event.path)
+        })
 
         queue = []
         active = true
@@ -97,45 +92,38 @@ function watch(task) {
         cwd: __dirname,
         ignored: ["./thallium{,-migrate}.js"],
     })
-    .on("all", function (event, path) {
+    .on("all", function (name, path) {
         // Give time for the file changes to settle by delaying and debouncing
         // the `onchange` task.
         if (timeout != null) clearTimeout(timeout)
-        queue.push({event: event, path: path})
+        queue.push({name: name, path: path})
         timeout = setTimeout(function () {
             timeout = undefined
             if (!active) execute()
         }, 500)
     })
-    .on("error", function (error) {
-        console.error(error.stack)
+    .on("error", function (err) {
+        console.error(err.stack)
     })
     .once("ready", function () {
         console.error('Watching "' + patterns.join('", "') + '"...')
     })
 }
 
-task("watch", function () {
-    watch("test")
-})
-
-task("watch:chrome", function () {
-    watch("test:chrome")
-})
-
-task("watch:phantomjs", function () {
-    watch("test:phantomjs")
-})
-
-task("watch:node", function () {
-    watch("test:node")
-})
+task("watch", function () { watch("test") })
+task("watch:chrome", function () { watch("test:chrome") })
+task("watch:phantomjs", function () { watch("test:phantomjs") })
+task("watch:node", function () { watch("test:node") })
 
 task("bundle", function () {
-    exec(c("browserify") +
-        " -dr ./lib/browser-bundle.js:thallium -o thallium.js")
-    exec(c("browserify") +
-        " -dr ./migrate/bundle.js:thallium -o thallium-migrate.js")
+    exec([
+        c("browserify"),
+        " -dr ./lib/browser-bundle.js:thallium -o thallium.js",
+    ])
+    exec([
+        c("browserify"),
+        " -dr ./migrate/bundle.js:thallium -o thallium-migrate.js",
+    ])
 })
 
 task("release", function (args) {
@@ -199,12 +187,12 @@ task("release", function (args) {
 
     target.bundle()
 
-    // Add everything
-    exec("git add thallium.js package.json CHANGELOG.md")
-
     // Increment the package version and get the printed version
     pkg.version = semver.inc(pkg.version, increment)
-    JSON.stringify(pkg).to(require.resolve("../package"))
+    JSON.stringify(pkg).to(path.resolve(__dirname, "package.json"))
+
+    // Add everything
+    exec("git add thallium.js package.json CHANGELOG.md")
 
     exec("git commit --message=v" + pkg.version)
     exec("git tag v" + pkg.version)

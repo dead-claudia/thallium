@@ -23,7 +23,7 @@ describe("cli runner", function () {
 
         ["start", "enter", "leave", "pass", "skip", "end"]
         .forEach(function (type) {
-            it("doesn't trigger for \"" + type + "\" events", function () {
+            it("doesn't trigger for \"" + type + "\" reports", function () {
                 var state = {fail: false}
                 var reporter = Run.exitReporter(state)
 
@@ -33,7 +33,7 @@ describe("cli runner", function () {
         })
 
         ;["fail", "error"].forEach(function (type) {
-            it("does trigger for \"" + type + "\" events", function () {
+            it("does trigger for \"" + type + "\" reports", function () {
                 var state = {fail: false}
                 var reporter = Run.exitReporter(state)
 
@@ -237,7 +237,7 @@ describe("cli runner", function () {
             var AssertionError = assert.AssertionError
             var ret = []
             var fail = new AssertionError("Expected 1 to not equal 1", 1, 1)
-            var fail2 = new AssertionError("Expected 2 to equal 1", 1, 2)
+            var fail2 = new AssertionError("Expected 1 to equal 2", 2, 1)
             var fail3 = new AssertionError("Expected 'yep' to be a nope",
                 undefined, "yep")
             var sentinel = new Error("sentinel")
@@ -251,7 +251,7 @@ describe("cli runner", function () {
             }
 
             function modOne(t) {
-                t.test("mod-one", function (t) {
+                t.test("mod-one", function () {
                     t.test("1 === 1", function () {
                         assert.equal(1, 1)
                     })
@@ -272,7 +272,7 @@ describe("cli runner", function () {
                         return Promise.reject(sentinel)
                     })
 
-                    t.test("nested", function (t) {
+                    t.test("nested", function () {
                         t.test("nested 2", function () {
                             assert.ok(true)
                         })
@@ -281,12 +281,12 @@ describe("cli runner", function () {
             }
 
             function modTwo(t) {
-                t.test("mod-two", function (t) {
+                t.test("mod-two", function () {
                     t.test("1 === 2", function () {
                         assert.equal(1, 2)
                     })
 
-                    t.test("expandos don't transfer", function (t) {
+                    t.test("expandos don't transfer", function () {
                         assert.notHasKey(t, "foo")
                     })
 

@@ -8,7 +8,7 @@ represent more real-world usage.
 t = require 'thallium'
 path = require 'path'
 Common = require '../../../lib/cli/common.js'
-gp = require '../../../lib/cli/glob-parent.js'
+{globParent: gp} = require '../../../lib/cli/init-common.js'
 assert = require 'thallium/assert'
 
 t.test 'cli common', ->

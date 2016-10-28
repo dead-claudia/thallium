@@ -1,1 +1,3 @@
-extends: ../../lib/cli/.eslintrc.yml
+extends: ../../.eslintrc.yml
+env:
+    node: true

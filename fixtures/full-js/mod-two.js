@@ -8,9 +8,9 @@ t.test("mod-two", function () {
         assert.equal(1, 2)
     })
 
-    function isNope(str) {
-        if (str !== "nope") {
-            assert.fail("Expected {actual} to be a nope", {actual: str})
+    function isNope(actual) {
+        if (actual !== "nope") {
+            assert.fail("Expected {actual} to be a nope", {actual: actual})
         }
     }
 

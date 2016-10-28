@@ -31,10 +31,7 @@ describe("cli glob stream", function () {
                 GS.addStream(Object.create(null), combined, streams, stream)
             })
 
-            combined.on("data", function (data) {
-                results.push(data)
-            })
-
+            combined.on("data", function (data) { results.push(data) })
             combined.on("end", function () {
                 assert.match(results, [
                     "stream 1",
@@ -61,9 +58,7 @@ describe("cli glob stream", function () {
 
             GS.addStream(Object.create(null), combined, [s], s)
 
-            combined.on("data", function (data) {
-                results.push(data)
-            })
+            combined.on("data", function (data) { results.push(data) })
 
             combined.on("end", function () {
                 assert.match(results, [
@@ -91,6 +86,7 @@ describe("cli glob stream", function () {
                     }, ms)
                 }
             }
+
             var s1 = through2.obj(delay(200))
             var s2 = through2.obj(delay(30))
             var s3 = through2.obj(delay(100))
@@ -102,9 +98,7 @@ describe("cli glob stream", function () {
                 GS.addStream(Object.create(null), combined, streams, stream)
             })
 
-            combined.on("data", function (data) {
-                results.push(data)
-            })
+            combined.on("data", function (data) { results.push(data) })
             combined.on("end", function () {
                 assert.match(results, [
                     "stream 1",
@@ -139,12 +133,8 @@ describe("cli glob stream", function () {
             GS.addStream(Object.create(null), combined, streams, s1)
             GS.addStream(Object.create(null), combined, streams, s2)
 
-            combined.on("data", function (data) {
-                streamData.push(data)
-            })
-            combined.on("error", function (err) {
-                error = err
-            })
+            combined.on("data", function (data) { streamData.push(data) })
+            combined.on("error", function (err) { error = err })
             combined.on("end", function () {
                 assert.hasOwn(error, "message", "stop")
                 assert.match(streamData, ["okay"])
@@ -163,13 +153,8 @@ describe("cli glob stream", function () {
 
         var oldCwd = process.cwd()
 
-        beforeEach(function () {
-            process.chdir(__dirname)
-        })
-
-        afterEach(function () {
-            process.chdir(oldCwd)
-        })
+        beforeEach(function () { process.chdir(__dirname) })
+        afterEach(function () { process.chdir(oldCwd) })
 
         function read(globs) {
             return new Promise(function (resolve, reject) {
@@ -177,12 +162,8 @@ describe("cli glob stream", function () {
                 var list = []
 
                 stream.on("error", reject)
-                stream.on("data", function (file) {
-                    list.push(file)
-                })
-                stream.on("end", function () {
-                    resolve(list)
-                })
+                stream.on("data", function (file) { list.push(file) })
+                stream.on("end", function () { resolve(list) })
             })
         }
 

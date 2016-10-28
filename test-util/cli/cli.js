@@ -6,6 +6,7 @@ var interpret = require("interpret")
 var peach = require("../../lib/util").peach
 var parse = require("../../lib/cli/parse")
 var State = require("../../lib/cli/run").State
+var methods = require("../../lib/methods")
 
 var hasOwn = Object.prototype.hasOwnProperty
 
@@ -50,10 +51,12 @@ var interpretMocks = {
     "node-jsx": function () { return {install: function () {}} },
 }
 
-var interpretModules = {} // eslint-disable-line newline-after-var
+var interpretModules = {}
 
-;(function () {
-    function addSingle(mod) {
+Object.keys(interpret.jsVariants)
+.map(function (key) { return interpret.jsVariants[key] })
+.forEach(function (mod) {
+    (Array.isArray(mod) ? mod : [mod]).forEach(function (mod) {
         if (mod == null) {
             // do nothing - it's a native extension.
         } else if (typeof mod === "string") {
@@ -61,25 +64,18 @@ var interpretModules = {} // eslint-disable-line newline-after-var
         } else {
             interpretModules[mod.module] = true
         }
+    })
+})
+
+function makeMatcher(resolve, globs) {
+    var glob, single
+
+    if (Array.isArray(globs)) {
+        if (globs.length !== 1) return new MultiMatcher(resolve, globs)
+        glob = globs[0]
+    } else {
+        glob = globs
     }
-
-    for (var key in interpret.jsVariants) {
-        if ({}.hasOwnProperty.call(interpret.jsVariants, key)) {
-            var mod = interpret.jsVariants[key]
-
-            if (Array.isArray(mod)) {
-                for (var i = 0; i < mod.length; i++) {
-                    addSingle(mod[i])
-                }
-            } else {
-                addSingle(mod)
-            }
-        }
-    }
-})()
-
-function singleMatcher(resolve, glob) {
-    var single
 
     if (glob[0] === "!") {
         single = "!" + resolve(glob.slice(1))
@@ -87,234 +83,219 @@ function singleMatcher(resolve, glob) {
         single = resolve(glob)
     }
 
-    var mm = new minimatch.Minimatch(single, {
+    return new minimatch.Minimatch(single, {
         nocase: process.platform === "win32",
         nocomment: true,
     })
-
-    return function (file) {
-        return mm.match(file)
-    }
 }
 
-function multiMatcher(resolve, globs) {
-    var ignores = []
-    var keeps = []
+function MultiMatcher(resolve, globs) {
+    this.ignores = []
+    this.keeps = []
     var opts = {
         nocase: process.platform === "win32",
         nocomment: true,
     }
 
-    for (var i = 0; i < globs.length; i++) {
-        var raw = globs[i]
-
+    globs.forEach(function (raw) {
         if (raw[0] === "!") {
-            raw = raw.slice(1)
-            ignores.push(new minimatch.Minimatch(resolve(raw), opts))
+            this.ignores.push(new minimatch.Minimatch(
+                resolve(raw.slice(1)), opts))
         } else {
-            keeps.push(new minimatch.Minimatch(resolve(raw), opts))
+            this.keeps.push(new minimatch.Minimatch(resolve(raw), opts))
         }
-    }
+    }, this)
+}
 
-    return function (file) {
-        for (var i = 0; i < ignores.length; i++) {
-            if (ignores[i].match(file)) return false
+methods(MultiMatcher, {
+    match: function (file) {
+        for (var i = 0; i < this.ignores.length; i++) {
+            if (this.ignores[i].match(file)) return false
         }
 
-        for (var j = 0; j < keeps.length; j++) {
-            if (keeps[j].match(file)) return true
+        for (var j = 0; j < this.keeps.length; j++) {
+            if (this.keeps[j].match(file)) return true
         }
 
         return false
-    }
+    },
+})
+
+function FileEntry(file) {
+    this.file = file
 }
 
-exports.mock = function (tree) {
-    var files = Object.create(null)
-    var listing = []
-    var cwd = process.platform === "win32" ? "C:\\" : "/"
+methods(FileEntry, {
+    load: function () {
+        throw new Error(this.file + " is not executable!")
+    },
+})
 
-    initTree(cwd, tree)
+function ModuleEntry(factory) {
+    this.factory = factory
+    this.value = undefined
+}
 
-    function initTree(file, entry) {
+methods(ModuleEntry, {
+    // Cache the load, like Node.
+    load: function () {
+        if (this.factory != null) {
+            this.value = (0, this.factory)()
+            this.factory = null
+        }
+
+        return this.value
+    },
+})
+
+function Stat(isFile) {
+    this._isFile = isFile
+}
+
+methods(Stat, {
+    isFile: function () { return this._isFile },
+    isDirectory: function () { return !this._isFile },
+})
+
+function Mock(tree) {
+    this._files = Object.create(null)
+    this._listing = []
+    this._cwd = process.platform === "win32" ? "C:\\" : "/"
+    this._initTree(this._cwd, tree)
+
+    // Bind these exported members
+    this.resolve = this.resolve.bind(this)
+    this.load = this.load.bind(this)
+    this.readGlob = this.readGlob.bind(this)
+    this.readdir = this.readdir.bind(this)
+    this.stat = this.stat.bind(this)
+    this.cwd = this.cwd.bind(this)
+    this.chdir = this.chdir.bind(this)
+}
+
+methods(Mock, {
+    _initTree: function (file, entry) {
         if (entry == null) {
             throw new TypeError("value for entry " + file + " must exist")
         } else if (typeof entry === "string") {
-            // Node tries to execute unknown extensions as JS, but this is
-            // better.
-            files[file] = function (load) {
-                if (!load) return Promise.resolve(entry)
-                return Promise.reject(new Error(file + " is not executable!"))
-            }
-            listing.push(file)
+            this._files[file] = new FileEntry(file)
+            this._listing.push(file)
         } else if (typeof entry === "function") {
-            // Cache the load, like Node.
-            var value
-
-            files[file] = function (load) {
-                if (!load) {
-                    return Promise.reject(
-                        new Error(file + " shouldn't be read!"))
-                }
-                if (entry != null) {
-                    value = {exports: entry()}
-                    entry = null
-                }
-                return Promise.resolve(value)
-            }
-            listing.push(file)
+            this._files[file] = new ModuleEntry(entry)
+            this._listing.push(file)
         } else {
+            var children = this._files[file] = []
             var keys = Object.keys(entry)
-            var children = files[file] = []
 
             for (var i = 0; i < keys.length; i++) {
                 var key = keys[i]
                 var resolved = path.resolve(file, key)
 
                 children.push(path.basename(resolved))
-                initTree(resolved, entry[key])
+                this._initTree(resolved, entry[key])
             }
         }
-    }
+    },
 
-    function resolve(file) {
-        return path.resolve(cwd, file)
-    }
+    resolve: function (file) {
+        return path.resolve(this._cwd, file)
+    },
 
-    function load(file) {
+    load: function (file) {
         // Total hack, but it's easier than implementing Node's resolution
         // algorithm.
         if (file === "thallium") {
-            return load("node_modules/thallium")
+            file = "node_modules/thallium"
         }
 
         if (interpretMocks[file] != null) {
-            return Promise.resolve(interpretMocks[file])
+            return interpretMocks[file]
         }
 
         if (interpretModules[file]) {
-            return Promise.resolve(undefined)
+            return undefined
         }
 
-        var target = resolve(file)
+        var target = this.resolve(file)
 
         // Directories are initialized as objects.
-        if (!hasOwn.call(files, target)) {
-            return Promise.reject(notFound(file))
+        if (!hasOwn.call(this._files, target)) {
+            throw notFound(file)
         }
 
-        var func = files[target]
+        var entry = this._files[target]
 
-        if (typeof func !== "function") func = files[target + ".js"]
-
-        if (typeof func !== "function") {
-            func = files[path.join(target, "index.js")]
+        if (Array.isArray(entry) || entry == null) {
+            entry = this._files[target + ".js"]
         }
 
-        if (typeof func !== "function") {
-            return Promise.reject(notFound(file))
+        if (Array.isArray(entry)) {
+            entry = this._files[path.join(target, "index.js")]
         }
 
-        return func(true)
-    }
+        if (entry == null) {
+            throw notFound(file)
+        }
 
-    return {
-        resolve: resolve,
-        load: load,
+        return entry.load()
+    },
 
-        read: function (file) {
-            var target = resolve(file)
+    readGlob: function (globs) {
+        var matcher = makeMatcher(this.resolve, globs)
 
-            // Directories are initialized as objects.
-            if (!hasOwn.call(files, target)) {
-                return Promise.reject(fsError({
-                    path: file,
-                    message: "no such file or directory",
-                    code: "ENOENT",
-                    errno: -2,
-                    syscall: "open",
-                }))
-            }
+        return peach(
+            this._listing.filter(function (file) {
+                return matcher.match(file)
+            }),
+            this.load)
+    },
 
-            var func = files[target]
+    readdir: function (dir) {
+        var entry = this._files[this.resolve(dir)]
 
-            if (typeof func === "object") {
-                return Promise.reject(fsError({
-                    message: "illegal operation on a directory",
-                    code: "EISDIR",
-                    errno: -21,
-                    syscall: "read",
-                }))
-            }
+        if (entry == null) {
+            throw fsError({
+                path: dir,
+                message: "no such file or directory",
+                code: "ENOENT",
+                errno: -2,
+                syscall: "scandir",
+            })
+        } else if (Array.isArray(entry)) {
+            return entry.slice()
+        } else {
+            throw fsError({
+                path: dir,
+                message: "not a directory",
+                code: "ENOTDIR",
+                errno: -20,
+                syscall: "scandir",
+            })
+        }
+    },
 
-            return func(false)
-        },
+    stat: function (file) {
+        var entry = this._files[this.resolve(file)]
 
-        readGlob: function (globs) {
-            if (!Array.isArray(globs)) globs = [globs]
+        if (entry == null) {
+            throw fsError({
+                path: file,
+                message: "no such file or directory",
+                code: "ENOENT",
+                errno: -2,
+                syscall: "stat",
+            })
+        } else {
+            return new Stat(!Array.isArray(entry))
+        }
+    },
 
-            var matcher
+    cwd: function () { return this._cwd },
+    chdir: function (dir) { this._cwd = this.resolve(dir) },
+})
 
-            if (globs.length === 1) {
-                matcher = singleMatcher(resolve, globs[0])
-            } else {
-                matcher = multiMatcher(resolve, globs)
-            }
-
-            return Promise.resolve(peach(listing.filter(matcher), load))
-        },
-
-        readdir: function (dir) {
-            var entry = files[resolve(dir)]
-
-            if (typeof entry === "object") {
-                return Promise.resolve(entry.slice())
-            } else if (typeof entry !== "undefined") {
-                return Promise.reject(fsError({
-                    path: dir,
-                    message: "not a directory",
-                    code: "ENOTDIR",
-                    errno: -20,
-                    syscall: "scandir",
-                }))
-            } else {
-                return Promise.reject(fsError({
-                    path: dir,
-                    message: "no such file or directory",
-                    code: "ENOENT",
-                    errno: -2,
-                    syscall: "scandir",
-                }))
-            }
-        },
-
-        stat: function (file) {
-            var entry = files[resolve(file)]
-
-            if (typeof entry === "object") {
-                return Promise.resolve({
-                    isFile: function () { return false },
-                    isDirectory: function () { return true },
-                })
-            } else if (typeof entry !== "undefined") {
-                return Promise.resolve({
-                    isFile: function () { return true },
-                    isDirectory: function () { return false },
-                })
-            } else {
-                return Promise.resolve({
-                    isFile: function () { return false },
-                    isDirectory: function () { return false },
-                })
-            }
-        },
-
-        cwd: function () { return cwd },
-        chdir: function (dir) { cwd = resolve(dir) },
-        exists: function (file) {
-            return Promise.resolve(typeof files[resolve(file)] === "function")
-        },
-    }
+exports.mock = function (tree) {
+    return new Mock(tree)
 }
 
 exports.Loader = function (args, util) {

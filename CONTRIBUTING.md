@@ -168,9 +168,9 @@ Note that I don't actually test the documentation's code, but please ensure it o
 
 ### Tips and idioms
 
-- I use ES6 promises extensively, as it makes code much easier to handle.
+- I use ES6 promises extensively, because it makes the code so much easier to handle.
 
-- There is a class-ish `methods` ~~swiss army knife~~ helper [here](http://github.com/isiahmeadows/thallium/blob/master/lib/methods.js) which is used throughout. This is one of the main reasons why I don't really need ES6 - it even handles inheritance and non-enumerability of methods. It's used to define the API, simplify the internal DSL for the core reporters, and decouple script loading in the CLI. The [report types](http://github.com/isiahmeadows/thallium/blob/master/lib/core/reports.js) are a good example on how this can be used, since it covers most ways you can use this. Don't overuse it, though, mainly because ESLint doesn't catch undefined properties, and object oriented code itself often drives up the boilerplate unnecessarily.
+- There is a class-ish `methods` ~~swiss army knife~~ helper [here](http://github.com/isiahmeadows/thallium/blob/master/lib/methods.js) which is used throughout. This is one of the main reasons why I don't really need ES6 beyond promises - it even handles inheritance and non-enumerability of methods. It's used to define the API, simplify the internal DSL for the core reporters, and decouple script loading in the CLI. The [report types](http://github.com/isiahmeadows/thallium/blob/master/lib/core/reports.js) are a good example on how this can be used, since it covers most ways you can use this. Don't overuse it, though, mainly because ESLint doesn't catch undefined properties, and object oriented code itself often drives up the boilerplate unnecessarily.
 
 - Lazy iteration of a list can be done by taking a callback and calling it when you're ready with a value. This is done in one of the functions in [the arguments parser](http://github.com/isiahmeadows/thallium/blob/master/lib/methods.js):
 

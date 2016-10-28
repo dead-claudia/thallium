@@ -1,7 +1,6 @@
 #!/usr/bin/env node
-"use strict"
-
 /* eslint-env node */
+"use strict"
 
 /**
  * This script loads Thallium, and respawns Node if necessary with the proper
@@ -15,27 +14,32 @@ if (require.main !== module) {
 }
 
 var path = require("path")
-var resolve = require("resolve")
-var parse = require(lookup(process.cwd(), "lib/cli/parse.js", false))
+var Module = require("module")
+var parse = load(process.cwd(), "parse.js", false)
 var args = parse(process.argv.slice(2))
 var base = args.cwd != null ? path.resolve(args.cwd) : process.cwd()
 
-require(lookup(base, "lib/cli/init.js", args.forceLocal))(
-    // Respawn with the local version
-    lookup(base, "bin/tl.js", args.forceLocal), args,
-    function (e) {
-        console.error(e.stack)
-        process.exit(1) // eslint-disable-line no-process-exit
-    },
-    process.exit)
+// Respawn with the local version
+load(base, "init.js", args.forceLocal)(args)
 
 // Prefer a local installation to a global one if at all possible
-function lookup(basedir, name, forceLocal) {
-    if (forceLocal) return path.resolve(__dirname, "..", name)
-
+function load(baseDir, name, forceLocal) {
+    // Hack: hijack Node's internal resolution algorithm to require the file
+    // as if from a fake module in the correct base directory. It also will
+    // avoid several bugs with the `resolve` module (Node's is necessarily more
+    // stable).
     try {
-        return resolve.sync("thallium/" + name, {basedir: basedir})
+        if (!forceLocal) {
+            var m = new Module(path.resolve(baseDir, "dummy.js"), undefined)
+
+            m.filename = m.id
+            m.paths = Module._nodeModulePaths(baseDir)
+            m.loaded = true
+            return m.require("thallium/" + name)
+        }
     } catch (_) {
-        return path.resolve(__dirname, "..", name)
+        // do nothing
     }
+
+    return require("../lib/cli/" + name) // eslint-disable-line global-require
 }

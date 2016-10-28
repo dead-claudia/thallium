@@ -14,9 +14,7 @@ t.test("mod-one", function () {
 
     t.test("bar()", function () {
         return new Promise(function (_, reject) {
-            global.setTimeout(function () {
-                reject(new Error("fail"))
-            }, 0)
+            global.setTimeout(function () { reject(new Error("fail")) }, 0)
         })
     })
 
@@ -25,6 +23,8 @@ t.test("mod-one", function () {
     })
 
     t.test("nested", function () {
-        t.test("nested 2", function () { assert.equal(true, true) })
+        t.test("nested 2", function () {
+            assert.equal(true, true)
+        })
     })
 })
