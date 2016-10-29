@@ -64,8 +64,6 @@
     "glob": "^7.0.5",
     "interpret": "1",
     "minimatch": "^3.0.2",
-    "resolve": "^1.1.7",
-    "through2": "2",
     "util-inspect": "^0.1.8"
   },
   "directories": {
