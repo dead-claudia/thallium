@@ -696,8 +696,13 @@ describe("assert (match)", function () { // eslint-disable-line max-statements, 
         var set1 = new Set()
         var set2 = new Set()
 
+        set1.add("foo")
         set1.add(set1)
+        set1.add("bar")
+
+        set2.add("foo")
         set2.add(set2)
+        set2.add("bar")
 
         check("sets with circular references", set1, set2, {
             deepEqual: true,

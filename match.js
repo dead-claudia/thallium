@@ -285,6 +285,11 @@ function searchFor(avalue, objects, context, left, right) { // eslint-disable-li
     return false
 }
 
+function hasStructure(value, context) {
+    return typeof value === "object" && value !== null ||
+            !(context & Strict) && typeof value === "symbol"
+}
+
 // The set algorithm is structured a little differently. It takes one of the
 // sets into an array, does a cheap identity check, then does the deep check.
 function matchSet(a, b, context, left, right) { // eslint-disable-line max-params, max-len
@@ -300,14 +305,13 @@ function matchSet(a, b, context, left, right) { // eslint-disable-line max-param
 
     // Gather all the objects
     for (var next = iter.next(); !next.done; next = iter.next()) {
-        var value = next.value
+        var bvalue = next.value
 
-        if (typeof value === "object" && value !== null ||
-                !(context & Strict) && typeof value === "symbol") {
+        if (hasStructure(bvalue, context)) {
             // Create the objects map lazily. Note that this also grabs Symbols
             // when not strictly matching, since their description is compared.
             if (count === 0) objects = Object.create(null)
-            objects[count++] = value
+            objects[count++] = bvalue
         }
     }
 
@@ -317,7 +321,11 @@ function matchSet(a, b, context, left, right) { // eslint-disable-line max-param
     // Iterate the object, removing each one remaining when matched (and
     // aborting if none can be).
     for (var i = 0; i < count; i++) {
-        if (!searchFor(alist[i], objects, context, left, right)) return false
+        var avalue = alist[i]
+
+        if (hasStructure(avalue, context)) {
+            if (!searchFor(avalue, objects, context, left, right)) return false
+        }
     }
 
     return true
