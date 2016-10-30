@@ -3,7 +3,8 @@
 // Note: the reports *must* be well formed. The reporter assumes the reports are
 // correct, and it will *not* verify this.
 
-describe("reporter dom", function () {
+// Skipped because it hasn't been finished yet.
+describe.skip("reporter dom", function () {
     // Skip if jsdom doesn't exist
     if (!Util.jsdom) return
 
@@ -21,6 +22,14 @@ describe("reporter dom", function () {
         assert.throws(TypeError, function () { dom(n.fail([p("test", 0)])) })
         assert.throws(TypeError, function () { dom(n.skip([p("test", 0)])) })
         assert.throws(TypeError, function () { dom(n.end()) })
+    })
+
+    it("validates no arguments", function () {
+        Util.r.dom()
+    })
+
+    it("validates a single empty options object", function () {
+        Util.r.dom({})
     })
 
     function test(name, opts) { // eslint-disable-line no-unused-vars

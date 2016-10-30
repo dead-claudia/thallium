@@ -20,6 +20,14 @@ describe("reporter spec", function () {
         assert.throws(TypeError, function () { spec(n.end()) })
     })
 
+    it("validates no arguments", function () {
+        Util.r.spec()
+    })
+
+    it("validates a single empty options object", function () {
+        Util.r.spec({})
+    })
+
     function stack(e) {
         var lines = Util.R.getStack(e).split(/\r?\n/g)
 

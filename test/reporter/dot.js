@@ -20,6 +20,14 @@ describe("reporter dot", function () {
         assert.throws(TypeError, function () { dot(n.end()) })
     })
 
+    it("validates no arguments", function () {
+        Util.r.dot()
+    })
+
+    it("validates a single empty options object", function () {
+        Util.r.dot({})
+    })
+
     function stack(e) {
         var lines = Util.R.getStack(e).split(/\r?\n/g)
 

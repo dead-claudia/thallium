@@ -19,6 +19,14 @@ describe("reporter tap", function () { // eslint-disable-line max-statements
         assert.throws(TypeError, function () { tap(n.end()) })
     })
 
+    it("validates no arguments", function () {
+        Util.r.tap()
+    })
+
+    it("validates a single empty options object", function () {
+        Util.r.tap({})
+    })
+
     function stack(err) {
         var stack = Util.R.getStack(err).split(/\r?\n/g)
 
