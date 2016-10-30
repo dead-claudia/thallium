@@ -86,7 +86,7 @@ Call a [plugin](../plugins.md) with an optional `arg`, and return its result.
 t.reporter(reporter, arg=undefined)
 ```
 
-Use a [reporter](../reporters.md) with an optional `arg`. Note that this only works at the root level.
+Use a [reporter](../reporters.md) with an optional `arg`. Note that this only works at the root level, and it replaces any old one that was previously used.
 
 <a id="timeout"></a>
 ## t.timeout

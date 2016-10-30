@@ -20,7 +20,7 @@ Also note that `reflect` instances are persistent and tied to the backing test i
 - [`reflect.slow`](#slow)
 - [`reflect` test hooks](#test-hooks)
 - [Tests with `reflect.test("name", callback)` and `reflect.testSkip("name", callback)`](#tests)
-- [Reporter management with `reflect.reporter(reporter, arg)` and `reflect.removeReporter(reporter)`](#reporters)
+- [Reporter management with `reflect.reporter(reporter, arg)`, `reflect.hasReporter(reporter)`, and `reflect.removeReporter(reporter)`](#reporters)
 - [`reflect.name`](#name)
 - [`reflect.index`](#index)
 - [`reflect.parent`](#parent)
@@ -183,10 +183,13 @@ test("testing", function *() {
 
 ```js
 reflect.reporter(reporter, arg=undefined)
+reflect.hasReporter(reporter)
 reflect.removeReporter(reporter)
 ```
 
-Add or remove a [reporter](../reporters.md), with an optional `arg` to pass to it. Note that this only exists on the root `reflect`, and not any children.
+Add, check for existence of, or remove a [reporter](../reporters.md), with an optional `arg` to pass to it. Note that this only exists on the root `reflect`, and not any children.
+
+Note that this list is completely separate from the primary reporter set by [`t.reporter(reporter, arg)`](./thallium.md#reporter).
 
 <a id="name"></a>
 ## reflect.name

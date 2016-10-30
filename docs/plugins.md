@@ -92,12 +92,15 @@ module.exports = reflect => {
 
 ## Best Practices
 
-- Try to minimize state within your plugins, especially that which is tied to the Thallium instance. It's often awkward to manage in general.
+- When you publish plugins on npm, you should declare Thallium as a [peer dependency](https://docs.npmjs.com/files/package.json#peerdependencies). This is to ensure your users have the correct version.
+
+- Try to minimize state within your plugins. It's often awkward to manage in general.
 
 - If you need per-test state, use `reflect.addBeforeAll`/etc. and symbols (a polyfill is acceptable) or a WeakMap if you're not worried about broad browser support.
 
 - Try to keep as much of your mutable global state within the plugin closure as you can, so if a user needs to load the plugin separately in multiple places, your plugin will be initialized as many times as they need. Also note that this isn't cached, so it will also be conveniently a clean slate each time.
+    - Caching for repeatable operations like with persistent weak maps don't necessarily count.
 
 - If you wrap a core method, such as in a BDD wrapper wrapping `t.test()`, try to limit how much you change the semantics in the wrapper. Otherwise, it will be very surprising to users of your plugin.
 
-- If you're writing anything assertion-related, it doesn't belong in a plugin. Plugins are meant for things like integrating with Istanbul or creating alternative wrappers for various methods.
+- If you're writing anything assertion-related, it doesn't belong in a plugin. Plugins are meant for things like integrating with tools or creating alternative wrappers for various methods.

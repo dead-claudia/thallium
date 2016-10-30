@@ -107,11 +107,27 @@ export interface HookReport<S extends HookStage> extends ReportBase<"hook"> {
     isAfterAll: this is HookReport<"after all">;
 }
 
-interface Reporter {
-    (report: Report): any | Thenable<any>;
+export type Reporter<T> = ArgReporter<T> | VoidReporter;
+
+export interface ArgReporter<T> {
+    (arg: T): (report: Report) => any | Thenable<any>;
 }
 
-interface Callback {
+export interface VoidReporter {
+    (): (report: Report) => any | Thenable<any>;
+}
+
+export type Plugin<T, R> = ArgPlugin<T, R> | VoidPlugin<R>;
+
+export interface ArgPlugin<T, R> {
+    (reflect: Reflect, arg: T): R;
+}
+
+export interface VoidPlugin<R> {
+    (reflect: Reflect): R;
+}
+
+export interface Callback {
     (): any | Thenable<any>;
 }
 
@@ -201,6 +217,28 @@ interface ReflectCommon {
     afterAll(func: Callback): void;
 
     /**
+     * Whether a hook was previously added with `t.before` or `reflect.before`.
+     */
+    hasBefore(func: Callback): boolean;
+
+    /**
+     * Whether a hook was previously added with `t.beforeAll` or
+     * `reflect.beforeAll`.
+     */
+    hasBeforeAll(func: Callback): boolean;
+
+    /**
+     * Whether a hook was previously added with `t.after` or`reflect.after`.
+     */
+    hasAfter(func: Callback): boolean;
+
+    /**
+     * Whether a hook was previously added with `t.afterAll` or
+     * `reflect.afterAll`.
+     */
+    hasAfterAll(func: Callback): boolean;
+
+    /**
      * Remove a hook previously added with `t.before` or `reflect.before`.
      */
     removeBefore(func: Callback): void;
@@ -233,19 +271,24 @@ interface ReflectCommon {
 
 export interface ReflectRoot extends ReflectCommon {
     /**
-     * Get a copy of the list of all reporters.
+     * Whether a particulare reporter was registered
      */
-    reporters: Reporter[];
+    hasReporter(reporter: Reporter<any>): boolean;
 
     /**
      * Add a reporter.
      */
-    reporter(reporter: Reporter): void;
+    reporter<T>(reporter: Reporter<T>, arg: T): void;
+
+    /**
+     * Add a reporter.
+     */
+    reporter(reporter: VoidReporter): void;
 
     /**
      * Remove a reporter.
      */
-    removeReporter(reporter: Reporter): void;
+    removeReporter(reporter: Reporter<any>): void;
 }
 
 export interface ReflectChild extends ReflectCommon {
@@ -275,7 +318,8 @@ export interface Test {
      * Call a plugin and return the result. The plugin is called with a Reflect
      * instance for access to plenty of potentially useful internal details.
      */
-    call<T>(plugin: (reflect: Reflect) => T): T;
+    call<T, R>(plugin: Plugin<T, R>, arg: T): R;
+    call<R>(plugin: VoidPlugin<R>): R;
 
     /**
      * Whitelist specific tests, using array-based selectors where each entry
@@ -284,18 +328,14 @@ export interface Test {
     only(...selectors: Array<string | RegExp>[]): void;
 
     /**
-     * Add a number of reporters. Note that this does add reporters to skipped
-     * tests, because they're still runnable.
-     *
-     * `block` is `true` if this reporter needs to block while emitting its
-     * data, but still work asynchronously. Useful if you need to have sole
-     * async access to a resource, but there's no lock available. A good example
-     * is having multiple console reporters, in which you probably want to make
-     * at least all but one block.
-     *
-     * Throws an error if this isn't the root test.
+     * Add a reporter. Throws an error if this isn't in the root test.
      */
-    reporter(reporter: Reporter, block?: boolean): void;
+    reporter<T>(reporter: Reporter<T>, arg: T): void;
+
+    /**
+     * Add a reporter. Throws an error if this isn't in the root test.
+     */
+    reporter(reporter: VoidReporter): void;
 
     /**
      * Get the current timeout. 0 means inherit the parent's, and `Infinity`

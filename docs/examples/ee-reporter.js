@@ -1,36 +1,16 @@
 "use strict"
 
-// An example of an adapter for using event emitters as reporters. The events
-// are identical to the API events.
+// An example of an event emitter wrapper to convert it into a reporter. The
+// events are identical to the API events.
 //
 // API:
 //
-// reporter.add(ee: EventEmitter | Reporter, block?: boolean): void
-// reporter.remove(ee: EventEmitter | Reporter, block?: boolean): void
+// wrap(reporter: (arg) => EventEmitter): Reporter
 //
-// Events are the same as what's in the API, and each event handler is called
-// with the event as the sole argument.
-const emitters = new WeakMap()
+// Events are the same as the report `type` property in the API, and each event
+// handler is called with the report as the sole argument.
+module.exports = reporter => arg => {
+    const emitter = reporter(arg)
 
-function unwrap(reporter) {
-    if (typeof reporter !== "object" || reporter === null) return reporter
-
-    let wrapper = emitters.get(reporter)
-
-    if (wrapper == null) {
-        wrapper = report => { reporter.emit(report.type, report) }
-        emitters.set(reporter, wrapper)
-    }
-
-    return wrapper
+    return report => { emitter.emit(report.type, report) }
 }
-
-module.exports = reflect => ({
-    add(reporter, arg) {
-        reflect.reporter(unwrap(reporter), arg)
-    },
-
-    remove(reporter, arg) {
-        reflect.removeReporter(unwrap(reporter), arg)
-    },
-})

@@ -1,7 +1,7 @@
 "use strict"
 
 // An example reporter wrapper using ES observables. Requires an Observable
-// polyfill, but uses `any-observable`.
+// polyfill, but uses `any-observable`. It has to be used as a plugin.
 //
 // reporter: Observable
 //

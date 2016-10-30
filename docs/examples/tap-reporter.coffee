@@ -16,22 +16,24 @@ windowWidth = do ->
 
     return 75
 
+eol = if process.platform is 'win32' then '\r\n' else '\n'
+
 print = (text) ->
     new Promise (resolve, reject) ->
-        process.stdout.write text, (err) ->
+        process.stdout.write text + eol, (err) ->
             if err? then reject(err) else resolve()
 
 joinPath = (report) ->
     report.path.map((i) -> i.name).join ' '
 
 printLines = (value, skipFirst) ->
-    lines = value.replace(/^/gm, '    ').split(/\report?\n/g)
+    lines = value.replace(/^/gm, '    ').split(/\r?\n/g)
     rest = if skipFirst then lines.slice(1) else lines
 
     rest.reduce ((p, line) -> p.then -> print(line)), Promise.resolve()
 
 printRaw = (key, str) ->
-    if str.length > windowWidth - key.length or /\report?\n|[:?-]/.test(str)
+    if str.length > windowWidth - key.length or /\r?\n|[:?-]/.test(str)
         print("  #{key}: |-")
         .then -> printLines(str, no)
     else

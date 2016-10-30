@@ -19,9 +19,13 @@ const windowWidth = (() => {
     return 75
 })()
 
+const eol = process.platform === "win32" ? "\r\n" : "\n"
+
 function print(text) {
     return new Promise((resolve, reject) => {
-        process.stdout.write(text, err => err != null ? reject(err) : resolve())
+        process.stdout.write(text + eol, err => {
+            return err != null ? reject(err) : resolve()
+        })
     })
 }
 
@@ -30,7 +34,7 @@ function joinPath(report) {
 }
 
 function printLines(value, skipFirst) {
-    const lines = value.replace(/^/gm, "    ").split(/\report?\n/g)
+    const lines = value.replace(/^/gm, "    ").split(/\r?\n/g)
     const rest = skipFirst ? lines.slice(1) : lines
 
     return rest.reduce(
@@ -39,7 +43,7 @@ function printLines(value, skipFirst) {
 }
 
 function printRaw(key, str) {
-    if (str.length > windowWidth - key.length || /\report?\n|[:?-]/.test(str)) {
+    if (str.length > windowWidth - key.length || /\r?\n|[:?-]/.test(str)) {
         return print(`  ${key}: |-`)
         .then(() => printLines(str, false))
     } else {
