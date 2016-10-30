@@ -6,35 +6,7 @@ Do note that it isn't necessarily comprehensive, although I try to keep it somew
 
 ## 0.3.0
 
-1. ~~Expose matching algorithm~~
-2. ~~Separate assertions from test instance~~
-3. ~~Allow for arguments to be bound for `t.try` (was `reflect.do`)~~
-4. ~~Remove support for generators in `t.async` in favor of [`co`](https://www.npmjs.com/package/co), async functions, etc.~~
-5. ~~Make most of the CLI/reporter constants configurable~~
-6. ~~Remove `done` callback support for `t.async`, reporters, etc.~~
-7. ~~Allow reporters to be removed~~
-8. ~~Add default config~~
-9. ~~Remove the `thallium` and `_thallium` aliases, and rename the repo's binaries accordingly~~~
-    - ~~Only `tl` is actually documented~~
-10. ~~Add more useful introspection methods (e.g. test name, test index, test's children, etc.)~~
-11. ~~Add `t.call(plugin)`, where `plugin` accepts a `reflect` instance, and the result is returned untouched~~
-    - ~~Deprecate `t.reflect()`, equivalent to `t.call(reflect => reflect)`~~
-    - ~~Deprecate `t.use(...plugins)`~~
-12. ~~Create before/after lifecycle hooks~~
-13. ~~Rename `t.async` &rarr; `t.test`, deprecate old form~~
-14. ~~Support a `.tl.opts` file to prepend CLI arguments (and way to disable it)~~
-15. ~~Add [AppVeyor](https://www.appveyor.com/) support for Windows testing~~
-16. ~~Add PhantomJS 2 to the Travis build~~
-17. ~~Drop support for Node pre-4~~
-    - ~~ES6 goodies now available in the CLI~~
-    - ~~This doesn't happen until I get PhantomJS 2 running~~
-18. ~~Move `reflect.loc` and `reflect.report` to their own module and deprecate them~~
-19. ~~Complete migration utility~~
-20. ~~Add `reflect.current` to get current running test as a `Reflect` (not necessarily that of the backing instance)~~
-    - ~~This could potentially be difficult, but will be immensely useful for plugin authors~~
-    - ~~Deprecate first `t` argument and `reflect.methods` in favor of this + function scoping~~
-21. ~~Update existing documentation~~
-22. ~~Document all the assertions~~
+See the [changelog](https://github.com/isiahmeadows/thallium/blob/master/CHANGELOG.md#v030).
 
 ## 0.3.x
 (not blocking 0.3.0)
