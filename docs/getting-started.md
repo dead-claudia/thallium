@@ -5,16 +5,25 @@
 Thallium is designed to be easy to get started with. But before we continue, there's two things you need to do:
 
 1. Ensure you have [Node.js and npm](https://nodejs.org/en/download/) installed.
+
 2. In a terminal (or Command Prompt if you're in Windows), run the following commands:
 
     ```sh
     # If you're in Windows, use forward slashes (`\`) for the path.
     cd path/to/your/project
 
-    # Install Thallium both globally (if you'd like) and locally.
-    npm install --global thallium
+    # Install Thallium locally (and globally, if you'd like).
     npm install --save-dev thallium
+    npm install --global thallium # Globally
     ```
+
+    If you just install the local version, and you don't have `./node_modules/.bin` in your system path, use `./node_modules/.bin/tl` instead, or if you use Bash (or similar), you can do this:
+
+    ```sh
+    # Now you have `tl`, even though it's not in your $PATH.
+    alias tl='./node_modules/.bin/tl'
+    ```
+
 3. Ensure you're familiar with ES2015/ES6, because all the examples use it. [Here's a blog post on CSS Tricks that does a good job covering some of the big parts](https://css-tricks.com/lets-learn-es2015/), and if you want to dive deeper, [there's plenty of other resources for you to check out](https://github.com/ericdouglas/ES6-Learning).
 
     - In case you're confused about there being two different short names, the whole specification's name is called *ECMA-262 6th Edition, The ECMAScript 2015 Language Specification*, and ES6 and ES2015 come from *ECMAScript 6th Edition* and *ECMAScript 2015*, respectively.
