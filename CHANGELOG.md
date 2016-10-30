@@ -2,6 +2,8 @@
 
 ## v0.3.0
 
+Special shout-out to @zubuzon for picking off numerous bugs littered throughout! :smile:
+
 There is a `thallium-migrate.js` bundle and another `thallium/migrate` module to assist in migrating across the many changes. The latter monkey-patches most of the old API back in to `thallium` itself. It doesn't help that this is a far bigger update than what would be typical of a major update, since I pretty much redesigned the core API.
 
 Here's an explanation of what changed:
