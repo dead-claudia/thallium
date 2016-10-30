@@ -36,6 +36,7 @@ var isFunction = (function () {
 
         return tag === "[object Function]" ||
             tag === "[object GeneratorFunction]" ||
+            tag === "[object AsyncFunction]" ||
             tag === "[object Proxy]"
     }
 
