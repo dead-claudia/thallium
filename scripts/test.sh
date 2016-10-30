@@ -13,8 +13,8 @@ node make lint || exit $?
 
 for i in 4 5 6; do
     nvm which $i > /dev/null 2>&1 || nvm install $i || exit $?
-    nvm exec $i mocha $@ || exit $?
+    nvm exec $i mocha --colors $@ || exit $?
 done
 
 export CHROME_BIN=$(which google-chrome)
-karma start --browsers Chrome,Firefox --single-run || exit $?
+karma start --colors --browsers Chrome,Firefox,PhantomJS --single-run || exit $?
