@@ -1,7 +1,7 @@
 "use strict"
 
-/* global Buffer, Symbol, Uint8Array, DataView, ArrayBuffer, ArrayBufferView,
-Map, Set */
+/* global Symbol, Uint8Array, DataView, ArrayBuffer, ArrayBufferView, Map,
+    Set */
 
 /**
  * Deep matching algorithm for `t.match` and `t.deepEqual`, with zero
@@ -21,8 +21,46 @@ Map, Set */
  * have compile-time macros. (Also, Sweet.js isn't worth the hassle.)
  */
 
+var objectToString = Object.prototype.toString
+var hasOwn = Object.prototype.hasOwnProperty
+
+var supportsUnicode = hasOwn.call(RegExp.prototype, "unicode")
+var supportsSticky = hasOwn.call(RegExp.prototype, "sticky")
+
+// Legacy engines have several issues when it comes to `typeof`.
+var isFunction = (function () {
+    function SlowIsFunction(value) {
+        if (value == null) return false
+
+        var tag = objectToString.call(value)
+
+        return tag === "[object Function]" ||
+            tag === "[object GeneratorFunction]" ||
+            tag === "[object Proxy]"
+    }
+
+    function isPoisoned(object) {
+        return object != null && typeof object !== "function"
+    }
+
+    // In Safari 10, `typeof Proxy === "object"`
+    if (isPoisoned(global.Proxy)) return SlowIsFunction
+
+    // In Safari 8, several typed array constructors are `typeof C === "object"`
+    if (isPoisoned(global.Int8Array)) return SlowIsFunction
+
+    // In old V8, RegExps are callable
+    if (typeof /x/ === "function") return SlowIsFunction // eslint-disable-line
+
+    // Leave this for normal things. It's easily inlined.
+    return function isFunction(value) {
+        return typeof value === "function"
+    }
+})()
+
 // Set up our own buffer check. We should always accept the polyfill, even in
-// Node.
+// Node. Note that it uses `global.Buffer` to avoid including `buffer` in the
+// bundle.
 
 var BufferNative = 0
 var BufferPolyfill = 1
@@ -34,33 +72,31 @@ var bufferSupport = (function () {
 
     // Only Safari 5-7 has ever had this issue.
     if (new FakeBuffer().constructor !== FakeBuffer) return BufferSafari
-    if (typeof Buffer !== "function") return BufferPolyfill
-    if (typeof Buffer.isBuffer !== "function") return BufferPolyfill
+    if (!isFunction(global.Buffer)) return BufferPolyfill
+    if (!isFunction(global.Buffer.isBuffer)) return BufferPolyfill
     // Avoid the polyfill
-    if (Buffer.isBuffer(new FakeBuffer())) return BufferPolyfill
+    if (global.Buffer.isBuffer(new FakeBuffer())) return BufferPolyfill
     return BufferNative
 })()
 
+var globalIsBuffer = bufferSupport === BufferNative
+    ? global.Buffer.isBuffer
+    : undefined
+
 function isBuffer(object) {
-    if (bufferSupport === BufferNative && Buffer.isBuffer(object)) return true
+    if (bufferSupport === BufferNative && globalIsBuffer(object)) return true
     if (bufferSupport === BufferSafari && object._isBuffer) return true
 
     var B = object.constructor
 
-    if (typeof B !== "function") return false
-    if (typeof B.isBuffer !== "function") return false
+    if (!isFunction(B)) return false
+    if (!isFunction(B.isBuffer)) return false
     return B.isBuffer(object)
 }
 
-var objectToString = Object.prototype.toString
-var hasOwn = Object.prototype.hasOwnProperty
-
-var supportsUnicode = hasOwn.call(RegExp.prototype, "unicode")
-var supportsSticky = hasOwn.call(RegExp.prototype, "sticky")
-
 // core-js' symbols are objects, and some old versions of V8 erroneously had
 // `typeof Symbol() === "object"`.
-var symbolsAreObjects = typeof Symbol === "function" &&
+var symbolsAreObjects = isFunction(global.Symbol) &&
     typeof Symbol() === "object"
 
 // `context` is a bit field, with the following bits. This is not as much for
@@ -138,11 +174,11 @@ var ArrayBufferLegacy = 1
 var ArrayBufferCurrent = 2
 
 var arrayBufferSupport = (function () {
-    if (typeof Uint8Array !== "function") return ArrayBufferNone
-    if (typeof DataView !== "function") return ArrayBufferNone
-    if (typeof ArrayBuffer !== "function") return ArrayBufferNone
-    if (typeof ArrayBuffer.isView === "function") return ArrayBufferCurrent
-    if (typeof ArrayBufferView === "function") return ArrayBufferLegacy
+    if (!isFunction(global.Uint8Array)) return ArrayBufferNone
+    if (!isFunction(global.DataView)) return ArrayBufferNone
+    if (!isFunction(global.ArrayBuffer)) return ArrayBufferNone
+    if (isFunction(global.ArrayBuffer.isView)) return ArrayBufferCurrent
+    if (isFunction(global.ArrayBufferView)) return ArrayBufferLegacy
     return ArrayBufferNone
 })()
 
@@ -180,8 +216,8 @@ var isView = (function () {
 // Support checking maps and sets deeply. They are object-like enough to count,
 // and are useful in their own right. The code is rather messy, but mainly to
 // keep the order-independent checking from becoming insanely slow.
-var supportsMap = typeof Map === "function"
-var supportsSet = typeof Set === "function"
+var supportsMap = isFunction(global.Map)
+var supportsSet = isFunction(global.Set)
 
 // One of the sets and both maps' keys are converted to arrays for faster
 // handling.
