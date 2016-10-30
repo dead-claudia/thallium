@@ -1,5 +1,9 @@
 # Changelog
 
+## v0.3.1
+
+- Missed a file...
+
 ## v0.3.0
 
 Special shout-out to @zubuzon for picking off numerous bugs littered throughout! :smile:
