@@ -25,11 +25,11 @@ describe.skip("reporter dom", function () {
     })
 
     it("validates no arguments", function () {
-        Util.r.dom()
+        Util.r.dom.reporter()
     })
 
     it("validates a single empty options object", function () {
-        Util.r.dom({})
+        Util.r.dom.reporter({})
     })
 
     function test(name, opts) { // eslint-disable-line no-unused-vars

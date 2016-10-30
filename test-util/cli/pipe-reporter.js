@@ -29,7 +29,9 @@ function fix(value) {
     return value
 }
 
-module.exports = function (report) {
+module.exports = function () { return reporter }
+
+function reporter(report) {
     var path = report.type
 
     if (report.path != null) {

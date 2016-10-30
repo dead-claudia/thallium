@@ -79,7 +79,7 @@ describe("core (asynchronous behavior)", function () {
 
         sentinel.marker = function () {}
 
-        tt.reporter(Util.push(ret))
+        tt.reporter(Util.push, ret)
 
         tt.test("test", function () {
             called = true
@@ -112,7 +112,7 @@ describe("core (asynchronous behavior)", function () {
 
         sentinel.marker = function () {}
 
-        tt.reporter(Util.push(ret))
+        tt.reporter(Util.push, ret)
 
         tt.test("test", function () {
             called = true
@@ -146,7 +146,7 @@ describe("core (asynchronous behavior)", function () {
 
         sentinel.marker = function () {}
 
-        tt.reporter(Util.push(ret))
+        tt.reporter(Util.push, ret)
 
         tt.test("test", function () {
             called = true

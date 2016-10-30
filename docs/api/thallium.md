@@ -5,13 +5,13 @@
 These are the most common methods you'll ever use.
 
 - [Tests with `t.test(name, callback)` and `t.testSkip(name, callback)`](#tests)
-- [`t.call(plugin)`](#call)
-- [`t.reporter(reporter)`](#reporter)
+- [Using plugins with `t.call(plugin)`](#call)
+- [Using reporters with `t.reporter(reporter, arg?)`](#reporter)
 - [`t.timeout`](#timeout)
 - [`t.slow`](#slow)
 - [`t.only(...selectors)`](#only)
 - [`t.run()`](#run)
-- [Test hooks with `t.before(func)`, `t.beforeAll(func)`, `t.after(func)`, and `t.afterAll(func)`](#test-hooks)
+- [Adding test hooks with `t.before(func)`, `t.beforeAll(func)`, `t.after(func)`, and `t.afterAll(func)`](#test-hooks)
 
 <a id="tests"></a>
 ## Tests
@@ -71,22 +71,22 @@ t.test 'reads files correctly', ->
 ```
 
 <a id="call"></a>
-## t.call(plugin)
+## Using plugins
 
 ```js
-t.call(plugin)
+t.call(plugin, arg=undefined)
 ```
 
-Call a [plugin](../plugins.md), and return its result.
+Call a [plugin](../plugins.md) with an optional `arg`, and return its result.
 
 <a id="reporter"></a>
-## t.reporter(reporter)
+## Using reporters
 
 ```js
-t.reporter(reporter)
+t.reporter(reporter, arg=undefined)
 ```
 
-Use a [reporter](../reporters.md). Note that this will throw if called from a child test.
+Use a [reporter](../reporters.md) with an optional `arg`. Note that this only works at the root level.
 
 <a id="timeout"></a>
 ## t.timeout
@@ -171,7 +171,7 @@ If it's rejected, the rejection always caused by one of two things:
 Either way, it's fatal, the test run has already aborted, and state has already been reset. Because of this, it is actually safe to rerun the tests after a rejection, since it's not in an invalid state unless the error was from Thallium itself (in which [you definitely should report it](https://github.com/isiahmeadows/thallium/issues/new)).
 
 <a id="test-hooks"></a>
-# Test hooks
+# Adding test hooks
 
 ```js
 t.before(func)

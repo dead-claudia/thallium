@@ -110,7 +110,7 @@ Note that I don't actually test the documentation's code, but please ensure it o
 
 - `test-util` - This contains various test-related utilities, including the mocks. Here's a few globals exported from `test-util/globals` you might appreciate knowing about:
 
-    - `Util.push(array, keep = false)` - A Thallium reporter that accepts an array destination to push its reports into. Set `keep` to `true` if you want to retain the original `duration` and `slow` speeds.
+    - `t.reporter(Util.push, array | {ret: array, keep = false})` - A Thallium reporter that accepts an array destination to push its reports into. Use the second form, with `keep` set to `true`, if you want to retain the original `duration` and `slow` speeds.
     - `Util.n.*` - Create a report node of a given type.
     - `Util.p(name, index)` - Create a path node with a given name and index.
 
@@ -221,7 +221,7 @@ Note that I don't actually test the documentation's code, but please ensure it o
     var tt = t.create()
     var ret = []
 
-    tt.reporter(Util.push(ret))
+    tt.reporter(Util.push, ret)
 
     tt.test("test", function () {})
     tt.test("test", function () {})

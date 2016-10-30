@@ -6,13 +6,12 @@ Thallium comes with a few built-in reporters, but currently, they are a work in 
 - `thallium/r/spec` - A reporter modeled very closely to Mocha's default `spec` reporter.
 - `thallium/r/dot` - A reporter modeled very closely to Mocha's default `dot` reporter.
 
-Each built-in reporter must be called like so, and if you don't, you'll get reminded with an error:
+Each built-in reporter can be used like so:
 
 ```js
 var spec = require("thallium/r/spec")
 
-// Note the function call
-t.reporter(spec())
+t.reporter(spec)
 ```
 
 If you are interested in writing your own, consult the reporter API [here](./reporter-api.md)

@@ -109,7 +109,7 @@ describe("cli runner", function () {
                     return {
                         test: {
                             ".tl.js": function () {
-                                t.reporter(Util.push(ret))
+                                t.reporter(Util.push, ret)
                             },
 
                             "one.js": function () {
@@ -142,7 +142,7 @@ describe("cli runner", function () {
                     return {
                         test: {
                             ".tl.js": function () {
-                                t.reporter(Util.push(ret))
+                                t.reporter(Util.push, ret)
                             },
 
                             "one": function () {
@@ -174,7 +174,7 @@ describe("cli runner", function () {
                     return {
                         test: {
                             ".tl.coffee": function () {
-                                t.reporter(Util.push(ret))
+                                t.reporter(Util.push, ret)
                             },
 
                             "one.js": function () {
@@ -207,7 +207,7 @@ describe("cli runner", function () {
                     return {
                         test: {
                             ".tl.js": function () {
-                                t.reporter(Util.push(ret))
+                                t.reporter(Util.push, ret)
                             },
 
                             "one.js": function () {
@@ -321,7 +321,7 @@ describe("cli runner", function () {
                     return {
                         test: {
                             ".tl.js": function () {
-                                t.reporter(Util.push(ret))
+                                t.reporter(Util.push, ret)
                             },
 
                             "mod-one.js": function () { modOne(t) },
@@ -348,7 +348,7 @@ describe("cli runner", function () {
                         },
 
                         ".tl.js": function () {
-                            custom.reporter(Util.push(ret))
+                            custom.reporter(Util.push, ret)
 
                             return {
                                 thallium: custom,

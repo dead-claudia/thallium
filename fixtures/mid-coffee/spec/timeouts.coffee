@@ -33,7 +33,7 @@ t.test 'core (timeouts) (FLAKE)', ->
         tt = create()
         ret = []
 
-        tt.reporter push(ret)
+        tt.reporter push, ret
 
         tt.test 'test', ->
             # It's highly unlikely the engine will take this long to finish.
@@ -51,7 +51,7 @@ t.test 'core (timeouts) (FLAKE)', ->
         tt = create()
         ret = []
 
-        tt.reporter push(ret)
+        tt.reporter push, ret
 
         tt.test 'test', ->
             tt.timeout = 50
@@ -69,7 +69,7 @@ t.test 'core (timeouts) (FLAKE)', ->
         tt = create()
         ret = []
 
-        tt.reporter push(ret)
+        tt.reporter push, ret
 
         tt.test 'test', ->
             tt.timeout = 50
@@ -88,7 +88,7 @@ t.test 'core (timeouts) (FLAKE)', ->
         tt = create()
         ret = []
 
-        tt.reporter push(ret)
+        tt.reporter push, ret
 
         tt.test 'test', ->
             tt.timeout = 50

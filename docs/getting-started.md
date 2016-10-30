@@ -220,7 +220,7 @@ Well...it's nice and all to have this pretty spec reporter, but what if we want 
 const t = require("thallium");
 
 // Register the reporter - don't forget to call it as well
-t.reporter(require("thallium/r/tap")());
+t.reporter(require("thallium/r/tap"));
 ```
 
 And then, install tap-nyan and run `tl` again.
@@ -245,7 +245,7 @@ If you would rather your test files be somewhere else (e.g. `file.spec.js` inste
 const t = require("thallium");
 
 // If we use a config, we have to always specify the reporter we want to use.
-t.reporter(require("thallium/r/spec")());
+t.reporter(require("thallium/r/spec"));
 
 // Specify our files here. This could also be an array of files.
 exports.files = "**/*.spec.js";
@@ -361,7 +361,7 @@ Let's also add a `.tl.ts` config file.
 import t from "thallium";
 import spec from "thallium/r/spec";
 
-t.reporter(spec());
+t.reporter(spec);
 
 // You can also do this, although we're not going to use it.
 // export default {files: "**/*.spec.ts"};
@@ -422,7 +422,7 @@ var thallium = require("thallium");
 var t = thallium.t;
 var assert = thallium.assert;
 
-t.reporter(thallium.r.spec());
+t.reporter(thallium.r.spec);
 
 // Define the tests
 t.test("testing", function () {
@@ -452,7 +452,7 @@ const t = require("thallium");
 const assert = require("thallium/assert");
 const myModule = require("../index.js"); // From earlier
 
-t.reporter(require("thallium/r/spec")())
+t.reporter(require("thallium/r/spec"));
 
 // Define the tests
 t.test("testing", () => {

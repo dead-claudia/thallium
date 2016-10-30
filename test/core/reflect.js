@@ -32,25 +32,29 @@ describe("core (reflect)", function () {
         run({
             beforeAll: function (tt, callback) {
                 tt.call(function (reflect) {
-                    return reflect.beforeAll(callback)
+                    reflect.beforeAll(callback)
+                    assert.equal(reflect.hasBeforeAll(callback), true)
                 })
             },
 
             beforeEach: function (tt, callback) {
                 tt.call(function (reflect) {
-                    return reflect.before(callback)
+                    reflect.before(callback)
+                    assert.equal(reflect.hasBefore(callback), true)
                 })
             },
 
             afterAll: function (tt, callback) {
                 tt.call(function (reflect) {
-                    return reflect.afterAll(callback)
+                    reflect.afterAll(callback)
+                    assert.equal(reflect.hasAfterAll(callback), true)
                 })
             },
 
             afterEach: function (tt, callback) {
                 tt.call(function (reflect) {
-                    return reflect.after(callback)
+                    reflect.after(callback)
+                    assert.equal(reflect.hasAfter(callback), true)
                 })
             },
         })
@@ -58,10 +62,33 @@ describe("core (reflect)", function () {
 
     context("hooks on root", function () {
         run({
-            beforeAll: function (tt, callback) { tt.beforeAll(callback) },
-            beforeEach: function (tt, callback) { tt.before(callback) },
-            afterAll: function (tt, callback) { tt.afterAll(callback) },
-            afterEach: function (tt, callback) { tt.after(callback) },
+            beforeAll: function (tt, callback) {
+                tt.beforeAll(callback)
+                tt.call(function (reflect) {
+                    assert.equal(reflect.hasBeforeAll(callback), true)
+                })
+            },
+
+            beforeEach: function (tt, callback) {
+                tt.before(callback)
+                tt.call(function (reflect) {
+                    assert.equal(reflect.hasBefore(callback), true)
+                })
+            },
+
+            afterAll: function (tt, callback) {
+                tt.afterAll(callback)
+                tt.call(function (reflect) {
+                    assert.equal(reflect.hasAfterAll(callback), true)
+                })
+            },
+
+            afterEach: function (tt, callback) {
+                tt.after(callback)
+                tt.call(function (reflect) {
+                    assert.equal(reflect.hasAfter(callback), true)
+                })
+            },
         })
     })
 
@@ -523,6 +550,58 @@ describe("core (reflect)", function () {
                         "root after each",
                         "root after all",
                     ])
+                })
+            })
+        })
+
+        describe("removing before all", function () {
+            it("works", function () {
+                var tt = Util.create()
+
+                function callback() {}
+                _.beforeAll(tt, callback)
+                tt.call(function (reflect) {
+                    reflect.removeBeforeAll(callback)
+                    assert.equal(reflect.hasBeforeAll(callback), false)
+                })
+            })
+        })
+
+        describe("removing before each", function () {
+            it("works", function () {
+                var tt = Util.create()
+
+                function callback() {}
+                _.beforeEach(tt, callback)
+                tt.call(function (reflect) {
+                    reflect.removeBefore(callback)
+                    assert.equal(reflect.hasBefore(callback), false)
+                })
+            })
+        })
+
+        describe("removing after each", function () {
+            it("works", function () {
+                var tt = Util.create()
+
+                function callback() {}
+                _.beforeEach(tt, callback)
+                tt.call(function (reflect) {
+                    reflect.removeAfter(callback)
+                    assert.equal(reflect.hasAfter(callback), false)
+                })
+            })
+        })
+
+        describe("removing after all", function () {
+            it("works", function () {
+                var tt = Util.create()
+
+                function callback() {}
+                _.afterAll(tt, callback)
+                tt.call(function (reflect) {
+                    reflect.removeAfterAll(callback)
+                    assert.equal(reflect.hasAfterAll(callback), false)
                 })
             })
         })

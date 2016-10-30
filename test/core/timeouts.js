@@ -29,7 +29,7 @@ describe("core (timeouts) (FLAKE)", /** @this */ function () {
         var tt = Util.create()
         var ret = []
 
-        tt.reporter(Util.push(ret))
+        tt.reporter(Util.push, ret)
 
         tt.test("test", function () {
             // It's highly unlikely the engine will take this long to finish
@@ -50,7 +50,7 @@ describe("core (timeouts) (FLAKE)", /** @this */ function () {
         var tt = Util.create()
         var ret = []
 
-        tt.reporter(Util.push(ret))
+        tt.reporter(Util.push, ret)
 
         tt.test("test", function () {
             tt.timeout = 50
@@ -71,7 +71,7 @@ describe("core (timeouts) (FLAKE)", /** @this */ function () {
         var tt = Util.create()
         var ret = []
 
-        tt.reporter(Util.push(ret))
+        tt.reporter(Util.push, ret)
 
         tt.test("test", function () {
             tt.timeout = 50
@@ -93,7 +93,7 @@ describe("core (timeouts) (FLAKE)", /** @this */ function () {
         var tt = Util.create()
         var ret = []
 
-        tt.reporter(Util.push(ret))
+        tt.reporter(Util.push, ret)
 
         tt.test("test", function () {
             tt.timeout = 50

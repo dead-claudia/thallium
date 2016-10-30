@@ -16,6 +16,7 @@ Here's an explanation of what changed:
 - The CLI now has a default config, in case you don't have one. It simply registers the spec reporter.
 - There now exist proper "before each", "after each", "before all", and "after all" hooks. The first two run on every test, but the last two only run on the test they're defined in.
     - There is now a new `hook` event for when errors occur in these.
+    - They have full `reflect` support, including adding, removing, and testing for existence.
 - Plugins may now remove reporters. It is not exposed normally because it's very rare for the end user to want to remove a reporter.
 - `t.call` is the new plugin factory, and it returns the result of the callback.
 - child `reflect` instances now can find their name, index, and children.
@@ -41,6 +42,9 @@ Here's an explanation of what changed:
     - You can use `reflect.isRoot` to differentiate these two.
 - Reporters may now only be changed at the root, not in children. This includes the new `reflect.reporter` and `reflect.removeReporter` methods.
 - The built-in reporters now exclusively use `write`, and no longer use `print`. So `print` is now ignored as an option.
+- `t.reporter` is no longer variadic, and now automatically invokes the reporter with the optional second argument. This has no `thallium/migrate` support, because I have no way of checking whether the reporter is the returned function or the factory itself.
+- `t.reporter` caches based on the factory now.
+- `reflect.reporters` is removed in favor for `reflect.hasReporter`.
 
 ### Things removed
 

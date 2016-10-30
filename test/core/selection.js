@@ -11,7 +11,7 @@ describe("core (selection)", function () {
             var tt = Util.create()
             var ret = []
 
-            tt.reporter(Util.push(ret))
+            tt.reporter(Util.push, ret)
 
             tt.test("one", function () {
                 tt.testSkip("inner", function () { assert.fail("fail") })
@@ -45,7 +45,7 @@ describe("core (selection)", function () {
             var tt = Util.create()
             var ret = []
 
-            tt.reporter(Util.push(ret))
+            tt.reporter(Util.push, ret)
             tt.only(["one", "inner"])
 
             tt.test("one", function () {
@@ -73,7 +73,7 @@ describe("core (selection)", function () {
             var tt = Util.create()
             var ret = []
 
-            tt.reporter(Util.push(ret))
+            tt.reporter(Util.push, ret)
             tt.only([/^one$/, "inner"])
 
             tt.test("one", function () {

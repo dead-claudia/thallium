@@ -26,11 +26,11 @@ function unwrap(reporter) {
 }
 
 module.exports = reflect => ({
-    add(reporter) {
-        reflect.reporter(unwrap(reporter))
+    add(reporter, arg) {
+        reflect.reporter(unwrap(reporter), arg)
     },
 
-    remove(reporter) {
-        reflect.removeReporter(unwrap(reporter))
+    remove(reporter, arg) {
+        reflect.removeReporter(unwrap(reporter), arg)
     },
 })

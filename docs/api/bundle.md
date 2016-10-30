@@ -14,7 +14,7 @@ var tl = require("thallium")
 var t = tl.t
 
 // Print the results to the console with the spec reporter.
-t.reporter(tl.r.spec())
+t.reporter(tl.r.spec)
 </script>
 
 <!-- Load your tests -->
@@ -40,7 +40,7 @@ t.use(function (t) {
     var ansi_up = require("ansi_up")
     var elem = document.getElementById("output")
 
-    t.reporter(tl.r.spec({
+    t.reporter(tl.r.spec, {
         print: function (line, callback) {
             elem.innerHTML += ansi_up.ansi_to_html(line)
             return callback()
@@ -50,7 +50,7 @@ t.use(function (t) {
             elem.innerHTML = ""
             return callback()
         },
-    }))
+    })
 })
 </script>
 

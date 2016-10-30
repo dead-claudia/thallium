@@ -53,6 +53,11 @@ var Util = global.Util = {
     inspect: require("../lib/replaced/inspect.js"),
 
     /* eslint-enable global-require */
+
+    // For some of the reporters
+    const: function (x) {
+        return function () { return x }
+    },
 }
 
 // Inject a no-op into browsers (so the relevant tests actually run), but not
@@ -149,7 +154,14 @@ Util.jsdom = (function () {
     }
 })()
 
-Util.push = function (ret, keep) {
+Util.push = function (ret) {
+    var keep = false
+
+    if (!Array.isArray(ret)) {
+        keep = ret.keep
+        ret = ret.ret
+    }
+
     return function push(report) {
         // Any equality tests on either of these are inherently flaky.
         // Only add the relevant properties

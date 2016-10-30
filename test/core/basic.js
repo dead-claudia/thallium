@@ -202,9 +202,9 @@ describe("core (basic)", function () {
             var called = 0
             var err
 
-            tt.reporter(function (res) {
+            tt.reporter(Util.const(function (res) {
                 if (res.isFail) err = res.error
-            })
+            }))
 
             tt.test("test", function () {
                 tt.test("foo", function () { called++ })
@@ -235,7 +235,7 @@ describe("core (basic)", function () {
             var tt = Util.create()
             var sentinel = createSentinel("fail")
 
-            tt.reporter(function () { throw sentinel })
+            tt.reporter(Util.const(function () { throw sentinel }))
 
             return tt.run().then(
                 function () { assert.fail("Expected a rejection") },

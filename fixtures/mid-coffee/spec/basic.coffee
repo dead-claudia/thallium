@@ -119,7 +119,7 @@ t.test 'core (basic)', ->
             called = 0
             err = undefined
 
-            tt.reporter (res) ->
+            tt.reporter -> (res) ->
                 err = res.error if res.isFail
                 return
 

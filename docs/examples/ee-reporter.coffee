@@ -1,7 +1,7 @@
 'use strict'
 
-# An example of an adapter for using event emitters as reporters. The events
-# are identical to the API events.
+# An example of an adapter for using both normal closure-based factories and
+# event emitters as reporters. The events are identical to the API events.
 #
 # API:
 #
@@ -25,5 +25,5 @@ unwrap = (reporter) ->
         wrapper
 
 module.exports = (reflect) ->
-    add: (reporter) -> reflect.reporter unwrap(reporter)
-    remove: (reporter) -> reflect.removeReporter unwrap(reporter)
+    add: (reporter, arg) -> reflect.reporter unwrap(reporter), arg
+    remove: (reporter, arg) -> reflect.removeReporter unwrap(reporter), arg

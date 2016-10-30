@@ -10,7 +10,7 @@
 const Observable = require("any-observable")
 
 module.exports = reflect => new Observable(observer => {
-    const reporter = report => {
+    const reporter = () => report => {
         if (report.end) observer.complete(report)
         else observer.next(report)
     }

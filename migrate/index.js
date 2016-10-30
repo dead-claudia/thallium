@@ -19,7 +19,6 @@ var Thallium = require("../lib/api/thallium")
 var assert = require("../assert")
 var AssertionError = assert.AssertionError
 var format = assert.format
-var hasOwn = Object.prototype.hasOwnProperty
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * - `reflect.checkInit()` is deprecated in favor of `reflect.locked` and    *
@@ -522,30 +521,13 @@ methods(Reflect, {
 })
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- * - The `block` property on reporters is deprecated.                        *
- * - The method is no longer variadic.                                       *
- * - The method is now void.                                                 *
+ * `reflect.reporters` -> `reflect.hasReporter`                              *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-var addReporter = Thallium.prototype.reporter
-
-methods(Thallium, {
-    reporter: function (reporter) { // eslint-disable-line no-unused-vars
-        if (arguments.length > 1) {
-            Common.warn("`t.reporter()` is no longer variadic. Please add " +
-                "each reporter individually.")
-        }
-
-        for (var i = 0; i < arguments.length; i++) {
-            var entry = arguments[i]
-
-            if (hasOwn.call(entry, "block")) {
-                Common.warn("The `block` property on reporters is " +
-                    "deprecated and no longer used.")
-            }
-
-            addReporter.call(this, entry)
-        }
-
-        return this
+methods(Reflect, {
+    get reporters() {
+        Common.warn("`reflect.reporters` is deprecated. Use " +
+            "`reflect.hasReporter` instead to check for existence of a " +
+            "reporter.")
+        return this._.methods
     },
 })

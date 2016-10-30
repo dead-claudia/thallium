@@ -20,7 +20,7 @@ Also note that `reflect` instances are persistent and tied to the backing test i
 - [`reflect.slow`](#slow)
 - [`reflect` test hooks](#test-hooks)
 - [Tests with `reflect.test("name", callback)` and `reflect.testSkip("name", callback)`](#tests)
-- [Reporter management with `reflect.reporter(reporter)` and `reflect.removeReporter(reporter)`](#reporters)
+- [Reporter management with `reflect.reporter(reporter, arg)` and `reflect.removeReporter(reporter)`](#reporters)
 - [`reflect.name`](#name)
 - [`reflect.index`](#index)
 - [`reflect.parent`](#parent)
@@ -182,11 +182,11 @@ test("testing", function *() {
 ## Reporter management
 
 ```js
-reflect.reporter(reporter)
+reflect.reporter(reporter, arg=undefined)
 reflect.removeReporter(reporter)
 ```
 
-Add or remove a [reporter](../reporters.md). Note that this only exists on the root `reflect`, and not any children.
+Add or remove a [reporter](../reporters.md), with an optional `arg` to pass to it. Note that this only exists on the root `reflect`, and not any children.
 
 <a id="name"></a>
 ## reflect.name

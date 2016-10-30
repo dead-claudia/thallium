@@ -58,8 +58,8 @@ From here, you may use global plugins, global reporters, or even instantiate a c
 // Your .tl.js
 const t = require("thallium")
 
-t.reporter(require("my-reporter")())
-t.use(require("my-thallium-integration")())
+t.reporter(require("my-reporter"))
+t.use(require("my-thallium-integration"))
 ```
 
 This config is searched for from the bottom of the glob's parent all the way to the root, so if you specify a glob of `test/**/*.js` from inside a `/home/my-name/projects/module`, Thallium will still be able to find a config all the way at `projects/.tl.js`, if it can't find one at `projects/module/test/.tl.js` or `projects/module/.tl.js`.
@@ -81,7 +81,7 @@ If you need to load a module before running the tests, it's very simple. Just `r
 const t = require("thallium")
 
 require("should")
-t.reporter(require("thallium/r/spec")())
+t.reporter(require("thallium/r/spec"))
 ```
 
 If you need to require something before even the config is loaded, like if you need to load a specific environment for your config in a complex CI scenario, or if you just need to shim something within `require` that may affect how your config is loaded, you can use the `--require` flag.

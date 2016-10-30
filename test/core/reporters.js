@@ -24,151 +24,274 @@ describe("core (reporters)", function () { // eslint-disable-line max-statements
         return e
     }
 
-    function reporters(reflect) {
-        return reflect.reporters
-    }
-
-    function checkBasic(_) {
+    context("normal", function () {
         it("added to root correctly", function () {
             var tt = Util.create()
+            var ret = []
 
-            function plugin() {}
+            tt.reporter(Util.push, ret)
 
-            _.reporter(tt, plugin)
-            assert.match(tt.call(reporters), [plugin])
+            tt.test("test 1", function () {})
+            tt.test("test 2", function () {})
+
+            return tt.run().then(function () {
+                assert.match(ret, [
+                    n.start(),
+                    n.pass([p("test 1", 0)]),
+                    n.pass([p("test 2", 1)]),
+                    n.end(),
+                ])
+            })
         })
 
         it("errors if added to children", function () {
             var tt = Util.create()
+            var ret = []
             var successful
 
-            function check(tt, plugin) {
+            function check(tt, reporter) {
                 if (successful) return
                 try {
-                    _.reporter(tt, plugin)
+                    tt.reporter(reporter)
                     successful = true
                 } catch (e) {
                     successful = false
                 }
             }
 
-            function plugin1() {}
-            function plugin2() {}
-            function plugin3() {}
-            function plugin4() {}
-            function plugin5() {}
-            function plugin6() {}
+            function reporter1() { return Util.const() }
+            function reporter2() { return Util.const() }
+            function reporter3() { return Util.const() }
+            function reporter4() { return Util.const() }
+            function reporter5() { return Util.const() }
 
-            _.reporter(tt, plugin6)
+            tt.reporter(Util.push, ret)
 
             tt.test("test", function () {
-                check(tt, plugin1)
-                check(tt, plugin2)
-                check(tt, plugin3)
-                check(tt, plugin4)
-                check(tt, plugin5)
+                check(tt, reporter1)
+                check(tt, reporter2)
+                check(tt, reporter3)
+                check(tt, reporter4)
+                check(tt, reporter5)
             })
 
             return tt.run().then(function () {
                 assert.equal(successful, false)
-                assert.match(tt.call(reporters), [plugin6])
+                assert.match(ret, [
+                    n.start(),
+                    n.pass([p("test", 0)]),
+                    n.end(),
+                ])
             })
         })
 
-        if (typeof _.removeReporter === "function") {
-            it("removed individually correctly", function () {
-                var tt = Util.create()
-
-                function plugin() {}
-
-                _.reporter(tt, plugin)
-                _.removeReporter(tt, plugin)
-                assert.match(tt.call(reporters), [])
-            })
-
-            it("errors if \"removed\" from children", function () {
-                var tt = Util.create()
-                var successful
-
-                function plugin1() {}
-                function plugin2() {}
-                function plugin3() {}
-                function plugin4() {}
-                function plugin5() {}
-                function plugin6() {}
-
-                function checkAdd(tt, plugin) {
-                    if (successful) return
-                    try {
-                        _.reporter(tt, plugin)
-                        successful = true
-                    } catch (e) {
-                        successful = false
-                    }
-                }
-
-                function checkRemove(tt, plugin) {
-                    if (successful) return
-                    try {
-                        _.reporter(tt, plugin)
-                        successful = true
-                    } catch (e) {
-                        successful = false
-                    }
-                }
-
-                _.reporter(tt, plugin6)
-
-                tt.test("test", function () {
-                    checkAdd(tt, plugin1)
-                    checkAdd(tt, plugin2)
-                    checkAdd(tt, plugin3)
-                    checkAdd(tt, plugin4)
-                    checkAdd(tt, plugin5)
-
-                    checkRemove(tt, plugin1)
-                    checkRemove(tt, plugin2)
-                    checkRemove(tt, plugin4)
-                })
-
-                return tt.run().then(function () {
-                    assert.equal(successful, false)
-                    assert.match(tt.call(reporters), [plugin6])
-                })
-            })
-        }
-
-        it("only added once", function () {
+        it("uses last added", function () {
             var tt = Util.create()
+            var ret1 = []
+            var ret2 = []
+            var ret3 = []
 
-            function plugin1() {}
-            function plugin2() {}
-            function plugin3() {}
+            function reporter1() { return Util.push(ret1) }
+            function reporter2() { return Util.push(ret2) }
+            function reporter3() { return Util.push(ret3) }
 
-            _.reporter(tt, plugin1)
-            _.reporter(tt, plugin2)
-            _.reporter(tt, plugin3)
+            tt.reporter(reporter1)
+            tt.reporter(reporter2)
+            tt.reporter(reporter3)
 
-            _.reporter(tt, plugin3)
-            _.reporter(tt, plugin1)
+            tt.reporter(reporter3)
+            tt.reporter(reporter2)
 
-            assert.match(tt.call(reporters), [plugin1, plugin2, plugin3])
+            tt.test("test 1", function () {})
+            tt.test("test 2", function () {})
+
+            return tt.run().then(function () {
+                assert.match(ret1, [])
+                assert.match(ret2, [
+                    n.start(),
+                    n.pass([p("test 1", 0)]),
+                    n.pass([p("test 2", 1)]),
+                    n.end(),
+                ])
+                assert.match(ret3, [])
+            })
         })
-    }
-
-    context("normal", function () {
-        checkBasic({reporter: function (tt, func) { tt.reporter(func) }})
     })
 
     context("reflect", function () {
-        checkBasic({
-            reporter: function (tt, func) {
-                tt.call(function (reflect) { reflect.reporter(func) })
-            },
+        function notHasReporter(tt, reporter) {
+            if (tt.call(function (r) { return r.hasReporter(reporter) })) {
+                assert.fail("Expected test to not have reporter {actual}", {
+                    actual: reporter,
+                })
+            }
+        }
 
-            removeReporter: function (tt, func) {
-                tt.call(function (reflect) { reflect.removeReporter(func) })
-            },
+        function hasReporter(tt, reporter) {
+            if (!tt.call(function (r) { return r.hasReporter(reporter) })) {
+                assert.fail("Expected test to have reporter {expected}", {
+                    expected: reporter,
+                })
+            }
+        }
+
+        function addReporter(reflect, reporter) {
+            reflect.reporter(reporter)
+        }
+
+        function removeReporter(reflect, reporter) {
+            reflect.removeReporter(reporter)
+        }
+
+        it("added to root correctly", function () {
+            var tt = Util.create()
+
+            function reporter() { return Util.const() }
+
+            tt.call(addReporter, reporter)
+            hasReporter(tt, reporter)
+        })
+
+        it("errors if added to children", function () {
+            var tt = Util.create()
+            var successful
+
+            function check(tt, reporter) {
+                if (successful) return
+                try {
+                    tt.call(addReporter, reporter)
+                    successful = true
+                } catch (e) {
+                    successful = false
+                }
+            }
+
+            function reporter1() { return Util.const() }
+            function reporter2() { return Util.const() }
+            function reporter3() { return Util.const() }
+            function reporter4() { return Util.const() }
+            function reporter5() { return Util.const() }
+            function reporter6() { return Util.const() }
+
+            tt.call(addReporter, reporter6)
+
+            tt.test("test", function () {
+                check(tt, reporter1)
+                check(tt, reporter2)
+                check(tt, reporter3)
+                check(tt, reporter4)
+                check(tt, reporter5)
+            })
+
+            return tt.run().then(function () {
+                assert.equal(successful, false)
+                notHasReporter(tt, reporter1)
+                notHasReporter(tt, reporter2)
+                notHasReporter(tt, reporter3)
+                notHasReporter(tt, reporter4)
+                notHasReporter(tt, reporter5)
+                hasReporter(tt, reporter6)
+            })
+        })
+
+        it("removed individually correctly", function () {
+            var tt = Util.create()
+
+            function reporter() { return Util.const() }
+
+            tt.call(addReporter, reporter)
+            tt.call(removeReporter, reporter)
+            notHasReporter(tt, reporter)
+        })
+
+        it("errors if \"removed\" from children", function () {
+            var tt = Util.create()
+            var successful
+
+            function reporter1() { return Util.const() }
+            function reporter2() { return Util.const() }
+            function reporter3() { return Util.const() }
+            function reporter4() { return Util.const() }
+            function reporter5() { return Util.const() }
+            function reporter6() { return Util.const() }
+
+            function checkAdd(tt, reporter) {
+                if (successful) return
+                try {
+                    tt.call(addReporter, reporter)
+                    successful = true
+                } catch (e) {
+                    successful = false
+                }
+            }
+
+            function checkRemove(tt, reporter) {
+                if (successful) return
+                try {
+                    tt.call(addReporter, reporter)
+                    successful = true
+                } catch (e) {
+                    successful = false
+                }
+            }
+
+            tt.call(addReporter, reporter6)
+
+            tt.test("test", function () {
+                checkAdd(tt, reporter1)
+                checkAdd(tt, reporter2)
+                checkAdd(tt, reporter3)
+                checkAdd(tt, reporter4)
+                checkAdd(tt, reporter5)
+
+                checkRemove(tt, reporter1)
+                checkRemove(tt, reporter2)
+                checkRemove(tt, reporter4)
+            })
+
+            return tt.run().then(function () {
+                assert.equal(successful, false)
+                notHasReporter(tt, reporter1)
+                notHasReporter(tt, reporter2)
+                notHasReporter(tt, reporter3)
+                notHasReporter(tt, reporter4)
+                notHasReporter(tt, reporter5)
+                hasReporter(tt, reporter6)
+            })
+        })
+
+        it("only added once", function () {
+            var tt = Util.create()
+            var ret1 = []
+            var ret2 = []
+            var ret3 = []
+
+            function reporter1() { return Util.push(ret1) }
+            function reporter2() { return Util.push(ret2) }
+            function reporter3() { return Util.push(ret3) }
+
+            tt.call(addReporter, reporter1)
+            tt.call(addReporter, reporter2)
+            tt.call(addReporter, reporter3)
+
+            tt.call(addReporter, reporter3)
+            tt.call(addReporter, reporter1)
+
+            tt.test("test 1", function () {})
+            tt.test("test 2", function () {})
+
+            var expected = [
+                n.start(),
+                n.pass([p("test 1", 0)]),
+                n.pass([p("test 2", 1)]),
+                n.end(),
+            ]
+
+            return tt.run().then(function () {
+                assert.match(ret1, expected)
+                assert.match(ret2, expected)
+                assert.match(ret3, expected)
+            })
         })
     })
 
@@ -176,7 +299,7 @@ describe("core (reporters)", function () { // eslint-disable-line max-statements
         var tt = Util.create()
         var ret = []
 
-        tt.reporter(Util.push(ret))
+        tt.reporter(Util.push, ret)
 
         tt.test("test", function () {})
         tt.test("test", function () {})
@@ -196,7 +319,7 @@ describe("core (reporters)", function () { // eslint-disable-line max-statements
         var ret = []
         var sentinel = createSentinel("sentinel")
 
-        tt.reporter(Util.push(ret))
+        tt.reporter(Util.push, ret)
 
         tt.test("one", function () { throw sentinel })
         tt.test("two", function () { throw sentinel })
@@ -216,7 +339,7 @@ describe("core (reporters)", function () { // eslint-disable-line max-statements
         var ret = []
         var sentinel = createSentinel("sentinel")
 
-        tt.reporter(Util.push(ret))
+        tt.reporter(Util.push, ret)
 
         tt.test("one", function () { throw sentinel })
         tt.test("two", function () {})
@@ -235,7 +358,7 @@ describe("core (reporters)", function () { // eslint-disable-line max-statements
         var tt = Util.create()
         var ret = []
 
-        tt.reporter(Util.push(ret))
+        tt.reporter(Util.push, ret)
 
         tt.test("test", function () {})
         tt.test("test", function () {})
@@ -255,7 +378,7 @@ describe("core (reporters)", function () { // eslint-disable-line max-statements
         var tt = Util.create()
         var ret = []
 
-        tt.reporter(Util.push(ret))
+        tt.reporter(Util.push, ret)
         tt.test("one", function () { assert.fail("fail") })
         tt.test("two", function () { assert.fail("fail") })
 
@@ -274,7 +397,7 @@ describe("core (reporters)", function () { // eslint-disable-line max-statements
         var tt = Util.create()
         var ret = []
 
-        tt.reporter(Util.push(ret))
+        tt.reporter(Util.push, ret)
         tt.test("one", function () { assert.fail("fail") })
         tt.test("two", function () {})
 
@@ -292,7 +415,7 @@ describe("core (reporters)", function () { // eslint-disable-line max-statements
         var tt = Util.create()
         var ret = []
 
-        tt.reporter(Util.push(ret))
+        tt.reporter(Util.push, ret)
 
         tt.test("test", function () { return resolve() })
         tt.test("test", function () {})
@@ -312,7 +435,7 @@ describe("core (reporters)", function () { // eslint-disable-line max-statements
         var ret = []
         var sentinel = createSentinel("sentinel")
 
-        tt.reporter(Util.push(ret))
+        tt.reporter(Util.push, ret)
 
         tt.test("one", function () { return reject(sentinel) })
         tt.test("two", function () { throw sentinel })
@@ -332,7 +455,7 @@ describe("core (reporters)", function () { // eslint-disable-line max-statements
         var ret = []
         var sentinel = createSentinel("sentinel")
 
-        tt.reporter(Util.push(ret))
+        tt.reporter(Util.push, ret)
 
         tt.test("one", function () { return reject(sentinel) })
         tt.test("two", function () { return resolve() })
@@ -351,7 +474,7 @@ describe("core (reporters)", function () { // eslint-disable-line max-statements
         var tt = Util.create()
         var ret = []
 
-        tt.reporter(Util.push(ret))
+        tt.reporter(Util.push, ret)
 
         tt.test("test", function () { return resolve() })
         tt.test("test", function () {})
@@ -371,7 +494,7 @@ describe("core (reporters)", function () { // eslint-disable-line max-statements
         var ret = []
         var sentinel = createSentinel("sentinel")
 
-        tt.reporter(Util.push(ret))
+        tt.reporter(Util.push, ret)
 
         tt.test("one", function () { return reject(sentinel) })
         tt.test("two", function () { throw sentinel })
@@ -391,7 +514,7 @@ describe("core (reporters)", function () { // eslint-disable-line max-statements
         var ret = []
         var sentinel = createSentinel("sentinel")
 
-        tt.reporter(Util.push(ret))
+        tt.reporter(Util.push, ret)
 
         tt.test("one", function () { return reject(sentinel) })
         tt.test("two", function () { return resolve() })
@@ -410,7 +533,7 @@ describe("core (reporters)", function () { // eslint-disable-line max-statements
         var tt = Util.create()
         var ret = []
 
-        tt.reporter(Util.push(ret))
+        tt.reporter(Util.push, ret)
 
         tt.test("test", function () {
             tt.test("one", function () {})
@@ -435,7 +558,7 @@ describe("core (reporters)", function () { // eslint-disable-line max-statements
         var sentinel1 = createSentinel("sentinel one")
         var sentinel2 = createSentinel("sentinel two")
 
-        tt.reporter(Util.push(ret))
+        tt.reporter(Util.push, ret)
 
         tt.test("parent one", function () {
             tt.test("child one", function () { throw sentinel1 })
@@ -469,7 +592,7 @@ describe("core (reporters)", function () { // eslint-disable-line max-statements
         var sentinel1 = createSentinel("sentinel one")
         var sentinel2 = createSentinel("sentinel two")
 
-        tt.reporter(Util.push(ret))
+        tt.reporter(Util.push, ret)
 
         tt.test("parent one", function () {
             tt.test("child one", function () { throw sentinel1 })
@@ -501,9 +624,9 @@ describe("core (reporters)", function () { // eslint-disable-line max-statements
         var tt = Util.create()
         var err
 
-        tt.reporter(function (report) {
+        tt.reporter(Util.const(function (report) {
             if (report.isFail) err = report.error
-        })
+        }))
 
         tt.test("test", function () {
             tt.run()
@@ -520,7 +643,7 @@ describe("core (reporters)", function () { // eslint-disable-line max-statements
         var ret = []
         var sentinel = createSentinel("sentinel")
 
-        tt.reporter(Util.push(ret))
+        tt.reporter(Util.push, ret)
 
         tt.test("mod-one", function () {
             tt.test("1 === 1", function () { assert.equal(1, 1) })
@@ -584,13 +707,13 @@ describe("core (reporters)", function () { // eslint-disable-line max-statements
         var ret = []
         var push = Util.push(ret)
 
-        tt.reporter(function (arg) {
+        tt.reporter(Util.const(function (arg) {
             return {
                 then: function (resolve) {
                     resolve(push(arg))
                 },
             }
-        })
+        }))
 
         tt.test("test", function () {})
         tt.test("test", function () {})
@@ -609,9 +732,9 @@ describe("core (reporters)", function () { // eslint-disable-line max-statements
         var tt = Util.create()
         var sentinel = createSentinel("sentinel")
 
-        tt.reporter(function () {
+        tt.reporter(Util.const(function () {
             return {then: function (_, reject) { return reject(sentinel) }}
-        })
+        }))
 
         tt.test("test", function () {})
         tt.test("test", function () {})
@@ -626,10 +749,10 @@ describe("core (reporters)", function () { // eslint-disable-line max-statements
         var sentinel = createSentinel("sentinel")
         var reported
 
-        tt.reporter(function (report) {
+        tt.reporter(Util.const(function (report) {
             if (report.isError) reported = report.error
             if (report.isStart) throw sentinel
-        })
+        }))
 
         return tt.run().then(
             function () { assert.fail("Expected a rejection") },
@@ -646,9 +769,9 @@ describe("core (reporters)", function () { // eslint-disable-line max-statements
         var sentinel = createSentinel("sentinel")
         var reported
 
-        tt.reporter(function (report) {
+        tt.reporter(Util.const(function (report) {
             if (report.isError) reported = report.error
-        })
+        }))
 
         tt.test("test", function () {
             Object.defineProperty(tt.call(identity)._, "locked", {
@@ -671,7 +794,7 @@ describe("core (reporters)", function () { // eslint-disable-line max-statements
         var ret = []
         var sentinel = createSentinel("sentinel")
 
-        tt.reporter(Util.push(ret))
+        tt.reporter(Util.push, ret)
 
         tt.test("mod-one", function () {
             tt.test("1 === 1", function () { assert.equal(1, 1) })

@@ -15,4 +15,4 @@ var reporter = {
 
 var t = exports.thallium = require("../index")
 
-t.reporter(require(reporter.module)(reporter.opts))
+t.reporter(require(reporter.module), reporter.opts)
