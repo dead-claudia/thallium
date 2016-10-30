@@ -192,7 +192,7 @@ task("release", function (args) {
     JSON.stringify(pkg).to(path.resolve(__dirname, "package.json"))
 
     // Add everything
-    exec("git add thallium.js package.json CHANGELOG.md")
+    exec("git add thallium.js thallium-migrate.js package.json CHANGELOG.md")
 
     exec("git commit --message=v" + pkg.version)
     exec("git tag v" + pkg.version)
