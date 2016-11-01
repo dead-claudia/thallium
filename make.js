@@ -189,7 +189,7 @@ task("release", function (args) {
 
     // Increment the package version and get the printed version
     pkg.version = semver.inc(pkg.version, increment)
-    JSON.stringify(pkg).to(path.resolve(__dirname, "package.json"))
+    JSON.stringify(pkg, null, 2).to(path.resolve(__dirname, "package.json"))
 
     // Add everything
     exec("git add thallium.js thallium-migrate.js package.json CHANGELOG.md")
