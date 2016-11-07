@@ -1,6 +1,6 @@
 {
   "name": "thallium",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "description": "A simple, unopinionated, modular test framework",
   "main": "index.js",
   "scripts": {
@@ -27,8 +27,15 @@
     "thallium.d.ts",
     "thallium.js"
   ],
-  "bin": {"tl": "bin/tl.js"},
-  "keywords": ["test", "testing", "tdd", "thallium"],
+  "bin": {
+    "tl": "bin/tl.js"
+  },
+  "keywords": [
+    "test",
+    "testing",
+    "tdd",
+    "thallium"
+  ],
   "author": "Isiah Meadows <me@isiahmeadows.com>",
   "license": "ISC",
   "devDependencies": {
