@@ -12,7 +12,7 @@
     "jsdom": "./node_modules/empty/object.js"
   },
   "files": [
-    "assert",
+    "assert.js",
     "assertions.js",
     "bin",
     "core.d.ts",
