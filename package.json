@@ -1,6 +1,6 @@
 {
   "name": "thallium",
-  "version": "0.3.2",
+  "version": "0.3.3",
   "description": "A simple, unopinionated, modular test framework",
   "main": "index.js",
   "scripts": {
@@ -13,14 +13,18 @@
   },
   "files": [
     "assert.js",
+    "assert.d.ts",
     "assertions.js",
     "bin",
-    "core.d.ts",
     "core.js",
     "docs",
     "index.d.ts",
     "index.js",
+    "internal.d.ts",
+    "internal.js",
     "lib",
+    "match.d.ts",
+    "match.js",
     "migrate",
     "r",
     "thallium-migrate.js",

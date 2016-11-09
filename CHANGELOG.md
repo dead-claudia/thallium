@@ -1,5 +1,9 @@
 # Changelog
 
+## v0.3.3
+
+- Missed other files... :( (Hopefully, I got everything this time)
+
 ## v0.3.2
 
 - Missed another file...
