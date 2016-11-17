@@ -25,17 +25,16 @@ See the [changelog](https://github.com/isiahmeadows/thallium/blob/master/CHANGEL
 2. Transition to TypeScript
     - I'm having enough of the highly uninformative `TypeError: foo has no method bar`, `TypeError: Cannot read property 'bar' of undefined`, `TypeError: object #<Object> is not a function`, etc. (At least Node 6 gives the variable name...)
     - I get arrow functions and classes for free, without having to deal with Babel's monstrosity
-3. Add parallel testing support.
-    - This will be based on a beast created and managed separately from core.
-4. Add some promise-aware assertions
+3. Add some promise-aware assertions
 
 ## 0.4.x
 (not blocking 0.4.0)
 
 1. Trim off internal stack traces when sending errors to reporters
 2. Add file watching support
-3. Integrate with Istanbul
-4. Add support for running tests in parallel
+3. Integrate with Karma
+4. Add parallel testing support.
+    - This will be based on a beast created and managed separately from core.
 
 ## 0.5.0
 
