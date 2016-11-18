@@ -1,5 +1,13 @@
 # Changelog
 
+## v0.3.4
+
+- Fix unusual error message duplication caused by not trimming them correctly.
+- Add OS X/macOS support
+- Fix broken TypeScript definitions for the built-in reporter options and the `VoidReporter`/`VoidPlugin` types.
+- Retain the default width when the terminal reports a width of zero columns.
+- Make errors discernable without color in the `dot` reporter.
+
 ## v0.3.3
 
 - Missed other files... :( (Hopefully, I got everything this time)
