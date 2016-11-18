@@ -114,7 +114,7 @@ export interface ArgReporter<T> {
 }
 
 export interface VoidReporter {
-    (): (report: Report) => any | Thenable<any>;
+    (arg?: void): (report: Report) => any | Thenable<any>;
 }
 
 export type Plugin<T, R> = ArgPlugin<T, R> | VoidPlugin<R>;
@@ -124,7 +124,7 @@ export interface ArgPlugin<T, R> {
 }
 
 export interface VoidPlugin<R> {
-    (reflect: Reflect): R;
+    (reflect: Reflect, arg?: void): R;
 }
 
 export interface Callback {
