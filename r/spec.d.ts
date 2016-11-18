@@ -3,7 +3,7 @@
 import {Reporter, Callback} from "../core.d";
 
 export interface SpecOptions {
-    print?(line: string, done: Callback<void>): any;
+    write?(line: string, done: Callback<void>): any;
     reset?(done: Callback<void>): any;
     color?: boolean;
 }

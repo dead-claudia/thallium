@@ -2,7 +2,7 @@ language: node_js
 
 os:
   - osx
-  # - linux
+  - linux
 
 env:
   - ENV=node
@@ -39,27 +39,25 @@ matrix:
       env: ENV=node
 
     # Browser tests
-    # TODO: set up Chrome - it's a little more involved.
-    # - node_js: stable
-    #   env: ENV=chrome
-    #   os: linux
-    #   sudo: required
-    #   dist: trusty
-    # - node_js: stable
-    #   env: ENV=firefox
-    #   os: linux
-    #   addons:
-    #     firefox: latest
-    # - node_js: stable
-    #   env: ENV=firefox-beta
-    #   os: linux
-    #   addons:
-    #     firefox: latest-beta
-    # - node_js: stable
-    #   env: ENV=firefox-esr
-    #   os: linux
-    #   addons:
-    #     firefox: latest-esr
-    # - node_js: stable
-    #   env: ENV=phantomjs
-    #   os: linux
+    - node_js: stable
+      env: ENV=chrome
+      os: linux
+      sudo: required
+      dist: trusty
+    - node_js: stable
+      env: ENV=firefox
+      os: linux
+      addons:
+        firefox: latest
+    - node_js: stable
+      env: ENV=firefox-beta
+      os: linux
+      addons:
+        firefox: latest-beta
+    - node_js: stable
+      env: ENV=firefox-esr
+      os: linux
+      addons:
+        firefox: latest-esr
+    - node_js: stable
+      env: ENV=phantomjs

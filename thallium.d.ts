@@ -25,6 +25,7 @@ export namespace settings {
         Pass: string;
         Fail: string;
         Dot: string;
+        DotFail: string;
     }
 
     export interface DefaultOptions {
