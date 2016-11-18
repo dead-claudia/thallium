@@ -1,41 +1,65 @@
 language: node_js
 
+node_js:
+  - "4"
+  - "5"
+  - "6"
+
+os:
+  - osx
+  - linux
+
+env:
+  - ENV=node
+
 before_install:
-  - export DISPLAY=:99.0
-  - sh -e /etc/init.d/xvfb start
+  # OS X already has a GUI
+  - if [[ "${TRAVIS_OS_NAME}" == 'linux' ]]; then export DISPLAY=:99.0; fi
+  - if [[ "${TRAVIS_OS_NAME}" == 'linux' ]]; then sh -e /etc/init.d/xvfb start; fi
+
+install:
+  # nvm isn't yet supported on OSX
+  - if [[ "${TRAVIS_OS_NAME}" == 'osx' ]]; then brew install nvm; fi
   - nvm install stable
+  - npm update -g npm
+  - npm install
+  - nvm install ${TRAVIS_NODE_VERSION}
+  # Oddly, Travis doesn't set the PATH on OSX...
+  - if [[ "${TRAVIS_OS_NAME}" == 'osx' ]]; then export PATH=$(pwd)/node_modules/.bin:${PATH}; fi
 
 script:
-  - nvm install stable
+  - nvm use stable
   - node make lint
-  - nvm install ${TRAVIS_NODE_VERSION}
-  - bash -e ./scripts/travis.sh
+  - nvm use ${TRAVIS_NODE_VERSION}
+  - ./scripts/travis.sh
 
 matrix:
+  fast_finish: true
   include:
-    - node_js: "4"
-      env: ENV=node
-    - node_js: "5"
-      env: ENV=node
-    - node_js: "6"
-      env: ENV=node
-
     # Browser tests
-    - node_js: stable
+    - node_js: "6"
       env: ENV=chrome
+      os: linux
       sudo: required
       dist: trusty
-    - node_js: stable
+    - node_js: "6"
       env: ENV=firefox
+      os: linux
       addons:
         firefox: latest
-    - node_js: stable
+    - node_js: "6"
       env: ENV=firefox-beta
+      os: linux
       addons:
         firefox: latest-beta
-    - node_js: stable
+    - node_js: "6"
       env: ENV=firefox-esr
+      os: linux
       addons:
         firefox: latest-esr
-    - node_js: stable
+    - node_js: "6"
       env: ENV=phantomjs
+      os: osx
+    - node_js: "6"
+      env: ENV=phantomjs
+      os: linux

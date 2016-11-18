@@ -11,8 +11,8 @@ See the [changelog](https://github.com/isiahmeadows/thallium/blob/master/CHANGEL
 ## 0.3.x
 (not blocking 0.3.0)
 
-1. Add OS X to the Travis build
-    - Travis has been having OSX issues lately, making debugging these errors a little harder.
+1. ~~Add OS X to the Travis build~~
+    - ~~Travis has been having OS X issues lately, making debugging these errors a little harder~~
 2. Add diff support to all existing reporters
 3. Create DOM reporter
 4. Support flaky tests via first-class retries
