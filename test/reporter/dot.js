@@ -81,7 +81,7 @@ describe("reporter dot", function () {
         afterEach(function () { Util.R.Colors.forceRestore() })
 
         var pass = c("fast", Util.R.symbols().Dot)
-        var fail = c("fail", Util.R.symbols().Dot)
+        var fail = c("fail", Util.R.symbols().DotFail)
         var skip = c("skip", Util.R.symbols().Dot)
         var test = makeTest(reporterColors)
 
