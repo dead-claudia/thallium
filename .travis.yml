@@ -21,7 +21,6 @@ matrix:
       env: ENV=node
 
     # Browser tests
-    # TODO: set up Chrome - it's a little more involved.
     - node_js: stable
       env: ENV=chrome
       sudo: required
