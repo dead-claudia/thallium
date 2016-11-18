@@ -1,14 +1,14 @@
 "use strict"
 
-var t = require("../../index.js")
+var t = require("../..")
 
-t.test("cli common", function (t) {
-    t.test("isObjectLike()", function (t) {
+t.test("cli common", function () {
+    t.test("isObjectLike()", function () {
         t.test("passes for objects and functions", function () {})
         t.test("fails for other things", function () {})
     })
 
-    t.test("resolveDefault()", function (t) {
+    t.test("resolveDefault()", function () {
         t.test("gets CJS default functions", function () {})
         t.test("gets CJS default functions with `default` property", function () {})  // eslint-disable-line max-len
         t.test("gets CJS default arrays with `default` property", function () {})  // eslint-disable-line max-len
@@ -23,8 +23,8 @@ t.test("cli common", function (t) {
         t.test("gets ES6 default primitives", function () {})
     })
 
-    t.test("normalizeGlob()", function (t) {
-        t.test("current directory", function (t) {
+    t.test("normalizeGlob()", function () {
+        t.test("current directory", function () {
             t.test("normalizes a file", function () {})
             t.test("normalizes a glob", function () {})
             t.test("retains trailing slashes", function () {})
@@ -32,7 +32,7 @@ t.test("cli common", function (t) {
             t.test("retains negative + trailing slashes", function () {})
         })
 
-        t.test("absolute directory", function (t) {
+        t.test("absolute directory", function () {
             t.test("normalizes a file", function () {})
             t.test("normalizes a glob", function () {})
             t.test("retains trailing slashes", function () {})
@@ -40,7 +40,7 @@ t.test("cli common", function (t) {
             t.test("retains negative + trailing slashes", function () {})
         })
 
-        t.test("relative directory", function (t) {
+        t.test("relative directory", function () {
             t.test("normalizes a file", function () {})
             t.test("normalizes a glob", function () {})
             t.test("retains trailing slashes", function () {})
@@ -48,7 +48,7 @@ t.test("cli common", function (t) {
             t.test("retains negative + trailing slashes", function () {})
         })
 
-        t.test("edge cases", function (t) {
+        t.test("edge cases", function () {
             t.test("normalizes `.` with a cwd of `.`", function () {})
             t.test("normalizes `..` with a cwd of `.`", function () {})
             t.test("normalizes `.` with a cwd of `..`", function () {})
@@ -59,7 +59,7 @@ t.test("cli common", function (t) {
         })
     })
 
-    t.test("globParent()", function (t) {
+    t.test("globParent()", function () {
         t.test("strips glob magic to return parent path", function () {})
         t.test("returns parent dirname from non-glob paths", function () {})
         t.test("gets a base name", function () {})

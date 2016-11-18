@@ -1,8 +1,8 @@
 "use strict"
 
-var t = require("../../index.js")
+var t = require("../..")
 
-t.test("core (basic)", function (t) {
+t.test("core (basic)", function () {
     t.testSkip("has `base()`")
     t.testSkip("has `test()`")
     t.testSkip("has `parent()`")

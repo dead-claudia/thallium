@@ -1,7 +1,7 @@
 "use strict"
 
-var t = require("../../index.js")
+var t = require("../..")
 
-t.reporter(require("../../scripts/pipe-reporter.js"))
+t.reporter(require("../../test-util/cli/pipe-reporter"))
 
 module.exports = {thallium: t}

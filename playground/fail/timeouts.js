@@ -1,12 +1,9 @@
 "use strict"
 
-var t = require("../../index.js")
+var t = require("../..")
+var fail = require("../../assert").fail
 
-function fail(t) {
-    t.fail("fail")
-}
-
-t.test("core (timeouts) (FLAKE)", function (t) {
+t.test("core (timeouts) (FLAKE)", function () {
     t.test("succeeds with own", fail)
     t.test("fails with own", fail)
     t.test("succeeds with inherited", fail)

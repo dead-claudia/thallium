@@ -34,6 +34,11 @@ Options:
     Note: you may add an optional preceding dot before `ext` (i.e. `.ext`), and
     it's considered equivalent.
 
+--opts [opts]
+    Use a custom opts file instead of trying to find a `.tl.opts` somewhere.
+    It's there in case you need to keep your options file somewhere else, and/or
+    under an alternative name.
+
 --
     Stop parsing options past this point. Treat any further argument as a file.
 

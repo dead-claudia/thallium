@@ -13,6 +13,10 @@ describe("core (reporters)", function () { // eslint-disable-line max-statements
         return {then: function (_, reject) { reject(value) }}
     }
 
+    function identity(r) {
+        return r
+    }
+
     function createSentinel(name) {
         var e = new Error(name)
 
@@ -20,490 +24,631 @@ describe("core (reporters)", function () { // eslint-disable-line max-statements
         return e
     }
 
-    function reporters(reflect) {
-        return reflect.reporters()
-    }
+    context("normal", function () {
+        it("added to root correctly", function () {
+            var tt = Util.create()
+            var ret = []
 
-    function activeReporters(reflect) {
-        return reflect.activeReporters()
-    }
+            tt.reporter(Util.push, ret)
 
-    it("added individually correctly", function () {
-        var tt = t.create()
+            tt.test("test 1", function () {})
+            tt.test("test 2", function () {})
 
-        function plugin() {}
+            return tt.run().then(function () {
+                assert.match(ret, [
+                    n.start(),
+                    n.pass([p("test 1", 0)]),
+                    n.pass([p("test 2", 1)]),
+                    n.end(),
+                ])
+            })
+        })
 
-        tt.reporter(plugin)
-        assert.match(tt.call(reporters), [plugin])
+        it("errors if added to children", function () {
+            var tt = Util.create()
+            var ret = []
+            var successful
+
+            function check(tt, reporter) {
+                if (successful) return
+                try {
+                    tt.reporter(reporter)
+                    successful = true
+                } catch (e) {
+                    successful = false
+                }
+            }
+
+            function reporter1() { return Util.const() }
+            function reporter2() { return Util.const() }
+            function reporter3() { return Util.const() }
+            function reporter4() { return Util.const() }
+            function reporter5() { return Util.const() }
+
+            tt.reporter(Util.push, ret)
+
+            tt.test("test", function () {
+                check(tt, reporter1)
+                check(tt, reporter2)
+                check(tt, reporter3)
+                check(tt, reporter4)
+                check(tt, reporter5)
+            })
+
+            return tt.run().then(function () {
+                assert.equal(successful, false)
+                assert.match(ret, [
+                    n.start(),
+                    n.pass([p("test", 0)]),
+                    n.end(),
+                ])
+            })
+        })
+
+        it("uses last added", function () {
+            var tt = Util.create()
+            var ret1 = []
+            var ret2 = []
+            var ret3 = []
+
+            function reporter1() { return Util.push(ret1) }
+            function reporter2() { return Util.push(ret2) }
+            function reporter3() { return Util.push(ret3) }
+
+            tt.reporter(reporter1)
+            tt.reporter(reporter2)
+            tt.reporter(reporter3)
+
+            tt.reporter(reporter3)
+            tt.reporter(reporter2)
+
+            tt.test("test 1", function () {})
+            tt.test("test 2", function () {})
+
+            return tt.run().then(function () {
+                assert.match(ret1, [])
+                assert.match(ret2, [
+                    n.start(),
+                    n.pass([p("test 1", 0)]),
+                    n.pass([p("test 2", 1)]),
+                    n.end(),
+                ])
+                assert.match(ret3, [])
+            })
+        })
     })
 
-    it("added in batches correctly", function () {
-        var tt = t.create()
+    context("reflect", function () {
+        function notHasReporter(tt, reporter) {
+            if (tt.call(function (r) { return r.hasReporter(reporter) })) {
+                assert.fail("Expected test to not have reporter {actual}", {
+                    actual: reporter,
+                })
+            }
+        }
 
-        function plugin1() {}
-        function plugin2() {}
-        function plugin3() {}
-        function plugin4() {}
-        function plugin5() {}
+        function hasReporter(tt, reporter) {
+            if (!tt.call(function (r) { return r.hasReporter(reporter) })) {
+                assert.fail("Expected test to have reporter {expected}", {
+                    expected: reporter,
+                })
+            }
+        }
 
-        tt.reporter(plugin1, plugin2, plugin3, plugin4, plugin5)
-        assert.match(
-            tt.call(reporters),
-            [plugin1, plugin2, plugin3, plugin4, plugin5])
-    })
+        function addReporter(reflect, reporter) {
+            reflect.reporter(reporter)
+        }
 
-    it("added on children correctly", function () {
-        var tt = t.create()
+        function removeReporter(reflect, reporter) {
+            reflect.removeReporter(reporter)
+        }
 
-        function plugin1() {}
-        function plugin2() {}
-        function plugin3() {}
-        function plugin4() {}
-        function plugin5() {}
-        function plugin6() {}
+        it("added to root correctly", function () {
+            var tt = Util.create()
 
-        tt.reporter(plugin6)
+            function reporter() { return Util.const() }
 
-        var ttt = tt.test("test")
-        .reporter(plugin1, plugin2, plugin3, plugin4, plugin5)
+            tt.call(addReporter, reporter)
+            hasReporter(tt, reporter)
+        })
 
-        assert.match(
-            ttt.call(reporters),
-            [plugin1, plugin2, plugin3, plugin4, plugin5])
+        it("errors if added to children", function () {
+            var tt = Util.create()
+            var successful
 
-        assert.match(
-            ttt.call(activeReporters),
-            [plugin1, plugin2, plugin3, plugin4, plugin5])
-        assert.match(tt.call(reporters), [plugin6])
-    })
+            function check(tt, reporter) {
+                if (successful) return
+                try {
+                    tt.call(addReporter, reporter)
+                    successful = true
+                } catch (e) {
+                    successful = false
+                }
+            }
 
-    it("read on children correctly", function () {
-        var tt = t.create()
+            function reporter1() { return Util.const() }
+            function reporter2() { return Util.const() }
+            function reporter3() { return Util.const() }
+            function reporter4() { return Util.const() }
+            function reporter5() { return Util.const() }
+            function reporter6() { return Util.const() }
 
-        function plugin1() {}
-        function plugin2() {}
-        function plugin3() {}
-        function plugin4() {}
-        function plugin5() {}
+            tt.call(addReporter, reporter6)
 
-        tt.reporter(plugin1, plugin2, plugin3, plugin4, plugin5)
-        var ttt = tt.test("test")
+            tt.test("test", function () {
+                check(tt, reporter1)
+                check(tt, reporter2)
+                check(tt, reporter3)
+                check(tt, reporter4)
+                check(tt, reporter5)
+            })
 
-        assert.match(ttt.call(reporters), [])
+            return tt.run().then(function () {
+                assert.equal(successful, false)
+                notHasReporter(tt, reporter1)
+                notHasReporter(tt, reporter2)
+                notHasReporter(tt, reporter3)
+                notHasReporter(tt, reporter4)
+                notHasReporter(tt, reporter5)
+                hasReporter(tt, reporter6)
+            })
+        })
 
-        assert.match(
-            ttt.call(activeReporters),
-            [plugin1, plugin2, plugin3, plugin4, plugin5])
-    })
+        it("removed individually correctly", function () {
+            var tt = Util.create()
 
-    it("removed individually correctly", function () {
-        var tt = t.create()
+            function reporter() { return Util.const() }
 
-        function plugin() {}
+            tt.call(addReporter, reporter)
+            tt.call(removeReporter, reporter)
+            notHasReporter(tt, reporter)
+        })
 
-        tt.reporter(plugin)
-        tt.removeReporter(plugin)
-        assert.match(tt.call(reporters), [])
-    })
+        it("errors if \"removed\" from children", function () {
+            var tt = Util.create()
+            var successful
 
-    it("removed in batches correctly", function () {
-        var tt = t.create()
+            function reporter1() { return Util.const() }
+            function reporter2() { return Util.const() }
+            function reporter3() { return Util.const() }
+            function reporter4() { return Util.const() }
+            function reporter5() { return Util.const() }
+            function reporter6() { return Util.const() }
 
-        function plugin1() {}
-        function plugin2() {}
-        function plugin3() {}
-        function plugin4() {}
-        function plugin5() {}
+            function checkAdd(tt, reporter) {
+                if (successful) return
+                try {
+                    tt.call(addReporter, reporter)
+                    successful = true
+                } catch (e) {
+                    successful = false
+                }
+            }
 
-        tt.reporter(plugin1, plugin2, plugin3, plugin4, plugin5)
-        tt.removeReporter(plugin1, plugin2, plugin4)
-        assert.match(tt.call(reporters), [plugin3, plugin5])
-    })
+            function checkRemove(tt, reporter) {
+                if (successful) return
+                try {
+                    tt.call(addReporter, reporter)
+                    successful = true
+                } catch (e) {
+                    successful = false
+                }
+            }
 
-    it("removed on children correctly", function () {
-        var tt = t.create()
+            tt.call(addReporter, reporter6)
 
-        function plugin1() {}
-        function plugin2() {}
-        function plugin3() {}
-        function plugin4() {}
-        function plugin5() {}
-        function plugin6() {}
+            tt.test("test", function () {
+                checkAdd(tt, reporter1)
+                checkAdd(tt, reporter2)
+                checkAdd(tt, reporter3)
+                checkAdd(tt, reporter4)
+                checkAdd(tt, reporter5)
 
-        tt.reporter(plugin6)
+                checkRemove(tt, reporter1)
+                checkRemove(tt, reporter2)
+                checkRemove(tt, reporter4)
+            })
 
-        var ttt = tt.test("test")
-        .reporter(plugin1, plugin2, plugin3, plugin4, plugin5)
+            return tt.run().then(function () {
+                assert.equal(successful, false)
+                notHasReporter(tt, reporter1)
+                notHasReporter(tt, reporter2)
+                notHasReporter(tt, reporter3)
+                notHasReporter(tt, reporter4)
+                notHasReporter(tt, reporter5)
+                hasReporter(tt, reporter6)
+            })
+        })
 
-        ttt.removeReporter(plugin1, plugin2, plugin4)
+        it("only added once", function () {
+            var tt = Util.create()
+            var ret1 = []
+            var ret2 = []
+            var ret3 = []
 
-        assert.match(ttt.call(reporters), [plugin3, plugin5])
-        assert.match(ttt.call(activeReporters), [plugin3, plugin5])
-        assert.match(tt.call(reporters), [plugin6])
-    })
+            function reporter1() { return Util.push(ret1) }
+            function reporter2() { return Util.push(ret2) }
+            function reporter3() { return Util.push(ret3) }
 
-    it("only added once", function () {
-        var tt = t.create()
+            tt.call(addReporter, reporter1)
+            tt.call(addReporter, reporter2)
+            tt.call(addReporter, reporter3)
 
-        function plugin1() {}
-        function plugin2() {}
-        function plugin3() {}
+            tt.call(addReporter, reporter3)
+            tt.call(addReporter, reporter1)
 
-        tt.reporter(plugin1, plugin2, plugin3)
-        tt.reporter(plugin3, plugin1)
+            tt.test("test 1", function () {})
+            tt.test("test 2", function () {})
 
-        assert.match(tt.call(reporters), [plugin1, plugin2, plugin3])
+            var expected = [
+                n.start(),
+                n.pass([p("test 1", 0)]),
+                n.pass([p("test 2", 1)]),
+                n.end(),
+            ]
 
-        assert.match(
-            tt.call(activeReporters),
-            [plugin1, plugin2, plugin3])
+            return tt.run().then(function () {
+                assert.match(ret1, expected)
+                assert.match(ret2, expected)
+                assert.match(ret3, expected)
+            })
+        })
     })
 
     it("called correctly with sync passing", function () {
-        var tt = t.create()
+        var tt = Util.create()
         var ret = []
 
-        tt.reporter(Util.push(ret))
+        tt.reporter(Util.push, ret)
 
         tt.test("test", function () {})
         tt.test("test", function () {})
 
         return tt.run().then(function () {
             assert.match(ret, [
-                n("start", []),
-                n("pass", [p("test", 0)]),
-                n("pass", [p("test", 1)]),
-                n("end", []),
+                n.start(),
+                n.pass([p("test", 0)]),
+                n.pass([p("test", 1)]),
+                n.end(),
             ])
         })
     })
 
     it("called correctly with sync failing", function () {
-        var tt = t.create()
+        var tt = Util.create()
         var ret = []
         var sentinel = createSentinel("sentinel")
 
-        tt.reporter(Util.push(ret))
+        tt.reporter(Util.push, ret)
 
         tt.test("one", function () { throw sentinel })
         tt.test("two", function () { throw sentinel })
 
         return tt.run().then(function () {
             assert.match(ret, [
-                n("start", []),
-                n("fail", [p("one", 0)], sentinel),
-                n("fail", [p("two", 1)], sentinel),
-                n("end", []),
+                n.start(),
+                n.fail([p("one", 0)], sentinel),
+                n.fail([p("two", 1)], sentinel),
+                n.end(),
             ])
         })
     })
 
     it("called correctly with sync both", function () {
-        var tt = t.create()
+        var tt = Util.create()
         var ret = []
         var sentinel = createSentinel("sentinel")
 
-        tt.reporter(Util.push(ret))
+        tt.reporter(Util.push, ret)
 
         tt.test("one", function () { throw sentinel })
         tt.test("two", function () {})
 
         return tt.run().then(function () {
             assert.match(ret, [
-                n("start", []),
-                n("fail", [p("one", 0)], sentinel),
-                n("pass", [p("two", 1)]),
-                n("end", []),
+                n.start(),
+                n.fail([p("one", 0)], sentinel),
+                n.pass([p("two", 1)]),
+                n.end(),
             ])
         })
     })
 
     it("called correctly with inline passing", function () {
-        var tt = t.create()
+        var tt = Util.create()
         var ret = []
 
-        tt.reporter(Util.push(ret))
+        tt.reporter(Util.push, ret)
 
-        tt.test("test")
-        tt.test("test")
+        tt.test("test", function () {})
+        tt.test("test", function () {})
 
         return tt.run().then(function () {
             assert.match(ret, [
-                n("start", []),
-                n("pass", [p("test", 0)]),
-                n("pass", [p("test", 1)]),
-                n("end", []),
+                n.start(),
+                n.pass([p("test", 0)]),
+                n.pass([p("test", 1)]),
+                n.end(),
             ])
         })
     })
 
     it("called correctly with inline failing", function () {
         var AssertionError = assert.AssertionError
-        var tt = t.create()
+        var tt = Util.create()
         var ret = []
 
-        tt.reporter(Util.push(ret))
-        tt.test("one").try(assert.fail, "fail")
-        tt.test("two").try(assert.fail, "fail")
+        tt.reporter(Util.push, ret)
+        tt.test("one", function () { assert.fail("fail") })
+        tt.test("two", function () { assert.fail("fail") })
 
         return tt.run().then(function () {
             assert.match(ret, [
-                n("start", []),
-                n("fail", [p("one", 0)], new AssertionError("fail")),
-                n("fail", [p("two", 1)], new AssertionError("fail")),
-                n("end", []),
+                n.start(),
+                n.fail([p("one", 0)], new AssertionError("fail")),
+                n.fail([p("two", 1)], new AssertionError("fail")),
+                n.end(),
             ])
         })
     })
 
     it("called correctly with inline both", function () {
         var AssertionError = assert.AssertionError
-        var tt = t.create()
+        var tt = Util.create()
         var ret = []
 
-        tt.reporter(Util.push(ret))
-        tt.test("one").try(assert.fail, "fail")
+        tt.reporter(Util.push, ret)
+        tt.test("one", function () { assert.fail("fail") })
         tt.test("two", function () {})
 
         return tt.run().then(function () {
             assert.match(ret, [
-                n("start", []),
-                n("fail", [p("one", 0)], new AssertionError("fail")),
-                n("pass", [p("two", 1)]),
-                n("end", []),
+                n.start(),
+                n.fail([p("one", 0)], new AssertionError("fail")),
+                n.pass([p("two", 1)]),
+                n.end(),
             ])
         })
     })
 
     it("called correctly with async passing", function () {
-        var tt = t.create()
+        var tt = Util.create()
         var ret = []
 
-        tt.reporter(Util.push(ret))
+        tt.reporter(Util.push, ret)
 
         tt.test("test", function () { return resolve() })
         tt.test("test", function () {})
 
         return tt.run().then(function () {
             assert.match(ret, [
-                n("start", []),
-                n("pass", [p("test", 0)]),
-                n("pass", [p("test", 1)]),
-                n("end", []),
+                n.start(),
+                n.pass([p("test", 0)]),
+                n.pass([p("test", 1)]),
+                n.end(),
             ])
         })
     })
 
     it("called correctly with async failing", function () {
-        var tt = t.create()
+        var tt = Util.create()
         var ret = []
         var sentinel = createSentinel("sentinel")
 
-        tt.reporter(Util.push(ret))
+        tt.reporter(Util.push, ret)
 
         tt.test("one", function () { return reject(sentinel) })
         tt.test("two", function () { throw sentinel })
 
         return tt.run().then(function () {
             assert.match(ret, [
-                n("start", []),
-                n("fail", [p("one", 0)], sentinel),
-                n("fail", [p("two", 1)], sentinel),
-                n("end", []),
+                n.start(),
+                n.fail([p("one", 0)], sentinel),
+                n.fail([p("two", 1)], sentinel),
+                n.end(),
             ])
         })
     })
 
     it("called correctly with async both", function () {
-        var tt = t.create()
+        var tt = Util.create()
         var ret = []
         var sentinel = createSentinel("sentinel")
 
-        tt.reporter(Util.push(ret))
+        tt.reporter(Util.push, ret)
 
         tt.test("one", function () { return reject(sentinel) })
         tt.test("two", function () { return resolve() })
 
         return tt.run().then(function () {
             assert.match(ret, [
-                n("start", []),
-                n("fail", [p("one", 0)], sentinel),
-                n("pass", [p("two", 1)]),
-                n("end", []),
+                n.start(),
+                n.fail([p("one", 0)], sentinel),
+                n.pass([p("two", 1)]),
+                n.end(),
             ])
         })
     })
 
     it("called correctly with async + promise passing", function () {
-        var tt = t.create()
+        var tt = Util.create()
         var ret = []
 
-        tt.reporter(Util.push(ret))
+        tt.reporter(Util.push, ret)
 
         tt.test("test", function () { return resolve() })
         tt.test("test", function () {})
 
         return tt.run().then(function () {
             assert.match(ret, [
-                n("start", []),
-                n("pass", [p("test", 0)]),
-                n("pass", [p("test", 1)]),
-                n("end", []),
+                n.start(),
+                n.pass([p("test", 0)]),
+                n.pass([p("test", 1)]),
+                n.end(),
             ])
         })
     })
 
     it("called correctly with async + promise failing", function () {
-        var tt = t.create()
+        var tt = Util.create()
         var ret = []
         var sentinel = createSentinel("sentinel")
 
-        tt.reporter(Util.push(ret))
+        tt.reporter(Util.push, ret)
 
         tt.test("one", function () { return reject(sentinel) })
         tt.test("two", function () { throw sentinel })
 
         return tt.run().then(function () {
             assert.match(ret, [
-                n("start", []),
-                n("fail", [p("one", 0)], sentinel),
-                n("fail", [p("two", 1)], sentinel),
-                n("end", []),
+                n.start(),
+                n.fail([p("one", 0)], sentinel),
+                n.fail([p("two", 1)], sentinel),
+                n.end(),
             ])
         })
     })
 
     it("called correctly with async + promise both", function () {
-        var tt = t.create()
+        var tt = Util.create()
         var ret = []
         var sentinel = createSentinel("sentinel")
 
-        tt.reporter(Util.push(ret))
+        tt.reporter(Util.push, ret)
 
         tt.test("one", function () { return reject(sentinel) })
         tt.test("two", function () { return resolve() })
 
         return tt.run().then(function () {
             assert.match(ret, [
-                n("start", []),
-                n("fail", [p("one", 0)], sentinel),
-                n("pass", [p("two", 1)]),
-                n("end", []),
+                n.start(),
+                n.fail([p("one", 0)], sentinel),
+                n.pass([p("two", 1)]),
+                n.end(),
             ])
         })
     })
 
     it("called correctly with child passing tests", function () {
-        var tt = t.create()
+        var tt = Util.create()
         var ret = []
 
-        tt.reporter(Util.push(ret))
+        tt.reporter(Util.push, ret)
 
-        tt.test("test", function (tt) {
+        tt.test("test", function () {
             tt.test("one", function () {})
             tt.test("two", function () {})
         })
 
         return tt.run().then(function () {
             assert.match(ret, [
-                n("start", []),
-                n("enter", [p("test", 0)]),
-                n("pass", [p("test", 0), p("one", 0)]),
-                n("pass", [p("test", 0), p("two", 1)]),
-                n("leave", [p("test", 0)]),
-                n("end", []),
+                n.start(),
+                n.enter([p("test", 0)]),
+                n.pass([p("test", 0), p("one", 0)]),
+                n.pass([p("test", 0), p("two", 1)]),
+                n.leave([p("test", 0)]),
+                n.end(),
             ])
         })
     })
 
     it("called correctly with child failing tests", function () {
-        var tt = t.create()
+        var tt = Util.create()
         var ret = []
         var sentinel1 = createSentinel("sentinel one")
         var sentinel2 = createSentinel("sentinel two")
 
-        tt.reporter(Util.push(ret))
+        tt.reporter(Util.push, ret)
 
-        tt.test("parent one", function (tt) {
+        tt.test("parent one", function () {
             tt.test("child one", function () { throw sentinel1 })
             tt.test("child two", function () { throw sentinel1 })
         })
 
-        tt.test("parent two", function (tt) {
+        tt.test("parent two", function () {
             tt.test("child one", function () { throw sentinel2 })
             tt.test("child two", function () { throw sentinel2 })
         })
 
         return tt.run().then(function () {
             assert.match(ret, [
-                n("start", []),
-                n("enter", [p("parent one", 0)]),
-                n("fail", [p("parent one", 0), p("child one", 0)], sentinel1),
-                n("fail", [p("parent one", 0), p("child two", 1)], sentinel1),
-                n("leave", [p("parent one", 0)]),
-                n("enter", [p("parent two", 1)]),
-                n("fail", [p("parent two", 1), p("child one", 0)], sentinel2),
-                n("fail", [p("parent two", 1), p("child two", 1)], sentinel2),
-                n("leave", [p("parent two", 1)]),
-                n("end", []),
+                n.start(),
+                n.enter([p("parent one", 0)]),
+                n.fail([p("parent one", 0), p("child one", 0)], sentinel1),
+                n.fail([p("parent one", 0), p("child two", 1)], sentinel1),
+                n.leave([p("parent one", 0)]),
+                n.enter([p("parent two", 1)]),
+                n.fail([p("parent two", 1), p("child one", 0)], sentinel2),
+                n.fail([p("parent two", 1), p("child two", 1)], sentinel2),
+                n.leave([p("parent two", 1)]),
+                n.end(),
             ])
         })
     })
 
     it("called correctly with child both", function () {
-        var tt = t.create()
+        var tt = Util.create()
         var ret = []
         var sentinel1 = createSentinel("sentinel one")
         var sentinel2 = createSentinel("sentinel two")
 
-        tt.reporter(Util.push(ret))
+        tt.reporter(Util.push, ret)
 
-        tt.test("parent one", function (tt) {
+        tt.test("parent one", function () {
             tt.test("child one", function () { throw sentinel1 })
             tt.test("child two", function () {})
         })
 
-        tt.test("parent two", function (tt) {
+        tt.test("parent two", function () {
             tt.test("child one", function () { throw sentinel2 })
             tt.test("child two", function () {})
         })
 
         return tt.run().then(function () {
             assert.match(ret, [
-                n("start", []),
-                n("enter", [p("parent one", 0)]),
-                n("fail", [p("parent one", 0), p("child one", 0)], sentinel1),
-                n("pass", [p("parent one", 0), p("child two", 1)]),
-                n("leave", [p("parent one", 0)]),
-                n("enter", [p("parent two", 1)]),
-                n("fail", [p("parent two", 1), p("child one", 0)], sentinel2),
-                n("pass", [p("parent two", 1), p("child two", 1)]),
-                n("leave", [p("parent two", 1)]),
-                n("end", []),
+                n.start(),
+                n.enter([p("parent one", 0)]),
+                n.fail([p("parent one", 0), p("child one", 0)], sentinel1),
+                n.pass([p("parent one", 0), p("child two", 1)]),
+                n.leave([p("parent one", 0)]),
+                n.enter([p("parent two", 1)]),
+                n.fail([p("parent two", 1), p("child one", 0)], sentinel2),
+                n.pass([p("parent two", 1), p("child two", 1)]),
+                n.leave([p("parent two", 1)]),
+                n.end(),
             ])
         })
     })
 
-    it("called correctly with subtest run", function () {
-        var tt = t.create().test("test")
+    it("locks itself when running", function () {
+        var tt = Util.create()
+        var err
 
-        tt.test("foo", function () {})
-        assert.throws(function () { tt.run() }, Error)
+        tt.reporter(Util.const(function (report) {
+            if (report.isFail) err = report.error
+        }))
+
+        tt.test("test", function () {
+            tt.run()
+        })
+
+        return tt.run().then(function () {
+            assert.is(Error, err)
+        })
     })
 
     it("called correctly with complex sequence", function () {
         var AssertionError = assert.AssertionError
-        var tt = t.create()
+        var tt = Util.create()
         var ret = []
         var sentinel = createSentinel("sentinel")
 
-        tt.reporter(Util.push(ret))
+        tt.reporter(Util.push, ret)
 
-        tt.test("mod-one", function (tt) {
-            tt.test("1 === 1").try(assert.equal, 1, 1)
+        tt.test("mod-one", function () {
+            tt.test("1 === 1", function () { assert.equal(1, 1) })
 
-            tt.test("foo()", function (tt) {
-                tt.foo = 1
+            tt.test("foo()", function () {
                 assert.notEqual(1, 1)
             })
 
@@ -525,14 +670,13 @@ describe("core (reporters)", function () { // eslint-disable-line max-statements
                 }
             })
 
-            tt.test("nested", function (tt) {
+            tt.test("nested", function () {
                 tt.test("nested 2", function () { assert.equal(true, true) })
             })
         })
 
-        tt.test("mod-two", function (tt) {
-            tt.test("1 === 2").try(assert.equal, 1, 2)
-            tt.test("expandos don't transfer").try(assert.notHasKey, tt, "foo")
+        tt.test("mod-two", function () {
+            tt.test("1 === 2", function () { assert.equal(1, 2) })
         })
 
         var fail = new AssertionError("Expected 1 to not equal 1", 1, 1)
@@ -540,58 +684,57 @@ describe("core (reporters)", function () { // eslint-disable-line max-statements
 
         return tt.run().then(function () {
             assert.match(ret, [
-                n("start", []),
-                n("enter", [p("mod-one", 0)]),
-                n("pass", [p("mod-one", 0), p("1 === 1", 0)]),
-                n("fail", [p("mod-one", 0), p("foo()", 1)], fail),
-                n("fail", [p("mod-one", 0), p("bar()", 2)], new Error("fail")),
-                n("fail", [p("mod-one", 0), p("baz()", 3)], sentinel),
-                n("enter", [p("mod-one", 0), p("nested", 4)]),
-                n("pass", [p("mod-one", 0), p("nested", 4), p("nested 2", 0)]),
-                n("leave", [p("mod-one", 0), p("nested", 4)]),
-                n("leave", [p("mod-one", 0)]),
-                n("enter", [p("mod-two", 1)]),
-                n("fail", [p("mod-two", 1), p("1 === 2", 0)], fail2),
-                n("pass", [p("mod-two", 1), p("expandos don't transfer", 1)]),
-                n("leave", [p("mod-two", 1)]),
-                n("end", []),
+                n.start(),
+                n.enter([p("mod-one", 0)]),
+                n.pass([p("mod-one", 0), p("1 === 1", 0)]),
+                n.fail([p("mod-one", 0), p("foo()", 1)], fail),
+                n.fail([p("mod-one", 0), p("bar()", 2)], new Error("fail")),
+                n.fail([p("mod-one", 0), p("baz()", 3)], sentinel),
+                n.enter([p("mod-one", 0), p("nested", 4)]),
+                n.pass([p("mod-one", 0), p("nested", 4), p("nested 2", 0)]),
+                n.leave([p("mod-one", 0), p("nested", 4)]),
+                n.leave([p("mod-one", 0)]),
+                n.enter([p("mod-two", 1)]),
+                n.fail([p("mod-two", 1), p("1 === 2", 0)], fail2),
+                n.leave([p("mod-two", 1)]),
+                n.end(),
             ])
         })
     })
 
     it("can return a resolving thenable", function () {
-        var tt = t.create()
+        var tt = Util.create()
         var ret = []
         var push = Util.push(ret)
 
-        tt.reporter(function (arg) {
+        tt.reporter(Util.const(function (arg) {
             return {
                 then: function (resolve) {
                     resolve(push(arg))
                 },
             }
-        })
+        }))
 
         tt.test("test", function () {})
         tt.test("test", function () {})
 
         return tt.run().then(function () {
             assert.match(ret, [
-                n("start", []),
-                n("pass", [p("test", 0)]),
-                n("pass", [p("test", 1)]),
-                n("end", []),
+                n.start(),
+                n.pass([p("test", 0)]),
+                n.pass([p("test", 1)]),
+                n.end(),
             ])
         })
     })
 
     it("can return a rejecting thenable", function () {
-        var tt = t.create()
+        var tt = Util.create()
         var sentinel = createSentinel("sentinel")
 
-        tt.reporter(function () {
+        tt.reporter(Util.const(function () {
             return {then: function (_, reject) { return reject(sentinel) }}
-        })
+        }))
 
         tt.test("test", function () {})
         tt.test("test", function () {})
@@ -602,14 +745,14 @@ describe("core (reporters)", function () { // eslint-disable-line max-statements
     })
 
     it("reports reporter errors", function () {
-        var tt = t.create()
+        var tt = Util.create()
         var sentinel = createSentinel("sentinel")
         var reported
 
-        tt.reporter(function (ev) {
-            if (ev.error()) reported = ev.value
-            if (ev.start()) throw sentinel
-        })
+        tt.reporter(Util.const(function (report) {
+            if (report.isError) reported = report.error
+            if (report.isStart) throw sentinel
+        }))
 
         return tt.run().then(
             function () { assert.fail("Expected a rejection") },
@@ -622,19 +765,19 @@ describe("core (reporters)", function () { // eslint-disable-line max-statements
     // This is a bit too tightly coupled to the implementation than I'd normally
     // be comfortable with...
     it("reports internal errors", function () {
-        var tt = t.create()
+        var tt = Util.create()
         var sentinel = createSentinel("sentinel")
         var reported
 
-        tt.reporter(function (ev) {
-            if (ev.error()) reported = ev.value
-        })
+        tt.reporter(Util.const(function (report) {
+            if (report.isError) reported = report.error
+        }))
 
-        var ttt = tt.test("test")
-
-        Object.defineProperty(ttt._, "data", {
-            get: function () { throw sentinel },
-            set: function () { throw sentinel },
+        tt.test("test", function () {
+            Object.defineProperty(tt.call(identity)._, "locked", {
+                get: function () { throw sentinel },
+                set: function () { throw sentinel },
+            })
         })
 
         return tt.run().then(
@@ -647,17 +790,16 @@ describe("core (reporters)", function () { // eslint-disable-line max-statements
 
     it("has repeatable output", function () {
         var AssertionError = assert.AssertionError
-        var tt = t.create()
+        var tt = Util.create()
         var ret = []
         var sentinel = createSentinel("sentinel")
 
-        tt.reporter(Util.push(ret))
+        tt.reporter(Util.push, ret)
 
-        tt.test("mod-one", function (tt) {
-            tt.test("1 === 1").try(assert.equal, 1, 1)
+        tt.test("mod-one", function () {
+            tt.test("1 === 1", function () { assert.equal(1, 1) })
 
-            tt.test("foo()", function (tt) {
-                tt.foo = 1
+            tt.test("foo()", function () {
                 assert.notEqual(1, 1)
             })
 
@@ -679,14 +821,13 @@ describe("core (reporters)", function () { // eslint-disable-line max-statements
                 }
             })
 
-            tt.test("nested", function (tt) {
+            tt.test("nested", function () {
                 tt.test("nested 2", function () { assert.equal(true, true) })
             })
         })
 
-        tt.test("mod-two", function (tt) {
-            tt.test("1 === 2").try(assert.equal, 1, 2)
-            tt.test("expandos don't transfer").try(assert.notHasKey, tt, "foo")
+        tt.test("mod-two", function () {
+            tt.test("1 === 2", function () { assert.equal(1, 2) })
         })
 
         var fail = new AssertionError("Expected 1 to not equal 1", 1, 1)
@@ -694,21 +835,20 @@ describe("core (reporters)", function () { // eslint-disable-line max-statements
 
         return tt.run().then(function () {
             assert.match(ret, [
-                n("start", []),
-                n("enter", [p("mod-one", 0)]),
-                n("pass", [p("mod-one", 0), p("1 === 1", 0)]),
-                n("fail", [p("mod-one", 0), p("foo()", 1)], fail),
-                n("fail", [p("mod-one", 0), p("bar()", 2)], new Error("fail")),
-                n("fail", [p("mod-one", 0), p("baz()", 3)], sentinel),
-                n("enter", [p("mod-one", 0), p("nested", 4)]),
-                n("pass", [p("mod-one", 0), p("nested", 4), p("nested 2", 0)]),
-                n("leave", [p("mod-one", 0), p("nested", 4)]),
-                n("leave", [p("mod-one", 0)]),
-                n("enter", [p("mod-two", 1)]),
-                n("fail", [p("mod-two", 1), p("1 === 2", 0)], fail2),
-                n("pass", [p("mod-two", 1), p("expandos don't transfer", 1)]),
-                n("leave", [p("mod-two", 1)]),
-                n("end", []),
+                n.start(),
+                n.enter([p("mod-one", 0)]),
+                n.pass([p("mod-one", 0), p("1 === 1", 0)]),
+                n.fail([p("mod-one", 0), p("foo()", 1)], fail),
+                n.fail([p("mod-one", 0), p("bar()", 2)], new Error("fail")),
+                n.fail([p("mod-one", 0), p("baz()", 3)], sentinel),
+                n.enter([p("mod-one", 0), p("nested", 4)]),
+                n.pass([p("mod-one", 0), p("nested", 4), p("nested 2", 0)]),
+                n.leave([p("mod-one", 0), p("nested", 4)]),
+                n.leave([p("mod-one", 0)]),
+                n.enter([p("mod-two", 1)]),
+                n.fail([p("mod-two", 1), p("1 === 2", 0)], fail2),
+                n.leave([p("mod-two", 1)]),
+                n.end(),
             ])
         })
         .then(function () {
@@ -717,21 +857,20 @@ describe("core (reporters)", function () { // eslint-disable-line max-statements
         })
         .then(function () {
             assert.match(ret, [
-                n("start", []),
-                n("enter", [p("mod-one", 0)]),
-                n("pass", [p("mod-one", 0), p("1 === 1", 0)]),
-                n("fail", [p("mod-one", 0), p("foo()", 1)], fail),
-                n("fail", [p("mod-one", 0), p("bar()", 2)], new Error("fail")),
-                n("fail", [p("mod-one", 0), p("baz()", 3)], sentinel),
-                n("enter", [p("mod-one", 0), p("nested", 4)]),
-                n("pass", [p("mod-one", 0), p("nested", 4), p("nested 2", 0)]),
-                n("leave", [p("mod-one", 0), p("nested", 4)]),
-                n("leave", [p("mod-one", 0)]),
-                n("enter", [p("mod-two", 1)]),
-                n("fail", [p("mod-two", 1), p("1 === 2", 0)], fail2),
-                n("pass", [p("mod-two", 1), p("expandos don't transfer", 1)]),
-                n("leave", [p("mod-two", 1)]),
-                n("end", []),
+                n.start(),
+                n.enter([p("mod-one", 0)]),
+                n.pass([p("mod-one", 0), p("1 === 1", 0)]),
+                n.fail([p("mod-one", 0), p("foo()", 1)], fail),
+                n.fail([p("mod-one", 0), p("bar()", 2)], new Error("fail")),
+                n.fail([p("mod-one", 0), p("baz()", 3)], sentinel),
+                n.enter([p("mod-one", 0), p("nested", 4)]),
+                n.pass([p("mod-one", 0), p("nested", 4), p("nested 2", 0)]),
+                n.leave([p("mod-one", 0), p("nested", 4)]),
+                n.leave([p("mod-one", 0)]),
+                n.enter([p("mod-two", 1)]),
+                n.fail([p("mod-two", 1), p("1 === 2", 0)], fail2),
+                n.leave([p("mod-two", 1)]),
+                n.end(),
             ])
         })
     })

@@ -7,7 +7,7 @@ module.exports = function (config) {
         basePath: __dirname,
         restartOnFileChange: true,
 
-        // browsers: ["Chrome", "Firefox"]
+        // browsers: ["Chrome", "Firefox", "PhantomJS"]
         frameworks: ["browserify", "mocha"],
         reporters: ["dots"],
 
@@ -16,10 +16,15 @@ module.exports = function (config) {
                 base: "Chrome",
                 flags: ["--no-sandbox"],
             },
+
+            PhantomJSDebug: {
+                base: "PhantomJS",
+                debug: true,
+            },
         },
 
         files: [
-            "./scripts/globals.js",
+            "./test-util/globals.js",
             {pattern: "./test/**/*.js", nocache: true},
             {pattern: "./lib/**/*.js", included: false, served: false},
             {pattern: "./scripts/**/*.js", included: false, served: false},
@@ -29,7 +34,7 @@ module.exports = function (config) {
         exclude: ["./test/cli/**"],
 
         preprocessors: {
-            "./scripts/globals.js": ["browserify"],
+            "./test-util/globals.js": ["browserify"],
         },
 
         browserify: {

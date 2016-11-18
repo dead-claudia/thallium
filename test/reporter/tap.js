@@ -10,13 +10,21 @@ describe("reporter tap", function () { // eslint-disable-line max-statements
     it("is not itself a reporter", function () {
         var tap = Util.r.tap
 
-        assert.throws(function () { tap(n("start", [])) }, TypeError)
-        assert.throws(function () { tap(n("enter", [p("test", 0)])) }, TypeError) // eslint-disable-line max-len
-        assert.throws(function () { tap(n("leave", [p("test", 0)])) }, TypeError) // eslint-disable-line max-len
-        assert.throws(function () { tap(n("pass", [p("test", 0)])) }, TypeError)
-        assert.throws(function () { tap(n("fail", [p("test", 0)])) }, TypeError)
-        assert.throws(function () { tap(n("skip", [p("test", 0)])) }, TypeError)
-        assert.throws(function () { tap(n("end", [])) }, TypeError)
+        assert.throws(TypeError, function () { tap(n.start()) })
+        assert.throws(TypeError, function () { tap(n.enter([p("test", 0)])) })
+        assert.throws(TypeError, function () { tap(n.leave([p("test", 0)])) })
+        assert.throws(TypeError, function () { tap(n.pass([p("test", 0)])) })
+        assert.throws(TypeError, function () { tap(n.fail([p("test", 0)])) })
+        assert.throws(TypeError, function () { tap(n.skip([p("test", 0)])) })
+        assert.throws(TypeError, function () { tap(n.end()) })
+    })
+
+    it("validates no arguments", function () {
+        Util.r.tap()
+    })
+
+    it("validates a single empty options object", function () {
+        Util.r.tap({})
     })
 
     function stack(err) {
@@ -33,13 +41,19 @@ describe("reporter tap", function () { // eslint-disable-line max-statements
     function test(name, opts) {
         it(name, function () {
             var list = []
+            var acc = ""
             var reporter = Util.r.tap({
-                print: function (arg) { list.push(arg) },
+                write: function (str) {
+                    // So lines are printed consistently.
+                    var lines = (acc + str).split(/\r?\n/g)
+
+                    acc = lines.pop()
+                    list.push.apply(list, lines)
+                },
                 reset: function () {},
             })
 
-            return Util.Promise.each(opts.input, reporter)
-            .then(function () {
+            return Util.peach(opts.input, reporter).then(function () {
                 assert.match(list, opts.output)
             })
         })
@@ -47,8 +61,8 @@ describe("reporter tap", function () { // eslint-disable-line max-statements
 
     test("empty test", {
         input: [
-            n("start", []),
-            n("end", []),
+            n.start(),
+            n.end(),
         ],
         output: [
             "TAP version 13",
@@ -60,10 +74,10 @@ describe("reporter tap", function () { // eslint-disable-line max-statements
 
     test("passing 2", {
         input: [
-            n("start", []),
-            n("pass", [p("test", 0)]),
-            n("pass", [p("test", 1)]),
-            n("end", []),
+            n.start(),
+            n.pass([p("test", 0)]),
+            n.pass([p("test", 1)]),
+            n.end(),
         ],
         output: [
             "TAP version 13",
@@ -80,10 +94,10 @@ describe("reporter tap", function () { // eslint-disable-line max-statements
 
     test("fail 2 with Error", {
         input: [
-            n("start", []),
-            n("fail", [p("one", 0)], sentinel),
-            n("fail", [p("two", 1)], sentinel),
-            n("end", []),
+            n.start(),
+            n.fail([p("one", 0)], sentinel),
+            n.fail([p("two", 1)], sentinel),
+            n.end(),
         ],
         output: [].concat([
             "TAP version 13",
@@ -104,10 +118,10 @@ describe("reporter tap", function () { // eslint-disable-line max-statements
 
     test("pass + fail with Error", {
         input: [
-            n("start", []),
-            n("pass", [p("one", 0)]),
-            n("fail", [p("two", 1)], sentinel),
-            n("end", []),
+            n.start(),
+            n.pass([p("one", 0)]),
+            n.fail([p("two", 1)], sentinel),
+            n.end(),
         ],
         output: [].concat([
             "TAP version 13",
@@ -126,10 +140,10 @@ describe("reporter tap", function () { // eslint-disable-line max-statements
 
     test("fail with Error + pass", {
         input: [
-            n("start", []),
-            n("fail", [p("one", 0)], sentinel),
-            n("pass", [p("two", 1)]),
-            n("end", []),
+            n.start(),
+            n.fail([p("one", 0)], sentinel),
+            n.pass([p("two", 1)]),
+            n.end(),
         ],
         output: [].concat([
             "TAP version 13",
@@ -151,10 +165,10 @@ describe("reporter tap", function () { // eslint-disable-line max-statements
 
     test("fail 2 with AssertionError", {
         input: [
-            n("start", []),
-            n("fail", [p("one", 0)], assertion),
-            n("fail", [p("two", 1)], assertion),
-            n("end", []),
+            n.start(),
+            n.fail([p("one", 0)], assertion),
+            n.fail([p("two", 1)], assertion),
+            n.end(),
         ],
         output: [].concat([
             "TAP version 13",
@@ -181,10 +195,10 @@ describe("reporter tap", function () { // eslint-disable-line max-statements
 
     test("pass + fail with AssertionError", {
         input: [
-            n("start", []),
-            n("pass", [p("one", 0)]),
-            n("fail", [p("two", 1)], assertion),
-            n("end", []),
+            n.start(),
+            n.pass([p("one", 0)]),
+            n.fail([p("two", 1)], assertion),
+            n.end(),
         ],
         output: [].concat([
             "TAP version 13",
@@ -206,10 +220,10 @@ describe("reporter tap", function () { // eslint-disable-line max-statements
 
     test("fail with AssertionError + pass", {
         input: [
-            n("start", []),
-            n("fail", [p("one", 0)], assertion),
-            n("pass", [p("two", 1)]),
-            n("end", []),
+            n.start(),
+            n.fail([p("one", 0)], assertion),
+            n.pass([p("two", 1)]),
+            n.end(),
         ],
         output: [].concat([
             "TAP version 13",
@@ -231,10 +245,10 @@ describe("reporter tap", function () { // eslint-disable-line max-statements
 
     test("skip 2", {
         input: [
-            n("start", []),
-            n("skip", [p("one", 0)]),
-            n("skip", [p("two", 1)]),
-            n("end", []),
+            n.start(),
+            n.skip([p("one", 0)]),
+            n.skip([p("two", 1)]),
+            n.end(),
         ],
         output: [
             "TAP version 13",
@@ -249,10 +263,10 @@ describe("reporter tap", function () { // eslint-disable-line max-statements
 
     test("pass + skip", {
         input: [
-            n("start", []),
-            n("pass", [p("one", 0)]),
-            n("skip", [p("two", 1)]),
-            n("end", []),
+            n.start(),
+            n.pass([p("one", 0)]),
+            n.skip([p("two", 1)]),
+            n.end(),
         ],
         output: [
             "TAP version 13",
@@ -268,10 +282,10 @@ describe("reporter tap", function () { // eslint-disable-line max-statements
 
     test("skip + pass", {
         input: [
-            n("start", []),
-            n("skip", [p("one", 0)]),
-            n("pass", [p("two", 1)]),
-            n("end", []),
+            n.start(),
+            n.skip([p("one", 0)]),
+            n.pass([p("two", 1)]),
+            n.end(),
         ],
         output: [
             "TAP version 13",
@@ -287,10 +301,10 @@ describe("reporter tap", function () { // eslint-disable-line max-statements
 
     test("fail + skip", {
         input: [
-            n("start", []),
-            n("fail", [p("one", 0)], sentinel),
-            n("skip", [p("two", 1)]),
-            n("end", []),
+            n.start(),
+            n.fail([p("one", 0)], sentinel),
+            n.skip([p("two", 1)]),
+            n.end(),
         ],
         output: [].concat([
             "TAP version 13",
@@ -309,10 +323,10 @@ describe("reporter tap", function () { // eslint-disable-line max-statements
 
     test("skip + fail", {
         input: [
-            n("start", []),
-            n("skip", [p("one", 0)]),
-            n("fail", [p("two", 1)], sentinel),
-            n("end", []),
+            n.start(),
+            n.skip([p("one", 0)]),
+            n.fail([p("two", 1)], sentinel),
+            n.end(),
         ],
         output: [].concat([
             "TAP version 13",
@@ -333,12 +347,12 @@ describe("reporter tap", function () { // eslint-disable-line max-statements
 
     test("internal errors", {
         input: [
-            n("start", []),
-            n("enter", [p("test", 0)]),
-            n("enter", [p("test", 0), p("inner", 0)]),
-            n("fail", [p("test", 0), p("inner", 0), p("fail", 0)], badType),
-            n("leave", [p("test", 0), p("inner", 0)]),
-            n("error", [p("test", 0)], badType),
+            n.start(),
+            n.enter([p("test", 0)]),
+            n.enter([p("test", 0), p("inner", 0)]),
+            n.fail([p("test", 0), p("inner", 0), p("fail", 0)], badType),
+            n.leave([p("test", 0), p("inner", 0)]),
+            n.error(badType),
         ],
         output: [].concat([
             "TAP version 13",
@@ -361,62 +375,62 @@ describe("reporter tap", function () { // eslint-disable-line max-statements
         /* eslint-disable max-len */
 
         input: [
-            n("start", []),
-            n("enter", [p("core (basic)", 0)]),
-            n("pass", [p("core (basic)", 0), p("has `base()`", 0)]),
-            n("pass", [p("core (basic)", 0), p("has `test()`", 1)]),
-            n("pass", [p("core (basic)", 0), p("has `parent()`", 2)]),
-            n("pass", [p("core (basic)", 0), p("can accept a string + function", 3)]),
-            n("pass", [p("core (basic)", 0), p("can accept a string", 4)]),
-            n("pass", [p("core (basic)", 0), p("returns the current instance when given a callback", 5)]),
-            n("pass", [p("core (basic)", 0), p("returns a prototypal clone when not given a callback", 6)]),
-            n("pass", [p("core (basic)", 0), p("runs block tests within tests", 7)]),
-            n("pass", [p("core (basic)", 0), p("runs successful inline tests within tests", 8)]),
-            n("pass", [p("core (basic)", 0), p("accepts a callback with `run()`", 9)]),
-            n("leave", [p("core (basic)", 0)]),
-            n("enter", [p("cli normalize glob", 1)]),
-            n("enter", [p("cli normalize glob", 1), p("current directory", 0)]),
-            n("pass", [p("cli normalize glob", 1), p("current directory", 0), p("normalizes a file", 0)]),
-            n("pass", [p("cli normalize glob", 1), p("current directory", 0), p("normalizes a glob", 1)]),
-            n("pass", [p("cli normalize glob", 1), p("current directory", 0), p("retains trailing slashes", 2)]),
-            n("pass", [p("cli normalize glob", 1), p("current directory", 0), p("retains negative", 3)]),
-            n("pass", [p("cli normalize glob", 1), p("current directory", 0), p("retains negative + trailing slashes", 4)]),
-            n("leave", [p("cli normalize glob", 1), p("current directory", 0)]),
-            n("enter", [p("cli normalize glob", 1), p("absolute directory", 1)]),
-            n("pass", [p("cli normalize glob", 1), p("absolute directory", 1), p("normalizes a file", 0)]),
-            n("pass", [p("cli normalize glob", 1), p("absolute directory", 1), p("normalizes a glob", 1)]),
-            n("pass", [p("cli normalize glob", 1), p("absolute directory", 1), p("retains trailing slashes", 2)]),
-            n("pass", [p("cli normalize glob", 1), p("absolute directory", 1), p("retains negative", 3)]),
-            n("pass", [p("cli normalize glob", 1), p("absolute directory", 1), p("retains negative + trailing slashes", 4)]),
-            n("leave", [p("cli normalize glob", 1), p("absolute directory", 1)]),
-            n("enter", [p("cli normalize glob", 1), p("relative directory", 2)]),
-            n("pass", [p("cli normalize glob", 1), p("relative directory", 2), p("normalizes a file", 0)]),
-            n("pass", [p("cli normalize glob", 1), p("relative directory", 2), p("normalizes a glob", 1)]),
-            n("pass", [p("cli normalize glob", 1), p("relative directory", 2), p("retains trailing slashes", 2)]),
-            n("pass", [p("cli normalize glob", 1), p("relative directory", 2), p("retains negative", 3)]),
-            n("pass", [p("cli normalize glob", 1), p("relative directory", 2), p("retains negative + trailing slashes", 4)]),
-            n("leave", [p("cli normalize glob", 1), p("relative directory", 2)]),
-            n("enter", [p("cli normalize glob", 1), p("edge cases", 3)]),
-            n("pass", [p("cli normalize glob", 1), p("edge cases", 3), p("normalizes `.` with a cwd of `.`", 0)]),
-            n("pass", [p("cli normalize glob", 1), p("edge cases", 3), p("normalizes `..` with a cwd of `.`", 1)]),
-            n("pass", [p("cli normalize glob", 1), p("edge cases", 3), p("normalizes `.` with a cwd of `..`", 2)]),
-            n("pass", [p("cli normalize glob", 1), p("edge cases", 3), p("normalizes directories with a cwd of `..`", 3)]),
-            n("pass", [p("cli normalize glob", 1), p("edge cases", 3), p("removes excess `.`", 4)]),
-            n("pass", [p("cli normalize glob", 1), p("edge cases", 3), p("removes excess `..`", 5)]),
-            n("pass", [p("cli normalize glob", 1), p("edge cases", 3), p("removes excess combined junk", 6)]),
-            n("leave", [p("cli normalize glob", 1), p("edge cases", 3)]),
-            n("leave", [p("cli normalize glob", 1)]),
-            n("enter", [p("core (timeouts)", 2)]),
-            n("pass", [p("core (timeouts)", 2), p("succeeds with own", 0)]),
-            n("pass", [p("core (timeouts)", 2), p("fails with own", 1)]),
-            n("pass", [p("core (timeouts)", 2), p("succeeds with inherited", 2)]),
-            n("pass", [p("core (timeouts)", 2), p("fails with inherited", 3)]),
-            n("pass", [p("core (timeouts)", 2), p("gets own set timeout", 4)]),
-            n("pass", [p("core (timeouts)", 2), p("gets own inline set timeout", 5)]),
-            n("pass", [p("core (timeouts)", 2), p("gets own sync inner timeout", 6)]),
-            n("pass", [p("core (timeouts)", 2), p("gets default timeout", 7)]),
-            n("leave", [p("core (timeouts)", 2)]),
-            n("end", []),
+            n.start(),
+            n.enter([p("core (basic)", 0)]),
+            n.pass([p("core (basic)", 0), p("has `base()`", 0)]),
+            n.pass([p("core (basic)", 0), p("has `test()`", 1)]),
+            n.pass([p("core (basic)", 0), p("has `parent()`", 2)]),
+            n.pass([p("core (basic)", 0), p("can accept a string + function", 3)]),
+            n.pass([p("core (basic)", 0), p("can accept a string", 4)]),
+            n.pass([p("core (basic)", 0), p("returns the current instance when given a callback", 5)]),
+            n.pass([p("core (basic)", 0), p("returns a prototypal clone when not given a callback", 6)]),
+            n.pass([p("core (basic)", 0), p("runs block tests within tests", 7)]),
+            n.pass([p("core (basic)", 0), p("runs successful inline tests within tests", 8)]),
+            n.pass([p("core (basic)", 0), p("accepts a callback with `run()`", 9)]),
+            n.leave([p("core (basic)", 0)]),
+            n.enter([p("cli normalize glob", 1)]),
+            n.enter([p("cli normalize glob", 1), p("current directory", 0)]),
+            n.pass([p("cli normalize glob", 1), p("current directory", 0), p("normalizes a file", 0)]),
+            n.pass([p("cli normalize glob", 1), p("current directory", 0), p("normalizes a glob", 1)]),
+            n.pass([p("cli normalize glob", 1), p("current directory", 0), p("retains trailing slashes", 2)]),
+            n.pass([p("cli normalize glob", 1), p("current directory", 0), p("retains negative", 3)]),
+            n.pass([p("cli normalize glob", 1), p("current directory", 0), p("retains negative + trailing slashes", 4)]),
+            n.leave([p("cli normalize glob", 1), p("current directory", 0)]),
+            n.enter([p("cli normalize glob", 1), p("absolute directory", 1)]),
+            n.pass([p("cli normalize glob", 1), p("absolute directory", 1), p("normalizes a file", 0)]),
+            n.pass([p("cli normalize glob", 1), p("absolute directory", 1), p("normalizes a glob", 1)]),
+            n.pass([p("cli normalize glob", 1), p("absolute directory", 1), p("retains trailing slashes", 2)]),
+            n.pass([p("cli normalize glob", 1), p("absolute directory", 1), p("retains negative", 3)]),
+            n.pass([p("cli normalize glob", 1), p("absolute directory", 1), p("retains negative + trailing slashes", 4)]),
+            n.leave([p("cli normalize glob", 1), p("absolute directory", 1)]),
+            n.enter([p("cli normalize glob", 1), p("relative directory", 2)]),
+            n.pass([p("cli normalize glob", 1), p("relative directory", 2), p("normalizes a file", 0)]),
+            n.pass([p("cli normalize glob", 1), p("relative directory", 2), p("normalizes a glob", 1)]),
+            n.pass([p("cli normalize glob", 1), p("relative directory", 2), p("retains trailing slashes", 2)]),
+            n.pass([p("cli normalize glob", 1), p("relative directory", 2), p("retains negative", 3)]),
+            n.pass([p("cli normalize glob", 1), p("relative directory", 2), p("retains negative + trailing slashes", 4)]),
+            n.leave([p("cli normalize glob", 1), p("relative directory", 2)]),
+            n.enter([p("cli normalize glob", 1), p("edge cases", 3)]),
+            n.pass([p("cli normalize glob", 1), p("edge cases", 3), p("normalizes `.` with a cwd of `.`", 0)]),
+            n.pass([p("cli normalize glob", 1), p("edge cases", 3), p("normalizes `..` with a cwd of `.`", 1)]),
+            n.pass([p("cli normalize glob", 1), p("edge cases", 3), p("normalizes `.` with a cwd of `..`", 2)]),
+            n.pass([p("cli normalize glob", 1), p("edge cases", 3), p("normalizes directories with a cwd of `..`", 3)]),
+            n.pass([p("cli normalize glob", 1), p("edge cases", 3), p("removes excess `.`", 4)]),
+            n.pass([p("cli normalize glob", 1), p("edge cases", 3), p("removes excess `..`", 5)]),
+            n.pass([p("cli normalize glob", 1), p("edge cases", 3), p("removes excess combined junk", 6)]),
+            n.leave([p("cli normalize glob", 1), p("edge cases", 3)]),
+            n.leave([p("cli normalize glob", 1)]),
+            n.enter([p("core (timeouts)", 2)]),
+            n.pass([p("core (timeouts)", 2), p("succeeds with own", 0)]),
+            n.pass([p("core (timeouts)", 2), p("fails with own", 1)]),
+            n.pass([p("core (timeouts)", 2), p("succeeds with inherited", 2)]),
+            n.pass([p("core (timeouts)", 2), p("fails with inherited", 3)]),
+            n.pass([p("core (timeouts)", 2), p("gets own set timeout", 4)]),
+            n.pass([p("core (timeouts)", 2), p("gets own inline set timeout", 5)]),
+            n.pass([p("core (timeouts)", 2), p("gets own sync inner timeout", 6)]),
+            n.pass([p("core (timeouts)", 2), p("gets default timeout", 7)]),
+            n.leave([p("core (timeouts)", 2)]),
+            n.end(),
         ],
 
         output: [
@@ -488,62 +502,62 @@ describe("reporter tap", function () { // eslint-disable-line max-statements
         /* eslint-disable max-len */
 
         input: [
-            n("start", []),
-            n("enter", [p("core (basic)", 0)]),
-            n("pass", [p("core (basic)", 0), p("has `base()`", 0)]),
-            n("pass", [p("core (basic)", 0), p("has `test()`", 1)]),
-            n("pass", [p("core (basic)", 0), p("has `parent()`", 2)]),
-            n("skip", [p("core (basic)", 0), p("can accept a string + function", 3)]),
-            n("pass", [p("core (basic)", 0), p("can accept a string", 4)]),
-            n("pass", [p("core (basic)", 0), p("returns the current instance when given a callback", 5)]),
-            n("fail", [p("core (basic)", 0), p("returns a prototypal clone when not given a callback", 6)], badType),
-            n("pass", [p("core (basic)", 0), p("runs block tests within tests", 7)]),
-            n("pass", [p("core (basic)", 0), p("runs successful inline tests within tests", 8)]),
-            n("pass", [p("core (basic)", 0), p("accepts a callback with `run()`", 9)]),
-            n("leave", [p("core (basic)", 0)]),
-            n("enter", [p("cli normalize glob", 1)]),
-            n("enter", [p("cli normalize glob", 1), p("current directory", 0)]),
-            n("fail", [p("cli normalize glob", 1), p("current directory", 0), p("normalizes a file", 0)], sentinel),
-            n("pass", [p("cli normalize glob", 1), p("current directory", 0), p("normalizes a glob", 1)]),
-            n("pass", [p("cli normalize glob", 1), p("current directory", 0), p("retains trailing slashes", 2)]),
-            n("pass", [p("cli normalize glob", 1), p("current directory", 0), p("retains negative", 3)]),
-            n("pass", [p("cli normalize glob", 1), p("current directory", 0), p("retains negative + trailing slashes", 4)]),
-            n("leave", [p("cli normalize glob", 1), p("current directory", 0)]),
-            n("enter", [p("cli normalize glob", 1), p("absolute directory", 1)]),
-            n("pass", [p("cli normalize glob", 1), p("absolute directory", 1), p("normalizes a file", 0)]),
-            n("pass", [p("cli normalize glob", 1), p("absolute directory", 1), p("normalizes a glob", 1)]),
-            n("pass", [p("cli normalize glob", 1), p("absolute directory", 1), p("retains trailing slashes", 2)]),
-            n("skip", [p("cli normalize glob", 1), p("absolute directory", 1), p("retains negative", 3)]),
-            n("pass", [p("cli normalize glob", 1), p("absolute directory", 1), p("retains negative + trailing slashes", 4)]),
-            n("leave", [p("cli normalize glob", 1), p("absolute directory", 1)]),
-            n("enter", [p("cli normalize glob", 1), p("relative directory", 2)]),
-            n("pass", [p("cli normalize glob", 1), p("relative directory", 2), p("normalizes a file", 0)]),
-            n("pass", [p("cli normalize glob", 1), p("relative directory", 2), p("normalizes a glob", 1)]),
-            n("pass", [p("cli normalize glob", 1), p("relative directory", 2), p("retains trailing slashes", 2)]),
-            n("pass", [p("cli normalize glob", 1), p("relative directory", 2), p("retains negative", 3)]),
-            n("fail", [p("cli normalize glob", 1), p("relative directory", 2), p("retains negative + trailing slashes", 4)], badType),
-            n("leave", [p("cli normalize glob", 1), p("relative directory", 2)]),
-            n("enter", [p("cli normalize glob", 1), p("edge cases", 3)]),
-            n("pass", [p("cli normalize glob", 1), p("edge cases", 3), p("normalizes `.` with a cwd of `.`", 0)]),
-            n("pass", [p("cli normalize glob", 1), p("edge cases", 3), p("normalizes `..` with a cwd of `.`", 1)]),
-            n("pass", [p("cli normalize glob", 1), p("edge cases", 3), p("normalizes `.` with a cwd of `..`", 2)]),
-            n("pass", [p("cli normalize glob", 1), p("edge cases", 3), p("normalizes directories with a cwd of `..`", 3)]),
-            n("pass", [p("cli normalize glob", 1), p("edge cases", 3), p("removes excess `.`", 4)]),
-            n("pass", [p("cli normalize glob", 1), p("edge cases", 3), p("removes excess `..`", 5)]),
-            n("pass", [p("cli normalize glob", 1), p("edge cases", 3), p("removes excess combined junk", 6)]),
-            n("leave", [p("cli normalize glob", 1), p("edge cases", 3)]),
-            n("leave", [p("cli normalize glob", 1)]),
-            n("enter", [p("core (timeouts)", 2)]),
-            n("skip", [p("core (timeouts)", 2), p("succeeds with own", 0)]),
-            n("pass", [p("core (timeouts)", 2), p("fails with own", 1)]),
-            n("pass", [p("core (timeouts)", 2), p("succeeds with inherited", 2)]),
-            n("pass", [p("core (timeouts)", 2), p("fails with inherited", 3)]),
-            n("pass", [p("core (timeouts)", 2), p("gets own set timeout", 4)]),
-            n("fail", [p("core (timeouts)", 2), p("gets own inline set timeout", 5)], sentinel),
-            n("skip", [p("core (timeouts)", 2), p("gets own sync inner timeout", 6)]),
-            n("pass", [p("core (timeouts)", 2), p("gets default timeout", 7)]),
-            n("leave", [p("core (timeouts)", 2)]),
-            n("end", []),
+            n.start(),
+            n.enter([p("core (basic)", 0)]),
+            n.pass([p("core (basic)", 0), p("has `base()`", 0)]),
+            n.pass([p("core (basic)", 0), p("has `test()`", 1)]),
+            n.pass([p("core (basic)", 0), p("has `parent()`", 2)]),
+            n.skip([p("core (basic)", 0), p("can accept a string + function", 3)]),
+            n.pass([p("core (basic)", 0), p("can accept a string", 4)]),
+            n.pass([p("core (basic)", 0), p("returns the current instance when given a callback", 5)]),
+            n.fail([p("core (basic)", 0), p("returns a prototypal clone when not given a callback", 6)], badType),
+            n.pass([p("core (basic)", 0), p("runs block tests within tests", 7)]),
+            n.pass([p("core (basic)", 0), p("runs successful inline tests within tests", 8)]),
+            n.pass([p("core (basic)", 0), p("accepts a callback with `run()`", 9)]),
+            n.leave([p("core (basic)", 0)]),
+            n.enter([p("cli normalize glob", 1)]),
+            n.enter([p("cli normalize glob", 1), p("current directory", 0)]),
+            n.fail([p("cli normalize glob", 1), p("current directory", 0), p("normalizes a file", 0)], sentinel),
+            n.pass([p("cli normalize glob", 1), p("current directory", 0), p("normalizes a glob", 1)]),
+            n.pass([p("cli normalize glob", 1), p("current directory", 0), p("retains trailing slashes", 2)]),
+            n.pass([p("cli normalize glob", 1), p("current directory", 0), p("retains negative", 3)]),
+            n.pass([p("cli normalize glob", 1), p("current directory", 0), p("retains negative + trailing slashes", 4)]),
+            n.leave([p("cli normalize glob", 1), p("current directory", 0)]),
+            n.enter([p("cli normalize glob", 1), p("absolute directory", 1)]),
+            n.pass([p("cli normalize glob", 1), p("absolute directory", 1), p("normalizes a file", 0)]),
+            n.pass([p("cli normalize glob", 1), p("absolute directory", 1), p("normalizes a glob", 1)]),
+            n.pass([p("cli normalize glob", 1), p("absolute directory", 1), p("retains trailing slashes", 2)]),
+            n.skip([p("cli normalize glob", 1), p("absolute directory", 1), p("retains negative", 3)]),
+            n.pass([p("cli normalize glob", 1), p("absolute directory", 1), p("retains negative + trailing slashes", 4)]),
+            n.leave([p("cli normalize glob", 1), p("absolute directory", 1)]),
+            n.enter([p("cli normalize glob", 1), p("relative directory", 2)]),
+            n.pass([p("cli normalize glob", 1), p("relative directory", 2), p("normalizes a file", 0)]),
+            n.pass([p("cli normalize glob", 1), p("relative directory", 2), p("normalizes a glob", 1)]),
+            n.pass([p("cli normalize glob", 1), p("relative directory", 2), p("retains trailing slashes", 2)]),
+            n.pass([p("cli normalize glob", 1), p("relative directory", 2), p("retains negative", 3)]),
+            n.fail([p("cli normalize glob", 1), p("relative directory", 2), p("retains negative + trailing slashes", 4)], badType),
+            n.leave([p("cli normalize glob", 1), p("relative directory", 2)]),
+            n.enter([p("cli normalize glob", 1), p("edge cases", 3)]),
+            n.pass([p("cli normalize glob", 1), p("edge cases", 3), p("normalizes `.` with a cwd of `.`", 0)]),
+            n.pass([p("cli normalize glob", 1), p("edge cases", 3), p("normalizes `..` with a cwd of `.`", 1)]),
+            n.pass([p("cli normalize glob", 1), p("edge cases", 3), p("normalizes `.` with a cwd of `..`", 2)]),
+            n.pass([p("cli normalize glob", 1), p("edge cases", 3), p("normalizes directories with a cwd of `..`", 3)]),
+            n.pass([p("cli normalize glob", 1), p("edge cases", 3), p("removes excess `.`", 4)]),
+            n.pass([p("cli normalize glob", 1), p("edge cases", 3), p("removes excess `..`", 5)]),
+            n.pass([p("cli normalize glob", 1), p("edge cases", 3), p("removes excess combined junk", 6)]),
+            n.leave([p("cli normalize glob", 1), p("edge cases", 3)]),
+            n.leave([p("cli normalize glob", 1)]),
+            n.enter([p("core (timeouts)", 2)]),
+            n.skip([p("core (timeouts)", 2), p("succeeds with own", 0)]),
+            n.pass([p("core (timeouts)", 2), p("fails with own", 1)]),
+            n.pass([p("core (timeouts)", 2), p("succeeds with inherited", 2)]),
+            n.pass([p("core (timeouts)", 2), p("fails with inherited", 3)]),
+            n.pass([p("core (timeouts)", 2), p("gets own set timeout", 4)]),
+            n.fail([p("core (timeouts)", 2), p("gets own inline set timeout", 5)], sentinel),
+            n.skip([p("core (timeouts)", 2), p("gets own sync inner timeout", 6)]),
+            n.pass([p("core (timeouts)", 2), p("gets default timeout", 7)]),
+            n.leave([p("core (timeouts)", 2)]),
+            n.end(),
         ],
 
         output: [].concat([
@@ -628,10 +642,10 @@ describe("reporter tap", function () { // eslint-disable-line max-statements
     context("restarting", function () {
         test("empty test", {
             input: [
-                n("start", []),
-                n("end", []),
-                n("start", []),
-                n("end", []),
+                n.start(),
+                n.end(),
+                n.start(),
+                n.end(),
             ],
             output: [
                 "TAP version 13",
@@ -647,14 +661,14 @@ describe("reporter tap", function () { // eslint-disable-line max-statements
 
         test("passing 2", {
             input: [
-                n("start", []),
-                n("pass", [p("test", 0)]),
-                n("pass", [p("test", 1)]),
-                n("end", []),
-                n("start", []),
-                n("pass", [p("test", 0)]),
-                n("pass", [p("test", 1)]),
-                n("end", []),
+                n.start(),
+                n.pass([p("test", 0)]),
+                n.pass([p("test", 1)]),
+                n.end(),
+                n.start(),
+                n.pass([p("test", 0)]),
+                n.pass([p("test", 1)]),
+                n.end(),
             ],
             output: [
                 "TAP version 13",
@@ -678,14 +692,14 @@ describe("reporter tap", function () { // eslint-disable-line max-statements
 
         test("fail 2 with Error", {
             input: [
-                n("start", []),
-                n("fail", [p("one", 0)], sentinel),
-                n("fail", [p("two", 1)], sentinel),
-                n("end", []),
-                n("start", []),
-                n("fail", [p("one", 0)], sentinel),
-                n("fail", [p("two", 1)], sentinel),
-                n("end", []),
+                n.start(),
+                n.fail([p("one", 0)], sentinel),
+                n.fail([p("two", 1)], sentinel),
+                n.end(),
+                n.start(),
+                n.fail([p("one", 0)], sentinel),
+                n.fail([p("two", 1)], sentinel),
+                n.end(),
             ],
             output: [].concat([
                 "TAP version 13",
@@ -719,14 +733,14 @@ describe("reporter tap", function () { // eslint-disable-line max-statements
 
         test("pass + fail with Error", {
             input: [
-                n("start", []),
-                n("pass", [p("one", 0)]),
-                n("fail", [p("two", 1)], sentinel),
-                n("end", []),
-                n("start", []),
-                n("pass", [p("one", 0)]),
-                n("fail", [p("two", 1)], sentinel),
-                n("end", []),
+                n.start(),
+                n.pass([p("one", 0)]),
+                n.fail([p("two", 1)], sentinel),
+                n.end(),
+                n.start(),
+                n.pass([p("one", 0)]),
+                n.fail([p("two", 1)], sentinel),
+                n.end(),
             ],
             output: [].concat([
                 "TAP version 13",
@@ -756,14 +770,14 @@ describe("reporter tap", function () { // eslint-disable-line max-statements
 
         test("fail with Error + pass", {
             input: [
-                n("start", []),
-                n("fail", [p("one", 0)], sentinel),
-                n("pass", [p("two", 1)]),
-                n("end", []),
-                n("start", []),
-                n("fail", [p("one", 0)], sentinel),
-                n("pass", [p("two", 1)]),
-                n("end", []),
+                n.start(),
+                n.fail([p("one", 0)], sentinel),
+                n.pass([p("two", 1)]),
+                n.end(),
+                n.start(),
+                n.fail([p("one", 0)], sentinel),
+                n.pass([p("two", 1)]),
+                n.end(),
             ],
             output: [].concat([
                 "TAP version 13",
@@ -795,14 +809,14 @@ describe("reporter tap", function () { // eslint-disable-line max-statements
 
         test("fail 2 with AssertionError", {
             input: [
-                n("start", []),
-                n("fail", [p("one", 0)], assertion),
-                n("fail", [p("two", 1)], assertion),
-                n("end", []),
-                n("start", []),
-                n("fail", [p("one", 0)], assertion),
-                n("fail", [p("two", 1)], assertion),
-                n("end", []),
+                n.start(),
+                n.fail([p("one", 0)], assertion),
+                n.fail([p("two", 1)], assertion),
+                n.end(),
+                n.start(),
+                n.fail([p("one", 0)], assertion),
+                n.fail([p("two", 1)], assertion),
+                n.end(),
             ],
             output: [].concat([
                 "TAP version 13",
@@ -848,14 +862,14 @@ describe("reporter tap", function () { // eslint-disable-line max-statements
 
         test("pass + fail with AssertionError", {
             input: [
-                n("start", []),
-                n("pass", [p("one", 0)]),
-                n("fail", [p("two", 1)], assertion),
-                n("end", []),
-                n("start", []),
-                n("pass", [p("one", 0)]),
-                n("fail", [p("two", 1)], assertion),
-                n("end", []),
+                n.start(),
+                n.pass([p("one", 0)]),
+                n.fail([p("two", 1)], assertion),
+                n.end(),
+                n.start(),
+                n.pass([p("one", 0)]),
+                n.fail([p("two", 1)], assertion),
+                n.end(),
             ],
             output: [].concat([
                 "TAP version 13",
@@ -891,14 +905,14 @@ describe("reporter tap", function () { // eslint-disable-line max-statements
 
         test("fail with AssertionError + pass", {
             input: [
-                n("start", []),
-                n("fail", [p("one", 0)], assertion),
-                n("pass", [p("two", 1)]),
-                n("end", []),
-                n("start", []),
-                n("fail", [p("one", 0)], assertion),
-                n("pass", [p("two", 1)]),
-                n("end", []),
+                n.start(),
+                n.fail([p("one", 0)], assertion),
+                n.pass([p("two", 1)]),
+                n.end(),
+                n.start(),
+                n.fail([p("one", 0)], assertion),
+                n.pass([p("two", 1)]),
+                n.end(),
             ],
             output: [].concat([
                 "TAP version 13",

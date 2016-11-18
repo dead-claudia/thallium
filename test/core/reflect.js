@@ -3,659 +3,607 @@
 /* eslint max-nested-callbacks: [2, 5] */
 
 describe("core (reflect)", function () {
-    var n = Util.n
-    var p = Util.p
+    describe("get current", function () {
+        function current(reflect) { return reflect.current }
+        function identity(reflect) { return reflect }
 
-    describe("methods()", function () {
-        function methods(reflect) { return reflect.methods() }
+        it("returns the correct instance", function () {
+            var tt = Util.create()
 
-        it("returns the correct methods", function () {
-            var tt = t.create()
-
-            assert.equal(tt.call(methods), tt)
+            assert.equal(tt.call(current), tt.call(identity))
         })
 
-        it("returns the correct methods in an inner inline test", function () {
-            var tt = t.create()
-            var inner = tt.test("test")
-
-            assert.equal(inner.call(methods), inner)
-        })
-
-        it("returns the correct methods in an inner block test", function () {
-            var tt = t.create()
+        it("returns the correct instance in a child test", function () {
+            var tt = Util.create()
             var inner, found
 
             tt.test("test", function (tt) {
-                inner = tt
-                found = tt.call(methods)
+                inner = tt.call(identity)
+                found = tt.call(current)
             })
 
             return tt.run().then(function () {
                 assert.equal(found, inner)
             })
         })
+    })
 
-        it("returns the correct methods from a previously run test", function () { // eslint-disable-line max-len
-            var tt = t.create()
-            var inner = tt.test("test")
+    context("hooks on reflect", function () {
+        run({
+            beforeAll: function (tt, callback) {
+                tt.call(function (reflect) {
+                    reflect.beforeAll(callback)
+                    assert.equal(reflect.hasBeforeAll(callback), true)
+                })
+            },
 
-            return tt.run().then(function () {
-                assert.equal(inner.call(methods), inner)
-            })
+            beforeEach: function (tt, callback) {
+                tt.call(function (reflect) {
+                    reflect.before(callback)
+                    assert.equal(reflect.hasBefore(callback), true)
+                })
+            },
+
+            afterAll: function (tt, callback) {
+                tt.call(function (reflect) {
+                    reflect.afterAll(callback)
+                    assert.equal(reflect.hasAfterAll(callback), true)
+                })
+            },
+
+            afterEach: function (tt, callback) {
+                tt.call(function (reflect) {
+                    reflect.after(callback)
+                    assert.equal(reflect.hasAfter(callback), true)
+                })
+            },
         })
     })
 
-    describe("try()", function () {
-        function attempt() {
-            var args = []
+    context("hooks on root", function () {
+        run({
+            beforeAll: function (tt, callback) {
+                tt.beforeAll(callback)
+                tt.call(function (reflect) {
+                    assert.equal(reflect.hasBeforeAll(callback), true)
+                })
+            },
 
-            for (var i = 0; i < arguments.length; i++) {
-                args.push(arguments[i])
-            }
+            beforeEach: function (tt, callback) {
+                tt.before(callback)
+                tt.call(function (reflect) {
+                    assert.equal(reflect.hasBefore(callback), true)
+                })
+            },
 
-            return function (reflect) {
-                return reflect.try.apply(reflect, args)
-            }
-        }
+            afterAll: function (tt, callback) {
+                tt.afterAll(callback)
+                tt.call(function (reflect) {
+                    assert.equal(reflect.hasAfterAll(callback), true)
+                })
+            },
 
-        it("runs blocks in sync tests", function () {
-            var tt = t.create()
-            var ret = []
-            var len, self // eslint-disable-line consistent-this
-
-            tt.reporter(Util.push(ret))
-
-            tt.test("test", function (tt) {
-                tt.call(attempt(/** @this */ function () {
-                    len = arguments.length
-                    self = this
-                }))
-            })
-
-            return tt.run().then(function () {
-                assert.equal(self, undefined)
-                assert.equal(len, 0)
-                assert.match(ret, [
-                    n("start", []),
-                    n("pass", [p("test", 0)]),
-                    n("end", []),
-                ])
-            })
-        })
-
-        it("propagates errors from blocks in sync tests", function () {
-            var tt = t.create()
-            var ret = []
-            var sentinel = new Error("sentinel")
-
-            sentinel.marker = function () {}
-
-            tt.reporter(Util.push(ret))
-
-            tt.test("test", function (tt) {
-                tt.call(attempt(function () { throw sentinel }))
-            })
-
-            return tt.run().then(function () {
-                assert.match(ret, [
-                    n("start", []),
-                    n("fail", [p("test", 0)], sentinel),
-                    n("end", []),
-                ])
-            })
-        })
-
-        it("runs blocks in async tests", function () {
-            var tt = t.create()
-            var ret = []
-            var len, self // eslint-disable-line consistent-this
-
-            tt.reporter(Util.push(ret))
-
-            tt.test("test", function (tt) {
-                tt.call(attempt(/** @this */ function () {
-                    len = arguments.length
-                    self = this
-                }))
-
-                return Util.Promise.resolve()
-            })
-
-            return tt.run().then(function () {
-                assert.equal(self, undefined)
-                assert.equal(len, 0)
-                assert.match(ret, [
-                    n("start", []),
-                    n("pass", [p("test", 0)]),
-                    n("end", []),
-                ])
-            })
-        })
-
-        it("propagates errors from blocks in async tests", function () {
-            var tt = t.create()
-            var ret = []
-            var sentinel = new Error("sentinel")
-
-            sentinel.marker = function () {}
-
-            tt.reporter(Util.push(ret))
-
-            tt.test("test", function (tt) {
-                tt.call(attempt(function () { throw sentinel }))
-                return Util.Promise.resolve()
-            })
-
-            return tt.run().then(function () {
-                assert.match(ret, [
-                    n("start", []),
-                    n("fail", [p("test", 0)], sentinel),
-                    n("end", []),
-                ])
-            })
-        })
-
-        it("runs blocks in inline sync tests", function () {
-            var tt = t.create()
-            var ret = []
-            var len, self // eslint-disable-line consistent-this
-
-            tt.reporter(Util.push(ret))
-
-            tt.test("test").call(attempt(/** @this */ function () {
-                len = arguments.length
-                self = this
-            }))
-
-            return tt.run().then(function () {
-                assert.equal(self, undefined)
-                assert.equal(len, 0)
-                assert.match(ret, [
-                    n("start", []),
-                    n("pass", [p("test", 0)]),
-                    n("end", []),
-                ])
-            })
-        })
-
-        it("propagates errors from blocks in inline sync tests", function () {
-            var tt = t.create()
-            var ret = []
-            var sentinel = new Error("sentinel")
-
-            sentinel.marker = function () {}
-
-            tt.reporter(Util.push(ret))
-
-            tt.test("test").call(attempt(function () { throw sentinel }))
-
-            return tt.run().then(function () {
-                assert.match(ret, [
-                    n("start", []),
-                    n("fail", [p("test", 0)], sentinel),
-                    n("end", []),
-                ])
-            })
+            afterEach: function (tt, callback) {
+                tt.after(callback)
+                tt.call(function (reflect) {
+                    assert.equal(reflect.hasAfter(callback), true)
+                })
+            },
         })
     })
 
-    describe("checkInit()", function () {
-        it("catches errors correctly", function () {
-            var inner
+    function run(_) {
+        describe("before all", function () {
+            it("works with no tests", function () {
+                var called = 0
+                var tt = Util.create()
 
-            return t.create()
-            .test("foo", function (tt) {
-                inner = tt.call(function (reflect) { return reflect })
-            })
-            .run().then(function () {
-                assert.throws(function () { inner.checkInit() }, ReferenceError)
-            })
-        })
-    })
+                _.beforeAll(tt, function () { called++ })
 
-    describe("runnable()", function () {
-        function runnable(reflect) { return reflect.runnable() }
-
-        it("checks roots", function () {
-            assert.equal(t.create().call(runnable), true)
-        })
-
-        it("checks inline normal tests", function () {
-            var tt = t.create()
-
-            assert.equal(tt.test("test").call(runnable), true)
-        })
-
-        it("checks inline skipped tests", function () {
-            var tt = t.create()
-
-            assert.equal(tt.testSkip("test").call(runnable), false)
-        })
-
-        it("checks block normal tests", function () {
-            var tt = t.create()
-            var inner
-
-            tt.test("test", function (tt) {
-                inner = tt.call(runnable)
+                return tt.run().then(function () {
+                    assert.equal(called, 0)
+                })
             })
 
-            return tt.run().then(function () {
-                assert.equal(inner, true)
-            })
-        })
+            it("works with one test", function () {
+                var called = 0
+                var tt = Util.create()
 
-        it("misses block skipped tests", function () {
-            var tt = t.create()
-            var inner
+                _.beforeAll(tt, function () { called++ })
+                tt.test("test", function () {})
 
-            tt.testSkip("test", function (tt) {
-                inner = tt.call(runnable)
-            })
-
-            return tt.run().then(function () {
-                assert.equal(inner, undefined)
-            })
-        })
-
-        it("checks whitelisted `.only()` inline tests", function () {
-            var tt = t.create()
-
-            tt.only(["test"])
-            assert.equal(tt.test("test").call(runnable), true)
-        })
-
-        it("checks non-whitelisted `.only()` inline tests", function () {
-            var tt = t.create()
-
-            tt.only(["nope"])
-            assert.equal(tt.test("test").call(runnable), false)
-        })
-
-        it("checks whitelisted `.only()` block tests", function () {
-            var tt = t.create()
-            var inner
-
-            tt.only(["test"])
-
-            tt.test("test", function (tt) {
-                inner = tt.call(runnable)
+                return tt.run().then(function () {
+                    assert.equal(called, 1)
+                })
             })
 
-            return tt.run().then(function () {
-                assert.equal(inner, true)
+            it("works with two tests", function () {
+                var called = 0
+                var tt = Util.create()
+
+                _.beforeAll(tt, function () { called++ })
+                tt.test("test", function () {})
+                tt.test("test", function () {})
+
+                return tt.run().then(function () {
+                    assert.equal(called, 1)
+                })
+            })
+
+            it("avoids child tests", function () {
+                var called = 0
+                var tt = Util.create()
+
+                _.beforeAll(tt, function () { called++ })
+                tt.test("test", function () {
+                    tt.test("test", function () {})
+                })
+
+                return tt.run().then(function () {
+                    assert.equal(called, 1)
+                })
+            })
+
+            it("works inside child tests", function () {
+                var called = 0
+                var tt = Util.create()
+
+                tt.test("test", function () {
+                    _.beforeAll(tt, function () { called++ })
+                    tt.test("test", function () {})
+                })
+
+                return tt.run().then(function () {
+                    assert.equal(called, 1)
+                })
+            })
+
+            it("executes in the right order", function () {
+                var queue = []
+                var tt = Util.create()
+
+                _.beforeAll(tt, function () { queue.push("root") })
+                tt.test("test", function () {
+                    _.beforeAll(tt, function () { queue.push("inner") })
+                    tt.test("test", function () {})
+                })
+
+                return tt.run().then(function () {
+                    assert.match(queue, ["root", "inner"])
+                })
             })
         })
 
-        it("misses non-whitelisted `.only()` block tests", function () {
-            var tt = t.create()
-            var inner
+        describe("before each", function () {
+            it("works with no tests", function () {
+                var called = 0
+                var tt = Util.create()
 
-            tt.only(["nope"])
+                _.beforeEach(tt, function () { called++ })
 
-            tt.test("test", function (tt) {
-                inner = tt.call(runnable)
+                return tt.run().then(function () {
+                    assert.equal(called, 0)
+                })
             })
 
-            return tt.run().then(function () {
-                assert.equal(inner, undefined)
-            })
-        })
-    })
+            it("works with one test", function () {
+                var called = 0
+                var tt = Util.create()
 
-    describe("skipped()", function () {
-        function skipped(reflect) { return reflect.skipped() }
+                _.beforeEach(tt, function () { called++ })
+                tt.test("test", function () {})
 
-        it("checks roots", function () {
-            assert.equal(t.create().call(skipped), false)
-        })
-
-        it("checks inline normal tests", function () {
-            var tt = t.create()
-
-            assert.equal(tt.test("test").call(skipped), false)
-        })
-
-        it("checks inline skipped tests", function () {
-            var tt = t.create()
-
-            assert.equal(tt.testSkip("test").call(skipped), true)
-        })
-
-        it("checks block normal tests", function () {
-            var tt = t.create()
-            var inner
-
-            tt.test("test", function (tt) {
-                inner = tt.call(skipped)
+                return tt.run().then(function () {
+                    assert.equal(called, 1)
+                })
             })
 
-            return tt.run().then(function () {
-                assert.equal(inner, false)
-            })
-        })
+            it("works with two tests", function () {
+                var called = 0
+                var tt = Util.create()
 
-        it("misses block skipped tests", function () {
-            var tt = t.create()
-            var inner
+                _.beforeEach(tt, function () { called++ })
+                tt.test("test", function () {})
+                tt.test("test", function () {})
 
-            tt.testSkip("test", function (tt) {
-                inner = tt.call(skipped)
-            })
-
-            return tt.run().then(function () {
-                assert.equal(inner, undefined)
-            })
-        })
-
-        it("checks whitelisted `.only()` inline tests", function () {
-            var tt = t.create()
-
-            tt.only(["test"])
-            assert.equal(tt.test("test").call(skipped), false)
-        })
-
-        it("checks non-whitelisted `.only()` inline tests", function () {
-            var tt = t.create()
-
-            tt.only(["nope"])
-            assert.equal(tt.test("test").call(skipped), false)
-        })
-
-        it("checks whitelisted `.only()` block tests", function () {
-            var tt = t.create()
-            var inner
-
-            tt.only(["test"])
-
-            tt.test("test", function (tt) {
-                inner = tt.call(skipped)
+                return tt.run().then(function () {
+                    assert.equal(called, 2)
+                })
             })
 
-            return tt.run().then(function () {
-                assert.equal(inner, false)
+            it("hits child tests", function () {
+                var called = 0
+                var tt = Util.create()
+
+                _.beforeEach(tt, function () { called++ })
+                tt.test("test", function () {
+                    tt.test("test", function () {})
+                })
+
+                return tt.run().then(function () {
+                    assert.equal(called, 2)
+                })
+            })
+
+            it("works inside child tests", function () {
+                var called = 0
+                var tt = Util.create()
+
+                tt.test("test", function () {
+                    _.beforeEach(tt, function () { called++ })
+                    tt.test("test", function () {})
+                })
+
+                return tt.run().then(function () {
+                    assert.equal(called, 1)
+                })
+            })
+
+            it("executes in the right order", function () {
+                var queue = []
+                var tt = Util.create()
+
+                _.beforeEach(tt, function () { queue.push("root") })
+                tt.test("test", function () {
+                    _.beforeEach(tt, function () { queue.push("inner") })
+                    tt.test("test", function () {})
+                })
+
+                return tt.run().then(function () {
+                    assert.match(queue, ["root", "root", "inner"])
+                })
             })
         })
 
-        it("misses non-whitelisted `.only()` block tests", function () {
-            var tt = t.create()
-            var inner
+        describe("after each", function () {
+            it("works with no tests", function () {
+                var called = 0
+                var tt = Util.create()
 
-            tt.only(["nope"])
+                _.afterEach(tt, function () { called++ })
 
-            tt.test("test", function (tt) {
-                inner = tt.call(skipped)
+                return tt.run().then(function () {
+                    assert.equal(called, 0)
+                })
             })
 
-            return tt.run().then(function () {
-                assert.equal(inner, undefined)
-            })
-        })
-    })
+            it("works with one test", function () {
+                var called = 0
+                var tt = Util.create()
 
-    describe("report()", function () {
-        var Report = Util.Tests.Report
-        var Types = Util.Tests.Types
-        var create = t.call(function (reflect) { return reflect.report })
+                _.afterEach(tt, function () { called++ })
+                tt.test("test", function () {})
 
-        it("correctly creates `start` reports", function () {
-            var report = create("start", [], {value: "hello"})
-            var expected = new Report(Types.Start, [], undefined, -1, 0)
-
-            assert.match(report, expected)
-        })
-
-        it("correctly creates `enter` reports", function () {
-            var report = create("enter", [], {value: "hello"})
-            var expected = new Report(Types.Enter, [], undefined, 10, 75)
-
-            assert.match(report, expected)
-        })
-
-        it("correctly creates `enter` reports with duration", function () {
-            var report = create("enter", [], {value: "hello"}, 20)
-            var expected = new Report(Types.Enter, [], undefined, 20, 75)
-
-            assert.match(report, expected)
-        })
-
-        it("correctly creates `enter` reports with slow", function () {
-            var report = create("enter", [], {value: "hello"}, null, 10) // eslint-disable-line max-len
-            var expected = new Report(Types.Enter, [], undefined, 10, 10)
-
-            assert.match(report, expected)
-        })
-
-        it("correctly creates `enter` reports with duration + slow", function () { // eslint-disable-line max-len
-            var report = create("enter", [], {value: "hello"}, null, 10) // eslint-disable-line max-len
-            var expected = new Report(Types.Enter, [], undefined, 10, 10)
-
-            assert.match(report, expected)
-        })
-
-        it("correctly creates `leave` reports", function () {
-            var report = create("leave", [], {value: "hello"})
-            var expected = new Report(Types.Leave, [], undefined, -1, 0)
-
-            assert.match(report, expected)
-        })
-
-        it("correctly creates `pass` reports", function () {
-            var report = create("pass", [], {value: "hello"})
-            var expected = new Report(Types.Pass, [], undefined, 10, 75)
-
-            assert.match(report, expected)
-        })
-
-        it("correctly creates `pass` reports with duration", function () {
-            var report = create("pass", [], {value: "hello"}, 20)
-            var expected = new Report(Types.Pass, [], undefined, 20, 75)
-
-            assert.match(report, expected)
-        })
-
-        it("correctly creates `pass` reports with slow", function () {
-            var report = create("pass", [], {value: "hello"}, null, 10) // eslint-disable-line max-len
-            var expected = new Report(Types.Pass, [], undefined, 10, 10)
-
-            assert.match(report, expected)
-        })
-
-        it("correctly creates `pass` reports with duration + slow", function () { // eslint-disable-line max-len
-            var report = create("pass", [], {value: "hello"}, null, 10) // eslint-disable-line max-len
-            var expected = new Report(Types.Pass, [], undefined, 10, 10)
-
-            assert.match(report, expected)
-        })
-
-        it("correctly creates `fail` reports", function () {
-            var report = create("fail", [], {value: "hello"})
-            var expected = new Report(Types.Fail, [], {value: "hello"}, 10, 75)
-
-            assert.match(report, expected)
-        })
-
-        it("correctly creates `fail` reports with duration", function () {
-            var report = create("fail", [], {value: "hello"}, 20)
-            var expected = new Report(Types.Fail, [], {value: "hello"}, 20, 75)
-
-            assert.match(report, expected)
-        })
-
-        it("correctly creates `fail` reports with slow", function () {
-            var report = create("fail", [], {value: "hello"}, null, 10) // eslint-disable-line max-len
-            var expected = new Report(Types.Fail, [], {value: "hello"}, 10, 10)
-
-            assert.match(report, expected)
-        })
-
-        it("correctly creates `fail` reports with duration + slow", function () { // eslint-disable-line max-len
-            var report = create("fail", [], {value: "hello"}, null, 10) // eslint-disable-line max-len
-            var expected = new Report(Types.Fail, [], {value: "hello"}, 10, 10)
-
-            assert.match(report, expected)
-        })
-
-        it("correctly creates `skip` reports", function () {
-            var report = create("skip", [], {value: "hello"})
-            var expected = new Report(Types.Skip, [], undefined, -1, 0)
-
-            assert.match(report, expected)
-        })
-
-        it("correctly creates `end` reports", function () {
-            var report = create("end", [], {value: "hello"})
-            var expected = new Report(Types.End, [], undefined, -1, 0)
-
-            assert.match(report, expected)
-        })
-
-        it("correctly creates `error` reports", function () {
-            var report = create("error", [], {value: "hello"})
-            var expected = new Report(Types.Error, [], {value: "hello"}, -1, 0)
-
-            assert.match(report, expected)
-        })
-
-        context("type checkers", function () {
-            it("correctly identifies `start` reports", function () {
-                var report = create("start", [])
-
-                assert.equal(report.start(), true)
-                assert.equal(report.enter(), false)
-                assert.equal(report.leave(), false)
-                assert.equal(report.pass(), false)
-                assert.equal(report.fail(), false)
-                assert.equal(report.skip(), false)
-                assert.equal(report.end(), false)
-                assert.equal(report.error(), false)
+                return tt.run().then(function () {
+                    assert.equal(called, 1)
+                })
             })
 
-            it("correctly identifies `enter` reports", function () {
-                var report = create("enter", [])
+            it("works with two tests", function () {
+                var called = 0
+                var tt = Util.create()
 
-                assert.equal(report.start(), false)
-                assert.equal(report.enter(), true)
-                assert.equal(report.leave(), false)
-                assert.equal(report.pass(), false)
-                assert.equal(report.fail(), false)
-                assert.equal(report.skip(), false)
-                assert.equal(report.end(), false)
-                assert.equal(report.error(), false)
+                _.afterEach(tt, function () { called++ })
+                tt.test("test", function () {})
+                tt.test("test", function () {})
+
+                return tt.run().then(function () {
+                    assert.equal(called, 2)
+                })
             })
 
-            it("correctly identifies `leave` reports", function () {
-                var report = create("leave", [])
+            it("hits child tests", function () {
+                var called = 0
+                var tt = Util.create()
 
-                assert.equal(report.start(), false)
-                assert.equal(report.enter(), false)
-                assert.equal(report.leave(), true)
-                assert.equal(report.pass(), false)
-                assert.equal(report.fail(), false)
-                assert.equal(report.skip(), false)
-                assert.equal(report.end(), false)
-                assert.equal(report.error(), false)
+                _.afterEach(tt, function () { called++ })
+                tt.test("test", function () {
+                    tt.test("test", function () {})
+                })
+
+                return tt.run().then(function () {
+                    assert.equal(called, 2)
+                })
             })
 
-            it("correctly identifies `pass` reports", function () {
-                var report = create("pass", [])
+            it("works inside child tests", function () {
+                var called = 0
+                var tt = Util.create()
 
-                assert.equal(report.start(), false)
-                assert.equal(report.enter(), false)
-                assert.equal(report.leave(), false)
-                assert.equal(report.pass(), true)
-                assert.equal(report.fail(), false)
-                assert.equal(report.skip(), false)
-                assert.equal(report.end(), false)
-                assert.equal(report.error(), false)
+                tt.test("test", function () {
+                    _.afterEach(tt, function () { called++ })
+                    tt.test("test", function () {})
+                })
+
+                return tt.run().then(function () {
+                    assert.equal(called, 1)
+                })
             })
 
-            it("correctly identifies `fail` reports", function () {
-                var report = create("fail", [])
+            it("executes in the right order", function () {
+                var queue = []
+                var tt = Util.create()
 
-                assert.equal(report.start(), false)
-                assert.equal(report.enter(), false)
-                assert.equal(report.leave(), false)
-                assert.equal(report.pass(), false)
-                assert.equal(report.fail(), true)
-                assert.equal(report.skip(), false)
-                assert.equal(report.end(), false)
-                assert.equal(report.error(), false)
-            })
+                _.afterEach(tt, function () { queue.push("root") })
+                tt.test("test", function () {
+                    _.afterEach(tt, function () { queue.push("inner") })
+                    tt.test("test", function () {})
+                })
 
-            it("correctly identifies `skip` reports", function () {
-                var report = create("skip", [])
-
-                assert.equal(report.start(), false)
-                assert.equal(report.enter(), false)
-                assert.equal(report.leave(), false)
-                assert.equal(report.pass(), false)
-                assert.equal(report.fail(), false)
-                assert.equal(report.skip(), true)
-                assert.equal(report.end(), false)
-                assert.equal(report.error(), false)
-            })
-
-            it("correctly identifies `end` reports", function () {
-                var report = create("end", [])
-
-                assert.equal(report.start(), false)
-                assert.equal(report.enter(), false)
-                assert.equal(report.leave(), false)
-                assert.equal(report.pass(), false)
-                assert.equal(report.fail(), false)
-                assert.equal(report.skip(), false)
-                assert.equal(report.end(), true)
-                assert.equal(report.error(), false)
-            })
-
-            it("correctly identifies `error` reports", function () {
-                var report = create("error", [])
-
-                assert.equal(report.start(), false)
-                assert.equal(report.enter(), false)
-                assert.equal(report.leave(), false)
-                assert.equal(report.pass(), false)
-                assert.equal(report.fail(), false)
-                assert.equal(report.skip(), false)
-                assert.equal(report.end(), false)
-                assert.equal(report.error(), true)
+                return tt.run().then(function () {
+                    assert.match(queue, ["inner", "root", "root"])
+                })
             })
         })
 
-        context("type()", function () {
-            it("returns correct value for `start` reports", function () {
-                assert.match(create("start", []).type(), "start")
+        describe("after all", function () {
+            it("works with no tests", function () {
+                var called = 0
+                var tt = Util.create()
+
+                _.afterAll(tt, function () { called++ })
+
+                return tt.run().then(function () {
+                    assert.equal(called, 0)
+                })
             })
 
-            it("returns correct value for `enter` reports", function () {
-                assert.match(create("enter", []).type(), "enter")
+            it("works with one test", function () {
+                var called = 0
+                var tt = Util.create()
+
+                _.afterAll(tt, function () { called++ })
+                tt.test("test", function () {})
+
+                return tt.run().then(function () {
+                    assert.equal(called, 1)
+                })
             })
 
-            it("returns correct value for `leave` reports", function () {
-                assert.match(create("leave", []).type(), "leave")
+            it("works with two tests", function () {
+                var called = 0
+                var tt = Util.create()
+
+                _.afterAll(tt, function () { called++ })
+                tt.test("test", function () {})
+                tt.test("test", function () {})
+
+                return tt.run().then(function () {
+                    assert.equal(called, 1)
+                })
             })
 
-            it("returns correct value for `pass` reports", function () {
-                assert.match(create("pass", []).type(), "pass")
+            it("avoids child tests", function () {
+                var called = 0
+                var tt = Util.create()
+
+                _.afterAll(tt, function () { called++ })
+                tt.test("test", function () {
+                    tt.test("test", function () {})
+                })
+
+                return tt.run().then(function () {
+                    assert.equal(called, 1)
+                })
             })
 
-            it("returns correct value for `fail` reports", function () {
-                assert.match(create("fail", []).type(), "fail")
+            it("works inside child tests", function () {
+                var called = 0
+                var tt = Util.create()
+
+                tt.test("test", function () {
+                    _.afterAll(tt, function () { called++ })
+                    tt.test("test", function () {})
+                })
+
+                return tt.run().then(function () {
+                    assert.equal(called, 1)
+                })
             })
 
-            it("returns correct value for `skip` reports", function () {
-                assert.match(create("skip", []).type(), "skip")
-            })
+            it("executes in the right order", function () {
+                var queue = []
+                var tt = Util.create()
 
-            it("returns correct value for `end` reports", function () {
-                assert.match(create("end", []).type(), "end")
-            })
+                _.afterAll(tt, function () { queue.push("root") })
+                tt.test("test", function () {
+                    _.afterAll(tt, function () { queue.push("inner") })
+                    tt.test("test", function () {})
+                })
 
-            it("returns correct value for `error` reports", function () {
-                assert.match(create("error", []).type(), "error")
+                return tt.run().then(function () {
+                    assert.match(queue, ["inner", "root"])
+                })
             })
         })
-    })
+
+        describe("all hooks", function () {
+            it("works with no tests", function () {
+                var queue = []
+                var tt = Util.create()
+
+                _.beforeAll(tt, function () { queue.push("before all") })
+                _.beforeEach(tt, function () { queue.push("before each") })
+                _.afterEach(tt, function () { queue.push("after each") })
+                _.afterAll(tt, function () { queue.push("after all") })
+
+                return tt.run().then(function () {
+                    assert.match(queue, [])
+                })
+            })
+
+            it("works with one test", function () {
+                var queue = []
+                var tt = Util.create()
+
+                _.beforeAll(tt, function () { queue.push("before all") })
+                _.beforeEach(tt, function () { queue.push("before each") })
+                _.afterEach(tt, function () { queue.push("after each") })
+                _.afterAll(tt, function () { queue.push("after all") })
+                tt.test("test", function () {})
+
+                return tt.run().then(function () {
+                    assert.match(queue, [
+                        "before all",
+                        "before each",
+                        "after each",
+                        "after all",
+                    ])
+                })
+            })
+
+            it("works with two tests", function () {
+                var queue = []
+                var tt = Util.create()
+
+                _.beforeAll(tt, function () { queue.push("before all") })
+                _.beforeEach(tt, function () { queue.push("before each") })
+                _.afterEach(tt, function () { queue.push("after each") })
+                _.afterAll(tt, function () { queue.push("after all") })
+                tt.test("test", function () {})
+                tt.test("test", function () {})
+
+                return tt.run().then(function () {
+                    assert.match(queue, [
+                        "before all",
+                        "before each",
+                        "after each",
+                        "before each",
+                        "after each",
+                        "after all",
+                    ])
+                })
+            })
+
+            it("works with child tests", function () {
+                var queue = []
+                var tt = Util.create()
+
+                _.beforeAll(tt, function () { queue.push("before all") })
+                _.beforeEach(tt, function () { queue.push("before each") })
+                _.afterEach(tt, function () { queue.push("after each") })
+                _.afterAll(tt, function () { queue.push("after all") })
+                tt.test("test", function () {
+                    tt.test("test", function () {})
+                })
+
+                return tt.run().then(function () {
+                    assert.match(queue, [
+                        "before all",
+                        "before each",
+                        "before each",
+                        "after each",
+                        "after each",
+                        "after all",
+                    ])
+                })
+            })
+
+            it("works inside child tests", function () {
+                var queue = []
+                var tt = Util.create()
+
+                tt.test("test", function () {
+                    _.beforeAll(tt, function () { queue.push("before all") }) // eslint-disable-line max-len
+                    _.beforeEach(tt, function () { queue.push("before each") }) // eslint-disable-line max-len
+                    _.afterEach(tt, function () { queue.push("after each") }) // eslint-disable-line max-len
+                    _.afterAll(tt, function () { queue.push("after all") })
+                    tt.test("test", function () {})
+                })
+
+                return tt.run().then(function () {
+                    assert.match(queue, [
+                        "before all",
+                        "before each",
+                        "after each",
+                        "after all",
+                    ])
+                })
+            })
+
+            it("executes in the right order", function () {
+                var queue = []
+                var tt = Util.create()
+
+                _.beforeAll(tt, function () { queue.push("root before all") }) // eslint-disable-line max-len
+                _.beforeEach(tt, function () { queue.push("root before each") }) // eslint-disable-line max-len
+                _.afterEach(tt, function () { queue.push("root after each") }) // eslint-disable-line max-len
+                _.afterAll(tt, function () { queue.push("root after all") }) // eslint-disable-line max-len
+                tt.test("test", function () {
+                    _.beforeAll(tt, function () { queue.push("inner before all") }) // eslint-disable-line max-len
+                    _.beforeEach(tt, function () { queue.push("inner before each") }) // eslint-disable-line max-len
+                    _.afterEach(tt, function () { queue.push("inner after each") }) // eslint-disable-line max-len
+                    _.afterAll(tt, function () { queue.push("inner after all") }) // eslint-disable-line max-len
+                    tt.test("test", function () {})
+                })
+
+                return tt.run().then(function () {
+                    assert.match(queue, [
+                        "root before all",
+                        "root before each",
+                        "inner before all",
+                        "root before each",
+                        "inner before each",
+                        "inner after each",
+                        "root after each",
+                        "inner after all",
+                        "root after each",
+                        "root after all",
+                    ])
+                })
+            })
+        })
+
+        describe("removing before all", function () {
+            it("works", function () {
+                var tt = Util.create()
+
+                function callback() {}
+                _.beforeAll(tt, callback)
+                tt.call(function (reflect) {
+                    reflect.removeBeforeAll(callback)
+                    assert.equal(reflect.hasBeforeAll(callback), false)
+                })
+            })
+        })
+
+        describe("removing before each", function () {
+            it("works", function () {
+                var tt = Util.create()
+
+                function callback() {}
+                _.beforeEach(tt, callback)
+                tt.call(function (reflect) {
+                    reflect.removeBefore(callback)
+                    assert.equal(reflect.hasBefore(callback), false)
+                })
+            })
+        })
+
+        describe("removing after each", function () {
+            it("works", function () {
+                var tt = Util.create()
+
+                function callback() {}
+                _.beforeEach(tt, callback)
+                tt.call(function (reflect) {
+                    reflect.removeAfter(callback)
+                    assert.equal(reflect.hasAfter(callback), false)
+                })
+            })
+        })
+
+        describe("removing after all", function () {
+            it("works", function () {
+                var tt = Util.create()
+
+                function callback() {}
+                _.afterAll(tt, callback)
+                tt.call(function (reflect) {
+                    reflect.removeAfterAll(callback)
+                    assert.equal(reflect.hasAfterAll(callback), false)
+                })
+            })
+        })
+    }
 })

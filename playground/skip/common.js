@@ -1,14 +1,14 @@
 "use strict"
 
-var t = require("../../index.js")
+var t = require("../..")
 
-t.test("cli common", function (t) {
-    t.test("isObjectLike()", function (t) {
+t.test("cli common", function () {
+    t.test("isObjectLike()", function () {
         t.testSkip("passes for objects and functions")
         t.testSkip("fails for other things")
     })
 
-    t.test("resolveDefault()", function (t) {
+    t.test("resolveDefault()", function () {
         t.testSkip("gets CJS default functions")
         t.testSkip("gets CJS default functions with `default` property")
         t.testSkip("gets CJS default arrays with `default` property")
@@ -23,8 +23,8 @@ t.test("cli common", function (t) {
         t.testSkip("gets ES6 default primitives")
     })
 
-    t.test("normalizeGlob()", function (t) {
-        t.test("current directory", function (t) {
+    t.test("normalizeGlob()", function () {
+        t.test("current directory", function () {
             t.testSkip("normalizes a file")
             t.testSkip("normalizes a glob")
             t.testSkip("retains trailing slashes")
@@ -32,7 +32,7 @@ t.test("cli common", function (t) {
             t.testSkip("retains negative + trailing slashes")
         })
 
-        t.test("absolute directory", function (t) {
+        t.test("absolute directory", function () {
             t.testSkip("normalizes a file")
             t.testSkip("normalizes a glob")
             t.testSkip("retains trailing slashes")
@@ -40,7 +40,7 @@ t.test("cli common", function (t) {
             t.testSkip("retains negative + trailing slashes")
         })
 
-        t.test("relative directory", function (t) {
+        t.test("relative directory", function () {
             t.testSkip("normalizes a file")
             t.testSkip("normalizes a glob")
             t.testSkip("retains trailing slashes")
@@ -48,7 +48,7 @@ t.test("cli common", function (t) {
             t.testSkip("retains negative + trailing slashes")
         })
 
-        t.test("edge cases", function (t) {
+        t.test("edge cases", function () {
             t.testSkip("normalizes `.` with a cwd of `.`")
             t.testSkip("normalizes `..` with a cwd of `.`")
             t.testSkip("normalizes `.` with a cwd of `..`")
@@ -59,7 +59,7 @@ t.test("cli common", function (t) {
         })
     })
 
-    t.test("globParent()", function (t) {
+    t.test("globParent()", function () {
         t.testSkip("strips glob magic to return parent path")
         t.testSkip("returns parent dirname from non-glob paths")
         t.testSkip("gets a base name")

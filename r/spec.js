@@ -2,8 +2,7 @@
 
 // This is a reporter that mimics Mocha's `spec` reporter.
 
-var Promise = require("../lib/bluebird.js")
-var R = require("../lib/reporter.js")
+var R = require("../lib/reporter")
 var c = R.color
 
 function indent(level) {
@@ -13,23 +12,24 @@ function indent(level) {
     return ret
 }
 
-function getName(level, ev) {
-    return ev.path[level - 1].name
+function getName(level, report) {
+    return report.path[level - 1].name
 }
 
-function printReport(r, ev, init) {
-    return Promise.try(function () {
-        if (r.state.lastIsNested && r.state.level === 1) return r.print()
-        else return undefined
-    })
-    .then(function () {
-        r.state.lastIsNested = false
-        return r.print(indent(r.state.level) + init())
-    })
+function printReport(_, init) {
+    if (_.state.lastIsNested && _.state.level === 1) {
+        return _.print().then(function () {
+            _.state.lastIsNested = false
+            return _.print(indent(_.state.level) + init())
+        })
+    } else {
+        _.state.lastIsNested = false
+        return _.print(indent(_.state.level) + init())
+    }
 }
 
 module.exports = R.on({
-    accepts: ["print", "reset", "colors"],
+    accepts: ["write", "reset", "colors"],
     create: R.consoleReporter,
     before: R.setColor,
     after: R.unsetColor,
@@ -39,49 +39,46 @@ module.exports = R.on({
         state.lastIsNested = false
     },
 
-    report: function (r, ev) {
-        if (ev.start()) {
-            if (ev.path.length === 0) return r.print()
-
-            return r.print().return(ev.path).each(function (entry) {
-                return r.print(indent(r.state.level++) + entry.name)
+    report: function (_, report) {
+        if (report.isStart) {
+            return _.print()
+        } else if (report.isEnter) {
+            return printReport(_, function () {
+                return getName(_.state.level++, report)
             })
-        } else if (ev.enter()) {
-            return printReport(r, ev, function () {
-                return getName(r.state.level++, ev)
-            })
-        } else if (ev.leave()) {
-            r.state.level--
-            r.state.lastIsNested = true
+        } else if (report.isLeave) {
+            _.state.level--
+            _.state.lastIsNested = true
             return undefined
-        } else if (ev.pass()) {
-            return printReport(r, ev, function () {
+        } else if (report.isPass) {
+            return printReport(_, function () {
                 var str =
                     c("checkmark", R.symbols().Pass + " ") +
-                    c("pass", getName(r.state.level, ev))
+                    c("pass", getName(_.state.level, report))
 
-                var speed = R.speed(ev)
+                var speed = R.speed(report)
 
                 if (speed !== "fast") {
-                    str += c(speed, " (" + ev.duration + "ms)")
+                    str += c(speed, " (" + report.duration + "ms)")
                 }
 
                 return str
             })
-        } else if (ev.fail()) {
-            return printReport(r, ev, function () {
-                r.pushError(ev, false)
-                return c("fail", r.errors.length + ") " +
-                    getName(r.state.level, ev))
+        } else if (report.isHook || report.isFail) {
+            return printReport(_, function () {
+                _.pushError(report)
+                return c("fail",
+                    _.errors.length + ") " + getName(_.state.level, report) +
+                    R.formatRest(report))
             })
-        } else if (ev.skip()) {
-            return printReport(r, ev, function () {
-                return c("skip", "- " + getName(r.state.level, ev))
+        } else if (report.isSkip) {
+            return printReport(_, function () {
+                return c("skip", "- " + getName(_.state.level, report))
             })
         }
 
-        if (ev.end()) return r.printResults()
-        if (ev.error()) return r.printError(ev)
+        if (report.isEnd) return _.printResults()
+        if (report.isError) return _.printError(report)
         return undefined
     },
 })

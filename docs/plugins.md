@@ -1,120 +1,106 @@
 # Plugins
 
-Thallium is very, *very* modular and extensible. The plugin system was made to be as easy as possible to work with, yet still be very powerful. It's powerful enough that the core assertions, `thallium/assertions`, are themselves implemented in a plugin.
+Thallium is very, *very* modular and extensible. The plugin system was made to be as easy as possible to work with, yet still be very powerful. It's powerful enough that it enables almost all the core tests to be completely black-box, while still getting all the data it needs.
 
-Plugins are just standard functions that accept a Thallium test instance as both `this` and the only argument. Here's a very minimal plugin, that does absolutely nothing:
+Plugins are just standard functions that accept a Thallium `reflect` instance as both `this` and the only argument, and they can optionally return a value. Here's a very minimal plugin, that does absolutely nothing:
 
 ```js
-module.exports = () => {}
+module.exports = () => {};
 ```
 
-You can define your own assertions within plugins pretty easily:
+You can easily wrap your tests to accept a `co` generator:
 
 ```js
 // plugin.js
-module.exports = t => {
-    t.define("equal", (a, b) => ({
-        test: a === b,
-        actual: a,
-        expected: b,
-        message: "Expected {actual} to equal {expected}",
-    }))
+const co = require("co");
+const toString = {}.toString;
 
-    t.define("notEqual", (a, b) => ({
-        test: a !== b,
-        actual: a,
-        expected: b,
-        message: "Expected {actual} to not equal {expected}",
-    }))
+function isGeneratorFunction(object) {
+    return toString.call(object) === "[object GeneratorFunction]";
 }
+
+module.exports = reflect => ({
+    test: function (name, callback) {
+        if (isGeneratorFunction(callback)) callback = co.wrap(callback);
+        return reflect.test(name, callback);
+    },
+
+    testSkip: function (name, callback) {
+        if (isGeneratorFunction(callback)) callback = co.wrap(callback);
+        return reflect.testSkip(name, callback);
+    },
+});
 ```
 
 Or, if you'd prefer a CoffeeScript example:
 
 ```coffee
 # plugin.coffee
-module.exports = ->
-    @define
-        equal: (a, b) ->
-            test: a is b
-            actual: a
-            expected: b
-            message: 'Expected {actual} to equal {expected}'
+co = require 'co'
+{toString} = {}
 
-        notEqual: (a, b) ->
-            test: a isnt b
-            actual: a
-            expected: b
-            message: 'Expected {actual} to not equal {expected}'
+isGeneratorFunction = (object) ->
+    toString.call(object) is '[object GeneratorFunction]'
+
+module.exports = (reflect) ->
+    test: (name, callback) ->
+        callback = co.wrap(callback) if isGeneratorFunction(callback)
+        reflect.test name, callback
+
+    testSkip: (name, callback) ->
+        callback = co.wrap(callback) if isGeneratorFunction(callback)
+        reflect.testSkip name, callback
 ```
 
 Using this plugin is as simple as this:
 
 ```js
 // JavaScript
-t.use(require("./plugin.js"))
+const p = t.call(require("./plugin"))
 
-t.test("test", t => {
-    t.equal(1, 1)
-    t.notEqual(1, 0)
+p.test("test", function *() {
+    const result = yield doSomethingAsync()
+    assert.equal(result, "foo")
+})
+
+p.testSkip("other", function *() {
+    const result = yield doSomethingElseAsync()
+    assert.equal(result, "bar")
 })
 ```
 
 ```coffee
 # CoffeeScript
-t.use require('./plugin.coffee')
+p = t.call require('./plugin')
 
-t.test 'test', ->
-    @equal 1, 1
-    @notEqual 1, 0
+p.test 'test', ->
+    result = yield doSomethingAsync()
+    assert.equal result, 'foo'
+
+p.testSkip 'other', ->
+    result = yield doSomethingElseAsync()
+    assert.equal result, 'bar'
 ```
 
 You can also easily add reporters specific to your plugin:
 
 ```js
-module.exports = t => {
-    t.reporter(require("my-reporter"))
+module.exports = reflect => {
+    reflect.reporter(require("my-reporter"))
 }
 ```
 
-## Caching
+## Best Practices
 
-When you use a plugin, Thallium caches that per-instance. So you can't use the same plugin twice without a layer of indirection.
+- When you publish plugins on npm, you should declare Thallium as a [peer dependency](https://docs.npmjs.com/files/package.json#peerdependencies). This is to ensure your users have the correct version.
 
-```js
-const plugin = require("./plugin.js")
+- Try to minimize state within your plugins. It's often awkward to manage in general.
 
-// This only calls the plugin once.
-t.use(plugin)
-t.use(plugin)
+- If you need per-test state, use `reflect.addBeforeAll`/etc. and symbols (a polyfill is acceptable) or a WeakMap if you're not worried about broad browser support.
 
-// This forces a new call
-t.use(t => plugin.call(t, t))
+- Try to keep as much of your mutable global state within the plugin closure as you can, so if a user needs to load the plugin separately in multiple places, your plugin will be initialized as many times as they need. Also note that this isn't cached, so it will also be conveniently a clean slate each time.
+    - Caching for repeatable operations like with persistent weak maps don't necessarily count.
 
-t.test("test", t => {
-    // This calls the plugin again, but for the child instance instead.
-    t.use(plugin)
-})
-```
+- If you wrap a core method, such as in a BDD wrapper wrapping `t.test()`, try to limit how much you change the semantics in the wrapper. Otherwise, it will be very surprising to users of your plugin.
 
-This helps cut down on memory a bit.
-
-## Safety considerations
-
-Any time you add a method that relies on state (Thallium's or your own), you *must* call `t.checkInit()`. This ensures your method is being run *when* the current test is executing, instead of in a child test in a separate tick, for example. This check helps catch a whole class of bugs that linters can't normally catch.
-
-If you use `reflect.define()`/`t.define()` or `reflect.add()`, this is already done for you, and it's recommended to use those when you're defining new methods and assertions.
-
-## Other best practices
-
-- Don't rely on Thallium's assertions when writing your own assertions. The API is simple for a reason.
-
-- Try to minimize state within your plugins, especially that which is tied to the Thallium instance. It's often awkward to manage in general.
-
-- If you need per-test state, wrap `t.test` and `t.async` to initialize your test, and use symbols (a polyfill is acceptable) or a WeakMap if you're okay with limiting yourself to ES6. Also note that tests prototypically inherit from their parent test by design.
-
-- Try to keep as much of your mutable global state within the plugin closure as you can, so if a user needs to load the plugin separately in multiple places, your plugin will be initialized as many times as they need.
-
-- If you ever have to modify a core method, such as in a BDD wrapper which would mean wrapping `t.test()` and `t.async()`, take as much care as possible to not change the API unless clearly documented as intentional. Otherwise, it will be very surprising to users of your plugin.
-
-- If you need to add private assertions for, say, `expect`-style assertions, use a symbol-named one, even if it's a polyfill.
+- If you're writing anything assertion-related, it doesn't belong in a plugin. Plugins are meant for things like integrating with tools or creating alternative wrappers for various methods.

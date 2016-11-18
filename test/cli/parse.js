@@ -1,7 +1,8 @@
 "use strict"
 
 var path = require("path")
-var parse = require("../../lib/cli/parse.js")
+var parse = require("../../lib/cli/parse")
+var Warning = require("../../lib/cli/init-common").Warning
 
 describe("cli args parsing", function () {
     function alias(description, str, opts) {
@@ -15,6 +16,7 @@ describe("cli args parsing", function () {
             if (opts.files == null) opts.files = []
             if (opts.forceLocal == null) opts.forceLocal = false
             if (opts.help == null) opts.help = undefined
+            if (opts.opts == null) opts.opts = undefined
             if (opts.require == null) opts.require = []
             if (opts.respawn == null) opts.respawn = true
             if (opts.unknown == null) opts.unknown = []
@@ -82,7 +84,7 @@ describe("cli args parsing", function () {
             var args = str ? str.split(/\s+/g) : []
 
             it("fails with missing argument for " + str, function () {
-                assert.throws(function () { parse(args) }, Error)
+                assert.throws(Warning, function () { parse(args) })
             })
         }
 

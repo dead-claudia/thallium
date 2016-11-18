@@ -1,7 +1,6 @@
 'use strict'
 
 t = require 'thallium'
-t.reporter require '../../scripts/pipe-reporter.js'
-require('../../lib/tests.js').silenceEmptyInlineWarnings()
+t.reporter require '../../test-util/cli/pipe-reporter'
 
 exports.files = 'spec/**/*.coffee'

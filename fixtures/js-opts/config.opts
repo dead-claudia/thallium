@@ -1,0 +1,2 @@
+--config ./test/config.js
+--require ./test/inject.js

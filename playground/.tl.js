@@ -9,10 +9,10 @@
 
 // Set the reporter and options below:
 var reporter = {
-    module: "../r/dot.js",
+    module: "../r/spec",
     opts: {},
 }
 
-var t = exports.thallium = require("../index.js")
+var t = exports.thallium = require("../index")
 
-t.reporter(require(reporter.module)(reporter.opts))
+t.reporter(require(reporter.module), reporter.opts)

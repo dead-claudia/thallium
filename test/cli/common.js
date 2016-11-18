@@ -6,7 +6,8 @@
 // over.
 
 var path = require("path")
-var Common = require("../../lib/cli/common.js")
+var Common = require("../../lib/cli/common")
+var gp = require("../../lib/cli/init-common").globParent
 
 describe("cli common", function () {
     var p = path.normalize
@@ -31,7 +32,7 @@ describe("cli common", function () {
             assert.notOk(isObjectLike(null))
             assert.notOk(isObjectLike(undefined))
             assert.notOk(isObjectLike())
-            if (typeof Symbol === "function") assert.notOk(isObjectLike(Symbol())) // eslint-disable-line no-undef, max-len
+            assert.notOk(isObjectLike(Symbol())) // eslint-disable-line no-undef, max-len
         })
     })
 
@@ -76,11 +77,9 @@ describe("cli common", function () {
             assert.equal(undefined, resolveDefault(undefined))
             assert.equal(undefined, resolveDefault())
 
-            if (typeof Symbol === "function") { // eslint-disable-line no-undef
-                var sym = Symbol() // eslint-disable-line no-undef
+            var sym = Symbol() // eslint-disable-line no-undef
 
-                assert.equal(sym, resolveDefault(sym))
-            }
+            assert.equal(sym, resolveDefault(sym))
         })
 
         it("gets ES6 default functions", function () {
@@ -132,11 +131,9 @@ describe("cli common", function () {
             assert.equal(null, resolveDefault({default: null}))
             assert.equal(undefined, resolveDefault({default: undefined}))
 
-            if (typeof Symbol === "function") { // eslint-disable-line no-undef
-                var sym = Symbol() // eslint-disable-line no-undef
+            var sym = Symbol() // eslint-disable-line no-undef
 
-                assert.equal(sym, resolveDefault({default: sym}))
-            }
+            assert.equal(sym, resolveDefault({default: sym}))
         })
     })
 
@@ -228,8 +225,6 @@ describe("cli common", function () {
     })
 
     describe("globParent()", function () {
-        var gp = Common.globParent
-
         it("strips glob magic to return parent path", function () {
             assert.equal(gp(p("path/to/*.js")), p("path/to"))
             assert.equal(gp(p("/root/path/to/*.js")), p("/root/path/to"))
@@ -302,7 +297,7 @@ describe("cli common", function () {
 
         function invalid(name, config) {
             it(name + " is invalid", function () {
-                assert.throws(function () { Common.validate(config) }, TypeError) // eslint-disable-line max-len
+                assert.throws(TypeError, function () { Common.validate(config) }) // eslint-disable-line max-len
             })
         }
 
@@ -342,7 +337,7 @@ describe("cli common", function () {
         function load(opts) {
             return function (name) {
                 assert.equal(name, "thallium")
-                return Util.Promise.resolve({exports: opts.thallium || {}})
+                return opts.thallium || {}
             }
         }
 
@@ -351,8 +346,8 @@ describe("cli common", function () {
                 files: files,
                 config: config,
                 load: load,
-                baseDir: ".",
                 isDefault: isDefault,
+                baseDir: ".",
             })
         }
 
@@ -360,55 +355,47 @@ describe("cli common", function () {
             it("merges an empty object", function () {
                 var thallium = {thallium: true}
                 var files = [p("custom/**")]
+                var config = merge(files, {}, load({thallium: thallium}), true)
 
-                return merge(files, {}, load({thallium: thallium}), true)
-                .then(function (config) {
-                    assert.match(config, {thallium: thallium, files: files})
-                    assert.equal(config.thallium, thallium)
-                })
+                assert.match(config, {thallium: thallium, files: files})
+                assert.equal(config.thallium, thallium)
             })
 
             it("merges `thallium`", function () {
                 var thallium = {thallium: true}
                 var files = [p("custom/**")]
+                var config = merge(files, {thallium: thallium}, load({}), true)
 
-                return merge(files, {thallium: thallium}, load({}), true)
-                .then(function (config) {
-                    assert.match(config, {thallium: thallium, files: files})
-                    assert.equal(config.thallium, thallium)
-                })
+                assert.match(config, {thallium: thallium, files: files})
+                assert.equal(config.thallium, thallium)
             })
 
             it("merges `files`", function () {
                 var thallium = {thallium: true}
                 var files = [p("custom/**")]
                 var extra = [p("other/**")]
-
-                return merge(
+                var config = merge(
                     files,
                     {files: extra},
                     load({thallium: thallium}),
                     true)
-                .then(function (config) {
-                    assert.match(config, {thallium: thallium, files: extra})
-                    assert.equal(config.thallium, thallium)
-                })
+
+                assert.match(config, {thallium: thallium, files: extra})
+                assert.equal(config.thallium, thallium)
             })
 
             it("merges everything", function () {
                 var thallium = {thallium: true}
                 var files = [p("custom/**")]
                 var extra = [p("other/**")]
-
-                return merge(
+                var config = merge(
                     files,
                     {thallium: thallium, files: extra},
                     load({}),
                     true)
-                .then(function (config) {
-                    assert.match(config, {thallium: thallium, files: extra})
-                    assert.equal(config.thallium, thallium)
-                })
+
+                assert.match(config, {thallium: thallium, files: extra})
+                assert.equal(config.thallium, thallium)
             })
         })
 
@@ -416,50 +403,45 @@ describe("cli common", function () {
             it("merges an empty object", function () {
                 var thallium = {thallium: true}
                 var files = [p("custom/**")]
+                var config = merge(files, {}, load({thallium: thallium}))
 
-                return merge(files, {}, load({thallium: thallium}))
-                .then(function (config) {
-                    assert.match(config, {thallium: thallium, files: files})
-                    assert.equal(config.thallium, thallium)
-                })
+                assert.match(config, {thallium: thallium, files: files})
+                assert.equal(config.thallium, thallium)
             })
 
             it("merges `thallium`", function () {
                 var thallium = {thallium: true}
                 var files = [p("custom/**")]
+                var config = merge(files, {thallium: thallium}, load({}))
 
-                return merge(files, {thallium: thallium}, load({}))
-                .then(function (config) {
-                    assert.match(config, {thallium: thallium, files: files})
-                    assert.equal(config.thallium, thallium)
-                })
+                assert.match(config, {thallium: thallium, files: files})
+                assert.equal(config.thallium, thallium)
             })
 
             it("merges `files`", function () {
                 var thallium = {thallium: true}
                 var files = [p("custom/**")]
                 var extra = [p("other/**")]
+                var config = merge(
+                    files,
+                    {files: extra},
+                    load({thallium: thallium}))
 
-                return merge(files, {files: extra}, load({thallium: thallium}))
-                .then(function (config) {
-                    assert.match(config, {thallium: thallium, files: files})
-                    assert.equal(config.thallium, thallium)
-                })
+                assert.match(config, {thallium: thallium, files: files})
+                assert.equal(config.thallium, thallium)
             })
 
             it("merges everything", function () {
                 var thallium = {thallium: true}
                 var files = [p("custom/**")]
                 var extra = [p("other/**")]
-
-                return merge(
+                var config = merge(
                     files,
                     {thallium: thallium, files: extra},
                     load({}))
-                .then(function (config) {
-                    assert.match(config, {thallium: thallium, files: files})
-                    assert.equal(config.thallium, thallium)
-                })
+
+                assert.match(config, {thallium: thallium, files: files})
+                assert.equal(config.thallium, thallium)
             })
         })
     })

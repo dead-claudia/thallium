@@ -4,8 +4,8 @@ describe("core (asynchronous behavior)", function () {
     var n = Util.n
     var p = Util.p
 
-    it("with normal tests", function () {
-        var tt = t.create()
+    it("with sync tests", function () {
+        var tt = Util.create()
         var called = false
 
         tt.test("test", function () { called = true })
@@ -16,25 +16,8 @@ describe("core (asynchronous behavior)", function () {
         return ret
     })
 
-    it("with shorthand tests", function () {
-        var tt = t.create()
-        var called = false
-
-        function fail() {
-            called = true
-            return assert.fail()
-        }
-
-        tt.test("test").try(fail)
-
-        var ret = tt.run().then(function () { assert.ok(called) })
-
-        assert.notOk(called)
-        return ret
-    })
-
     it("with async tests + sync resolve", function () {
-        var tt = t.create()
+        var tt = Util.create()
         var called = false
 
         tt.test("test", function () {
@@ -49,7 +32,7 @@ describe("core (asynchronous behavior)", function () {
     })
 
     it("with async tests + async resolve", function () {
-        var tt = t.create()
+        var tt = Util.create()
         var called = false
 
         tt.test("test", function () {
@@ -68,7 +51,7 @@ describe("core (asynchronous behavior)", function () {
     })
 
     it("with async tests + duplicate thenable resolution", function () {
-        var tt = t.create()
+        var tt = Util.create()
         var called = false
 
         tt.test("test", function () {
@@ -89,14 +72,14 @@ describe("core (asynchronous behavior)", function () {
     })
 
     it("with async tests + duplicate thenable rejection", function () {
-        var tt = t.create()
+        var tt = Util.create()
         var called = false
         var ret = []
         var sentinel = new Error("sentinel")
 
         sentinel.marker = function () {}
 
-        tt.reporter(Util.push(ret))
+        tt.reporter(Util.push, ret)
 
         tt.test("test", function () {
             called = true
@@ -111,9 +94,9 @@ describe("core (asynchronous behavior)", function () {
 
         var result = tt.run().then(function () {
             assert.match(ret, [
-                n("start", []),
-                n("fail", [p("test", 0)], sentinel),
-                n("end", []),
+                n.start(),
+                n.fail([p("test", 0)], sentinel),
+                n.end(),
             ])
         })
 
@@ -122,14 +105,14 @@ describe("core (asynchronous behavior)", function () {
     })
 
     it("with async tests + mixed thenable (resolve first)", function () {
-        var tt = t.create()
+        var tt = Util.create()
         var called = false
         var ret = []
         var sentinel = new Error("sentinel")
 
         sentinel.marker = function () {}
 
-        tt.reporter(Util.push(ret))
+        tt.reporter(Util.push, ret)
 
         tt.test("test", function () {
             called = true
@@ -145,9 +128,9 @@ describe("core (asynchronous behavior)", function () {
 
         var result = tt.run().then(function () {
             assert.match(ret, [
-                n("start", []),
-                n("pass", [p("test", 0)]),
-                n("end", []),
+                n.start(),
+                n.pass([p("test", 0)]),
+                n.end(),
             ])
         })
 
@@ -156,14 +139,14 @@ describe("core (asynchronous behavior)", function () {
     })
 
     it("with async tests + mixed thenable (reject first)", function () {
-        var tt = t.create()
+        var tt = Util.create()
         var called = false
         var ret = []
         var sentinel = new Error("sentinel")
 
         sentinel.marker = function () {}
 
-        tt.reporter(Util.push(ret))
+        tt.reporter(Util.push, ret)
 
         tt.test("test", function () {
             called = true
@@ -180,9 +163,9 @@ describe("core (asynchronous behavior)", function () {
 
         var result = tt.run().then(function () {
             assert.match(ret, [
-                n("start", []),
-                n("fail", [p("test", 0)], sentinel),
-                n("end", []),
+                n.start(),
+                n.fail([p("test", 0)], sentinel),
+                n.end(),
             ])
         })
 

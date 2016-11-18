@@ -8,20 +8,21 @@ represent more real-world usage.
 t = require 'thallium'
 path = require 'path'
 Common = require '../../../lib/cli/common.js'
+{globParent: gp} = require '../../../lib/cli/init-common.js'
 assert = require 'thallium/assert'
 
 t.test 'cli common', ->
     p = path.normalize
 
-    @test 'isObjectLike()', ->
+    t.test 'isObjectLike()', ->
         {isObjectLike} = Common
 
-        @test 'passes for objects and functions', ->
+        t.test 'passes for objects and functions', ->
             assert.equal isObjectLike({}), true
             assert.equal isObjectLike([]), true
             assert.equal isObjectLike(->), true
 
-        @test 'fails for other things', ->
+        t.test 'fails for other things', ->
             assert.equal isObjectLike(''), false
             assert.equal isObjectLike('foo'), false
             assert.equal isObjectLike(true), false
@@ -36,28 +37,28 @@ t.test 'cli common', ->
             if typeof Symbol is 'function'
                 assert.equal isObjectLike(Symbol()), false
 
-    @test 'resolveDefault()', ->
+    t.test 'resolveDefault()', ->
         {resolveDefault} = Common
 
-        @test 'gets CJS default functions', ->
+        t.test 'gets CJS default functions', ->
             f = ->
             assert.equal f, resolveDefault(f)
 
-        @test 'gets CJS default functions with `default` property', ->
+        t.test 'gets CJS default functions with `default` property', ->
             f = ->
             f.default = 'foo'
             assert.equal f, resolveDefault(f)
 
-        @test 'gets CJS default arrays with `default` property', ->
+        t.test 'gets CJS default arrays with `default` property', ->
             array = []
             array.default = 'foo'
             assert.equal array, resolveDefault(array)
 
-        @test 'gets CJS default objects', ->
+        t.test 'gets CJS default objects', ->
             obj = {}
             assert.equal obj, resolveDefault(obj)
 
-        @test 'gets CJS default primitives', ->
+        t.test 'gets CJS default primitives', ->
             assert.equal '', resolveDefault('')
             assert.equal 'foo', resolveDefault('foo')
             assert.equal true, resolveDefault(true)
@@ -73,33 +74,33 @@ t.test 'cli common', ->
                 sym = Symbol()
                 assert.equal sym, resolveDefault(sym)
 
-        @test 'gets ES6 default functions', ->
+        t.test 'gets ES6 default functions', ->
             f = ->
             assert.equal f, resolveDefault(default: f)
 
-        @test 'gets ES6 default objects', ->
+        t.test 'gets ES6 default objects', ->
             obj = {}
             assert.equal obj, resolveDefault(default: obj)
 
-        @test 'gets ES6 default arrays', ->
+        t.test 'gets ES6 default arrays', ->
             array = []
             assert.equal array, resolveDefault(default: array)
 
-        @test 'gets ES6 default objects with `default` property', ->
+        t.test 'gets ES6 default objects with `default` property', ->
             obj = default: {}
             assert.equal obj, resolveDefault(default: obj)
 
-        @test 'gets ES6 default functions with `default` property', ->
+        t.test 'gets ES6 default functions with `default` property', ->
             f = ->
             f.default = 'foo'
             assert.equal f, resolveDefault(default: f)
 
-        @test 'gets ES6 default arrays with `default` property', ->
+        t.test 'gets ES6 default arrays with `default` property', ->
             array = []
             array.default = 'foo'
             assert.equal array, resolveDefault(default: array)
 
-        @test 'gets ES6 default primitives', ->
+        t.test 'gets ES6 default primitives', ->
             assert.equal '', resolveDefault(default: '')
             assert.equal 'foo', resolveDefault(default: 'foo')
             assert.equal true, resolveDefault(default: true)
@@ -114,23 +115,23 @@ t.test 'cli common', ->
                 sym = Symbol()
                 assert.equal sym, resolveDefault(default: sym)
 
-    @test 'normalizeGlob()', ->
+    t.test 'normalizeGlob()', ->
         {normalizeGlob} = Common
         format = (str) -> str.replace /[\\\/]/g, path.sep
 
-        check = (name, base, {file, glob, dir, negate, negateDir}) =>
-            check1 = ([arg, expected]) ->
+        check = (name, base, {file, glob, dir, negate, negateDir}) ->
+            inner = ([arg, expected]) ->
                 assert.equal(
                     normalizeGlob format(arg), p(base)
                     p(expected)
                 )
 
-            @test name, ->
-                @test 'normalizes a file', -> check1 file
-                @test 'normalizes a glob', -> check1 glob
-                @test 'retains trailing slashes', -> check1 dir
-                @test 'retains negative', -> check1 negate
-                @test 'retains negative + trailing slashes', -> check1 negateDir
+            t.test name, ->
+                t.test 'normalizes a file', -> inner file
+                t.test 'normalizes a glob', -> inner glob
+                t.test 'retains trailing slashes', -> inner dir
+                t.test 'retains negative', -> inner negate
+                t.test 'retains negative + trailing slashes', -> inner negateDir
 
         check 'current directory', '.',
             file: ['a', 'a']
@@ -154,44 +155,42 @@ t.test 'cli common', ->
             negateDir: ['!a/*/', '!foo/a/*/']
 
         # Some of these aren't likely to ever show up, but just in case.
-        @test 'edge cases', ->
-            @test 'normalizes `.` with a cwd of `.`', ->
+        t.test 'edge cases', ->
+            t.test 'normalizes `.` with a cwd of `.`', ->
                 assert.equal normalizeGlob('.', '.'), '.'
 
-            @test 'normalizes `..` with a cwd of `.`', ->
+            t.test 'normalizes `..` with a cwd of `.`', ->
                 assert.equal normalizeGlob('..', '.'), '..'
 
-            @test 'normalizes `.` with a cwd of `..`', ->
+            t.test 'normalizes `.` with a cwd of `..`', ->
                 assert.equal normalizeGlob('.', '..'), '..'
 
-            @test 'normalizes directories with a cwd of `..`', ->
+            t.test 'normalizes directories with a cwd of `..`', ->
                 assert.equal(
                     normalizeGlob format('foo/bar'), '..'
                     p('../foo/bar')
                 )
 
-            @test 'removes excess `.`', ->
+            t.test 'removes excess `.`', ->
                 assert.equal(
                     normalizeGlob format('././././.'), 'foo'
                     'foo'
                 )
 
-            @test 'removes excess `..`', ->
+            t.test 'removes excess `..`', ->
                 assert.equal(
                     normalizeGlob format('foo/../bar/baz/..'), 'dir'
                     p('dir/bar')
                 )
 
-            @test 'removes excess combined junk', ->
+            t.test 'removes excess combined junk', ->
                 assert.equal(
                     normalizeGlob format('foo/./bar/../baz/./what'), '.'
                     p('foo/baz/what')
                 )
 
-    @test 'globParent()', ->
-        gp = Common.globParent
-
-        @test 'strips glob magic to return parent path', ->
+    t.test 'globParent()', ->
+        t.test 'strips glob magic to return parent path', ->
             assert.equal gp(p('path/to/*.js')), p('path/to')
             assert.equal gp(p('/root/path/to/*.js')), p('/root/path/to')
             assert.equal gp(p('/*.js')), p('/')
@@ -206,33 +205,33 @@ t.test 'cli common', ->
             assert.equal gp(p('path/**/*')), 'path'
             assert.equal gp(p('path/**/subdir/foo.*')), 'path'
 
-        @test 'returns glob itself from non-glob paths', ->
+        t.test 'returns glob itself from non-glob paths', ->
             assert.equal gp(p('path/foo/bar.js')), p('path/foo/bar.js')
             assert.equal gp(p('path/foo/')), p('path/foo')
             assert.equal gp(p('path/foo')), p('path/foo')
 
-        @test 'gets a base name', ->
+        t.test 'gets a base name', ->
             assert.equal gp(p('js/*.js')), 'js'
 
-        @test 'gets a base name from a nested glob', ->
+        t.test 'gets a base name from a nested glob', ->
             assert.equal gp(p('js/**/test/*.js')), 'js'
 
-        @test 'gets a base name from a flat file', ->
+        t.test 'gets a base name from a flat file', ->
             assert.equal gp(p('js/test/wow.js')), p('js/test/wow.js')
 
-        @test 'gets a base name from character class pattern', ->
+        t.test 'gets a base name from character class pattern', ->
             assert.equal gp(p('js/t[a-z]st}/*.js')), 'js'
 
-        @test 'gets a base name from brace , expansion', ->
+        t.test 'gets a base name from brace , expansion', ->
             assert.equal gp(p('js/{src,test}/*.js')), 'js'
 
-        @test 'gets a base name from brace .. expansion', ->
+        t.test 'gets a base name from brace .. expansion', ->
             assert.equal gp(p('js/test{0..9}/*.js')), 'js'
 
-        @test 'gets a base name from extglob', ->
+        t.test 'gets a base name from extglob', ->
             assert.equal gp(p('js/t+(wo|est)/*.js')), 'js'
 
-        @test 'gets a base name from a complex brace glob', ->
+        t.test 'gets a base name from a complex brace glob', ->
             assert.equal(
                 gp p('lib/{components,pages}/**/{test,another}/*.txt')
                 'lib'

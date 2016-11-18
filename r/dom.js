@@ -1,8 +1,7 @@
 "use strict"
 
-var Promise = require("../lib/bluebird.js")
-var R = require("../lib/reporter.js")
-var getType = require("../lib/util.js").getType
+var R = require("../lib/reporter/index")
+var getType = require("../lib/util").getType
 
 // TODO: make a stylesheet for this
 var styles = [
@@ -135,19 +134,19 @@ function getRoot(root, window) {
     }
 }
 
-function updateStats(r) {
-    setText(r.state.passes, r.passes)
-    setText(r.state.failures, r.failures)
-    setText(r.state.duration, R.formatTime(r.duration))
+function updateStats(_) {
+    setText(_.state.passes, _.passes)
+    setText(_.state.failures, _.failures)
+    setText(_.state.duration, R.formatTime(_.duration))
 }
 
-function onNextRepaint(r, callback) {
-    if (r.opts.window.requestAnimationFrame) {
-        r.opts.window.requestAnimationFrame(callback)
+function onNextRepaint(_, callback) {
+    if (_.opts.window.requestAnimationFrame) {
+        _.opts.window.requestAnimationFrame(callback)
     } else if (global.setTimeout) {
         global.setTimeout(callback, 0)
     } else {
-        r.opts.window.setTimeout(callback, 0)
+        _.opts.window.setTimeout(callback, 0)
     }
 }
 
@@ -185,22 +184,22 @@ function initIframe(state, opts) {
     return iframe
 }
 
-function initFirstTest(r, ev) {
-    var document = r.state.window.document
+function initFirstTest(_, report) {
+    var document = _.state.window.document
 
-    if (!ev.path.length) {
-        r.get([]).node = document.createElement("ul")
-        r.state.report.appendChild(r.get([]).node)
+    if (!report.path.length) {
+        _.get([]).node = document.createElement("ul")
+        _.state.report.appendChild(_.get([]).node)
         return
     }
 
     var stack = []
 
-    for (var i = 0; i < ev.path.length; i++) {
-        var entry = ev.path[i]
+    for (var i = 0; i < report.path.length; i++) {
+        var entry = report.path[i]
         var children = document.createElement("ul")
 
-        r.get(stack).node = children
+        _.get(stack).node = children
         stack.push(entry)
 
         var suite = document.createElement("li")
@@ -211,37 +210,38 @@ function initFirstTest(r, ev) {
         header.appendChild(document.createTextNode(entry.name))
         header.appendChild(children)
 
-        r.get(stack).node.appendChild(suite)
+        _.get(stack).node.appendChild(suite)
     }
 }
 
-function showTestResult(r, ev) {
-    var document = r.state.window.document
-    var className = ev.enter() ? "" : "test " + ev.type()
-    var name = ev.path[ev.path.length - 1].name
+function showTestResult(_, report) {
+    var document = _.state.window.document
+    var className = report.enter ? "" : "test " + report.type
+    var name = report.path[report.path.length - 1].name
     var outer = document.createElement("li")
-    var inner = document.createElement(ev.enter() ? "h1" : "h2")
+    var inner = document.createElement(report.enter ? "h1" : "h2")
 
     inner.appendChild(document.createTextNode(name))
 
-    if (!ev.skip()) {
-        className += " " + R.speed(ev)
+    if (!report.skip) {
+        className += " " + R.speed(report)
         var duration = document.createElement("span")
 
-        duration.appendChild(document.createTextNode(R.formatTime(ev.duration)))
+        duration.appendChild(document.createTextNode(
+            R.formatTime(report.duration)))
         inner.appendChild(duration)
     }
 
     outer.className = className
     outer.appendChild(inner)
 
-    if (ev.enter()) {
-        r.get(ev.path).node = document.createElement("ul")
-        outer.appendChild(r.get(ev.path).node)
+    if (report.enter) {
+        _.get(report.path).node = document.createElement("ul")
+        outer.appendChild(_.get(report.path).node)
     }
 
-    ev.path.pop()
-    r.get(ev.path).node.appendChild(outer)
+    report.path.pop()
+    _.get(report.path).node.appendChild(outer)
 }
 
 module.exports = R.on({
@@ -280,25 +280,28 @@ module.exports = R.on({
 
     // Give the browser a chance to repaint before continuing (microtasks
     // normally block rendering).
-    after: function (r) {
-        return new Promise(function (resolve) { onNextRepaint(r, resolve) })
+    after: function (_) {
+        return new Promise(function (resolve) { onNextRepaint(_, resolve) })
     },
 
-    report: function (r, ev) {
-        if (ev.start()) {
-            initFirstTest(r, ev)
-        } else if (ev.enter() || ev.pass() || ev.fail() || ev.skip()) {
-            showTestResult(r, ev)
-            updateStats(r)
-        } else if (ev.error()) {
-            if (r.opts.window.console) {
-                var console = r.opts.window.conosle
+    report: function (_, report) {
+        if (report.isStart) {
+            initFirstTest(_, report)
+        } else if (report.isEnter ||
+                report.isPass ||
+                report.isFail ||
+                report.isSkip) {
+            showTestResult(_, report)
+            updateStats(_)
+        } else if (report.isError) {
+            if (_.opts.window.console) {
+                var console = _.opts.window.conosle
 
-                if (console.error) console.error(ev.value)
-                else if (console.log) console.log(ev.value)
-                else onNextRepaint(r, function () { throw ev.value })
+                if (console.error) console.error(report.error)
+                else if (console.log) console.log(report.error)
+                else onNextRepaint(_, function () { throw report.error })
             } else {
-                onNextRepaint(r, function () { throw ev.value })
+                onNextRepaint(_, function () { throw report.error })
             }
         }
     },

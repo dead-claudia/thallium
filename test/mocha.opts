@@ -2,5 +2,5 @@
 --reporter dot
 --check-leaks
 --recursive
---require ./scripts/globals.js
+--require ./test-util/globals.js
 --globals Util,t,assert

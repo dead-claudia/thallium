@@ -5,136 +5,127 @@ Note: updates to this should also be reflected in test/core/basic.js, as this
 is trying to represent more real-world usage.
 ###
 
-Promise = require 'bluebird'
 t = require 'thallium'
 assert = require 'thallium/assert'
+{root: create} = require 'thallium/internal'
 
 t.test 'core (basic)', ->
-    @test 'reflect', ->
-        @test 'parent()', ->
-            tt = @create()
-            parent = -> @parent()
+    t.test 'reflect', ->
+        t.test 'get parent', ->
+            parent = -> @parent
 
-            @test 'works on the root instance', ->
-                assert.equal tt.call(parent), undefined
+            t.test 'works on the root instance', ->
+                assert.equal create().call(parent), undefined
 
-            @test 'works on children', ->
-                assert.equal tt.test('test').call(parent), tt
+            t.test 'works on children', ->
+                tt = create()
+                inner = undefined
+                tt.test 'test', -> inner = tt.call(parent)
+                tt.run().then -> assert.equal inner, tt.call(-> this)
 
-        @test 'count()', (t) ->
-            tt = @create()
-            count = -> @count()
+        t.test 'get count', ->
+            tt = create()
+            count = -> @count
+            check = (name, expected) ->
+                found = tt.call(count)
+                t.test name, -> assert.equal found, expected
 
-            @test('works with 0 tests').try assert.equal, tt.call(count), 0
-            tt.test('test')
-            @test('works with 1 test').try assert.equal, tt.call(count), 1
-            tt.test('test')
-            @test('works with 2 tests').try assert.equal, tt.call(count), 2
-            tt.test('test')
-            @test('works with 3 tests').try assert.equal, tt.call(count), 3
+            check 'works with 0 tests', 0
+            tt.test 'test', ->
+            check 'works with 1 test', 1
+            tt.test 'test', ->
+            check 'works with 2 tests', 2
+            tt.test 'test', ->
+            check 'works with 3 tests', 3
 
             # Test this test itself
-            @test('works with itself').try assert.equal, @call(count), 5
+            testCount = t.call count
+            t.test 'works with itself', -> assert.equal testCount, 4
 
-        @test 'name()', ->
-            tt = @create()
-            name = -> @name()
+        t.test 'get name', ->
+            name = -> @name
 
-            @test 'works with the root test', ->
-                assert.equal tt.call(name), undefined
+            t.test 'works with the root test', ->
+                assert.equal create().call(name), undefined
 
-            @test 'works with child tests', ->
-                assert.equal tt.test('test').call(name), 'test'
+            t.test 'works with child tests', ->
+                tt = create()
+                child = undefined
+                tt.test 'test', -> child = tt.call(name)
+                tt.run().then -> assert.equal child, 'test'
 
-            @test 'works with itself', ->
-                assert.equal @call(name), 'works with itself'
+            t.test 'works with itself', ->
+                assert.equal t.call(name), 'works with itself'
 
-        @test 'index()', ->
-            tt = @create()
-            index = -> @index()
+        t.test 'get index', ->
+            tt = create()
+            index = -> @index
+            first = second = undefined
 
-            @test 'works with the root test', ->
-                assert.equal tt.call(index), -1
+            t.test 'works with the root test', ->
+                assert.equal tt.call(index), undefined
 
-            first = tt.test('test')
-            @test 'works with the first child test', ->
-                assert.equal first.call(index), 0
+            tt.test 'test', -> first = tt.call(index)
+            tt.test 'test', -> second = tt.call(index)
 
-            second = tt.test('test')
-            @test 'works with the second child test', ->
-                assert.equal second.call(index), 1
+            tt.run().then ->
+                t.test 'works with the first child test', ->
+                    assert.equal first, 0
 
-            @test 'works with itself', ->
-                assert.equal @call(index), 3
+                t.test 'works with the second child test', ->
+                    assert.equal second, 1
 
-        @test 'children()', ->
-            children = -> @children()
+                t.test 'works with itself', ->
+                    assert.equal t.call(index), 3
 
-            @test 'works with 0 tests', ->
-                tt = t.create()
+        t.test 'get children', ->
+            children = -> @children
+
+            t.test 'works with 0 tests', ->
+                tt = create()
                 assert.match tt.call(children), []
 
-            @test 'works with 1 test', ->
-                tt = @create()
-                test = tt.test('test').call -> this
-                assert.match tt.call(children), [test]
+            t.test 'works with 1 test', ->
+                tt = create()
+                test = undefined
+                tt.test 'test', -> test = tt.call(-> this)
+                tt.run().then ->
+                    assert.match tt.call(children), [test]
 
-            @test 'works with 2 tests', ->
-                tt = @create()
-                first = tt.test('first').call -> this
-                second = tt.test('second').call -> this
-                assert.match tt.call(children), [first, second]
+            t.test 'works with 2 tests', ->
+                tt = create()
+                first = second = undefined
+                tt.test 'first', -> first = tt.call(-> this)
+                tt.test 'second', -> second = tt.call(-> this)
+                tt.run().then ->
+                    assert.match tt.call(children), [first, second]
 
-            @test 'returns a copy', ->
-                tt = @create()
+            t.test 'returns a copy', ->
+                tt = create()
                 slice = tt.call(children)
-                tt.test('test')
+                tt.test 'test', ->
                 assert.match slice, []
 
-    @test 'test()', ->
-        @test('exists').try assert.function, @create().test
+    t.test 'test()', ->
+        t.test 'returns a prototypal clone inside', ->
+            tt = create()
+            inner = undefined
+            tt.test 'test', -> inner = this
+            tt.run().then -> assert.equal Object.getPrototypeOf(inner), tt
 
-        @test 'accepts a string + function', ->
-            tt = @create()
-            tt.test 'test', ->
-
-        @test 'accepts a string', ->
-            tt = @create()
-            tt.test('test')
-
-        @test 'returns the current instance when given a callback', ->
-            tt = @create()
-            test = tt.test 'test', ->
-            assert.equal test, tt
-
-        @test 'returns a prototypal clone when not given a callback', ->
-            tt = @create()
-            test = tt.test('test')
-
-            assert.notEqual test, tt
-            assert.equal Object.getPrototypeOf(test), tt
-
-    @test 'run()', ->
-        @test('exists').try assert.function, @create().run
-
-        @test 'runs block tests within tests', ->
-            tt = @create()
+    t.test 'run()', ->
+        t.test 'runs child tests', ->
+            tt = create()
             called = 0
-
-            tt.test 'test', ->
-                @test 'foo', -> called++
-
-            tt.run().then -> assert.equal called, 1
-
-        @test 'runs successful inline tests within tests', ->
-            tt = @create()
             err = undefined
 
-            tt.reporter (res) ->
-                err = res.value if res.fail()
+            tt.reporter -> (res) ->
+                err = res.error if res.isFail
                 return
 
             tt.test 'test', ->
-                @test('foo').call ->
+                tt.test 'foo', -> called++
 
-            tt.run().then -> assert.notOk err
+            tt.run().then ->
+                assert.equal called, 1
+                assert.notOk err

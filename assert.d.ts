@@ -1,65 +1,51 @@
 /* tslint:disable */
 
-import {Test} from "./core";
-
 export type Key = string | number | symbol;
-export type ObjectMap<T> = {[key: Key]: T};
-
-export function format(message: string, args: ObjectMap<any>): string;
+export type ObjectMap<T> = {[key: string]: T} | {[key: number]: T};
+export function assert(condition: any, message?: string): void;
 
 export class AssertionError extends Error {
     name: "AssertionError";
     message: string;
     expected: any;
-    found: any;
-    constructor(message: string, expected: any, actual: any);
+    actual: any;
+    constructor(message?: string, expected?: any, actual?: any);
 }
 
-export function assert(cond: boolean, message?: string): void;
-export function fail(message?: string, expected?: any, actual?: any): void;
-export function failFormat(message: string, args: ObjectMap<any>): void;
+export function format(message: string, args: ObjectMap<any>, prettify?: (value: any) => string): string;
+export function escape(message: string): string;
+export function fail(message: string): void;
+export function fail(message: string, args: ObjectMap<any>, prettify?: (value: any) => string): void;
 
-export function ok(cond: any): void;
-export function notOk(cond: any): void;
+export function ok(value: any): void;
+export function notOk(value: any): void;
 
-export function boolean(object: any): void;
+export function isBoolean(object: any): void;
 export function notBoolean(object: any): void;
 
-export function function(object: any): void;
+export function isFunction(object: any): void;
 export function notFunction(object: any): void;
 
-export function number(object: any): void;
+export function isNumber(object: any): void;
 export function notNumber(object: any): void;
 
-export function object(object: any): void;
+export function isObject(object: any): void;
 export function notObject(object: any): void;
 
-export function string(object: any): void;
+export function isString(object: any): void;
 export function notString(object: any): void;
 
-export function symbol(object: any): void;
+export function isSymbol(object: any): void;
 export function notSymbol(object: any): void;
 
 export function exists(object: any): void;
 export function notExists(object: any): void;
 
-export function array(object: any): void;
+export function isArray(object: any): void;
 export function notArray(object: any): void;
 
-export type TypeofValue =
-    "boolean" |
-    "function" |
-    "number" |
-    "object" |
-    "string" |
-    "symbol" |
-    "undefined";
-
-export function type(object: any, type: TypeofValue): void;
-export function notType(object: any, type: TypeofValue): void;
-
-export function inherits(object: any, Type: new (...args: any[]) => any): void;
-export function notInherits(object: any, Type: new (...args: any[]) => any): void;
+export function is(Type: new (...args: any[]) => any, object: any): void;
+export function not(Type: new (...args: any[]) => any, object: any): void;
 
 export function equal<T>(a: T, b: T): void;
 export function notEqual<T>(a: T, b: T): void;
@@ -82,14 +68,20 @@ export function match<T>(a: T, b: T): void;
 export function notMatch<T>(a: T, b: T): void;
 
 // has own property, possibly equal to a value
-export function hasOwn(object: Object, key: Key, value?: any): void;
-export function notHasOwn(object: Object, key: Key, value?: any): void;
+export function hasOwn(object: Object, key: Key): void;
+export function notHasOwn(object: Object, key: Key): void;
+
+export function hasOwn(object: Object, key: Key, value: any): void;
+export function notHasOwn(object: Object, key: Key, value: any): void;
 export function hasOwnLoose(object: Object, key: Key, value: any): void;
 export function notHasOwnLoose(object: Object, key: Key, value: any): void;
 
 // has own or inherited property, possibly equal to a value
-export function hasKey(object: Object, key: Key, value?: any): void;
-export function notHasKey(object: Object, key: Key, value?: any): void;
+export function hasKey(object: Object, key: Key): void;
+export function notHasKey(object: Object, key: Key): void;
+
+export function hasKey(object: Object, key: Key, value: any): void;
+export function notHasKey(object: Object, key: Key, value: any): void;
 export function hasKeyLoose(object: Object, key: Key, value: any): void;
 export function notHasKeyLoose(object: Object, key: Key, value: any): void;
 
@@ -99,94 +91,73 @@ export interface MapLike<T, U> {
     get(value: T): U;
 }
 
-export function has<T, U>(object: MapLike<T, U>, key: T, value?: U): void;
-export function notHas<T, U>(object: MapLike<T, U>, key: T, value?: U): void;
+export function has<T>(object: MapLike<T, any>, key: T): void;
+export function notHas<T>(object: MapLike<T, any>, key: T): void;
+
+export function has<T, U>(object: MapLike<T, U>, key: T, value: U): void;
+export function notHas<T, U>(object: MapLike<T, U>, key: T, value: U): void;
 export function hasLoose<T, U>(object: MapLike<T, U>, key: T, value: U): void;
 export function notHasLoose<T, U>(object: MapLike<T, U>, key: T, value: U): void;
 
 // throws, possibly of a specified type
-export function throws(func: () => any, Type?: new (...args: any[]) => any): void;
-export function notThrows(func: () => any, Type?: new (...args: any[]) => any): void;
+export function throws(func: () => any): void;
+export function throws(Type: new (...args: any[]) => any, func: () => any): void;
 
 // throws, possibly satisfying a predicate function, having message
 // equal to a particular string, or having message that matches a
 // regular expression
-export type Matcher = ((error: Error) => any) | string | RegExp;
+export type Matcher = ((error: Error) => any) | string | RegExp | {[key: string]: any};
 
-export function throwsMatch(func: () => any, matcher?: Matcher): void;
-export function notThrowsMatch(func: () => any, matcher?: Matcher): void;
-
-// Note: length comparisons always fail with NaNs.
-export function length(object: {length: number}, length: number): void;
-export function notLength(object: {length: number}, length: number): void;
-export function lengthAtLeast(object: {length: number}, length: number): void;
-export function lengthAtMost(object: {length: number}, length: number): void;
-export function lengthAbove(object: {length: number}, length: number): void;
-export function lengthBelow(object: {length: number}, length: number): void;
+export function throwsMatch(matcher: Matcher, func: () => any): void;
 
 // Note: these two always fail with NaNs, and the delta ignores sign.
-export function closeTo(actual: number, expected: number, delta: number): void;
-export function notCloseTo(actual: number, expected: number, delta: number): void;
+export function closeTo(actual: number, expected: number, epsilon?: number): void;
+export function notCloseTo(actual: number, expected: number, epsilon?: number): void;
 
 // includes list of values
-// strict equal
-export function includes<T>(array: T[], keys: T | T[]): void;
-export function notIncludesAll<T>(array: T[], keys: T | T[]): void;
-export function includesAny<T>(array: T[], keys: T | T[]): void;
-export function notIncludes<T>(array: T[], keys: T | T[]): void;
+// includes all
+export function includes<T>(array: T[], values: T | T[]): void;
+export function includesDeep<T>(array: T[], values: T | T[]): void;
+export function includesMatch<T>(array: T[], values: T | T[]): void;
 
-// loose equal
-export function includesLoose<T>(array: T[], keys: T | T[]): void;
-export function notIncludesLooseAll<T>(array: T[], keys: T | T[]): void;
-export function includesLooseAny<T>(array: T[], keys: T | T[]): void;
-export function notIncludesLoose<T>(array: T[], keys: T | T[]): void;
+// includes some
+export function includesAny<T>(array: T[], values: T[]): void;
+export function includesDeepAny<T>(array: T[], values: T[]): void;
+export function includesMatchAny<T>(array: T[], values: T[]): void;
 
-// strict deep equal
-export function includesDeep<T>(array: T[], keys: T | T[]): void;
-export function notIncludesDeepAll<T>(array: T[], keys: T | T[]): void;
-export function includesDeepAny<T>(array: T[], keys: T | T[]): void;
-export function notIncludesDeep<T>(array: T[], keys: T | T[]): void;
+// missing some
+export function notIncludesAll<T>(array: T[], values: T[]): void;
+export function notIncludesDeepAll<T>(array: T[], values: T[]): void;
+export function notIncludesMatchAll<T>(array: T[], values: T[]): void;
 
-// structural deep equal
-export function includesMatch<T>(array: T[], keys: T | T[]): void;
-export function notIncludesMatchAll<T>(array: T[], keys: T | T[]): void;
-export function includesMatchAny<T>(array: T[], keys: T | T[]): void;
-export function notIncludesMatch<T>(array: T[], keys: T | T[]): void;
+// missing all
+export function notIncludes<T>(array: T[], values: T[]): void;
+export function notIncludesDeep<T>(array: T[], values: T[]): void;
+export function notIncludesMatch<T>(array: T[], values: T[]): void;
 
 // match Object.keys(object) with list of keys
-// strict equal
 export function hasKeys(object: Object, keys: Key[]): void;
-export function notHasAllKeys(object: Object, keys: Key[]): void;
-export function hasAnyKeys(object: Object, keys: Key[]): void;
+export function notHasKeysAll(object: Object, keys: Key[]): void;
+export function hasKeysAny(object: Object, keys: Key[]): void;
 export function notHasKeys(object: Object, keys: Key[]): void;
 
-// loose equal
-export function hasLooseKeys(object: Object, keys: Key[]): void;
-export function notHasLooseAllKeys(object: Object, keys: Key[]): void;
-export function hasLooseAnyKeys(object: Object, keys: Key[]): void;
-export function notHasLooseKeys(object: Object, keys: Key[]): void;
-
 // match Object.keys(object) with keys
-// strict equal
+// includes all
 export function hasKeys(object: Object, keys: ObjectMap<any>): void;
-export function notHasAllKeys(object: Object, keys: ObjectMap<any>): void;
-export function hasAnyKeys(object: Object, keys: ObjectMap<any>): void;
+export function hasKeysMatch(object: Object, keys: ObjectMap<any>): void;
+export function hasKeysDeep(object: Object, keys: ObjectMap<any>): void;
+
+// includes some
+export function hasKeysAny(object: Object, keys: ObjectMap<any>): void;
+export function hasKeysAnyDeep(object: Object, keys: ObjectMap<any>): void;
+export function hasKeysAnyMatch(object: Object, keys: ObjectMap<any>): void;
+
+// missing some
+export function notHasKeysAll(object: Object, keys: ObjectMap<any>): void;
+export function notHasKeysAllDeep(object: Object, keys: ObjectMap<any>): void;
+export function notHasKeysAllMatch(object: Object, keys: ObjectMap<any>): void;
+
+// missing all
 export function notHasKeys(object: Object, keys: ObjectMap<any>): void;
-
-// loose equal
-export function hasLooseKeys(object: Object, keys: ObjectMap<any>): void;
-export function notHasLooseAllKeys(object: Object, keys: ObjectMap<any>): void;
-export function hasLooseAnyKeys(object: Object, keys: ObjectMap<any>): void;
-export function notHasLooseKeys(object: Object, keys: ObjectMap<any>): void;
-
-// strict deep equal
-export function hasDeepKeys(object: Object, keys: ObjectMap<any>): void;
-export function notHasDeepAllKeys(object: Object, keys: ObjectMap<any>): void;
-export function hasDeepAnyKeys(object: Object, keys: ObjectMap<any>): void;
-export function notHasDeepKeys(object: Object, keys: ObjectMap<any>): void;
-
-// structural deep equal
-export function hasMatchKeys(object: Object, keys: ObjectMap<any>): void;
-export function notHasMatchAllKeys(object: Object, keys: ObjectMap<any>): void;
-export function hasMatchAnyKeys(object: Object, keys: ObjectMap<any>): void;
-export function notHasMatchKeys(object: Object, keys: ObjectMap<any>): void;
+export function notHasKeysMatch(object: Object, keys: ObjectMap<any>): void;
+export function notHasKeysDeep(object: Object, keys: ObjectMap<any>): void;

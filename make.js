@@ -6,47 +6,65 @@ require("shelljs/make")
 var path = require("path")
 var chokidar = require("chokidar")
 var semver = require("semver")
-var pkg = require("./package.json")
+var pkg = require("./package")
 
 function c(cmd) {
-    return path.resolve(__dirname, "./node_modules/.bin", cmd)
+    return path.resolve(__dirname, "node_modules/.bin", cmd)
 }
 
 function exec(str, cb) {
+    if (Array.isArray(str)) str = str.join(" ")
+    echo("exec: " + str)
     return global.exec(str, {stdio: "inherit"}, cb)
+}
+
+function task(name, callback) {
+    target[name] = function (arg) {
+        if (callback.length) {
+            echo("=== Task `" + name + "`, args: " + arg.join(" ") + " ===")
+        } else {
+            echo("=== Task `" + name + "` ===")
+        }
+        return callback(arg)
+    }
 }
 
 config.fatal = true
 
-target.all = function () {
+task("all", function () {
     target.lint()
     target.test()
-}
+})
 
-target.lint = function () {
+task("lint", function () {
     exec(c("eslint") + " . --cache --color")
     exec(c("coffeelint") + " . --cache --color=always")
-}
+})
 
-target.test = function () {
+task("test", function () {
     target["test:chrome"]()
+    target["test:phantomjs"]()
     target["test:node"]()
-}
+})
 
-target["test:chrome"] = function () {
+task("test:chrome", function () {
     exec(c("karma") + " start --colors --single-run --browsers Chrome")
-}
+})
 
-target["test:node"] = function () {
+task("test:phantomjs", function () {
+    exec(c("karma") + " start --colors --single-run --browsers PhantomJS")
+})
+
+task("test:node", function () {
     exec(c("mocha") + " --colors")
-}
+})
 
-var patterns = [
-    "{bin,fixtures,helpers,lib,r,scripts,test,migrate}/**/{.,}*.js",
-    "{bin,fixtures,helpers,lib,r,scripts,test,migrate}/**/{.,}*.coffee",
-    "{.,}*.js",
-    "{.,}*.coffee",
-]
+var dirs = [
+    "bin", "fixtures", "helpers", "lib", "r", "test", "test-util", "migrate",
+    "assert", "match",
+].join(",")
+
+var patterns = ["{" + dirs + "}/**/{.,}*.{js,coffee}", "{.,}*.{js,coffee}"]
 
 // This creates a closure with `onchange` to not use the memoized versions
 // ShellJS replaces them with after the initial tick.
@@ -57,9 +75,9 @@ function watch(task) {
     var timeout
 
     function execute() {
-        for (var i = 0; i < queue.length; i++) {
-            console.error(queue[i].event, queue[i].path)
-        }
+        queue.forEach(function (event) {
+            echo(event.name + " " + event.path)
+        })
 
         queue = []
         active = true
@@ -72,64 +90,62 @@ function watch(task) {
 
     chokidar.watch(patterns, {
         cwd: __dirname,
-        ignored: ["**/test-bundle.js"],
+        ignored: ["./thallium{,-migrate}.js"],
     })
-    .on("all", function (event, path) {
+    .on("all", function (name, path) {
         // Give time for the file changes to settle by delaying and debouncing
         // the `onchange` task.
         if (timeout != null) clearTimeout(timeout)
-        queue.push({event: event, path: path})
+        queue.push({name: name, path: path})
         timeout = setTimeout(function () {
             timeout = undefined
             if (!active) execute()
         }, 500)
     })
-    .on("error", function (error) {
-        console.error(error.stack)
+    .on("error", function (err) {
+        console.error(err.stack)
     })
     .once("ready", function () {
         console.error('Watching "' + patterns.join('", "') + '"...')
     })
 }
 
-target.watch = function () {
-    watch("test")
-}
+task("watch", function () { watch("test") })
+task("watch:chrome", function () { watch("test:chrome") })
+task("watch:phantomjs", function () { watch("test:phantomjs") })
+task("watch:node", function () { watch("test:node") })
 
-target["watch:chrome"] = function () {
-    watch("test:chrome")
-}
+task("bundle", function () {
+    exec([
+        c("browserify"),
+        " -dr ./lib/browser-bundle.js:thallium -o thallium.js",
+    ])
+    exec([
+        c("browserify"),
+        " -dr ./migrate/bundle.js:thallium -o thallium-migrate.js",
+    ])
+})
 
-target["watch:node"] = function () {
-    watch("test:node")
-}
-
-target.bundle = function () {
-    exec(c("browserify") +
-        " -dr ./lib/browser-bundle.js:thallium -o thallium.js")
-}
-
-target.release = function (args) { // eslint-disable-line max-statements
+task("release", function (args) {
     var force = false
     var increment
 
-    for (var i = 0; i < args.length; i++) {
-        switch (args[i]) {
+    args.forEach(function (arg) {
+        switch (arg) {
         case "major": case "minor": case "patch":
         case "premajor": case "preminor": case "prepatch": case "prerelease":
             if (increment != null) {
-                console.error(
-                    "Unexpected additional increment parameter: " + args[i])
+                console.error("Unexpected additional increment: " + arg)
                 exit(1)
             }
-            increment = args[i]
+            increment = arg
             break
 
         case "--force": case "-f": force = true; break
         case "--no-force": force = false; break
         default: // ignore
         }
-    }
+    })
 
     if (increment == null) {
         console.error([
@@ -171,15 +187,15 @@ target.release = function (args) { // eslint-disable-line max-statements
 
     target.bundle()
 
-    // Add everything
-    exec("git add thallium.js package.json CHANGELOG.md")
-
     // Increment the package version and get the printed version
     pkg.version = semver.inc(pkg.version, increment)
-    JSON.stringify(pkg).to(require.resolve("../package.json"))
+    JSON.stringify(pkg, null, 2).to(path.resolve(__dirname, "package.json"))
+
+    // Add everything
+    exec("git add thallium.js thallium-migrate.js package.json CHANGELOG.md")
 
     exec("git commit --message=v" + pkg.version)
     exec("git tag v" + pkg.version)
     exec("git push")
     exec("git push --tags")
-}
+})

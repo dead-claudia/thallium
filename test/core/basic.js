@@ -7,376 +7,243 @@
 // real-world usage.
 
 describe("core (basic)", function () {
-    describe("create()", function () {
-        it("exists", function () {
-            assert.function(t.create)
-        })
-    })
+    function identity(reflect) { return reflect }
 
     describe("reflect", function () {
-        describe("parent()", function () {
-            function parent(reflect) { return reflect.parent() }
+        describe("get parent", function () {
+            function parent(reflect) { return reflect.parent }
 
             it("works on the root instance", function () {
-                var tt = t.create()
+                var tt = Util.create()
 
                 assert.equal(tt.call(parent), undefined)
             })
 
             it("works on children", function () {
-                var tt = t.create()
+                var tt = Util.create()
+                var inner
 
-                assert.equal(tt.call(parent), undefined)
-                assert.equal(tt.test("test").call(parent), tt)
+                tt.test("test", function () {
+                    inner = tt.call(parent)
+                })
+
+                return tt.run().then(function () {
+                    assert.equal(inner, tt.call(identity))
+                })
             })
         })
 
-        describe("count()", function () {
-            function count(reflect) { return reflect.count() }
+        describe("get count", function () {
+            function count(reflect) { return reflect.count }
 
             it("works with 0 tests", function () {
-                var tt = t.create()
+                var tt = Util.create()
 
                 assert.equal(tt.call(count), 0)
             })
 
             it("works with 1 test", function () {
-                var tt = t.create()
+                var tt = Util.create()
 
-                tt.test("test")
+                tt.test("test", function () {})
 
                 assert.equal(tt.call(count), 1)
             })
 
             it("works with 2 tests", function () {
-                var tt = t.create()
+                var tt = Util.create()
 
-                tt.test("test")
-                tt.test("test")
+                tt.test("test", function () {})
+                tt.test("test", function () {})
 
                 assert.equal(tt.call(count), 2)
             })
 
             it("works with 3 tests", function () {
-                var tt = t.create()
+                var tt = Util.create()
 
-                tt.test("test")
-                tt.test("test")
-                tt.test("test")
+                tt.test("test", function () {})
+                tt.test("test", function () {})
+                tt.test("test", function () {})
 
                 assert.equal(tt.call(count), 3)
             })
         })
 
-        describe("name()", function () {
-            function name(reflect) { return reflect.name() }
+        describe("get name", function () {
+            function name(reflect) { return reflect.name }
 
             it("works with the root test", function () {
-                var tt = t.create()
+                var tt = Util.create()
 
                 assert.equal(tt.call(name), undefined)
             })
 
             it("works with child tests", function () {
-                var tt = t.create().test("test")
+                var tt = Util.create()
+                var child
 
-                assert.equal(tt.call(name), "test")
+                tt.test("test", function () {
+                    child = tt.call(name)
+                })
+
+                return tt.run().then(function () {
+                    assert.equal(child, "test")
+                })
             })
         })
 
-        describe("index()", function () {
-            function index(reflect) { return reflect.index() }
+        describe("get index", function () {
+            function index(reflect) { return reflect.index }
 
             it("works with the root test", function () {
-                var tt = t.create()
+                var tt = Util.create()
 
-                assert.equal(tt.call(index), -1)
+                assert.equal(tt.call(index), undefined)
             })
 
             it("works with the first child test", function () {
-                var tt = t.create().test("test")
+                var tt = Util.create()
+                var first
 
-                assert.equal(tt.call(index), 0)
+                tt.test("test", function () {
+                    first = tt.call(index)
+                })
+
+                return tt.run().then(function () {
+                    assert.equal(first, 0)
+                })
             })
 
             it("works with the second child test", function () {
-                var tt = t.create()
+                var tt = Util.create()
+                var second
 
-                tt.test("test")
-                var second = tt.test("test")
+                tt.test("test", function () {})
+                tt.test("test", function () {
+                    second = tt.call(index)
+                })
 
-                assert.equal(second.call(index), 1)
+                return tt.run().then(function () {
+                    assert.equal(second, 1)
+                })
             })
         })
 
-        describe("children()", function () {
-            function children(reflect) { return reflect.children() }
+        describe("get children", function () {
+            function children(reflect) { return reflect.children }
 
             it("works with 0 tests", function () {
-                var tt = t.create()
+                var tt = Util.create()
 
                 assert.match(tt.call(children), [])
             })
 
             it("works with 1 test", function () {
-                var tt = t.create()
-                var test = tt.test("test").call(function (r) { return r })
+                var tt = Util.create()
+                var test
 
-                assert.match(tt.call(children), [test])
+                tt.test("test", function () {
+                    test = tt.call(identity)
+                })
+
+                return tt.run().then(function () {
+                    assert.match(tt.call(children), [test])
+                })
             })
 
             it("works with 2 tests", function () {
-                var tt = t.create()
-                var first = tt.test("first").call(function (r) { return r })
-                var second = tt.test("second").call(function (r) { return r })
+                var tt = Util.create()
+                var first, second
 
-                assert.match(tt.call(children), [first, second])
+                tt.test("first", function () {
+                    first = tt.call(identity)
+                })
+
+                tt.test("second", function () {
+                    second = tt.call(identity)
+                })
+
+                return tt.run().then(function () {
+                    assert.match(tt.call(children), [first, second])
+                })
             })
 
             it("returns a copy", function () {
-                var tt = t.create()
+                var tt = Util.create()
                 var slice = tt.call(children)
 
-                tt.test("test")
+                tt.test("test", function () {})
                 assert.match(slice, [])
             })
         })
     })
 
+    /**
+     * TODO: This is deprecated
+     */
     describe("test()", function () {
-        it("exists", function () {
-            assert.function(t.create().test)
-        })
+        it("returns a prototypal clone inside", function () {
+            var tt = Util.create()
+            var test
 
-        it("accepts a string + function", function () {
-            var tt = t.create()
+            tt.test("test", function (tt) { test = tt })
 
-            tt.test("test", function () {})
-        })
-
-        it("accepts a string", function () {
-            var tt = t.create()
-
-            tt.test("test")
-        })
-
-        it("returns the current instance when given a callback", function () {
-            var tt = t.create()
-            var test = tt.test("test", function () {})
-
-            assert.equal(test, tt)
-        })
-
-        it("returns a prototypal clone when not given a callback", function () {
-            var tt = t.create()
-            var test = tt.test("test")
-
-            assert.notEqual(test, tt)
-            assert.equal(Object.getPrototypeOf(test), tt)
+            return tt.run().then(function () {
+                assert.notEqual(test, tt)
+                assert.equal(Object.getPrototypeOf(test), tt)
+            })
         })
     })
 
     describe("run()", function () {
-        it("exists", function () {
-            assert.function(t.create().run)
-        })
-
-        it("runs block tests within tests", function () {
-            var tt = t.create()
+        it("runs child tests", function () {
+            var tt = Util.create()
             var called = 0
+            var err
 
-            tt.test("test", function (tt) {
+            tt.reporter(Util.const(function (res) {
+                if (res.isFail) err = res.error
+            }))
+
+            tt.test("test", function () {
                 tt.test("foo", function () { called++ })
             })
 
-            return tt.run().then(function () { assert.equal(called, 1) })
-        })
-
-        it("runs successful inline tests within tests", function () {
-            var tt = t.create()
-            var err
-
-            tt.reporter(function (res) {
-                if (res.fail()) err = res.value
+            return tt.run().then(function () {
+                assert.equal(called, 1)
+                assert.notOk(err)
             })
-
-            tt.test("test", function (tt) {
-                tt.test("foo").call(function () {})
-            })
-
-            return tt.run().then(function () { assert.notOk(err) })
-        })
-    })
-
-    describe("try()", function () {
-        it("exists", function () {
-            assert.function(t.create().try)
-            t.call(function (reflect) { assert.function(reflect.try) })
         })
 
-        function makeSpy(result) {
-            /** @this */
-            function spy() {
-                var args = []
+        function createSentinel(name) {
+            var e = new Error(name)
 
-                for (var i = 0; i < arguments.length; i++) {
-                    args.push(arguments[i])
-                }
-
-                spy.this.push(this)
-                spy.args.push(args)
-
-                if (result != null) throw result
-            }
-
-            spy.this = []
-            spy.args = []
-            return spy
+            e.marker = function () {}
+            return e
         }
 
-        context("with block tests", function () {
-            it("requires a function", function () {
-                assert.throws(function () { t.create().try() }, TypeError)
-                assert.throws(function () { t.create().try(1) }, TypeError)
-                assert.throws(function () { t.create().try("foo") }, TypeError)
-                assert.throws(function () { t.create().try(true) }, TypeError)
-                assert.throws(function () { t.create().try({}) }, TypeError)
-                assert.throws(function () { t.create().try([]) }, TypeError)
-                assert.throws(function () { t.create().try(null) }, TypeError)
-                if (typeof Symbol === "function") { // eslint-disable-line no-undef, max-len
-                    assert.throws(function () { t.create().try(Symbol()) }, TypeError) // eslint-disable-line no-undef, max-len
-                }
-            })
+        it("catches concurrent runs", function () {
+            var tt = Util.create()
+            var res = tt.run()
 
-            it("succeeds with 0 args", function () {
-                var spy = makeSpy()
-                var tt = t.create()
-
-                tt.try(spy)
-                assert.match(spy.this, [undefined])
-                assert.match(spy.args, [[]])
-            })
-
-            it("succeeds with 1 arg", function () {
-                var spy = makeSpy()
-                var tt = t.create()
-
-                tt.try(spy, {value: 1})
-                assert.match(spy.this, [undefined])
-                assert.match(spy.args, [[{value: 1}]])
-            })
-
-            it("succeeds with 2 args", function () {
-                var spy = makeSpy()
-                var tt = t.create()
-
-                tt.try(spy, {value: 1}, {value: 2})
-                assert.match(spy.this, [undefined])
-                assert.match(spy.args, [[{value: 1}, {value: 2}]])
-            })
-
-            it("succeeds with 3 args", function () {
-                var spy = makeSpy()
-                var tt = t.create()
-
-                tt.try(spy, {value: 1}, {value: 2}, {value: 3})
-                assert.match(spy.this, [undefined])
-                assert.match(spy.args, [[{value: 1}, {value: 2}, {value: 3}]])
-            })
-
-            it("succeeds with 4 args", function () {
-                var spy = makeSpy()
-                var tt = t.create()
-
-                tt.try(spy, {value: 1}, {value: 2}, {value: 3}, {value: 4})
-                assert.match(spy.this, [undefined])
-                assert.match(spy.args, [
-                    [{value: 1}, {value: 2}, {value: 3}, {value: 4}],
-                ])
-            })
+            assert.throws(Error, function () { tt.run() })
+            return res
         })
 
-        context("with inline tests", function () {
-            it("requires a function", function () {
-                assert.throws(function () { t.create().try() }, TypeError)
-                assert.throws(function () { t.create().try(1) }, TypeError)
-                assert.throws(function () { t.create().try("foo") }, TypeError)
-                assert.throws(function () { t.create().try(true) }, TypeError)
-                assert.throws(function () { t.create().try({}) }, TypeError)
-                assert.throws(function () { t.create().try([]) }, TypeError)
-                assert.throws(function () { t.create().try(null) }, TypeError)
-                if (typeof Symbol === "function") { // eslint-disable-line no-undef, max-len
-                    assert.throws(function () { t.create().try(Symbol()) }, TypeError) // eslint-disable-line no-undef, max-len
-                }
-            })
+        it("allows non-concurrent runs with reporter error", function () {
+            var tt = Util.create()
+            var sentinel = createSentinel("fail")
 
-            it("succeeds with 0 args", function () {
-                var spy = makeSpy()
-                var tt = t.create()
+            tt.reporter(Util.const(function () { throw sentinel }))
 
-                tt.test("test")
-                .try(spy)
-
-                return tt.run().then(function () {
-                    assert.match(spy.this, [undefined])
-                    assert.match(spy.args, [[]])
-                })
-            })
-
-            it("succeeds with 1 arg", function () {
-                var spy = makeSpy()
-                var tt = t.create()
-
-                tt.test("test")
-                .try(spy, {value: 1})
-
-                return tt.run().then(function () {
-                    assert.match(spy.this, [undefined])
-                    assert.match(spy.args, [[{value: 1}]])
-                })
-            })
-
-            it("succeeds with 2 args", function () {
-                var spy = makeSpy()
-                var tt = t.create()
-
-                tt.test("test")
-                .try(spy, {value: 1}, {value: 2})
-
-                return tt.run().then(function () {
-                    assert.match(spy.this, [undefined])
-                    assert.match(spy.args, [[{value: 1}, {value: 2}]])
-                })
-            })
-
-            it("succeeds with 3 args", function () {
-                var spy = makeSpy()
-                var tt = t.create()
-
-                tt.test("test")
-                .try(spy, {value: 1}, {value: 2}, {value: 3})
-
-                return tt.run().then(function () {
-                    assert.match(spy.this, [undefined])
-                    assert.match(spy.args, [
-                        [{value: 1}, {value: 2}, {value: 3}],
-                    ])
-                })
-            })
-
-            it("succeeds with 4 args", function () {
-                var spy = makeSpy()
-                var tt = t.create()
-
-                tt.test("test")
-                .try(spy, {value: 1}, {value: 2}, {value: 3}, {value: 4})
-
-                return tt.run().then(function () {
-                    assert.match(spy.this, [undefined])
-                    assert.match(spy.args, [
-                        [{value: 1}, {value: 2}, {value: 3}, {value: 4}],
-                    ])
-                })
+            return tt.run().then(
+                function () { assert.fail("Expected a rejection") },
+                function (err) { assert.equal(err, sentinel) })
+            .then(function () {
+                return tt.run().then(
+                    function () { assert.fail("Expected a rejection") },
+                    function (err) { assert.equal(err, sentinel) })
             })
         })
     })

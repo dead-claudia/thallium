@@ -23,6 +23,9 @@ Options:
     running Babel with a different set of plugins than what's specified in your
     `.babelrc`.
 
+--opts [opts]
+    Use a custom opts file instead of trying to find a `.tl.opts` somewhere.
+
 --
     Stop parsing options.
 

@@ -3,12 +3,11 @@
 /* global Map, Set, Buffer, Symbol, Int8Array, Int16Array, Int32Array,
 Uint8Array, Uint16Array, Uint32Array, Float32Array, Float64Array,
 Uint8ClampedArray, DataView */
-/* eslint-env node */
 
-var match = require("../match.js")
+var match = require("../match")
 var newline = require("os").EOL
 
-// Note: updates to this should also be reflected in test/assertions/match.js,
+// Note: updates to this should also be reflected in test/assert/match.js,
 // so this doesn't throw errors.
 
 function loop(list) {
@@ -760,8 +759,13 @@ function init(suite) { // eslint-disable-line max-statements
         var set1 = new Set()
         var set2 = new Set()
 
+        set1.add("foo")
         set1.add(set1)
+        set1.add("bar")
+
+        set2.add("foo")
         set2.add(set2)
+        set2.add("bar")
 
         check("sets with circular references", set1, set2, {
             deepEqual: true,

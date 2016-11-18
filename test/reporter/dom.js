@@ -3,7 +3,8 @@
 // Note: the reports *must* be well formed. The reporter assumes the reports are
 // correct, and it will *not* verify this.
 
-describe("reporter dom", function () {
+// Skipped because it hasn't been finished yet.
+describe.skip("reporter dom", function () {
     // Skip if jsdom doesn't exist
     if (!Util.jsdom) return
 
@@ -14,20 +15,28 @@ describe("reporter dom", function () {
     it("is not itself a reporter", function () {
         var dom = Util.r.dom
 
-        assert.throws(function () { dom(n("start", [])) }, TypeError)
-        assert.throws(function () { dom(n("enter", [p("test", 0)])) }, TypeError) // eslint-disable-line max-len
-        assert.throws(function () { dom(n("leave", [p("test", 0)])) }, TypeError) // eslint-disable-line max-len
-        assert.throws(function () { dom(n("pass", [p("test", 0)])) }, TypeError)
-        assert.throws(function () { dom(n("fail", [p("test", 0)])) }, TypeError)
-        assert.throws(function () { dom(n("skip", [p("test", 0)])) }, TypeError)
-        assert.throws(function () { dom(n("end", [])) }, TypeError)
+        assert.throws(TypeError, function () { dom(n.start()) })
+        assert.throws(TypeError, function () { dom(n.enter([p("test", 0)])) })
+        assert.throws(TypeError, function () { dom(n.leave([p("test", 0)])) })
+        assert.throws(TypeError, function () { dom(n.pass([p("test", 0)])) })
+        assert.throws(TypeError, function () { dom(n.fail([p("test", 0)])) })
+        assert.throws(TypeError, function () { dom(n.skip([p("test", 0)])) })
+        assert.throws(TypeError, function () { dom(n.end()) })
+    })
+
+    it("validates no arguments", function () {
+        Util.r.dom.reporter()
+    })
+
+    it("validates a single empty options object", function () {
+        Util.r.dom.reporter({})
     })
 
     function test(name, opts) { // eslint-disable-line no-unused-vars
         (opts.skip ? it.skip : it)(name, function () {
             var shared = {}
             var reporterOpts = {
-                inst: t.create(),
+                inst: Util.create(),
                 opts: {window: mock.window()},
             }
 
@@ -35,8 +44,7 @@ describe("reporter dom", function () {
 
             var reporter = Util.r.dom.reporter(reporterOpts)
 
-            return Util.Promise.each(opts.input, reporter)
-            .then(function () {
+            return Util.peach(opts.input, reporter).then(function () {
                 if (opts.match) opts.match(shared, mock)
             })
         })

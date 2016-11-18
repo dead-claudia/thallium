@@ -1,19 +1,17 @@
-/* eslint-env node */
-// Remove after this hits npm: https://github.com/eslint/eslint/pull/7175
-/* eslint no-unused-expressions: 0 */
+"use strict"
 
 // This is a basic TAP-generating reporter.
 
-import * as tty from "tty"
-import {inspect} from "util"
+const tty = require("tty")
+const inspect = require("util").inspect
 
 const windowWidth = (() => {
     if (tty.isatty(1) && tty.isatty(2)) {
-        if (process.stdout.columns) {
+        if (process.stdout.columns != null) {
             return process.stdout.columns
-        } else if (process.stdout.getWindowSize) {
+        } else if (process.stdout.getWindowSize != null) {
             return process.stdout.getWindowSize(1)[0]
-        } else if (tty.getWindowSize) {
+        } else if (tty.getWindowSize != null) {
             return tty.getWindowSize()[1]
         }
     }
@@ -21,104 +19,121 @@ const windowWidth = (() => {
     return 75
 })()
 
+const eol = process.platform === "win32" ? "\r\n" : "\n"
+
 function print(text) {
     return new Promise((resolve, reject) => {
-        process.stdout.write(text, err => err != null ? reject(err) : resolve())
+        process.stdout.write(text + eol, err => {
+            return err != null ? reject(err) : resolve()
+        })
     })
 }
 
-let counter, tests, pass, fail, skip
-
-reset()
-function reset() {
-    counter = tests = pass = fail = skip = 0
+function joinPath(report) {
+    return report.path.map(i => i.name).join(" ")
 }
 
-function joinPath(ev) {
-    return ev.path.map(i => i.name).join(" ")
+function printLines(value, skipFirst) {
+    const lines = value.replace(/^/gm, "    ").split(/\r?\n/g)
+    const rest = skipFirst ? lines.slice(1) : lines
+
+    return rest.reduce(
+        (p, line) => p.then(() => print(line)),
+        Promise.resolve())
 }
 
-function template(ev, tmpl, skip) {
+function printRaw(key, str) {
+    if (str.length > windowWidth - key.length || /\r?\n|[:?-]/.test(str)) {
+        return print(`  ${key}: |-`)
+        .then(() => printLines(str, false))
+    } else {
+        return print(`  ${key}: ${str}`)
+    }
+}
+
+function printError(report) {
+    const err = report.error
+
+    if (!(err instanceof Error)) {
+        return printRaw("value", inspect(err))
+    } else if (err.name !== "AssertionError") {
+        // Let's *not* depend on the constructor being Thallium's...
+        return print("  stack: |-")
+        .then(() => printLines(err.stack, false))
+    } else {
+        return printRaw("expected", inspect(err.expected))
+        .then(() => printRaw("actual", inspect(err.actual)))
+        .then(() => printRaw("message", err.message))
+        .then(() => print("  stack: |-"))
+        .then(() => {
+            const message = err.message
+
+            err.message = ""
+            return printLines(err.stack, true)
+            .then(() => { err.message = message })
+        })
+    }
+}
+
+function fixHooks(joined, report) {
+    if (!report.hook) return joined
+    if (!report.name) return `${joined} (${report.stage})`
+    return `${joined} (${report.stage} ‒ ${report.name})`
+}
+
+let counter = 0
+let tests = 0
+let pass = 0
+let fail = 0
+let skip = 0
+
+function template(report, tmpl, skip) {
     if (!skip) counter++
+    const joined = joinPath(report).replace(/\$/g, "$$$$")
 
     return print(
         tmpl.replace(/%c/g, counter)
-            .replace(/%p/g, joinPath(ev).replace(/\$/g, "$$$$")))
+            .replace(/%p/g, fixHooks(joined, report)))
 }
 
-async function printLines(value, skipFirst) {
-    const lines = value.replace(/^/gm, "    ").split(/\r?\n/g)
-
-    for (const line of skipFirst ? lines.slice(1) : lines) {
-        await print(line)
-    }
-}
-
-async function printRaw(key, str) {
-    if (str.length > windowWidth - key.length || /\r?\n|[:?-]/.test(str)) {
-        await print(`  ${key}: |-`)
-        await printLines(str, false)
-    } else {
-        await print(`  ${key}: ${str}`)
-    }
-}
-
-async function printError({value: err}) {
-    if (!(err instanceof Error)) {
-        await printRaw("value", inspect(err))
-    } else if (err.name !== "AssertionError") {
-        // Let's *not* depend on the constructor being Thallium's...
-        await print("  stack: |-")
-        await printLines(err.stack, false)
-    } else {
-        await printRaw("expected", inspect(err.expected))
-        await printRaw("actual", inspect(err.actual))
-        await printRaw("message", err.message)
-        await print("  stack: |-")
-
-        const message = err.message
-
-        err.message = ""
-        await printLines(err.stack, true)
-        err.message = message
-    }
-}
-
-export default async function tap(ev) { // eslint-disable-line max-statements
-    if (ev.start()) {
-        await print("TAP version 13")
-    } else if (ev.enter()) {
+module.exports = report => { // eslint-disable-line max-statements
+    if (report.isStart) {
+        counter = tests = pass = fail = skip = 0
+        return print("TAP version 13")
+    } else if (report.isEnter) {
         tests++
         pass++
         // Print a leading comment, to make some TAP formatters prettier.
-        await template(ev, "# %p", true)
-        await template(ev, "ok %c")
-    } else if (ev.pass()) {
+        return template(report, "# %p", true)
+        .then(() => template(report, "ok %c"))
+    } else if (report.isPass) {
         tests++
         pass++
-        await template(ev, "ok %c %p")
-    } else if (ev.fail()) {
+        return template(report, "ok %c %p")
+    } else if (report.isFail || report.isHook) {
         tests++
         fail++
-        await template(ev, "not ok %c %p")
-        await print("  ---")
-        await printError(ev)
-        await print("  ...")
-    } else if (ev.skip()) {
+        return template(report, "not ok %c %p")
+        .then(() => print("  ---"))
+        .then(() => printError(report))
+        .then(() => print("  ..."))
+    } else if (report.isSkip) {
         skip++
-        await template(ev, "ok %c # skip %p")
-    } else if (ev.end()) {
-        await print(`1..${counter}`)
-        await print(`# tests ${tests}`)
-        if (pass) await print(`# pass ${pass}`)
-        if (fail) await print(`# fail ${fail}`)
-        if (skip) await print(`# skip ${skip}`)
-        reset()
-    } else if (ev.error()) {
-        await print("Bail out!")
-        await print("  ---")
-        await printError(ev)
-        await print("  ...")
-        reset()
+        return template(report, "ok %c # skip %p")
+    } else if (report.isEnd) {
+        let p = print(`1..${counter}`)
+        .then(() => print(`# tests ${tests}`))
+
+        if (pass) p = p.then(() => print(`# pass ${pass}`))
+        if (fail) p = p.then(() => print(`# fail ${fail}`))
+        if (skip) p = p.then(() => print(`# skip ${skip}`))
+        return p
+    } else if (report.isError) {
+        return print("Bail out!")
+        .then(() => print("  ---"))
+        .then(() => printError(report))
+        .then(() => print("  ..."))
+    } else {
+        return undefined
     }
 }

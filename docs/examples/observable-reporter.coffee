@@ -1,31 +1,20 @@
 'use strict'
 
 # An example reporter wrapper using ES observables. Requires an Observable
-# polyfill.
+# polyfill, but uses `any-observable`. It has to be used as a plugin.
 #
-# `t.reporter()` -> new Observable
-# `t.reporter(args...)` -> as normal
+# reporter: Observable
 #
-# The observable emits the same events as the normal reporters, except "exit"
-# terminates the stream instead.
+# The observable emits the same events as the normal reporters, except 'end'
+# closes the observable instead.
+Observable = require 'any-observable'
 
-module.exports = ->
-    old = @methods().reporter
-    @methods().reporter = ->
-        if arguments.length
-            old.apply this, arguments
-        else
-            new Observable (observer) ->
-                subscribed = yes
+module.exports = (reflect) ->
+    new Observable (observer) ->
+        reporter = -> (report) ->
+            if report.end then observer.complete(report)
+            else observer.next(report)
+            return
 
-                old.call this, (ev) ->
-                    if subscribed
-                        if ev.end()
-                            observer.complete()
-                        else
-                            observer.next(ev)
-                    return
-
-                ->
-                    subscribed = no
-                    observer = undefined # GC assist
+        reflect.reporter(reporter)
+        -> reflect.removeReporter(reporter)

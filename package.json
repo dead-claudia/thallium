@@ -1,31 +1,39 @@
 {
   "name": "thallium",
-  "version": "0.2.10",
+  "version": "0.3.3",
   "description": "A simple, unopinionated, modular test framework",
   "main": "index.js",
   "scripts": {
     "test": "node make"
   },
   "browser": {
-    "./lib/replaced/inspect.js": "util-inspect",
+    "./lib/replaced/inspect.js": "./node_modules/util-inspect/index.js",
     "./lib/replaced/console.js": "./lib/replaced/console-browser.js",
-    "jsdom": "empty/object"
+    "jsdom": "./node_modules/empty/object.js"
   },
   "files": [
-    "assertions.d.ts",
+    "assert.js",
+    "assert.d.ts",
     "assertions.js",
-    "core.d.ts",
+    "bin",
     "core.js",
+    "docs",
     "index.d.ts",
     "index.js",
-    "thallium.js",
-    "thallium.d.ts",
+    "internal.d.ts",
+    "internal.js",
     "lib",
-    "bin",
+    "match.d.ts",
+    "match.js",
+    "migrate",
     "r",
-    "docs"
+    "thallium-migrate.js",
+    "thallium.d.ts",
+    "thallium.js"
   ],
-  "bin": {"tl": "bin/tl.js"},
+  "bin": {
+    "tl": "bin/tl.js"
+  },
   "keywords": [
     "test",
     "testing",
@@ -41,6 +49,7 @@
     "coffee-script": "^1.10.0",
     "coffeelint": "^1.15.7",
     "empty": "^0.10.1",
+    "es6-promise": "^4.0.5",
     "eslint": "^3.4.0",
     "eslint-config-isiahmeadows": "^0.1.6",
     "jsdom": "^9.4.0",
@@ -49,18 +58,16 @@
     "karma-chrome-launcher": "^2.0.0",
     "karma-firefox-launcher": "^1.0.0",
     "karma-mocha": "^1.1.1",
+    "karma-phantomjs-launcher": "^1.0.2",
     "mocha": "^3.0.2",
     "semver": "^5.3.0",
     "shelljs": "^0.7.4",
     "watchify": "^3.7.0"
   },
   "dependencies": {
-    "bluebird": "^3.4.1",
     "glob": "^7.0.5",
     "interpret": "1",
     "minimatch": "^3.0.2",
-    "resolve": "^1.1.7",
-    "through2": "2",
     "util-inspect": "^0.1.8"
   },
   "directories": {

@@ -1,7 +1,7 @@
 "use strict"
 
-/* global Buffer, Symbol, Uint8Array, DataView, ArrayBuffer, ArrayBufferView,
-Map, Set */
+/* global Symbol, Uint8Array, DataView, ArrayBuffer, ArrayBufferView, Map,
+    Set */
 
 /**
  * Deep matching algorithm for `t.match` and `t.deepEqual`, with zero
@@ -12,9 +12,6 @@ Map, Set */
  * - This does pack a *lot* of features. There's a reason why this is so long.
  * - Some of the duplication is intentional. It's generally commented, but it's
  *   mainly for performance, since the engine needs its type info.
- * - Arguments objects aren't handled specially, mainly because they extend
- *   `Object.prototype`, all the indices are keys, and they're rarely compared
- *   to begin with.
  * - Polyfilled core-js Symbols from cross-origin contexts will never register
  *   as being actual Symbols.
  *
@@ -24,8 +21,47 @@ Map, Set */
  * have compile-time macros. (Also, Sweet.js isn't worth the hassle.)
  */
 
+var objectToString = Object.prototype.toString
+var hasOwn = Object.prototype.hasOwnProperty
+
+var supportsUnicode = hasOwn.call(RegExp.prototype, "unicode")
+var supportsSticky = hasOwn.call(RegExp.prototype, "sticky")
+
+// Legacy engines have several issues when it comes to `typeof`.
+var isFunction = (function () {
+    function SlowIsFunction(value) {
+        if (value == null) return false
+
+        var tag = objectToString.call(value)
+
+        return tag === "[object Function]" ||
+            tag === "[object GeneratorFunction]" ||
+            tag === "[object AsyncFunction]" ||
+            tag === "[object Proxy]"
+    }
+
+    function isPoisoned(object) {
+        return object != null && typeof object !== "function"
+    }
+
+    // In Safari 10, `typeof Proxy === "object"`
+    if (isPoisoned(global.Proxy)) return SlowIsFunction
+
+    // In Safari 8, several typed array constructors are `typeof C === "object"`
+    if (isPoisoned(global.Int8Array)) return SlowIsFunction
+
+    // In old V8, RegExps are callable
+    if (typeof /x/ === "function") return SlowIsFunction // eslint-disable-line
+
+    // Leave this for normal things. It's easily inlined.
+    return function isFunction(value) {
+        return typeof value === "function"
+    }
+})()
+
 // Set up our own buffer check. We should always accept the polyfill, even in
-// Node.
+// Node. Note that it uses `global.Buffer` to avoid including `buffer` in the
+// bundle.
 
 var BufferNative = 0
 var BufferPolyfill = 1
@@ -37,44 +73,31 @@ var bufferSupport = (function () {
 
     // Only Safari 5-7 has ever had this issue.
     if (new FakeBuffer().constructor !== FakeBuffer) return BufferSafari
-    if (typeof Buffer !== "function") return BufferPolyfill
-    if (typeof Buffer.isBuffer !== "function") return BufferPolyfill
+    if (!isFunction(global.Buffer)) return BufferPolyfill
+    if (!isFunction(global.Buffer.isBuffer)) return BufferPolyfill
     // Avoid the polyfill
-    if (Buffer.isBuffer(new FakeBuffer())) return BufferPolyfill
+    if (global.Buffer.isBuffer(new FakeBuffer())) return BufferPolyfill
     return BufferNative
 })()
 
-function isPolyfilledFastBuffer(object) {
-    var Buffer = object.constructor
-
-    if (typeof Buffer !== "function") return false
-    if (typeof Buffer.isBuffer !== "function") return false
-    return Buffer.isBuffer(object)
-}
+var globalIsBuffer = bufferSupport === BufferNative
+    ? global.Buffer.isBuffer
+    : undefined
 
 function isBuffer(object) {
-    if (bufferSupport === BufferNative && Buffer.isBuffer(object)) return true
+    if (bufferSupport === BufferNative && globalIsBuffer(object)) return true
     if (bufferSupport === BufferSafari && object._isBuffer) return true
-    if (isPolyfilledFastBuffer(object)) return true
 
-    // Node v0.10 support
-    if (typeof object.readFloatLE !== "function") return false
-    if (typeof object.slice !== "function") return false
+    var B = object.constructor
 
-    var slice = object.slice(0, 0)
-
-    return slice != null && isPolyfilledFastBuffer(slice)
+    if (!isFunction(B)) return false
+    if (!isFunction(B.isBuffer)) return false
+    return B.isBuffer(object)
 }
-
-var objectToString = Object.prototype.toString
-var hasOwn = Object.prototype.hasOwnProperty
-
-var supportsUnicode = hasOwn.call(RegExp.prototype, "unicode")
-var supportsSticky = hasOwn.call(RegExp.prototype, "sticky")
 
 // core-js' symbols are objects, and some old versions of V8 erroneously had
 // `typeof Symbol() === "object"`.
-var symbolsAreObjects = typeof Symbol === "function" &&
+var symbolsAreObjects = isFunction(global.Symbol) &&
     typeof Symbol() === "object"
 
 // `context` is a bit field, with the following bits. This is not as much for
@@ -102,103 +125,32 @@ exports.strict = function (a, b) {
 // specifically filters out errors and only checks existing descriptors, just to
 // keep the mess from affecting everything (it's not fully correct, but it's
 // necessary).
+var requiresProxy = (function () {
+    var test = new Error()
+    var old = Object.create(null)
 
-// Initialization
-
-var ignoredKeys = (function () {
-    function descriptorIsDifferent(old, desc) {
-        if (old === undefined) return true
-        if (desc.configurable !== old.configurable) return true
-        if (desc.enumerable !== old.enumerable) return true
-        if (hasOwn.call(desc, "value")) {
-            if (!hasOwn.call(old, "value")) return true
-            if (desc.value !== old.value) return true
-            if (desc.writable !== old.writable) return true
-        } else {
-            if (hasOwn.call(old, "value")) return true
-            if (desc.get !== old.get) return true
-            if (desc.set !== old.set) return true
-        }
-        return false
-    }
-
-    var testError = new Error()
-    var testErrorDescriptors = Object.create(null)
-    var ignoredKeys
-
-    Object.keys(testError).forEach(function (key) {
-        testErrorDescriptors[key] =
-            Object.getOwnPropertyDescriptor(testError, key)
-    })
+    Object.keys(test).forEach(function (key) { old[key] = true })
 
     try {
-        throw testError
+        throw test
     } catch (_) {
         // ignore
     }
 
-    Object.keys(testError).forEach(function (key) {
-        var old = testErrorDescriptors[key]
-        var desc = Object.getOwnPropertyDescriptor(testError, key)
-
-        if (descriptorIsDifferent(old, desc)) {
-            if (ignoredKeys == null) ignoredKeys = Object.create(null)
-            if (hasOwn.call(desc, "value")) {
-                var type
-
-                if (desc.value == null) type = "null"
-                else if (Array.isArray(desc.value)) type = "array"
-                else type = typeof desc.value
-
-                ignoredKeys[key] = {
-                    isValue: true,
-                    type: type,
-                    configurable: desc.configurable,
-                    enumerable: desc.enumerable,
-                    writable: desc.writable,
-                }
-            } else {
-                ignoredKeys[key] = {
-                    isValue: false,
-                    get: desc.get,
-                    set: desc.set,
-                    configurable: desc.configurable,
-                    enumerable: desc.enumerable,
-                }
-            }
-        }
-    })
-
-    return ignoredKeys
+    return Object.keys(test).some(function (key) { return !old[key] })
 })()
 
-// Runtime component.
-var requiresProxy = ignoredKeys != null
-
-function matchType(type, value) {
-    if (type === "array") return Array.isArray(value)
-    if (type === "null") return value === null
-    return typeof value === type
-}
-
-// Note that this will likely be rarely invoked.
 function isIgnored(object, key) {
-    var test = ignoredKeys[key]
-    var desc
-
-    if (test.isValue) {
-        if (matchType(test.type, object[key])) return false
-        desc = Object.getOwnPropertyDescriptor(object, key)
-        if (test.writable !== desc.writable) return false
-    } else {
-        desc = Object.getOwnPropertyDescriptor(object, key)
-        if (test.get !== desc.get) return false
-        if (test.set !== desc.set) return false
+    switch (key) {
+    case "line": if (typeof object[key] !== "number") return false; break
+    case "sourceURL": if (typeof object[key] !== "string") return false; break
+    case "stack": if (typeof object[key] !== "string") return false; break
+    default: return false
     }
 
-    if (test.configurable !== desc.configurable) return false
-    if (test.enumerable !== desc.enumerable) return false
-    return true
+    var desc = Object.getOwnPropertyDescriptor(object, key)
+
+    return !desc.configurable && desc.enumerable && !desc.writable
 }
 
 // This is only invoked with errors, so it's not going to present a significant
@@ -208,10 +160,7 @@ function getKeysStripped(object) {
     var count = 0
 
     for (var i = 0; i < keys.length; i++) {
-        if (!hasOwn.call(ignoredKeys, keys[i]) ||
-                !isIgnored(object, keys[i])) {
-            keys[count++] = keys[i]
-        }
+        if (!isIgnored(object, keys[i])) keys[count++] = keys[i]
     }
 
     keys.length = count
@@ -226,11 +175,11 @@ var ArrayBufferLegacy = 1
 var ArrayBufferCurrent = 2
 
 var arrayBufferSupport = (function () {
-    if (typeof Uint8Array !== "function") return ArrayBufferNone
-    if (typeof DataView !== "function") return ArrayBufferNone
-    if (typeof ArrayBuffer !== "function") return ArrayBufferNone
-    if (typeof ArrayBuffer.isView === "function") return ArrayBufferCurrent
-    if (typeof ArrayBufferView === "function") return ArrayBufferLegacy
+    if (!isFunction(global.Uint8Array)) return ArrayBufferNone
+    if (!isFunction(global.DataView)) return ArrayBufferNone
+    if (!isFunction(global.ArrayBuffer)) return ArrayBufferNone
+    if (isFunction(global.ArrayBuffer.isView)) return ArrayBufferCurrent
+    if (isFunction(global.ArrayBufferView)) return ArrayBufferLegacy
     return ArrayBufferNone
 })()
 
@@ -268,8 +217,8 @@ var isView = (function () {
 // Support checking maps and sets deeply. They are object-like enough to count,
 // and are useful in their own right. The code is rather messy, but mainly to
 // keep the order-independent checking from becoming insanely slow.
-var supportsMap = typeof Map === "function"
-var supportsSet = typeof Set === "function"
+var supportsMap = isFunction(global.Map)
+var supportsSet = isFunction(global.Set)
 
 // One of the sets and both maps' keys are converted to arrays for faster
 // handling.
@@ -373,6 +322,11 @@ function searchFor(avalue, objects, context, left, right) { // eslint-disable-li
     return false
 }
 
+function hasStructure(value, context) {
+    return typeof value === "object" && value !== null ||
+            !(context & Strict) && typeof value === "symbol"
+}
+
 // The set algorithm is structured a little differently. It takes one of the
 // sets into an array, does a cheap identity check, then does the deep check.
 function matchSet(a, b, context, left, right) { // eslint-disable-line max-params, max-len
@@ -388,14 +342,13 @@ function matchSet(a, b, context, left, right) { // eslint-disable-line max-param
 
     // Gather all the objects
     for (var next = iter.next(); !next.done; next = iter.next()) {
-        var value = next.value
+        var bvalue = next.value
 
-        if (typeof value === "object" && value !== null ||
-                !(context & Strict) && typeof value === "symbol") {
+        if (hasStructure(bvalue, context)) {
             // Create the objects map lazily. Note that this also grabs Symbols
             // when not strictly matching, since their description is compared.
             if (count === 0) objects = Object.create(null)
-            objects[count++] = value
+            objects[count++] = bvalue
         }
     }
 
@@ -405,7 +358,11 @@ function matchSet(a, b, context, left, right) { // eslint-disable-line max-param
     // Iterate the object, removing each one remaining when matched (and
     // aborting if none can be).
     for (var i = 0; i < count; i++) {
-        if (!searchFor(alist[i], objects, context, left, right)) return false
+        var avalue = alist[i]
+
+        if (hasStructure(avalue, context)) {
+            if (!searchFor(avalue, objects, context, left, right)) return false
+        }
     }
 
     return true
@@ -536,8 +493,41 @@ function matchArrayLike(a, b, context, left, right) { // eslint-disable-line max
     return true
 }
 
+// PhantomJS and SlimerJS both have mysterious issues where `Error` is sometimes
+// erroneously of a different `window`, and it shows up in the tests. This means
+// I have to use a much slower algorithm to detect Errors.
+//
+// PhantomJS: https://github.com/petkaantonov/bluebird/issues/1146
+// SlimerJS: https://github.com/laurentj/slimerjs/issues/400
+//
+// (Yes, the PhantomJS bug is detailed in the Bluebird issue tracker.)
+var checkCrossOrigin = (function () {
+    if (global.window == null || global.window.navigator == null) return false
+    return /slimerjs|phantomjs/i.test(global.window.navigator.userAgent)
+})()
+
+var errorStringTypes = {
+    "[object Error]": true,
+    "[object EvalError]": true,
+    "[object RangeError]": true,
+    "[object ReferenceError]": true,
+    "[object SyntaxError]": true,
+    "[object TypeError]": true,
+    "[object URIError]": true,
+}
+
+function isProxiedError(object) {
+    while (object != null) {
+        if (errorStringTypes[objectToString.call(object)]) return true
+        object = Object.getPrototypeOf(object)
+    }
+
+    return false
+}
+
 function matchInner(a, b, context, left, right) { // eslint-disable-line max-statements, max-params, max-len
     var akeys, bkeys
+    var isUnproxiedError = false
 
     if (context & SameProto) {
         if (Array.isArray(a)) return matchArrayLike(a, b, context, left, right)
@@ -554,18 +544,22 @@ function matchInner(a, b, context, left, right) { // eslint-disable-line max-sta
             return matchArrayLike(a, b, context, left, right)
         }
 
-        if (a instanceof Error) {
-            akeys = requiresProxy ? getKeysStripped(a) : Object.keys(a)
-            bkeys = requiresProxy ? getKeysStripped(b) : Object.keys(b)
+        if (requiresProxy &&
+                (checkCrossOrigin ? isProxiedError(a) : a instanceof Error)) {
+            akeys = getKeysStripped(a)
+            bkeys = getKeysStripped(b)
         } else {
             akeys = Object.keys(a)
             bkeys = Object.keys(b)
+            isUnproxiedError = a instanceof Error
         }
     } else {
         if (objectToString.call(a) === "[object Arguments]") {
             return matchArrayLike(a, b, context, left, right)
         }
 
+        // If we require a proxy, be permissive and check the `toString` type.
+        // This is so it works cross-origin in PhantomJS in particular.
         if (a instanceof Error) return false
         akeys = Object.keys(a)
         bkeys = Object.keys(b)
@@ -578,14 +572,36 @@ function matchInner(a, b, context, left, right) { // eslint-disable-line max-sta
     // Shortcut if there's nothing to match
     if (count === 0) return true
 
-    // Shortcut if the properties are different.
-    for (var i = 0; i < count; i++) {
-        if (!hasOwn.call(b, akeys[i])) return false
-    }
+    var i
 
-    // Verify that all the akeys' values matched.
-    for (var j = 0; j < count; j++) {
-        if (!match(a[akeys[j]], b[akeys[j]], context, left, right)) return false
+    if (isUnproxiedError) {
+        // Shortcut if the properties are different.
+        for (i = 0; i < count; i++) {
+            if (akeys[i] !== "stack") {
+                if (!hasOwn.call(b, akeys[i])) return false
+            }
+        }
+
+        // Verify that all the akeys' values matched.
+        for (i = 0; i < count; i++) {
+            if (akeys[i] !== "stack") {
+                if (!match(a[akeys[i]], b[akeys[i]], context, left, right)) {
+                    return false
+                }
+            }
+        }
+    } else {
+        // Shortcut if the properties are different.
+        for (i = 0; i < count; i++) {
+            if (!hasOwn.call(b, akeys[i])) return false
+        }
+
+        // Verify that all the akeys' values matched.
+        for (i = 0; i < count; i++) {
+            if (!match(a[akeys[i]], b[akeys[i]], context, left, right)) {
+                return false
+            }
+        }
     }
 
     return true

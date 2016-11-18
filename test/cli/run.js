@@ -2,9 +2,9 @@
 
 /* eslint max-nested-callbacks: [2, 5] */
 
-var parse = require("../../lib/cli/parse.js")
-var Run = require("../../lib/cli/run.js")
-var Cli = require("../../scripts/cli.js")
+var parse = require("../../lib/cli/parse")
+var Run = require("../../lib/cli/run")
+var Cli = require("../../test-util/cli/cli")
 
 describe("cli runner", function () {
     var n = Util.n
@@ -17,13 +17,13 @@ describe("cli runner", function () {
         }
 
         function execute(reporter, type) {
-            return Util.Promise.resolve(
-                reporter(n(type, [p("test", 0)], map[type])))
+            return Promise.resolve(
+                reporter(n[type]([p("test", 0)], map[type])))
         }
 
         ["start", "enter", "leave", "pass", "skip", "end"]
         .forEach(function (type) {
-            it("doesn't trigger for \"" + type + "\" events", function () {
+            it("doesn't trigger for \"" + type + "\" reports", function () {
                 var state = {fail: false}
                 var reporter = Run.exitReporter(state)
 
@@ -33,7 +33,7 @@ describe("cli runner", function () {
         })
 
         ;["fail", "error"].forEach(function (type) {
-            it("does trigger for \"" + type + "\" events", function () {
+            it("does trigger for \"" + type + "\" reports", function () {
                 var state = {fail: false}
                 var reporter = Run.exitReporter(state)
 
@@ -83,12 +83,8 @@ describe("cli runner", function () {
          * Most of these are integration tests.
          */
 
-        // When Mocha reloads this module, the module defining the tests also
-        // gets reloaded, so the warnings need re-suppressed.
-        Util.silenceEmptyInlineWarnings()
-
         function run(opts) {
-            var tt = t.create()
+            var tt = Util.create()
             var tree = opts.tree(tt)
 
             if (tree["node_modules"] == null) tree["node_modules"] = {}
@@ -113,15 +109,15 @@ describe("cli runner", function () {
                     return {
                         test: {
                             ".tl.js": function () {
-                                t.reporter(Util.push(ret))
+                                t.reporter(Util.push, ret)
                             },
 
                             "one.js": function () {
-                                t.test("test 1")
+                                t.test("test 1", function () {})
                             },
 
                             "two.js": function () {
-                                t.test("test 2")
+                                t.test("test 2", function () {})
                             },
                         },
                     }
@@ -129,10 +125,10 @@ describe("cli runner", function () {
             }).then(function (code) {
                 assert.equal(code, 0)
                 assert.match(ret, [
-                    n("start", []),
-                    n("pass", [p("test 1", 0)]),
-                    n("pass", [p("test 2", 1)]),
-                    n("end", []),
+                    n.start(),
+                    n.pass([p("test 1", 0)]),
+                    n.pass([p("test 2", 1)]),
+                    n.end(),
                 ])
             })
         })
@@ -146,15 +142,15 @@ describe("cli runner", function () {
                     return {
                         test: {
                             ".tl.js": function () {
-                                t.reporter(Util.push(ret))
+                                t.reporter(Util.push, ret)
                             },
 
                             "one": function () {
-                                t.test("test 1")
+                                t.test("test 1", function () {})
                             },
 
                             "two.js": function () {
-                                t.test("test 2")
+                                t.test("test 2", function () {})
                             },
                         },
                     }
@@ -162,9 +158,9 @@ describe("cli runner", function () {
             }).then(function (code) {
                 assert.equal(code, 0)
                 assert.match(ret, [
-                    n("start", []),
-                    n("pass", [p("test 2", 0)]),
-                    n("end", []),
+                    n.start(),
+                    n.pass([p("test 2", 0)]),
+                    n.end(),
                 ])
             })
         })
@@ -178,15 +174,15 @@ describe("cli runner", function () {
                     return {
                         test: {
                             ".tl.coffee": function () {
-                                t.reporter(Util.push(ret))
+                                t.reporter(Util.push, ret)
                             },
 
                             "one.js": function () {
-                                t.test("test 1")
+                                t.test("test 1", function () {})
                             },
 
                             "two.coffee": function () {
-                                t.test("test 2")
+                                t.test("test 2", function () {})
                             },
                         },
                     }
@@ -194,9 +190,9 @@ describe("cli runner", function () {
             }).then(function (code) {
                 assert.equal(code, 0)
                 assert.match(ret, [
-                    n("start", []),
-                    n("pass", [p("test 2", 0)]),
-                    n("end", []),
+                    n.start(),
+                    n.pass([p("test 2", 0)]),
+                    n.end(),
                 ])
             })
         })
@@ -211,15 +207,17 @@ describe("cli runner", function () {
                     return {
                         test: {
                             ".tl.js": function () {
-                                t.reporter(Util.push(ret))
+                                t.reporter(Util.push, ret)
                             },
 
                             "one.js": function () {
-                                t.test("test 1")
+                                t.test("test 1", function () {})
                             },
 
                             "two.js": function () {
-                                t.test("test 2").try(assert.fail, "oops")
+                                t.test("test 2", function () {
+                                    assert.fail("oops")
+                                })
                             },
                         },
                     }
@@ -227,10 +225,10 @@ describe("cli runner", function () {
             }).then(function (code) {
                 assert.equal(code, 1)
                 assert.match(ret, [
-                    n("start", []),
-                    n("pass", [p("test 1", 0)]),
-                    n("fail", [p("test 2", 1)], new AssertionError("oops")),
-                    n("end", []),
+                    n.start(),
+                    n.pass([p("test 1", 0)]),
+                    n.fail([p("test 2", 1)], new AssertionError("oops")),
+                    n.end(),
                 ])
             })
         })
@@ -248,29 +246,33 @@ describe("cli runner", function () {
 
             function isNope(x) {
                 if (x !== "nope") {
-                    assert.failFormat(
-                        "Expected {actual} to be a nope",
-                        {actual: x})
+                    assert.fail("Expected {actual} to be a nope", {actual: x})
                 }
             }
 
             function modOne(t) {
-                t.test("mod-one", function (t) {
-                    t.test("1 === 1").try(assert.equal, 1, 1)
+                t.test("mod-one", function () {
+                    t.test("1 === 1", function () {
+                        assert.equal(1, 1)
+                    })
 
                     t.test("foo()", function () {
                         assert.notEqual(1, 1)
                     })
 
                     t.test("bar()", function () {
-                        return Util.Promise.delay(0).throw(new Error("fail"))
+                        return new Promise(function (_, reject) {
+                            global.setTimeout(function () {
+                                reject(new Error("fail"))
+                            }, 0)
+                        })
                     })
 
                     t.test("baz()", function () {
-                        return Util.Promise.reject(sentinel)
+                        return Promise.reject(sentinel)
                     })
 
-                    t.test("nested", function (t) {
+                    t.test("nested", function () {
                         t.test("nested 2", function () {
                             assert.ok(true)
                         })
@@ -279,34 +281,38 @@ describe("cli runner", function () {
             }
 
             function modTwo(t) {
-                t.test("mod-two", function (t) {
-                    t.test("1 === 2").try(assert.equal, 1, 2)
+                t.test("mod-two", function () {
+                    t.test("1 === 2", function () {
+                        assert.equal(1, 2)
+                    })
 
-                    t.test("expandos don't transfer", function (t) {
+                    t.test("expandos don't transfer", function () {
                         assert.notHasKey(t, "foo")
                     })
 
-                    t.test("what a fail...").try(isNope, "yep")
+                    t.test("what a fail...", function () {
+                        isNope("yep")
+                    })
                 })
             }
 
             var expected = [
-                n("start", []),
-                n("enter", [p("mod-one", 0)]),
-                n("pass", [p("mod-one", 0), p("1 === 1", 0)]),
-                n("fail", [p("mod-one", 0), p("foo()", 1)], fail),
-                n("fail", [p("mod-one", 0), p("bar()", 2)], new Error("fail")),
-                n("fail", [p("mod-one", 0), p("baz()", 3)], sentinel),
-                n("enter", [p("mod-one", 0), p("nested", 4)]),
-                n("pass", [p("mod-one", 0), p("nested", 4), p("nested 2", 0)]),
-                n("leave", [p("mod-one", 0), p("nested", 4)]),
-                n("leave", [p("mod-one", 0)]),
-                n("enter", [p("mod-two", 1)]),
-                n("fail", [p("mod-two", 1), p("1 === 2", 0)], fail2),
-                n("pass", [p("mod-two", 1), p("expandos don't transfer", 1)]),
-                n("fail", [p("mod-two", 1), p("what a fail...", 2)], fail3),
-                n("leave", [p("mod-two", 1)]),
-                n("end", []),
+                n.start(),
+                n.enter([p("mod-one", 0)]),
+                n.pass([p("mod-one", 0), p("1 === 1", 0)]),
+                n.fail([p("mod-one", 0), p("foo()", 1)], fail),
+                n.fail([p("mod-one", 0), p("bar()", 2)], new Error("fail")),
+                n.fail([p("mod-one", 0), p("baz()", 3)], sentinel),
+                n.enter([p("mod-one", 0), p("nested", 4)]),
+                n.pass([p("mod-one", 0), p("nested", 4), p("nested 2", 0)]),
+                n.leave([p("mod-one", 0), p("nested", 4)]),
+                n.leave([p("mod-one", 0)]),
+                n.enter([p("mod-two", 1)]),
+                n.fail([p("mod-two", 1), p("1 === 2", 0)], fail2),
+                n.pass([p("mod-two", 1), p("expandos don't transfer", 1)]),
+                n.fail([p("mod-two", 1), p("what a fail...", 2)], fail3),
+                n.leave([p("mod-two", 1)]),
+                n.end(),
             ]
 
             return run({
@@ -315,7 +321,7 @@ describe("cli runner", function () {
                     return {
                         test: {
                             ".tl.js": function () {
-                                t.reporter(Util.push(ret))
+                                t.reporter(Util.push, ret)
                             },
 
                             "mod-one.js": function () { modOne(t) },
@@ -331,9 +337,7 @@ describe("cli runner", function () {
 
         it("adheres to the config correctly", function () {
             var ret = []
-            var custom = t.create()
-
-            function noop() {}
+            var custom = Util.create()
 
             return run({
                 args: "",
@@ -344,7 +348,7 @@ describe("cli runner", function () {
                         },
 
                         ".tl.js": function () {
-                            custom.reporter(Util.push(ret))
+                            custom.reporter(Util.push, ret)
 
                             return {
                                 thallium: custom,
@@ -357,23 +361,23 @@ describe("cli runner", function () {
 
                         "totally-not-a-test": {
                             "test.coffee": function () {
-                                custom.test("test").try(noop)
+                                custom.test("test", function () {})
                             },
                         },
 
                         "whatever": {
                             "other.js": function () {
-                                custom.test("other").try(noop)
+                                custom.test("other", function () {})
                             },
                         },
                     }
                 },
             }).then(function () {
                 assert.match(ret, [
-                    n("start", []),
-                    n("pass", [p("test", 0)]),
-                    n("pass", [p("other", 1)]),
-                    n("end", []),
+                    n.start(),
+                    n.pass([p("test", 0)]),
+                    n.pass([p("other", 1)]),
+                    n.end(),
                 ])
             })
         })

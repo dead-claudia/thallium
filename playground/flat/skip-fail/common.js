@@ -2,11 +2,8 @@
 
 /* eslint-disable max-len */
 
-var t = require("../../../index.js")
-
-function fail(t) {
-    t.fail("fail")
-}
+var t = require("../../..")
+var fail = require("../../../assert").fail
 
 t.testSkip("cli common isObjectLike() passes for objects and functions")
 t.testSkip("cli common isObjectLike() fails for other things")

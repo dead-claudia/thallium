@@ -2,7 +2,7 @@
 
 /* eslint-disable max-len */
 
-var t = require("../../../index.js")
+var t = require("../../..")
 
 function fail(t) {
     t.fail("fail")

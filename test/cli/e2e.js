@@ -8,7 +8,7 @@
 
 var path = require("path")
 var cp = require("child_process")
-var fixture = require("../../scripts/cli.js").fixture
+var fixture = require("../../test-util/cli/cli.js").fixture
 
 describe("cli end-to-end (FLAKE)", /** @this */ function () {
     this.retries(3)
@@ -34,6 +34,7 @@ describe("cli end-to-end (FLAKE)", /** @this */ function () {
 
             var child = cp.spawn(process.argv[0], opts.args, {
                 stdio: [process.stdin, "pipe", process.stderr],
+                cwd: opts.cwd,
             })
 
             var output = ""
@@ -41,20 +42,20 @@ describe("cli end-to-end (FLAKE)", /** @this */ function () {
             child.stdout.setEncoding("utf-8")
             child.stdout.on("data", function (data) { output += data })
 
-            return Util.Promise.all([
-                new Util.Promise(function (resolve, reject) {
+            return Promise.all([
+                new Promise(function (resolve, reject) {
                     child.on("error", reject)
                     child.stdout.on("error", reject)
                     child.stdout.on("end", resolve)
                 }),
-                new Util.Promise(function (resolve, reject) {
+                new Promise(function (resolve, reject) {
                     child.on("close", function (code, signal) {
                         if (signal == null) return resolve(code)
                         return reject(
                             new Error("terminated with signal " + signal))
                     })
                 }),
-                new Util.Promise(function (resolve, reject) {
+                new Promise(function (resolve, reject) {
                     child.on("exit", function (code, signal) {
                         if (signal == null) return resolve(code)
                         return reject(
@@ -83,7 +84,7 @@ describe("cli end-to-end (FLAKE)", /** @this */ function () {
         ],
     })
 
-    test("runs small sized test suites", {
+    test("runs small sized failing test suites", {
         args: ["--cwd", fixture("."), "full-js/**"],
         code: 1,
         timeout: 5000,
@@ -102,8 +103,7 @@ describe("cli end-to-end (FLAKE)", /** @this */ function () {
             "leave [0: mod-one] = undefined",
             "enter [1: mod-two] = undefined",
             "fail [1: mod-two] > [0: 1 === 2] = \"AssertionError: Expected 1 to equal 2\"",
-            "pass [1: mod-two] > [1: expandos don't transfer] = undefined",
-            "fail [1: mod-two] > [2: what a fail...] = \"AssertionError: Expected 'yep' to be a nope\"",
+            "fail [1: mod-two] > [1: what a fail...] = \"AssertionError: Expected 'yep' to be a nope\"",
             "leave [1: mod-two] = undefined",
             "end = undefined",
         ],
@@ -116,46 +116,40 @@ describe("cli end-to-end (FLAKE)", /** @this */ function () {
         "start = undefined",
         "enter [0: core (basic)] = undefined",
         "enter [0: core (basic)] > [0: reflect] = undefined",
-        "enter [0: core (basic)] > [0: reflect] > [0: parent()] = undefined",
-        "pass [0: core (basic)] > [0: reflect] > [0: parent()] > [0: works on the root instance] = undefined",
-        "pass [0: core (basic)] > [0: reflect] > [0: parent()] > [1: works on children] = undefined",
-        "leave [0: core (basic)] > [0: reflect] > [0: parent()] = undefined",
-        "enter [0: core (basic)] > [0: reflect] > [1: count()] = undefined",
-        "pass [0: core (basic)] > [0: reflect] > [1: count()] > [0: works with 0 tests] = undefined",
-        "pass [0: core (basic)] > [0: reflect] > [1: count()] > [1: works with 1 test] = undefined",
-        "pass [0: core (basic)] > [0: reflect] > [1: count()] > [2: works with 2 tests] = undefined",
-        "pass [0: core (basic)] > [0: reflect] > [1: count()] > [3: works with 3 tests] = undefined",
-        "pass [0: core (basic)] > [0: reflect] > [1: count()] > [4: works with itself] = undefined",
-        "leave [0: core (basic)] > [0: reflect] > [1: count()] = undefined",
-        "enter [0: core (basic)] > [0: reflect] > [2: name()] = undefined",
-        "pass [0: core (basic)] > [0: reflect] > [2: name()] > [0: works with the root test] = undefined",
-        "pass [0: core (basic)] > [0: reflect] > [2: name()] > [1: works with child tests] = undefined",
-        "pass [0: core (basic)] > [0: reflect] > [2: name()] > [2: works with itself] = undefined",
-        "leave [0: core (basic)] > [0: reflect] > [2: name()] = undefined",
-        "enter [0: core (basic)] > [0: reflect] > [3: index()] = undefined",
-        "pass [0: core (basic)] > [0: reflect] > [3: index()] > [0: works with the root test] = undefined",
-        "pass [0: core (basic)] > [0: reflect] > [3: index()] > [1: works with the first child test] = undefined",
-        "pass [0: core (basic)] > [0: reflect] > [3: index()] > [2: works with the second child test] = undefined",
-        "pass [0: core (basic)] > [0: reflect] > [3: index()] > [3: works with itself] = undefined",
-        "leave [0: core (basic)] > [0: reflect] > [3: index()] = undefined",
-        "enter [0: core (basic)] > [0: reflect] > [4: children()] = undefined",
-        "pass [0: core (basic)] > [0: reflect] > [4: children()] > [0: works with 0 tests] = undefined",
-        "pass [0: core (basic)] > [0: reflect] > [4: children()] > [1: works with 1 test] = undefined",
-        "pass [0: core (basic)] > [0: reflect] > [4: children()] > [2: works with 2 tests] = undefined",
-        "pass [0: core (basic)] > [0: reflect] > [4: children()] > [3: returns a copy] = undefined",
-        "leave [0: core (basic)] > [0: reflect] > [4: children()] = undefined",
+        "enter [0: core (basic)] > [0: reflect] > [0: get parent] = undefined",
+        "pass [0: core (basic)] > [0: reflect] > [0: get parent] > [0: works on the root instance] = undefined",
+        "pass [0: core (basic)] > [0: reflect] > [0: get parent] > [1: works on children] = undefined",
+        "leave [0: core (basic)] > [0: reflect] > [0: get parent] = undefined",
+        "enter [0: core (basic)] > [0: reflect] > [1: get count] = undefined",
+        "pass [0: core (basic)] > [0: reflect] > [1: get count] > [0: works with 0 tests] = undefined",
+        "pass [0: core (basic)] > [0: reflect] > [1: get count] > [1: works with 1 test] = undefined",
+        "pass [0: core (basic)] > [0: reflect] > [1: get count] > [2: works with 2 tests] = undefined",
+        "pass [0: core (basic)] > [0: reflect] > [1: get count] > [3: works with 3 tests] = undefined",
+        "pass [0: core (basic)] > [0: reflect] > [1: get count] > [4: works with itself] = undefined",
+        "leave [0: core (basic)] > [0: reflect] > [1: get count] = undefined",
+        "enter [0: core (basic)] > [0: reflect] > [2: get name] = undefined",
+        "pass [0: core (basic)] > [0: reflect] > [2: get name] > [0: works with the root test] = undefined",
+        "pass [0: core (basic)] > [0: reflect] > [2: get name] > [1: works with child tests] = undefined",
+        "pass [0: core (basic)] > [0: reflect] > [2: get name] > [2: works with itself] = undefined",
+        "leave [0: core (basic)] > [0: reflect] > [2: get name] = undefined",
+        "enter [0: core (basic)] > [0: reflect] > [3: get index] = undefined",
+        "pass [0: core (basic)] > [0: reflect] > [3: get index] > [0: works with the root test] = undefined",
+        "pass [0: core (basic)] > [0: reflect] > [3: get index] > [1: works with the first child test] = undefined",
+        "pass [0: core (basic)] > [0: reflect] > [3: get index] > [2: works with the second child test] = undefined",
+        "pass [0: core (basic)] > [0: reflect] > [3: get index] > [3: works with itself] = undefined",
+        "leave [0: core (basic)] > [0: reflect] > [3: get index] = undefined",
+        "enter [0: core (basic)] > [0: reflect] > [4: get children] = undefined",
+        "pass [0: core (basic)] > [0: reflect] > [4: get children] > [0: works with 0 tests] = undefined",
+        "pass [0: core (basic)] > [0: reflect] > [4: get children] > [1: works with 1 test] = undefined",
+        "pass [0: core (basic)] > [0: reflect] > [4: get children] > [2: works with 2 tests] = undefined",
+        "pass [0: core (basic)] > [0: reflect] > [4: get children] > [3: returns a copy] = undefined",
+        "leave [0: core (basic)] > [0: reflect] > [4: get children] = undefined",
         "leave [0: core (basic)] > [0: reflect] = undefined",
         "enter [0: core (basic)] > [1: test()] = undefined",
-        "pass [0: core (basic)] > [1: test()] > [0: exists] = undefined",
-        "pass [0: core (basic)] > [1: test()] > [1: accepts a string + function] = undefined",
-        "pass [0: core (basic)] > [1: test()] > [2: accepts a string] = undefined",
-        "pass [0: core (basic)] > [1: test()] > [3: returns the current instance when given a callback] = undefined",
-        "pass [0: core (basic)] > [1: test()] > [4: returns a prototypal clone when not given a callback] = undefined",
+        "pass [0: core (basic)] > [1: test()] > [0: returns a prototypal clone inside] = undefined",
         "leave [0: core (basic)] > [1: test()] = undefined",
         "enter [0: core (basic)] > [2: run()] = undefined",
-        "pass [0: core (basic)] > [2: run()] > [0: exists] = undefined",
-        "pass [0: core (basic)] > [2: run()] > [1: runs block tests within tests] = undefined",
-        "pass [0: core (basic)] > [2: run()] > [2: runs successful inline tests within tests] = undefined",
+        "pass [0: core (basic)] > [2: run()] > [0: runs child tests] = undefined",
         "leave [0: core (basic)] > [2: run()] = undefined",
         "leave [0: core (basic)] = undefined",
         "enter [1: cli common] = undefined",
@@ -227,11 +221,9 @@ describe("cli end-to-end (FLAKE)", /** @this */ function () {
         "pass [2: core (timeouts) (FLAKE)] > [1: fails with own] = undefined",
         "pass [2: core (timeouts) (FLAKE)] > [2: succeeds with inherited] = undefined",
         "pass [2: core (timeouts) (FLAKE)] > [3: fails with inherited] = undefined",
-        "pass [2: core (timeouts) (FLAKE)] > [4: gets own block timeout] = undefined",
-        "pass [2: core (timeouts) (FLAKE)] > [5: gets own inline timeout] = undefined",
-        "pass [2: core (timeouts) (FLAKE)] > [6: gets inherited block timeout] = undefined",
-        "pass [2: core (timeouts) (FLAKE)] > [7: gets inherited inline timeout] = undefined",
-        "pass [2: core (timeouts) (FLAKE)] > [8: gets default timeout] = undefined",
+        "pass [2: core (timeouts) (FLAKE)] > [4: gets own timeout] = undefined",
+        "pass [2: core (timeouts) (FLAKE)] > [5: gets inherited timeout] = undefined",
+        "pass [2: core (timeouts) (FLAKE)] > [6: gets default timeout] = undefined",
         "leave [2: core (timeouts) (FLAKE)] = undefined",
         "end = undefined",
     ]
@@ -290,5 +282,34 @@ describe("cli end-to-end (FLAKE)", /** @this */ function () {
         code: 0,
         timeout: 7500,
         messages: midCoffeeMessages,
+    })
+
+    var optsMessages = [
+        "start = undefined",
+        "pass [0: injection worked] = undefined",
+        "end = undefined",
+    ]
+
+    test("runs tests with .tl.opts", {
+        args: [],
+        cwd: fixture("js-opts"),
+        code: 0,
+        timeout: 5000,
+        messages: optsMessages,
+    })
+
+    test("runs tests with .tl.opts and files", {
+        args: [fixture("js-opts/test/**")],
+        code: 0,
+        timeout: 5000,
+        messages: optsMessages,
+    })
+
+    test("runs tests with specified --opts", {
+        args: ["--opts", fixture("js-opts/config.opts")],
+        cwd: fixture("js-opts"),
+        code: 0,
+        timeout: 5000,
+        messages: optsMessages,
     })
 })

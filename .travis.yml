@@ -1,15 +1,5 @@
 language: node_js
 
-node_js:
-  - "0.10"
-  - "0.12"
-  - "1"
-  - "2"
-  - "3"
-  - "4"
-  - "5"
-  - "6"
-
 os:
   - osx
   # - linux
@@ -40,28 +30,36 @@ script:
 
 matrix:
   fast_finish: true
-  # Browser tests
-  # include:
-  #   - node_js: stable
-  #     env: ENV=chrome
-  #     os: linux
-  #     sudo: required
-  #     dist: trusty
-  #
-  #   - node_js: stable
-  #     env: ENV=firefox
-  #     os: linux
-  #     addons:
-  #       firefox: latest
-  #
-  #   - node_js: stable
-  #     env: ENV=firefox-beta
-  #     os: linux
-  #     addons:
-  #       firefox: latest-beta
-  #
-  #   - node_js: stable
-  #     env: ENV=firefox-esr
-  #     os: linux
-  #     addons:
-  #       firefox: latest-esr
+  include:
+    - node_js: "4"
+      env: ENV=node
+    - node_js: "5"
+      env: ENV=node
+    - node_js: "6"
+      env: ENV=node
+
+    # Browser tests
+    # TODO: set up Chrome - it's a little more involved.
+    # - node_js: stable
+    #   env: ENV=chrome
+    #   os: linux
+    #   sudo: required
+    #   dist: trusty
+    # - node_js: stable
+    #   env: ENV=firefox
+    #   os: linux
+    #   addons:
+    #     firefox: latest
+    # - node_js: stable
+    #   env: ENV=firefox-beta
+    #   os: linux
+    #   addons:
+    #     firefox: latest-beta
+    # - node_js: stable
+    #   env: ENV=firefox-esr
+    #   os: linux
+    #   addons:
+    #     firefox: latest-esr
+    # - node_js: stable
+    #   env: ENV=phantomjs
+    #   os: linux

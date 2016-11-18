@@ -1,10 +1,7 @@
 "use strict"
 
-var t = require("../../../index.js")
-
-function fail(t) {
-    t.fail("fail")
-}
+var t = require("../../..")
+var fail = require("../../../assert").fail
 
 t.testSkip("core (timeouts) (FLAKE) succeeds with own")
 t.testSkip("core (timeouts) (FLAKE) fails with own")

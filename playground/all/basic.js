@@ -1,12 +1,9 @@
 "use strict"
 
-var t = require("../../index.js")
+var t = require("../..")
+var fail = require("../../assert").fail
 
-function fail(t) {
-    t.fail("fail")
-}
-
-t.test("core (basic)", function (t) {
+t.test("core (basic)", function () {
     t.test("has `base()`", function () {})
     t.test("has `test()`", function () {})
     t.test("has `parent()`", function () {})

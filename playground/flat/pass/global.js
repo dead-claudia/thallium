@@ -1,6 +1,6 @@
 "use strict"
 
-var t = require("../../../index.js")
+var t = require("../../..")
 
 t.test("works", function () {})
 t.test("doesn't work", function () {})

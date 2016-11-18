@@ -31,22 +31,22 @@ describe("core (slow) (FLAKE)", /** @this */ function () {
     }
 
     it("succeeds with own", function () {
-        var tt = t.create()
+        var tt = Util.create()
         var ret = []
 
-        tt.reporter(Util.push(ret, true))
+        tt.reporter(Util.push, {ret: ret, keep: true})
 
-        tt.test("test", function (tt) {
+        tt.test("test", function () {
             // It's highly unlikely the engine will take this long to finish.
-            tt.slow(10)
+            tt.slow = 10
             return resolve()
         })
 
         return tt.run().then(function () {
             assert.match(ret, [
-                n("start", [], undefined, -1, 75),
-                n("pass", [p("test", 0)], undefined, ret[1].duration, ret[1].slow), // eslint-disable-line max-len
-                n("end", [], undefined, -1, 75),
+                n.start(),
+                n.pass([p("test", 0)], ret[1].duration, ret[1].slow),
+                n.end(),
             ])
 
             speed(ret[1], "fast")
@@ -54,22 +54,22 @@ describe("core (slow) (FLAKE)", /** @this */ function () {
     })
 
     it("hits middle with own", function () {
-        var tt = t.create()
+        var tt = Util.create()
         var ret = []
 
-        tt.reporter(Util.push(ret, true))
+        tt.reporter(Util.push, {ret: ret, keep: true})
 
-        tt.test("test", function (tt) {
+        tt.test("test", function () {
             // It's highly unlikely the engine will take this long to finish.
-            tt.slow(100)
+            tt.slow = 100
             return delay(60)
         })
 
         return tt.run().then(function () {
             assert.match(ret, [
-                n("start", [], undefined, -1, 75),
-                n("pass", [p("test", 0)], undefined, ret[1].duration, ret[1].slow), // eslint-disable-line max-len
-                n("end", [], undefined, -1, 75),
+                n.start(),
+                n.pass([p("test", 0)], ret[1].duration, ret[1].slow),
+                n.end(),
             ])
 
             assert.equal(ret[1].slow, 100)
@@ -78,22 +78,22 @@ describe("core (slow) (FLAKE)", /** @this */ function () {
     })
 
     it("fails with own", function () {
-        var tt = t.create()
+        var tt = Util.create()
         var ret = []
 
-        tt.reporter(Util.push(ret, true))
+        tt.reporter(Util.push, {ret: ret, keep: true})
 
-        tt.test("test", function (tt) {
-            tt.slow(50)
+        tt.test("test", function () {
+            tt.slow = 50
             // It's highly unlikely the engine will take this long to finish
             return delay(200)
         })
 
         return tt.run().then(function () {
             assert.match(ret, [
-                n("start", [], undefined, -1, 75),
-                n("pass", [p("test", 0)], undefined, ret[1].duration, ret[1].slow), // eslint-disable-line max-len
-                n("end", [], undefined, -1, 75),
+                n.start(),
+                n.pass([p("test", 0)], ret[1].duration, ret[1].slow),
+                n.end(),
             ])
 
             assert.equal(ret[1].slow, 50)
@@ -102,22 +102,23 @@ describe("core (slow) (FLAKE)", /** @this */ function () {
     })
 
     it("succeeds with inherited", function () {
-        var tt = t.create()
+        var tt = Util.create()
         var ret = []
 
-        tt.reporter(Util.push(ret, true))
+        tt.reporter(Util.push, {ret: ret, keep: true})
 
-        tt.test("test")
-        .slow(50)
-        .test("inner", function () { return resolve() })
+        tt.test("test", function () {
+            tt.slow = 50
+            tt.test("inner", function () { return resolve() })
+        })
 
         return tt.run().then(function () {
             assert.match(ret, [
-                n("start", [], undefined, -1, 75),
-                n("enter", [p("test", 0)], undefined, ret[1].duration, ret[1].slow), // eslint-disable-line max-len
-                n("pass", [p("test", 0), p("inner", 0)], undefined, ret[2].duration, ret[2].slow), // eslint-disable-line max-len
-                n("leave", [p("test", 0)], undefined, -1, 50),
-                n("end", [], undefined, -1, 75),
+                n.start(),
+                n.enter([p("test", 0)], ret[1].duration, ret[1].slow),
+                n.pass([p("test", 0), p("inner", 0)], ret[2].duration, ret[2].slow), // eslint-disable-line max-len
+                n.leave([p("test", 0)]),
+                n.end(),
             ])
 
             assert.equal(ret[1].slow, 50)
@@ -128,22 +129,23 @@ describe("core (slow) (FLAKE)", /** @this */ function () {
     })
 
     it("fails with inherited", function () {
-        var tt = t.create()
+        var tt = Util.create()
         var ret = []
 
-        tt.reporter(Util.push(ret, true))
+        tt.reporter(Util.push, {ret: ret, keep: true})
 
-        tt.test("test")
-        .slow(50)
-        .test("inner", function () { return delay(200) })
+        tt.test("test", function () {
+            tt.slow = 50
+            tt.test("inner", function () { return delay(200) })
+        })
 
         return tt.run().then(function () {
             assert.match(ret, [
-                n("start", [], undefined, -1, 75),
-                n("enter", [p("test", 0)], undefined, ret[1].duration, ret[1].slow), // eslint-disable-line max-len
-                n("pass", [p("test", 0), p("inner", 0)], undefined, ret[2].duration, ret[2].slow), // eslint-disable-line max-len
-                n("leave", [p("test", 0)], undefined, -1, 50),
-                n("end", [], undefined, -1, 75),
+                n.start(),
+                n.enter([p("test", 0)], ret[1].duration, ret[1].slow),
+                n.pass([p("test", 0), p("inner", 0)], ret[2].duration, ret[2].slow), // eslint-disable-line max-len
+                n.leave([p("test", 0)]),
+                n.end(),
             ])
 
             assert.equal(ret[1].slow, 50)
@@ -153,22 +155,22 @@ describe("core (slow) (FLAKE)", /** @this */ function () {
         })
     })
 
+    function ownSlow(reflect) {
+        return reflect.ownSlow
+    }
+
     function slow(reflect) {
-        return reflect.slow()
+        return reflect.slow
     }
 
-    function activeSlow(reflect) {
-        return reflect.activeSlow()
-    }
-
-    it("gets own block slow", function () {
-        var tt = t.create()
+    it("gets own slow", function () {
+        var tt = Util.create()
         var active, raw
 
-        tt.test("test", function (tt) {
-            tt.slow(50)
-            active = tt.call(activeSlow)
-            raw = tt.call(slow)
+        tt.test("test", function () {
+            tt.slow = 50
+            active = tt.call(slow)
+            raw = tt.call(ownSlow)
         })
 
         return tt.run().then(function () {
@@ -177,23 +179,16 @@ describe("core (slow) (FLAKE)", /** @this */ function () {
         })
     })
 
-    it("gets own inline slow", function () {
-        var tt = t.create()
-        var ttt = tt.test("test").slow(50)
-
-        assert.equal(ttt.call(activeSlow), 50)
-        assert.equal(ttt.call(slow), 50)
-    })
-
-    it("gets inherited block slow", function () {
-        var tt = t.create()
+    it("gets inherited slow", function () {
+        var tt = Util.create()
         var active, raw
 
-        tt.test("test")
-        .slow(50)
-        .test("inner", function (tt) {
-            active = tt.call(activeSlow)
-            raw = tt.call(slow)
+        tt.test("test", function () {
+            tt.slow = 50
+            tt.test("inner", function () {
+                active = tt.call(slow)
+                raw = tt.call(ownSlow)
+            })
         })
 
         return tt.run().then(function () {
@@ -202,23 +197,13 @@ describe("core (slow) (FLAKE)", /** @this */ function () {
         })
     })
 
-    it("gets inherited inline slow", function () {
-        var tt = t.create()
-        var ttt = tt.test("test")
-        .slow(50)
-        .test("inner")
-
-        assert.equal(ttt.call(activeSlow), 50)
-        assert.equal(ttt.call(slow), 0)
-    })
-
     it("gets default slow", function () {
-        var tt = t.create()
+        var tt = Util.create()
         var active, raw
 
-        tt.test("test", function (tt) {
-            active = tt.call(activeSlow)
-            raw = tt.call(slow)
+        tt.test("test", function () {
+            active = tt.call(slow)
+            raw = tt.call(ownSlow)
         })
 
         return tt.run().then(function () {

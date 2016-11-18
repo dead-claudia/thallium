@@ -2,37 +2,36 @@
 
 /* eslint max-nested-callbacks: [2, 5] */
 
-var through2 = require("through2")
-var fixture = require("../../scripts/cli.js").fixture
-var GS = require("../../lib/cli/glob-stream.js")
+var Transform = require("stream").Transform
+var fixture = require("../../test-util/cli/cli").fixture
+var GS = require("../../lib/cli/glob-stream")
 
 describe("cli glob stream", function () {
     describe("addStream()", function () {
         it("throws error if stream is not readable", function () {
-            var stream = through2.obj()
+            var stream = new GS.Through()
             var list = [{readable: false}]
 
-            assert.throwsMatch(function () {
-                GS.addStream(Object.create(null), stream, list, list[0])
-            }, "All input streams must be readable")
+            assert.throwsMatch(
+                "All input streams must be readable",
+                function () {
+                    GS.addStream(Object.create(null), stream, list, list[0])
+                })
         })
 
         it("emits data from all streams", function (done) {
-            var s1 = through2.obj()
-            var s2 = through2.obj()
-            var s3 = through2.obj()
+            var s1 = new GS.Through()
+            var s2 = new GS.Through()
+            var s3 = new GS.Through()
             var streams = [s1, s2, s3]
-            var combined = through2.obj()
+            var combined = new GS.Through()
             var results = []
 
             streams.forEach(function (stream) {
                 GS.addStream(Object.create(null), combined, streams, stream)
             })
 
-            combined.on("data", function (data) {
-                results.push(data)
-            })
-
+            combined.on("data", function (data) { results.push(data) })
             combined.on("end", function () {
                 assert.match(results, [
                     "stream 1",
@@ -53,15 +52,13 @@ describe("cli glob stream", function () {
         })
 
         it("emits all data event from each stream", function (done) {
-            var s = through2.obj()
-            var combined = through2.obj()
+            var s = new GS.Through()
+            var combined = new GS.Through()
             var results = []
 
             GS.addStream(Object.create(null), combined, [s], s)
 
-            combined.on("data", function (data) {
-                results.push(data)
-            })
+            combined.on("data", function (data) { results.push(data) })
 
             combined.on("end", function () {
                 assert.match(results, [
@@ -79,30 +76,34 @@ describe("cli glob stream", function () {
         })
 
         it("preserves streams order", function (done) {
-            function delay(ms) {
-                return /** @this */ function (data, enc, next) {
+            function Delay(ms) {
+                Transform.call(this, {objectMode: true})
+                this.ms = ms
+            }
+
+            Util.methods(Delay, GS.Through, {
+                _transform: function (data, enc, callback) {
                     var self = this
 
                     Util.setTimeout(function () {
                         self.push(data)
-                        next()
-                    }, ms)
-                }
-            }
-            var s1 = through2.obj(delay(200))
-            var s2 = through2.obj(delay(30))
-            var s3 = through2.obj(delay(100))
+                        return callback()
+                    }, this.ms)
+                },
+            })
+
+            var s1 = new Delay(200)
+            var s2 = new Delay(30)
+            var s3 = new Delay(100)
             var streams = [s1, s2, s3]
-            var combined = through2.obj()
+            var combined = new GS.Through()
             var results = []
 
             streams.forEach(function (stream) {
                 GS.addStream(Object.create(null), combined, streams, stream)
             })
 
-            combined.on("data", function (data) {
-                results.push(data)
-            })
+            combined.on("data", function (data) { results.push(data) })
             combined.on("end", function () {
                 assert.match(results, [
                     "stream 1",
@@ -123,26 +124,24 @@ describe("cli glob stream", function () {
         })
 
         it("emits stream errors downstream", function (done) {
-            var s1 = through2.obj(/** @this */ function (data, enc, next) {
-                this.emit("error", new Error("stop"))
-                next()
+            var s1 = new Transform({
+                transform: function (data, enc, callback) {
+                    this.emit("error", new Error("stop"))
+                    return callback()
+                },
             })
-            var s2 = through2.obj()
+            var s2 = new GS.Through()
 
             var error
             var streamData = []
             var streams = [s1, s2]
-            var combined = through2.obj()
+            var combined = new GS.Through()
 
             GS.addStream(Object.create(null), combined, streams, s1)
             GS.addStream(Object.create(null), combined, streams, s2)
 
-            combined.on("data", function (data) {
-                streamData.push(data)
-            })
-            combined.on("error", function (err) {
-                error = err
-            })
+            combined.on("data", function (data) { streamData.push(data) })
+            combined.on("error", function (err) { error = err })
             combined.on("end", function () {
                 assert.hasOwn(error, "message", "stop")
                 assert.match(streamData, ["okay"])
@@ -161,26 +160,17 @@ describe("cli glob stream", function () {
 
         var oldCwd = process.cwd()
 
-        beforeEach(function () {
-            process.chdir(__dirname)
-        })
-
-        afterEach(function () {
-            process.chdir(oldCwd)
-        })
+        beforeEach(function () { process.chdir(__dirname) })
+        afterEach(function () { process.chdir(oldCwd) })
 
         function read(globs) {
-            return new Util.Promise(function (resolve, reject) {
+            return new Promise(function (resolve, reject) {
                 var stream = GS.create(globs)
                 var list = []
 
                 stream.on("error", reject)
-                stream.on("data", function (file) {
-                    list.push(file)
-                })
-                stream.on("end", function () {
-                    resolve(list)
-                })
+                stream.on("data", function (file) { list.push(file) })
+                stream.on("end", function () { resolve(list) })
             })
         }
 
@@ -309,23 +299,23 @@ describe("cli glob stream", function () {
         })
 
         it("throws on invalid glob argument", function () {
-            assert.throwsMatch(function () {
+            assert.throwsMatch(/Invalid glob .* 0/, function () {
                 GS.create([42])
-            }, /Invalid glob .* 0/)
+            })
 
-            assert.throwsMatch(function () {
+            assert.throwsMatch(/Invalid glob .* 1/, function () {
                 GS.create([".", 42])
-            }, /Invalid glob .* 1/)
+            })
         })
 
         it("throws on missing positive glob", function () {
-            assert.throwsMatch(function () {
+            assert.throwsMatch(/Missing positive glob/, function () {
                 GS.create(["!c"])
-            }, /Missing positive glob/)
+            })
 
-            assert.throwsMatch(function () {
+            assert.throwsMatch(/Missing positive glob/, function () {
                 GS.create(["!a", "!b"])
-            }, /Missing positive glob/)
+            })
         })
 
         it("warns on singular glob when file not found", function (done) {
@@ -335,7 +325,7 @@ describe("cli glob stream", function () {
             stream.on("data", function () {})
             stream.on("warn", function (str) {
                 warned = true
-                assert.string(str)
+                assert.isString(str)
             })
             stream.on("error", done)
             stream.on("end", function () {
@@ -353,7 +343,7 @@ describe("cli glob stream", function () {
             stream.on("data", function () {})
             stream.on("warn", function (str) {
                 warned = true
-                assert.string(str)
+                assert.isString(str)
             })
             stream.on("error", done)
             stream.on("end", function () {
@@ -371,7 +361,7 @@ describe("cli glob stream", function () {
             stream.on("data", function () {})
             stream.on("warn", function (str) {
                 warned = true
-                assert.string(str)
+                assert.isString(str)
             })
             stream.on("error", done)
             stream.on("end", function () {
