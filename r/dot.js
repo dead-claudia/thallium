@@ -9,11 +9,15 @@ function width() {
 }
 
 function printDot(_, color) {
+    function emit() {
+        return _.write(R.color(color,
+            color === "fail" ? R.symbols().DotFail : R.symbols().Dot))
+    }
+
     if (_.state.counter++ % width() === 0) {
-        return _.write(R.newline() + "  ")
-        .then(function () { return _.write(R.color(color, R.symbols().Dot)) })
+        return _.write(R.newline() + "  ").then(emit)
     } else {
-        return _.write(R.color(color, R.symbols().Dot))
+        return emit()
     }
 }
 
