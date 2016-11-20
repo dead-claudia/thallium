@@ -219,7 +219,7 @@ export interface ArgReporter<T> {
 }
 
 export interface VoidReporter {
-    (arg?: void): (report: Report) => any | PromiseLike<any>;
+    (): (report: Report) => any | PromiseLike<any>;
 }
 
 export type Plugin<T, R> = ArgPlugin<T, R> | VoidPlugin<R>;
@@ -229,7 +229,7 @@ export interface ArgPlugin<T, R> {
 }
 
 export interface VoidPlugin<R> {
-    (reflect: Reflect, arg?: void): R;
+    (reflect: Reflect): R;
 }
 
 export interface Callback {
