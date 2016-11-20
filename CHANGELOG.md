@@ -1,5 +1,7 @@
 # Changelog
 
+- Check/fix broken TypeScript definitions
+
 ## v0.3.4
 
 - Fix unusual error message duplication caused by not trimming them correctly.
