@@ -1,5 +1,9 @@
 # Changelog
 
+## v0.3.7
+
+- More TypeScript fixes
+
 ## v0.3.6
 
 - Check/fix broken TypeScript definitions
