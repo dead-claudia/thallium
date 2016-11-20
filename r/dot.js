@@ -21,7 +21,7 @@ function printDot(_, color) {
     }
 }
 
-module.exports = R.on({
+module.exports = R.on("dot", {
     accepts: ["write", "reset", "colors"],
     create: R.consoleReporter,
     before: R.setColor,

@@ -8,4 +8,4 @@ export interface DotOptions {
     color?: boolean;
 }
 
-export default function dot(options?: DotOptions): ReporterConsumer;
+export function dot(options?: DotOptions): ReporterConsumer;

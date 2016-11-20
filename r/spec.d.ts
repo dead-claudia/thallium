@@ -8,4 +8,4 @@ export interface SpecOptions {
     color?: boolean;
 }
 
-export default function spec(options?: SpecOptions): ReporterConsumer;
+export function spec(options?: SpecOptions): ReporterConsumer;

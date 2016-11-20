@@ -7,4 +7,4 @@ export interface TapOptions {
     reset?(): void | PromiseLike<void>;
 }
 
-export default function tap(options?: TapOptions): ReporterConsumer;
+export function tap(options?: TapOptions): ReporterConsumer;

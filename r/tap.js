@@ -70,7 +70,7 @@ function printError(_, report) {
     })
 }
 
-module.exports = R.on({
+module.exports = R.on("tap", {
     accepts: ["write", "reset"],
     create: R.consoleReporter,
     init: function (state) { state.counter = 0 },

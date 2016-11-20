@@ -28,7 +28,7 @@ function printReport(_, init) {
     }
 }
 
-module.exports = R.on({
+module.exports = R.on("spec", {
     accepts: ["write", "reset", "colors"],
     create: R.consoleReporter,
     before: R.setColor,
