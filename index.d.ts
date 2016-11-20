@@ -1,9 +1,4 @@
-export interface Thenable<T> {
-    then<U>(
-        resolve: (value: T) => U | Thenable<U>,
-        reject?: (value: Error) => U | Thenable<U>
-    ): Thenable<U>;
-}
+/* tslint:disable */
 
 export interface Location {
     name: string;
@@ -34,35 +29,65 @@ export type Report =
 
 interface ReportBase<T extends ReportType> {
     type: T;
-
-    isStart: this is StartReport;
-    isEnter: this is EnterReport;
-    isLeave: this is LeaveReport;
-    isPass: this is PassReport;
-    isFail: this is FailReport;
-    isSkip: this is SkipReport;
-    isEnd: this is EndReport;
-    isError: this is ErrorReport;
-    isHook: this is HookReport;
-    inspect(): Object;
+    inspect(): any;
 }
 
-export interface StartReport extends ReportBase<"start"> {}
+export interface StartReport extends ReportBase<"start"> {
+    isStart: true;
+    isEnter: false;
+    isLeave: false;
+    isPass: false;
+    isFail: false;
+    isSkip: false;
+    isEnd: false;
+    isError: false;
+    isHook: false;
+}
 
 export interface EnterReport extends ReportBase<"enter"> {
     path: Location[];
     duration: number;
     slow: number;
+
+    isStart: false;
+    isEnter: true;
+    isLeave: false;
+    isPass: false;
+    isFail: false;
+    isSkip: false;
+    isEnd: false;
+    isError: false;
+    isHook: false;
 }
 
 export interface LeaveReport extends ReportBase<"leave"> {
     path: Location[];
+
+    isStart: false;
+    isEnter: false;
+    isLeave: true;
+    isPass: false;
+    isFail: false;
+    isSkip: false;
+    isEnd: false;
+    isError: false;
+    isHook: false;
 }
 
 export interface PassReport extends ReportBase<"pass"> {
     path: Location[];
     duration: number;
     slow: number;
+
+    isStart: false;
+    isEnter: false;
+    isLeave: false;
+    isPass: true;
+    isFail: false;
+    isSkip: false;
+    isEnd: false;
+    isError: false;
+    isHook: false;
 }
 
 export interface FailReport extends ReportBase<"fail"> {
@@ -70,16 +95,56 @@ export interface FailReport extends ReportBase<"fail"> {
     error: any;
     duration: number;
     slow: number;
+
+    isStart: false;
+    isEnter: false;
+    isLeave: false;
+    isPass: false;
+    isFail: true;
+    isSkip: false;
+    isEnd: false;
+    isError: false;
+    isHook: false;
 }
 
 export interface SkipReport extends ReportBase<"skip"> {
     path: Location[];
+
+    isStart: false;
+    isEnter: false;
+    isLeave: false;
+    isPass: false;
+    isFail: false;
+    isSkip: true;
+    isEnd: false;
+    isError: false;
+    isHook: false;
 }
 
-export interface EndReport extends ReportBase<"end"> {}
+export interface EndReport extends ReportBase<"end"> {
+    isStart: false;
+    isEnter: false;
+    isLeave: false;
+    isPass: false;
+    isFail: false;
+    isSkip: false;
+    isEnd: true;
+    isError: false;
+    isHook: false;
+}
 
 export interface ErrorReport extends ReportBase<"error"> {
     error: any;
+
+    isStart: false;
+    isEnter: false;
+    isLeave: false;
+    isPass: false;
+    isFail: false;
+    isSkip: false;
+    isEnd: false;
+    isError: true;
+    isHook: false;
 }
 
 export type HookStage =
@@ -94,27 +159,67 @@ export interface HookError<S extends HookStage> {
     error: any;
 }
 
-export interface HookReport<S extends HookStage> extends ReportBase<"hook"> {
+interface HookReportBase<S extends HookStage> extends ReportBase<"hook"> {
     stage: S;
     path: Location[];
     name: string;
     error: any;
 
     hookError: HookError<S>;
-    isBeforeAll: this is HookReport<"before all">;
-    isBeforeEach: this is HookReport<"before each">;
-    isAfterEach: this is HookReport<"after each">;
-    isAfterAll: this is HookReport<"after all">;
+    isStart: false;
+    isEnter: false;
+    isLeave: false;
+    isPass: false;
+    isFail: false;
+    isSkip: false;
+    isEnd: false;
+    isError: false;
+    isHook: true;
+}
+
+export type HookReport =
+    BeforeAllReport |
+    BeforeEachReport |
+    AfterEachReport |
+    AfterAllReport;
+
+export interface BeforeAllReport extends HookReportBase<"before all"> {
+    isBeforeAll: true;
+    isBeforeEach: false;
+    isAfterEach: false;
+    isAfterAll: false;
+}
+
+export interface BeforeEachReport extends HookReportBase<"before each"> {
+    isBeforeAll: false;
+    isBeforeEach: true;
+    isAfterEach: false;
+    isAfterAll: false;
+}
+
+export interface AfterEachReport extends HookReportBase<"after each"> {
+    isBeforeAll: false;
+    isBeforeEach: false;
+    isAfterEach: true;
+    isAfterAll: false;
+}
+
+export interface AfterAllReport extends HookReportBase<"after all"> {
+    isBeforeAll: false;
+    isBeforeEach: false;
+    isAfterEach: false;
+    isAfterAll: true;
 }
 
 export type Reporter<T> = ArgReporter<T> | VoidReporter;
+export type ReporterConsumer = (report: Report) => any | PromiseLike<any>;
 
 export interface ArgReporter<T> {
-    (arg: T): (report: Report) => any | Thenable<any>;
+    (arg: T): (report: Report) => any | PromiseLike<any>;
 }
 
 export interface VoidReporter {
-    (arg?: void): (report: Report) => any | Thenable<any>;
+    (arg?: void): (report: Report) => any | PromiseLike<any>;
 }
 
 export type Plugin<T, R> = ArgPlugin<T, R> | VoidPlugin<R>;
@@ -128,7 +233,7 @@ export interface VoidPlugin<R> {
 }
 
 export interface Callback {
-    (): any | Thenable<any>;
+    (): any | PromiseLike<any>;
 }
 
 /**
@@ -159,11 +264,6 @@ interface ReflectCommon {
      * intentionally a slice, so you can't mutate the real children.
      */
     children: ReflectChild[];
-
-    /**
-     * Is this test the root, i.e. top level?
-     */
-    isRoot: this is ReflectRoot;
 
     /**
      * Is this locked (i.e. unsafe to modify)?
@@ -271,6 +371,11 @@ interface ReflectCommon {
 
 export interface ReflectRoot extends ReflectCommon {
     /**
+    * Is this test the root, i.e. top level?
+    */
+    isRoot: true;
+
+    /**
      * Whether a particulare reporter was registered
      */
     hasReporter(reporter: Reporter<any>): boolean;
@@ -293,9 +398,14 @@ export interface ReflectRoot extends ReflectCommon {
 
 export interface ReflectChild extends ReflectCommon {
     /**
+    * Is this test the root, i.e. top level?
+    */
+    isRoot: false;
+
+    /**
      * Get the test name.
      */
-    name: String;
+    name: string;
 
     /**
      * Get the test index.

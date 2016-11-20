@@ -1,0 +1,20 @@
+{
+    "compileOnSave": false,
+    "compilerOptions": {
+        "noEmit": true,
+        "lib": ["es5", "es2015.promise"],
+        "target": "es6",
+        "moduleResolution": "node"
+    },
+    "files": [
+        "assert.d.ts",
+        "index.d.ts",
+        "internal.d.ts",
+        "match.d.ts",
+        "r/dot.d.ts",
+        "r/index.d.ts",
+        "r/spec.d.ts",
+        "r/tap.d.ts",
+        "thallium.d.ts"
+    ]
+}

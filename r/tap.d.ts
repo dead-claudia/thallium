@@ -1,10 +1,10 @@
 /* tslint:disable */
 
-import {Reporter, Callback} from "../core.d";
+import {ReporterConsumer} from "../index.d";
 
 export interface TapOptions {
-    write?(line: string, done: Callback<void>): any;
-    reset?(done: Callback<void>): any;
+    write?(line: string): void | PromiseLike<void>;
+    reset?(): void | PromiseLike<void>;
 }
 
-export default function tap(options: TapOptions): Reporter
+export default function tap(options?: TapOptions): ReporterConsumer;

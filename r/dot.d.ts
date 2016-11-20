@@ -1,11 +1,11 @@
 /* tslint:disable */
 
-import {Reporter, Callback} from "../core.d";
+import {ReporterConsumer} from "../index.d";
 
 export interface DotOptions {
-    write?(string: string, done: Callback<void>): any;
-    reset?(done: Callback<void>): any;
+    write?(string: string): void | PromiseLike<void>;
+    reset?(): void | PromiseLike<void>;
     color?: boolean;
 }
 
-export default function dot(options: DotOptions): Reporter
+export default function dot(options?: DotOptions): ReporterConsumer;

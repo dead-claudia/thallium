@@ -1,11 +1,12 @@
 export {
-    Thenable,
-    Location, ReportType, HookInfoStage, HookInfo, Report,
-    StartReport, EnterReport, LeaveReport,
-    PassReport, FailReport, SkipReport,
-    EndReport, ErrorReport, HookReport,
-    BeforeAllHook, BeforeEachHook, AfterEachHook, AfterAllHook,
-    Test, Reflect, default as t,
+    Location, ReportType, Report, HookStage, HookError,
+    StartReport, EnterReport, LeaveReport, PassReport, FailReport,
+    SkipReport, EndReport, ErrorReport, HookReport,
+    BeforeAllReport, BeforeEachReport, AfterEachReport, AfterAllReport,
+    Reporter, ArgReporter, VoidReporter, ReporterConsumer,
+    Plugin, ArgPlugin, VoidPlugin,
+    Callback, Reflect, ReflectRoot, ReflectChild,
+    Test, default as t,
 } from "./index";
 
 import * as assert from "./assert";

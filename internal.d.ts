@@ -2,6 +2,7 @@ import {
     Test, Location,
     StartReport, EnterReport, LeaveReport, PassReport,
     FailReport, SkipReport, EndReport, ErrorReport, HookReport,
+    BeforeAllReport, BeforeEachReport, AfterEachReport, AfterAllReport,
     HookStage, HookError,
 } from "./index";
 
@@ -54,32 +55,51 @@ export namespace reports {
     /**
      * Create a `hook` report. Mostly useful for testing reporters.
      */
-    export function hook<S extends HookStage>(
-        path: Location[],
-        hookError: HookError<S>
-    ): HookReport<S>;
+    export function hook(path: Location[], hookError: HookError<HookStage>): HookReport;
+
+    /**
+     * Create a `hook` report. Mostly useful for testing reporters.
+     */
+    export function hook(path: Location[], hookError: HookError<"before all">): BeforeAllReport;
+
+    /**
+     * Create a `hook` report. Mostly useful for testing reporters.
+     */
+    export function hook(path: Location[], hookError: HookError<"before each">): BeforeEachReport;
+
+    /**
+     * Create a `hook` report. Mostly useful for testing reporters.
+     */
+    export function hook(path: Location[], hookError: HookError<"after each">): AfterEachReport;
+
+    /**
+     * Create a `hook` report. Mostly useful for testing reporters.
+     */
+    export function hook(path: Location[], hookError: HookError<"after all">): AfterAllReport;
 }
+
+type Hook = (...args: any[]) => any;
 
 export namespace hookErrors {
     /**
      * Create a new `before all` hook error, mainly for testing reporters.
      */
-    export function beforeAll(func: Function, error: any): HookError<"before all">;
+    export function beforeAll(func: Hook, error: any): HookError<"before all">;
 
     /**
      * Create a new `before each` hook error, mainly for testing reporters.
      */
-    export function beforeEach(func: Function, error: any): HookError<"before each">;
+    export function beforeEach(func: Hook, error: any): HookError<"before each">;
 
     /**
      * Create a new `after each` hook error, mainly for testing reporters.
      */
-    export function afterEach(func: Function, error: any): HookError<"after each">;
+    export function afterEach(func: Hook, error: any): HookError<"after each">;
 
     /**
      * Create a new `after all` hook error, mainly for testing reporters.
      */
-    export function afterAll(func: Function, error: any): HookError<"after all">;
+    export function afterAll(func: Hook, error: any): HookError<"after all">;
 }
 
 /**
