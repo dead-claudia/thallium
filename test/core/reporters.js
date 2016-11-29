@@ -3,6 +3,7 @@
 describe("core (reporters)", function () { // eslint-disable-line max-statements
     var n = Util.n
     var p = Util.p
+    var hooks = Util.hooks
 
     // Use thenables, not actual Promises.
     function resolve(value) {
@@ -870,6 +871,206 @@ describe("core (reporters)", function () { // eslint-disable-line max-statements
                 n.enter([p("mod-two", 1)]),
                 n.fail([p("mod-two", 1), p("1 === 2", 0)], fail2),
                 n.leave([p("mod-two", 1)]),
+                n.end(),
+            ])
+        })
+    })
+
+    it("reports global `before all` failures", function () {
+        var tt = Util.create()
+        var ret = []
+        var sentinel = createSentinel("sentinel")
+
+        function fail() {
+            throw sentinel
+        }
+
+        tt.reporter(Util.push, ret)
+        tt.beforeAll(fail)
+        tt.test("foo", function () {})
+
+        return tt.run().then(function () {
+            assert.match(ret, [
+                n.start(),
+                n.hook([], [], hooks.beforeAll(fail, sentinel)),
+                n.end(),
+            ])
+        })
+    })
+
+    it("reports global `before each` failures", function () {
+        var tt = Util.create()
+        var ret = []
+        var sentinel = createSentinel("sentinel")
+
+        function fail() {
+            throw sentinel
+        }
+
+        tt.reporter(Util.push, ret)
+        tt.before(fail)
+        tt.test("foo", function () {})
+
+        return tt.run().then(function () {
+            assert.match(ret, [
+                n.start(),
+                n.hook([p("foo", 0)], [], hooks.beforeEach(fail, sentinel)),
+                n.end(),
+            ])
+        })
+    })
+
+    it("reports global `after each` failures", function () {
+        var tt = Util.create()
+        var ret = []
+        var sentinel = createSentinel("sentinel")
+
+        function fail() {
+            throw sentinel
+        }
+
+        tt.reporter(Util.push, ret)
+        tt.after(fail)
+        tt.test("foo", function () {})
+
+        return tt.run().then(function () {
+            assert.match(ret, [
+                n.start(),
+                n.pass([p("foo", 0)]),
+                n.hook([p("foo", 0)], [], hooks.afterEach(fail, sentinel)),
+                n.end(),
+            ])
+        })
+    })
+
+    it("reports global `after all` failures", function () {
+        var tt = Util.create()
+        var ret = []
+        var sentinel = createSentinel("sentinel")
+
+        function fail() {
+            throw sentinel
+        }
+
+        tt.reporter(Util.push, ret)
+        tt.afterAll(fail)
+        tt.test("foo", function () {})
+
+        return tt.run().then(function () {
+            assert.match(ret, [
+                n.start(),
+                n.pass([p("foo", 0)]),
+                n.hook([], [], hooks.afterAll(fail, sentinel)),
+                n.end(),
+            ])
+        })
+    })
+
+    it("reports local `before all` failures", function () {
+        var tt = Util.create()
+        var ret = []
+        var sentinel = createSentinel("sentinel")
+
+        function fail() {
+            throw sentinel
+        }
+
+        tt.reporter(Util.push, ret)
+        tt.test("foo", function () {
+            tt.beforeAll(fail)
+            tt.test("inner", function () {})
+        })
+
+        return tt.run().then(function () {
+            assert.match(ret, [
+                n.start(),
+                n.enter([p("foo", 0)]),
+                n.leave([p("foo", 0)]),
+                n.hook([p("foo", 0)], [p("foo", 0)],
+                    hooks.beforeAll(fail, sentinel)),
+                n.end(),
+            ])
+        })
+    })
+
+    it("reports local `before each` failures", function () {
+        var tt = Util.create()
+        var ret = []
+        var sentinel = createSentinel("sentinel")
+
+        function fail() {
+            throw sentinel
+        }
+
+        tt.reporter(Util.push, ret)
+        tt.test("foo", function () {
+            tt.before(fail)
+            tt.test("inner", function () {})
+        })
+
+        return tt.run().then(function () {
+            assert.match(ret, [
+                n.start(),
+                n.enter([p("foo", 0)]),
+                n.hook([p("foo", 0), p("inner", 0)], [p("foo", 0)],
+                    hooks.beforeEach(fail, sentinel)),
+                n.leave([p("foo", 0)]),
+                n.end(),
+            ])
+        })
+    })
+
+    it("reports local `after each` failures", function () {
+        var tt = Util.create()
+        var ret = []
+        var sentinel = createSentinel("sentinel")
+
+        function fail() {
+            throw sentinel
+        }
+
+        tt.reporter(Util.push, ret)
+        tt.test("foo", function () {
+            tt.after(fail)
+            tt.test("inner", function () {})
+        })
+
+        return tt.run().then(function () {
+            assert.match(ret, [
+                n.start(),
+                n.enter([p("foo", 0)]),
+                n.pass([p("foo", 0), p("inner", 0)]),
+                n.hook([p("foo", 0), p("inner", 0)], [p("foo", 0)],
+                    hooks.afterEach(fail, sentinel)),
+                n.leave([p("foo", 0)]),
+                n.end(),
+            ])
+        })
+    })
+
+    it("reports local `after all` failures", function () {
+        var tt = Util.create()
+        var ret = []
+        var sentinel = createSentinel("sentinel")
+
+        function fail() {
+            throw sentinel
+        }
+
+        tt.reporter(Util.push, ret)
+        tt.test("foo", function () {
+            tt.afterAll(fail)
+            tt.test("inner", function () {})
+        })
+
+        return tt.run().then(function () {
+            assert.match(ret, [
+                n.start(),
+                n.enter([p("foo", 0)]),
+                n.pass([p("foo", 0), p("inner", 0)]),
+                n.leave([p("foo", 0)]),
+                n.hook([p("foo", 0)], [p("foo", 0)],
+                    hooks.afterAll(fail, sentinel)),
                 n.end(),
             ])
         })

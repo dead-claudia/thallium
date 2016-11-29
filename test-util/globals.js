@@ -31,6 +31,7 @@ var Util = global.Util = {
     create: Thallium.root,
     n: Thallium.reports,
     p: Thallium.location,
+    hooks: Thallium.hookErrors,
     Tests: Tests,
 
     /* eslint-disable global-require */

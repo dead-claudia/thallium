@@ -66,8 +66,8 @@ exports.reports = {
         return new Reports.Error(value)
     },
 
-    hook: function (path, value) {
-        return new Reports.Hook(p(path), h(value))
+    hook: function (path, rootPath, value) {
+        return new Reports.Hook(p(path), p(rootPath), h(value))
     },
 }
 

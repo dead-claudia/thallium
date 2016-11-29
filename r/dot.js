@@ -33,6 +33,7 @@ module.exports = R.on("dot", {
             return printDot(_, R.speed(report))
         } else if (report.isHook || report.isFail) {
             _.pushError(report)
+            // Print a dot regardless of hook success
             return printDot(_, "fail")
         } else if (report.isSkip) {
             return printDot(_, "skip")

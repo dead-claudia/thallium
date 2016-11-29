@@ -16,14 +16,13 @@ function getName(level, report) {
     return report.path[level - 1].name
 }
 
-function printReport(_, init) {
-    if (_.state.lastIsNested && _.state.level === 1) {
+function printReport(_, report, init) {
+    if (_.state.leaving) {
+        _.state.leaving = false
         return _.print().then(function () {
-            _.state.lastIsNested = false
             return _.print(indent(_.state.level) + init())
         })
     } else {
-        _.state.lastIsNested = false
         return _.print(indent(_.state.level) + init())
     }
 }
@@ -36,22 +35,30 @@ module.exports = R.on("spec", {
 
     init: function (state) {
         state.level = 1
-        state.lastIsNested = false
+        state.leaving = false
     },
 
     report: function (_, report) {
         if (report.isStart) {
             return _.print()
         } else if (report.isEnter) {
-            return printReport(_, function () {
-                return getName(_.state.level++, report)
-            })
+            var level = _.state.level++
+            var last = report.path[level - 1]
+
+            _.state.leaving = false
+            if (last.index) {
+                return _.print().then(function () {
+                    return _.print(indent(level) + last.name)
+                })
+            } else {
+                return _.print(indent(level) + last.name)
+            }
         } else if (report.isLeave) {
             _.state.level--
-            _.state.lastIsNested = true
+            _.state.leaving = true
             return undefined
         } else if (report.isPass) {
-            return printReport(_, function () {
+            return printReport(_, report, function () {
                 var str =
                     c("checkmark", R.symbols().Pass + " ") +
                     c("pass", getName(_.state.level, report))
@@ -65,14 +72,20 @@ module.exports = R.on("spec", {
                 return str
             })
         } else if (report.isHook || report.isFail) {
-            return printReport(_, function () {
-                _.pushError(report)
+            _.pushError(report)
+
+            // Don't print the description line on cumulative hooks
+            if (report.isHook && (report.isBeforeAll || report.isAfterAll)) {
+                return undefined
+            }
+
+            return printReport(_, report, function () {
                 return c("fail",
                     _.errors.length + ") " + getName(_.state.level, report) +
                     R.formatRest(report))
             })
         } else if (report.isSkip) {
-            return printReport(_, function () {
+            return printReport(_, report, function () {
                 return c("skip", "- " + getName(_.state.level, report))
             })
         }

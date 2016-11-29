@@ -30,8 +30,9 @@ Here's the properties for each event:
 - `error` has `value` (the thrown/rejected error)
 - `hook` has `value` (the thrown/rejected error), `path`, and the following properties:
 
-    - `stage` - A string representing the type of hook that failed.
+    - `stage` - A string representing the type of hook that failed
     - `name` - The name of the function called by the hook
+    - `rootPath` - The path the hook was defined in
     - `isBeforeAll` - Whether this is a `beforeAll` hook that failed
     - `isBeforeEach` - Whether this is a `beforeEach` hook that failed
     - `isBfterEach` - Whether this is a `afterEach` hook that failed
