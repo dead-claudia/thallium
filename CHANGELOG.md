@@ -1,5 +1,10 @@
 # Changelog
 
+## v0.3.8
+
+- Improve internal error printing when initializing CLI
+- CLI arg parsing bug fix
+
 ## v0.3.7
 
 - More TypeScript fixes
