@@ -1,5 +1,12 @@
 # Changelog
 
+## v0.3.9
+
+- Add `hookError.rootPath` for more informative error handling
+- Reorder hook error events to not disrupt the hierarchial assumptions it would otherwise not allow within reporters (the built-in ones rely on it extensively)
+- Be more informative with the output of hook errors
+- Space consecutive subtests in the `spec` reporter
+
 ## v0.3.8
 
 - Improve internal error printing when initializing CLI
