@@ -74,7 +74,7 @@ describe("cli args parsing", function () {
             {files: [my, "--help"]})
 
         it("tracks invalid long options", "--why -AM -i --here", {
-            unknown: ["why", "here"],
+            unknown: ["--why", "--here"],
         })
     })
 
