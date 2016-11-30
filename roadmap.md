@@ -26,6 +26,9 @@ See the [changelog](https://github.com/isiahmeadows/thallium/blob/master/CHANGEL
     - I'm having enough of the highly uninformative `TypeError: foo has no method bar`, `TypeError: Cannot read property 'bar' of undefined`, `TypeError: object #<Object> is not a function`, etc. (At least Node 6 gives the variable name...)
     - I get arrow functions and classes for free, without having to deal with Babel's monstrosity
 3. Add some promise-aware assertions
+4. Add ability to skip remaining tests on error
+    - Sometimes, a test error can result in leaving the rest invalid state
+    - It's not always practical to isolate every subtest into its own unit
 
 ## 0.4.x
 (not blocking 0.4.0)
