@@ -14,21 +14,34 @@ See the [changelog](https://github.com/isiahmeadows/thallium/blob/master/CHANGEL
 1. ~~Add OS X to the Travis build~~
     - ~~Travis has been having OS X issues lately, making debugging these errors a little harder~~
 2. Add diff support to all existing reporters
-3. Create DOM reporter
+3. Create/finish DOM reporter
 4. Support flaky tests via first-class retries
     - This is a requirement to self-host the runner
 5. Move `thallium/match` and `thallium/assert` implementations out of core
+    - `thallium/match` is useful on its own
+    - Third-party assertions should be able to build off the same basic assertion primitives without depending on `thallium`
+    - The assertions' core primitives are already fairly stable
+6. Add `t.hasReporter()` so the CLI can detect no reporter set and add the appropriate default.
 
 ## 0.4.0
 
 1. Remove all the previously deprecated methods/etc.
-2. Transition to TypeScript
+2. Expose `thallium` as global `t` in bundle, tack existing `tl.*` exports onto it
+    - Expose `thallium/assert` as `assert` instead
+    - Don't expose `require("thallium")`
+3. Transition to TypeScript internally
     - I'm having enough of the highly uninformative `TypeError: foo has no method bar`, `TypeError: Cannot read property 'bar' of undefined`, `TypeError: object #<Object> is not a function`, etc. (At least Node 6 gives the variable name...)
     - I get arrow functions and classes for free, without having to deal with Babel's monstrosity
-3. Add some promise-aware assertions
-4. Add ability to skip remaining tests on error
+    - Downleveled async functions will drastically simplify both the runner and all the reporters (requires TS 2.1)
+    - It'll be a *lot* easier when most of the deprecated dynamic stuff like test inheritance is finally removed
+4. Add some promise-aware assertions
+5. Add ability to skip remaining tests on error
     - Sometimes, a test error can result in leaving the rest invalid state
     - It's not always practical to isolate every subtest into its own unit
+6. Move `exports.files` config option to `t.files`
+    - Change `exports.thallium` to default export
+    - Ignored by core, but will mildly simplify CLI interface
+    - Will make parallel interface much more consistent
 
 ## 0.4.x
 (not blocking 0.4.0)
@@ -36,8 +49,9 @@ See the [changelog](https://github.com/isiahmeadows/thallium/blob/master/CHANGEL
 1. Trim off internal stack traces when sending errors to reporters
 2. Add file watching support
 3. Integrate with Karma
-4. Add parallel testing support.
+4. Add parallel testing support
     - This will be based on a beast created and managed separately from core.
+    - This will involve a secondary config
 
 ## 0.5.0
 
