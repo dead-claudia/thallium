@@ -1,3 +1,18 @@
+# General dev crap
+/appveyor.yml
+/bench
+/coffeelint.json
+/fixtures
+/karma.conf.js
+/make.js
+/mocha
+/playground
+/roadmap.md
+/scripts
+/test
+/test-util
+/tsconfig.json
+
 # Any incomplete, in-progress feature goes here.
 /r/dom.js
 /r/dom.d.ts

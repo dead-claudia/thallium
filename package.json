@@ -11,26 +11,6 @@
     "./lib/replaced/console.js": "./lib/replaced/console-browser.js",
     "jsdom": "./node_modules/empty/object.js"
   },
-  "files": [
-    "assert.js",
-    "assert.d.ts",
-    "assertions.js",
-    "bin",
-    "core.js",
-    "docs",
-    "index.d.ts",
-    "index.js",
-    "internal.d.ts",
-    "internal.js",
-    "lib",
-    "match.d.ts",
-    "match.js",
-    "migrate",
-    "r",
-    "thallium-migrate.js",
-    "thallium.d.ts",
-    "thallium.js"
-  ],
   "bin": {
     "tl": "bin/tl.js"
   },
