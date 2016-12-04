@@ -49,13 +49,14 @@ See the [changelog](https://github.com/isiahmeadows/thallium/blob/master/CHANGEL
 4. Add parallel testing support
     - This will be based on a beast created and managed separately from core.
     - This will involve a secondary config
-5. Add ability to denote inter-test dependencies, and skip ones that depend on failed tests
+5. Add first-class support for multiple test groups and test group dependencies
+    - I see this a lot in Java circles, but not in JS circles
+    - I could already use this to some degree here (I already frequently disable the end-to-end tests in normal development)
+6. Add ability to denote inter-test dependencies, and skip ones that depend on failed tests
     - Sometimes, a test error can result in others starting with invalid state
     - It's sometimes easier to do integration-style tests, testing each step along the way (particularly useful with highly stateful, low-level code)
     - This is something no existing test framework I'm aware of actually offers in any capacity
-6. Add first-class support for multiple test groups and test group dependencies
-    - I see this a lot in Java circles, but not in JS circles
-    - I could already use this to some degree here (I already frequently disable the end-to-end tests in normal development)
+    - This could be done by adding a per-group boolean flag (abort group if test or group dependency fails)
 
 ## 0.5.0
 
