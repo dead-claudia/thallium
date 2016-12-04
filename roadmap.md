@@ -55,9 +55,9 @@ See the [changelog](https://github.com/isiahmeadows/thallium/blob/master/CHANGEL
     - There must be a way to keep a test out of the default group
 6. Add ability to denote inter-test dependencies, and skip ones that depend on failed tests
     - Sometimes, a test error can result in others starting with invalid state
-    - It's sometimes easier to do integration-style tests, testing each step along the way (particularly useful with highly stateful, low-level code)
+    - It's sometimes easier to do integration-style tests, testing each step along the way (particularly useful for testing state machines)
     - This is something no existing test framework I'm aware of actually offers in any capacity
-    - This could be done by adding a per-group boolean flag (abort group if test or group dependency fails)
+    - This could be done by adding a per-group boolean flag (skip rest of group if test in own group or group dependency fails)
 
 ## 0.5.0
 
