@@ -35,10 +35,7 @@ See the [changelog](https://github.com/isiahmeadows/thallium/blob/master/CHANGEL
     - Downleveled async functions will drastically simplify both the runner and all the reporters (requires TS 2.1)
     - It'll be a *lot* easier when most of the deprecated dynamic stuff like test inheritance is finally removed
 4. Add some promise-aware assertions
-5. Add ability to skip remaining tests on error
-    - Sometimes, a test error can result in leaving the rest invalid state
-    - It's not always practical to isolate every subtest into its own unit
-6. Move `exports.files` config option to `t.files`
+5. Move `exports.files` config option to `t.files`
     - Change `exports.thallium` to default export
     - Ignored by core, but will mildly simplify CLI interface
     - Will make parallel interface much more consistent
@@ -52,12 +49,19 @@ See the [changelog](https://github.com/isiahmeadows/thallium/blob/master/CHANGEL
 4. Add parallel testing support
     - This will be based on a beast created and managed separately from core.
     - This will involve a secondary config
+5. Add ability to denote inter-test dependencies, and skip ones that depend on failed tests
+    - Sometimes, a test error can result in others starting with invalid state
+    - It's sometimes easier to do integration-style tests, testing each step along the way (particularly useful with highly stateful, low-level code)
+    - This is something no existing test framework I'm aware of actually offers in any capacity
+6. Add first-class support for multiple test groups and test group dependencies
+    - I see this a lot in Java circles, but not in JS circles
+    - I could already use this to some degree here (I already frequently disable the end-to-end tests in normal development)
 
 ## 0.5.0
 
-1. Reimplement [`util-inspect`](https://www.npmjs.com/package/util-inspect) for browsers based on Node's current [`util.inspect`](https://nodejs.org/api/util.html#util_util_inspect_object_options), since that is completely untested and completely unaware of ES6. :worried:
+1. Reimplement [`util-inspect`](https://www.npmjs.com/package/util-inspect) for browsers based on Node's current [`util.inspect`](https://nodejs.org/api/util.html#util_util_inspect_object_options), since that is completely untested and completely unaware of ES6 :worried:
     - This will be published out of core
-2. Create a nice REPL driver for Node, in addition to the CLI.\*
+2. Create a nice REPL driver for Node, in addition to the CLI\*
     - This will just be a module + sugar binary, so you can use it with any language
 
 \* *That's something from Lisp-land I really wish was here...*
