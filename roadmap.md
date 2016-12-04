@@ -52,6 +52,7 @@ See the [changelog](https://github.com/isiahmeadows/thallium/blob/master/CHANGEL
 5. Add first-class support for multiple test groups and test group dependencies
     - I see this a lot in Java circles, but not in JS circles
     - I could already use this to some degree here (I already frequently disable the end-to-end tests in normal development)
+    - There must be a way to keep a test out of the default group
 6. Add ability to denote inter-test dependencies, and skip ones that depend on failed tests
     - Sometimes, a test error can result in others starting with invalid state
     - It's sometimes easier to do integration-style tests, testing each step along the way (particularly useful with highly stateful, low-level code)
