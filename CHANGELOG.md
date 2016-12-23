@@ -1,5 +1,10 @@
 # Changelog
 
+## v0.3.10
+
+- Unbreak PhantomJS
+- Fix a typo
+
 ## v0.3.9
 
 - Add `hookError.rootPath` for more informative error handling
