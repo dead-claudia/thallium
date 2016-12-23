@@ -118,11 +118,11 @@ task("watch:node", function () { watch("test:node") })
 task("bundle", function () {
     exec([
         c("browserify"),
-        " -dr ./lib/browser-bundle.js:thallium -o thallium.js",
+        "-dr ./lib/browser-bundle.js:thallium -o thallium.js",
     ])
     exec([
         c("browserify"),
-        " -dr ./migrate/bundle.js:thallium -o thallium-migrate.js",
+        "-dr ./migrate/bundle.js:thallium -o thallium-migrate.js",
     ])
 })
 
