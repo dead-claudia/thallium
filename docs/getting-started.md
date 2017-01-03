@@ -12,22 +12,12 @@ Thallium is designed to be easy to get started with. But before we continue, the
     # If you're in Windows, use forward slashes (`\`) for the path.
     cd path/to/your/project
 
-    # Install Thallium locally (and globally, if you'd like).
+    # Install Thallium.
+    npm install --global thallium
     npm install --save-dev thallium
-    npm install --global thallium # Globally
     ```
 
-    If you just install the local version, and you don't have `./node_modules/.bin` in your system path, use `./node_modules/.bin/tl` instead, or if you use Bash (or similar), you can do this:
-
-    ```sh
-    # Now you have `tl`, even though it's not in your $PATH.
-    alias tl='./node_modules/.bin/tl'
-    ```
-
-3. Ensure you're familiar with ES2015/ES6, because all the examples use it. [Here's a blog post on CSS Tricks that does a good job covering some of the big parts](https://css-tricks.com/lets-learn-es2015/), and if you want to dive deeper, [there's plenty of other resources for you to check out](https://github.com/ericdouglas/ES6-Learning).
-
-    - In case you're confused about there being two different short names, the whole specification's name is called *ECMA-262 6th Edition, The ECMAScript 2015 Language Specification*, and ES6 and ES2015 come from *ECMAScript 6th Edition* and *ECMAScript 2015*, respectively.
-    - These examples are meant work in Node 4+ without extra flags, so none of the documentation uses ES6 module syntax.
+Also, make sure you're familiar with ES2015, because most of the examples use it. [Here's a blog post on CSS Tricks that covers some of the highlights](https://css-tricks.com/lets-learn-es2015/), and if you want to dive deeper, [there's plenty of other resources for you to check out](https://github.com/ericdouglas/ES6-Learning).
 
 Now that we've gotten Thallium installed, create a `test/index.js`, and let's create some simple tests, to make sure everything is set up correctly.
 
@@ -333,15 +323,15 @@ testing
 
 ## Using extra flags
 
-If you ever need extra flags, and don't want to pass them every time, just drop a `.tl.opts` file in your root containing those flags. They don't even have to be in the same line, and you can escape any character with a forward slash, including spaces with `\ ` or even a literal forward slash with `\\`. Furthermore, comments are supported by preceding them with an unescaped `#`. Thallium will notice, and prepend all of those flags to the command line before processing any of them.\* It'll even respawn Node if you pass any arguments for it (like `--harmony` or `--es-staging`).\*\*
+If you ever need extra flags, and don't want to pass them every time, just drop a `.tl.opts` file in your project root containing those flags. They may span multiple lines, and you can escape any character with a forward slash, including spaces with `\ ` or the forward slash itself with `\\`. Furthermore, comments are supported by starting with an unescaped `#`. Thallium will prepend all of the flags in that file to the command line internally before processing anything, so it can even include `--require` and similar.\*
+
+If you include `--harmony` or other Node-specific or V8-specific flags, it'll even respawn Node for you with the correct flags. This means you can add `--harmony-async-functions` to your `.tl.opts` and then use magical async functions throughout your code, one of the latest additions to the language (that one was enabled by default in V8 a version too late to make it into Node 7).
 
 \* *Well...that's a white lie. It works like it does that, but in reality, it still has to parse what was initially passed to find the correct `.tl.opts` file to load.*
 
-\*\* *Technically, any flag Thallium doesn't understand is passed to Node when Thallium respawns itself.*
-
 ## Using transpilers
 
-So, say you use TypeScript, Babel, or even CoffeeScript? That's perfectly fine, and is supported out of the box. First, if you haven't already, install that language's compiler/register hook. Let's use TypeScript as an example. First, let's create a fresh directory.
+So, say you prefer TypeScript, Babel, or even CoffeeScript? That's perfectly fine, and is supported out of the box. First, if you haven't already, install that language's compiler/register hook. Let's use TypeScript as an example, with its static types and ES6 module support (which Node doesn't have yet). First, let's create a fresh directory.
 
 ```
 $ npm install --save-dev typescript ts-node
@@ -439,7 +429,7 @@ t.run().catch(console.error.bind(console))
 </script>
 ```
 
-*No ES6 features were used here because browser support has only just caught up in the most recent versions, and Android is only just starting to catch up.*
+*No ES6 features were used here because browser support is only just now catching up across the board.*
 
 ## Node, without the runner
 
@@ -464,12 +454,7 @@ t.test("testing", () => {
 });
 
 // Then run it yourself.
-t.run().then(
-    () => { process.exit(0) },
-    e => {
-        console.error(e.stack)
-        process.exit(1)
-    })
+t.run()
 ```
 
 Then, you can run `node test.js`, and it should look something like this.
