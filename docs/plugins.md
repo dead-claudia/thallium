@@ -103,4 +103,4 @@ module.exports = reflect => {
 
 - If you wrap a core method, such as in a BDD wrapper wrapping `t.test()`, try to limit how much you change the semantics in the wrapper. Otherwise, it will be very surprising to users of your plugin.
 
-- If you're writing anything assertion-related, it doesn't belong in a plugin. Plugins are meant for things like integrating with tools or creating alternative wrappers for various methods.
+- If you don't need Thallium, don't write a plugin. For example, most assertion-related things won't need a plugin, unless they're generating tests or something like that.
