@@ -15,8 +15,8 @@ env:
 
 before_install:
   # OS X already has a GUI
-  - if [[ "${TRAVIS_OS_NAME}" == 'linux' ]]; then export DISPLAY=:99.0; fi
-  - if [[ "${TRAVIS_OS_NAME}" == 'linux' ]]; then sh -e /etc/init.d/xvfb start; fi
+  - if [[ "${TRAVIS_OS_NAME}" == 'linux' -a "${ENV}" != 'node' ]]; then export DISPLAY=:99.0; fi
+  - if [[ "${TRAVIS_OS_NAME}" == 'linux' -a "${ENV}" != 'node' ]]; then sh -e /etc/init.d/xvfb start; fi
 
 install:
   # nvm isn't yet supported on OSX
