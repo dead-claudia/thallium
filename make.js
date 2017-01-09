@@ -43,12 +43,17 @@ task("lint", function () {
 
 task("test", function () {
     target["test:chrome"]()
+    target["test:firefox"]()
     target["test:phantomjs"]()
     target["test:node"]()
 })
 
 task("test:chrome", function () {
     exec(c("karma") + " start --colors --single-run --browsers Chrome")
+})
+
+task("test:firefox", function () {
+    exec(c("karma") + " start --colors --single-run --browsers Firefox")
 })
 
 task("test:phantomjs", function () {
