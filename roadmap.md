@@ -21,7 +21,12 @@ See the [changelog](https://github.com/isiahmeadows/thallium/blob/master/CHANGEL
     - ~~`thallium/match` is useful on its own~~
     - ~~Third-party assertions should be able to build off the same basic assertion primitives without depending on `thallium`~~
     - ~~The assertions' core primitives are already fairly stable~~
-6. Add `t.hasReporter()` so the CLI can detect no reporter set and add the appropriate default.
+6. ~~Add `t.hasReporter()` so the CLI can detect no reporter set and add the appropriate default.~~
+7. Support failable tests
+    - You may want to run a buggy test while still not letting it fail. It helps you know which tests are buggy, and to just not run them if they are
+    - Add a `t.run()` option to run or skip these
+8. Move `t.only` to a `t.run()` option, deprecate it altogether
+    - Now that `t.only` is detected at test run time, this is way easier to do, and it just makes more sense here than as a setter
 
 ## 0.4.0
 
@@ -39,6 +44,9 @@ See the [changelog](https://github.com/isiahmeadows/thallium/blob/master/CHANGEL
     - Change `exports.thallium` to default export
     - Ignored by core, but will mildly simplify CLI interface
     - Will make parallel interface much more consistent
+6. Allow full name matching of `t.only`
+    - Feature parity with most other heavy frameworks
+7. Add `t.runOptions` getter/setter
 
 ## 0.4.x
 (not blocking 0.4.0)
@@ -47,8 +55,9 @@ See the [changelog](https://github.com/isiahmeadows/thallium/blob/master/CHANGEL
 2. Add file watching support
 3. Integrate with Karma
 4. Add parallel testing support
-    - This will be based on a beast created and managed separately from core.
-    - This will involve a secondary config
+    - This will involve a secondary child config
+    - This will require a dedicated worker pool
+    - Parallelism must be an option
 5. Add first-class support for multiple test groups and test group dependencies
     - I see this a lot in Java circles, but not in JS circles
     - I could already use this to some degree here (I already frequently disable the end-to-end tests in normal development)
@@ -87,4 +96,4 @@ Here's the nice-to-haves, and so these are in no particular order:
     - This will be out of core
 
 - Use the patience diff for larger data sets, since it deals with those a little more readably, a plus for data-heavy integration/end-to-end tests (this repo has some of those)
-    - There doesn't appear to be a JS port yet, and algorithm documentation is scarce, so I'd have to write it myself, and it will likely be challenging.
+    - There doesn't appear to be a JS port yet, and algorithm documentation is scarce, so I'd have to write it myself, and it will likely be challenging

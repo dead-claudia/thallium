@@ -339,32 +339,15 @@ $ npm install --save-dev typescript ts-node
 npm output...
 ```
 
-Now, let's create an `index.ts` file.
+Now, let's create a simple `index.ts` file.
 
 ```ts
 export const value = "string";
 ```
 
-Let's also add a `.tl.ts` config file.
+Next, create an empty `.tl.ts` file. Alternatively, you could add a `.tl.opts` with `--require ts:ts-node` to a similar effect.
 
-```ts
-import t from "thallium";
-import spec from "thallium/r/spec";
-
-t.reporter(spec);
-
-// You can also do this, although we're not going to use it.
-// export default {files: "**/*.spec.ts"};
-```
-
-Alternatively, you could add a `.tl.opts` to a similar effect.
-
-```
-# This is all that's needed.
---require ts:ts-node
-```
-
-And finally, let's add a `tests/test.ts` file.
+And finally, let's add a `test/index.ts` file.
 
 ```ts
 import t from "thallium";

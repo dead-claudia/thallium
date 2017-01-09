@@ -30,7 +30,9 @@ describe("core (reporters)", function () { // eslint-disable-line max-statements
             var tt = Util.create()
             var ret = []
 
+            assert.equal(tt.hasReporter, false)
             tt.reporter(Util.push, ret)
+            assert.equal(tt.hasReporter, true)
 
             tt.test("test 1", function () {})
             tt.test("test 2", function () {})
