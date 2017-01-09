@@ -26,7 +26,6 @@ var Tests = require("../lib/core/tests.js")
 
 var assert = global.assert = Thallium.assert
 var Util = global.Util = {
-    match: Thallium.match,
     r: Thallium.r,
     create: Thallium.root,
     n: Thallium.reports,

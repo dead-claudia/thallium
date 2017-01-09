@@ -66,7 +66,7 @@ task("test:node", function () {
 
 var dirs = [
     "bin", "fixtures", "helpers", "lib", "r", "test", "test-util", "migrate",
-    "assert", "match",
+    "assert",
 ].join(",")
 
 var patterns = ["{" + dirs + "}/**/{.,}*.{js,coffee}", "{.,}*.{js,coffee}"]

@@ -5,7 +5,7 @@
  * there is *so* much repetition.
  */
 
-var match = require("./match")
+var match = require("clean-match")
 var deprecate = require("./migrate/common").deprecate
 
 var toString = Object.prototype.toString
@@ -338,7 +338,7 @@ binary("deepEqual", match.strict, [
     "Expected {actual} to not deeply equal {expected}",
 ])
 
-binary("match", match.match, [
+binary("match", match.loose, [
     "Expected {actual} to match {expected}",
     "Expected {actual} to not match {expected}",
 ])
@@ -745,8 +745,8 @@ defineIncludes("notIncludesDeepAll", includesDeepAll, true, "Expected {actual} t
 defineIncludes("includesDeepAny", includesDeepAny, false, "Expected {actual} to match any value in {values}")
 defineIncludes("notIncludesDeep", includesDeepAny, true, "Expected {actual} to not match any value in {values}")
 
-var includesMatchAll = makeIncludes(true, match.match)
-var includesMatchAny = makeIncludes(false, match.match)
+var includesMatchAll = makeIncludes(true, match.loose)
+var includesMatchAny = makeIncludes(false, match.loose)
 
 defineIncludes("includesMatch", includesMatchAll, false, "Expected {actual} to match all values in {values}")
 defineIncludes("notIncludesMatchAll", includesMatchAll, true, "Expected {actual} to not match all values in {values}")
@@ -870,8 +870,8 @@ makeHasKeys("notHasDeepAllKeys", hasDeepAllKeys, true, "Expected {actual} to not
 makeHasKeys("hasDeepAnyKeys", hasDeepAnyKeys, false, "Expected {actual} to have any key in {keys}")
 makeHasKeys("notHasDeepKeys", hasDeepAnyKeys, true, "Expected {actual} to not have any key in {keys}")
 
-var hasMatchAllKeys = hasKeysType(true, match.match)
-var hasMatchAnyKeys = hasKeysType(false, match.match)
+var hasMatchAllKeys = hasKeysType(true, match.loose)
+var hasMatchAnyKeys = hasKeysType(false, match.loose)
 
 makeHasKeys("hasMatchKeys", hasMatchAllKeys, false, "Expected {actual} to match all keys in {keys}")
 makeHasKeys("notHasMatchAllKeys", hasMatchAllKeys, true, "Expected {actual} to not match all keys in {keys}")

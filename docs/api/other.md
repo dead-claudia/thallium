@@ -4,42 +4,10 @@
 
 There are a few other APIs that are a little more low-level, but still useful.
 
-- [`match.match(a, b)`](#match-match)
-- [`match.strict(a, b)`](#match-strict)
 - [`internal.root()`](#internal-root)
 - [`internal.reports`](#internal-reports)
 - [`internal.hookErrors`](#internal-hookerrors)
 - [`internal.location(name, index)`](#internal-location)
-
-<a id="match-match"></a>
-## match.match(a, b)
-
-```js
-match.match(a, b)
-```
-
-Compare two values, either primitives or objects, structurally without regard to their prototypes. Note that this does still do some type checking:
-
-- Primitives and their wrapper objects do not match
-- Symbols are checked for their description, not for identity
-- Dates are matched through their values
-- Arrays don't match plain objects or `arguments`
-- Typed arrays don't match anything other than another array of the same type
-- Maps and sets have their contents compared in an order-independent fashion
-- It checks typed arrays, Buffers, ArrayBuffers and DataViews
-- Expando properties aren't checked on arrays/maps/sets/etc.
-- It works with the core-js Symbol polyfill if it's the global, and they are checked just like the native primitives
-- It ignores the `stack` property on Errors
-- Objects that are specially handled (e.g. Dates, arrays, `arguments`, Errors) are checked to have the same prototype.
-
-<a id="match-strict"></a>
-## match.strict(a, b)
-
-```js
-match.strict(a, b)
-```
-
-Compare two values, either primitives or objects, structurally, but also verify that their prototypes match (and their children, recursively). The above notes for `match.match` also apply, except that symbols are checked for identity instead
 
 <a id="internal-root"></a>
 ## internal.root()

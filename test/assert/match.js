@@ -4,9 +4,6 @@
 Uint8Array, Uint16Array, Uint32Array, Float32Array, Float64Array,
 Uint8ClampedArray, DataView */
 
-// Note: updates to this should also be reflected in bench/match.js, so that
-// benchmark doesn't throw errors.
-
 describe("assert (match)", function () { // eslint-disable-line max-statements, max-len
     function check(name, a, b, opts) {
         function m(key) {
