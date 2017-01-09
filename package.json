@@ -4,12 +4,12 @@
   "description": "A simple, unopinionated, modular test framework",
   "main": "index.js",
   "scripts": {
+    "postinstall": "node scripts/update-clean-assert.js || echo Warning: thallium/assert.d.ts is not set up! >&2",
     "test": "node make"
   },
   "browser": {
-    "./lib/replaced/inspect.js": "./node_modules/util-inspect/index.js",
     "./lib/replaced/console.js": "./lib/replaced/console-browser.js",
-    "jsdom": "./node_modules/empty/object.js"
+    "jsdom": false
   },
   "bin": {
     "tl": "bin/tl.js"
@@ -23,12 +23,10 @@
   "author": "Isiah Meadows <me@isiahmeadows.com>",
   "license": "ISC",
   "devDependencies": {
-    "benchmark": "^2.1.1",
     "browserify": "^13.0.1",
     "chokidar": "^1.6.0",
     "coffee-script": "^1.10.0",
     "coffeelint": "^1.15.7",
-    "empty": "^0.10.1",
     "es6-promise": "^4.0.5",
     "eslint": "^3.4.0",
     "eslint-config-isiahmeadows": "^0.1.6",
@@ -45,6 +43,8 @@
     "watchify": "^3.7.0"
   },
   "dependencies": {
+    "clean-assert": "^1.0.0",
+    "clean-assert-util": "^1.0.1",
     "clean-match": "^1.0.2",
     "glob": "^7.0.5",
     "interpret": "1",

@@ -31,7 +31,7 @@ tl
 
 Couple specific notes:
 
-1. I plan to make this a very batteries-included framework. It includes several useful utilities like an assertion library far more helpful than Node's `assert` (you can define your own ad-hoc assertions, even - I do it in the tests themselves).
+1. I plan to make this a very batteries-included framework. It includes several useful utilities like an assertion library far more helpful than Node's `assert` (you can easily define your own ad-hoc assertions, even - I do it in the tests themselves).
 
 2. Not much configuration is required to get started. I aim for ease of use and convention over configuration, but I also try to enable as much flexibility as you need. Your config file can even return a promise, if that's what you need.
 

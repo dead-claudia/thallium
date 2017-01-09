@@ -17,10 +17,10 @@ See the [changelog](https://github.com/isiahmeadows/thallium/blob/master/CHANGEL
 3. Create/finish DOM reporter
 4. Support flaky tests via first-class retries
     - This is a requirement to self-host the runner
-5. Move ~~`thallium/match`~~ and `thallium/assert` implementations out of core
+5. ~~Move `thallium/match` and `thallium/assert` implementations out of core~~
     - ~~`thallium/match` is useful on its own~~
-    - Third-party assertions should be able to build off the same basic assertion primitives without depending on `thallium`
-    - The assertions' core primitives are already fairly stable
+    - ~~Third-party assertions should be able to build off the same basic assertion primitives without depending on `thallium`~~
+    - ~~The assertions' core primitives are already fairly stable~~
 6. Add `t.hasReporter()` so the CLI can detect no reporter set and add the appropriate default.
 
 ## 0.4.0

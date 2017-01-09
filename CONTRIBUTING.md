@@ -83,8 +83,6 @@ Note that I don't actually test the documentation's code, but please ensure it o
 
 - `lib` - The core of this project. Many public API modules are just thin wrappers for something in here, including the main export.
 
-- `lib/assert` - The built-in assertions. Most of these are re-exported under the same name.
-
 - `lib/api` - The core API. Both the primary `t` and `reflect` APIs are defined here.
 
 - `lib/core` - The core test state and execution logic. Handle with care, since it's probably the most heavily used. Bugs in this can and often will affect seemingly unrelated tests. Also, the report types are defined here.

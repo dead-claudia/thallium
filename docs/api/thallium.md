@@ -26,7 +26,7 @@ The basic test definition method, used for defining block tests. Should be famil
 ```js
 // JavaScript
 t.test("1 should equal 1", () => {
-    assert..equal(1, 1)
+    assert.equal(1, 1)
 })
 ```
 

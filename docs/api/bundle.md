@@ -61,7 +61,7 @@ t.use(function (t) {
 ## API Details
 
 - `tl.t` - The primary API, from `require("thallium")`.
-- `tl.assert` - The assertions namespace, from `require("thallium/assert")`.
+- `tl.assert` - The assertions namespace, from `require("clean-assert")`.
 - `tl.r` - Each of the reporters live here. You can find more details on these [here](../reporters.md).
 - `tl.r.dot` - The dot reporter, same as `require("thallium/r/dot")`.
 - `tl.r.spec` - The spec reporter, same as `require("thallium/r/spec")`.

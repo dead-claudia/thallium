@@ -16,9 +16,7 @@ var Report = require("../lib/core/reports").Report
 var Reflect = require("../lib/api/reflect")
 var Thallium = require("../lib/api/thallium")
 
-var assert = require("../assert")
-var AssertionError = assert.AssertionError
-var format = assert.format
+var assert = require("clean-assert")
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * - `reflect.checkInit()` is deprecated in favor of `reflect.locked` and    *
@@ -215,9 +213,7 @@ function defineAssertion(test, name, func) {
         }
 
         if (!res.test) {
-            throw new AssertionError(
-                format(res.message, res),
-                res.expected, res.actual)
+            assert.fail(res.message, res)
         }
     }
 
@@ -369,7 +365,7 @@ Object.defineProperty(Reflect.prototype, "AssertionError", {
     enumerable: false,
     get: Common.deprecate(
         "`reflect.AssertionError` is deprecated. Use `assert.AssertionError` from `thallium/assert` instead.", // eslint-disable-line max-len
-        function () { return lockError(AssertionError) }),
+        function () { return lockError(assert.AssertionError) }),
     set: Common.deprecate(
         "`reflect.AssertionError` is deprecated. Use `assert.AssertionError` from `thallium/assert` instead.", // eslint-disable-line max-len
         lockError),
@@ -386,7 +382,7 @@ methods(Thallium, {
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * - assertions defined on main export                                       *
  * - `t.*` assertions -> `assert.*` (some renamed) from `thallium/assert`    *
- * - `t.true`/etc. are gone (except `t.undefined` -> `assert.undefined`)     *
+ * - `t.true`/etc. are gone (except `t.undefined` -> `assert.isUndefined`)   *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 Common.hideDeprecation()
 require("../assertions")(require("../index"))

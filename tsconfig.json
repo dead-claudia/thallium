@@ -7,10 +7,8 @@
         "moduleResolution": "node"
     },
     "files": [
-        "assert.d.ts",
         "index.d.ts",
         "internal.d.ts",
-        "match.d.ts",
         "r/dot.d.ts",
         "r/index.d.ts",
         "r/spec.d.ts",

@@ -50,7 +50,6 @@ var Util = global.Util = {
 
     methods: require("../lib/methods.js"),
     R: require("../lib/reporter/index.js"),
-    inspect: require("../lib/replaced/inspect.js"),
 
     /* eslint-enable global-require */
 

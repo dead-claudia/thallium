@@ -1,5 +1,8 @@
 /node_modules
 
 # Tooling stuff
-npm-debug.log
-.eslintcache
+/npm-debug.log
+/.eslintcache
+
+# Generated stuff
+/assert.d.ts

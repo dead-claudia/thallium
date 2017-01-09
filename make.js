@@ -131,6 +131,27 @@ task("bundle", function () {
     ])
 })
 
+task("update", function (args) {
+    var pkgs = args.filter(function (arg) { return arg[0] !== "-" })
+    var saveFlag = "--save-dev"
+
+    args
+    .filter(function (arg) { return arg[0] === "-" })
+    .forEach(function (arg) {
+        switch (arg) {
+        case "--release": saveFlag = "--save"; break
+        case "--raw": saveFlag = ""; break
+        default: // ignore
+        }
+    })
+
+    exec("npm install " + pkgs.join(" ") + saveFlag)
+
+    if (pkgs.indexOf("clean-assert") >= 0) {
+        exec("node ./scripts/update-clean-assert.js")
+    }
+})
+
 task("release", function (args) {
     var force = false
     var increment
