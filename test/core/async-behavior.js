@@ -1,6 +1,6 @@
-"use strict"
-
 describe("core (asynchronous behavior)", function () {
+    "use strict"
+
     var n = Util.n
     var p = Util.p
 

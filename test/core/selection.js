@@ -1,8 +1,8 @@
-"use strict"
-
 /* eslint max-nested-callbacks: [2, 5] */
 
 describe("core (selection)", function () {
+    "use strict"
+
     var p = Util.p
     var n = Util.n
 

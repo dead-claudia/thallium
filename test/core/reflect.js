@@ -1,8 +1,8 @@
-"use strict"
-
 /* eslint max-nested-callbacks: [2, 5] */
 
 describe("core (reflect)", function () {
+    "use strict"
+
     describe("get current", function () {
         function current(reflect) { return reflect.current }
         function identity(reflect) { return reflect }

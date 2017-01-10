@@ -1,6 +1,6 @@
-"use strict"
-
 describe("core (reporters)", function () { // eslint-disable-line max-statements
+    "use strict"
+
     var n = Util.n
     var p = Util.p
     var hooks = Util.hooks

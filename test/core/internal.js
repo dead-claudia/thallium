@@ -1,6 +1,6 @@
-"use strict"
-
 describe("core (internal)", function () {
+    "use strict"
+
     describe("reports", function () {
         var Reports = Util.Reports
         var n = Util.n

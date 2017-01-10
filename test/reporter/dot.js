@@ -1,9 +1,9 @@
-"use strict"
-
 // Note: the reports *must* be well formed. The reporter assumes the reports are
 // correct, and it will *not* verify this.
 
 describe("reporter dot", function () {
+    "use strict"
+
     var p = Util.p
     var n = Util.n
     var c = Util.R.color

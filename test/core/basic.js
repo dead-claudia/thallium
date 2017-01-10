@@ -1,5 +1,3 @@
-"use strict"
-
 /* eslint max-nested-callbacks: [2, 5] */
 
 // Note: updates to this should also be reflected in
@@ -7,6 +5,8 @@
 // real-world usage.
 
 describe("core (basic)", function () {
+    "use strict"
+
     function identity(reflect) { return reflect }
 
     describe("reflect", function () {

@@ -1,5 +1,3 @@
-"use strict"
-
 // Note: updates to this should also be reflected in
 // fixtures/mid-coffee/spec/timeouts.coffee, as it's trying to
 // represent more real-world usage.
@@ -8,6 +6,8 @@
 // these have been tested against a slower machine, so it should hopefully not
 // be too bad.
 describe("core (timeouts) (FLAKE)", /** @this */ function () {
+    "use strict"
+
     this.retries(3)
 
     var n = Util.n

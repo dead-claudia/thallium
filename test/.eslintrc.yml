@@ -7,5 +7,3 @@ globals:
     t: false
     Util: false
     assert: false
-rules:
-    strict: [2, global]

@@ -1,10 +1,10 @@
-"use strict"
-
 // Note: the reports *must* be well formed. The reporter assumes the reports are
 // correct, and it will *not* verify this.
 
 // Skipped because it hasn't been finished yet.
 describe.skip("reporter dom", function () {
+    "use strict"
+
     // Skip if jsdom doesn't exist
     if (!Util.jsdom) return
 
