@@ -1077,4 +1077,27 @@ describe("core (reporters)", function () { // eslint-disable-line max-statements
             ])
         })
     })
+
+    context("stack traces", function () {
+        it("pretty-prints single-line errors with no stack", function () {
+            var e = new Error("test")
+
+            e.stack = e.message
+            assert.match(Util.R.getStack(e), "Error: test")
+        })
+
+        it("pretty-prints multi-line errors with no stack", function () {
+            var e = new Error("test\ntest")
+
+            e.stack = e.message
+            assert.match(Util.R.getStack(e), "Error: test\ntest")
+        })
+
+        it("trims the message correctly", function () {
+            var e = new Error("  test\n   test")
+
+            e.stack = e.message + "\n at Foo "
+            assert.match(Util.R.getStack(e), "Error:   test\n   test\nat Foo")
+        })
+    })
 })

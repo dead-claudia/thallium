@@ -634,6 +634,32 @@ describe("reporter spec", function () {
             /* eslint-enable max-len */
         })
 
+        var multiline = new AssertionError(
+            "Test:\n  expected: {id: 1}\n  found: {id: 2}",
+            {id: 1}, {id: 2})
+
+        test("multiline fail with AssertionError + pass", {
+            input: [
+                n.start(),
+                n.fail([p("one", 0)], multiline),
+                n.pass([p("two", 1)]),
+                n.end(),
+            ],
+            output: [].concat([
+                "",
+                "  " + c("fail", "1) one"),
+                "  " + pass("two"),
+                "",
+                c("bright pass", "  ") + c("green", "1 passing") +
+                    time("20ms"),
+                c("bright fail", "  ") + c("fail", "1 failing"),
+                "",
+                "  " + c("plain", "1) one:"),
+            ], stack(multiline), [
+                "",
+            ]),
+        })
+
         context("restarting", function () {
             test("empty test", {
                 input: [
