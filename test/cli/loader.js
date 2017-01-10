@@ -614,7 +614,7 @@ describe("cli loader", function () {
                     test: {".tl.js": "contents"},
                 },
                 args: "",
-                globs: ["test/**/*.js"],
+                globs: ["test/**/*.js", "test.js"],
                 modules: [new S("test/.tl.js")],
             })
 
@@ -623,7 +623,7 @@ describe("cli loader", function () {
                     test: {".tl.coffee": "contents"},
                 },
                 args: "",
-                globs: ["test/**/*.coffee"],
+                globs: ["test/**/*.coffee", "test.coffee"],
                 modules: [
                     new I(".coffee"),
                     new S("test/.tl.coffee"),
@@ -635,7 +635,7 @@ describe("cli loader", function () {
                     test: {".tl.babel.js": "contents"},
                 },
                 args: "",
-                globs: ["test/**/*.babel.js"],
+                globs: ["test/**/*.babel.js", "test.babel.js"],
                 modules: [
                     new I(".babel.js"),
                     new S("test/.tl.babel.js"),
@@ -647,7 +647,7 @@ describe("cli loader", function () {
                     test: {".tl.coffee.md": "contents"},
                 },
                 args: "",
-                globs: ["test/**/*.coffee.md"],
+                globs: ["test/**/*.coffee.md", "test.coffee.md"],
                 modules: [
                     new I(".coffee.md"),
                     new S("test/.tl.coffee.md"),
@@ -661,7 +661,7 @@ describe("cli loader", function () {
                     test: {"nope.js": ""},
                 },
                 args: "",
-                globs: ["test/**/*.js"],
+                globs: ["test/**/*.js", "test.js"],
                 modules: [new D()],
             })
 
@@ -670,7 +670,7 @@ describe("cli loader", function () {
                     test: {".tl.json": "contents"},
                 },
                 args: "",
-                globs: ["test/**/*.js"],
+                globs: ["test/**/*.js", "test.js"],
                 modules: [new D()],
             })
 
@@ -679,7 +679,7 @@ describe("cli loader", function () {
                     test: {".tl.js": {}},
                 },
                 args: "",
-                globs: ["test/**/*.js"],
+                globs: ["test/**/*.js", "test.js"],
                 modules: [new D()],
             })
         })
@@ -691,7 +691,7 @@ describe("cli loader", function () {
                     other: {"foo.js": "contents"},
                 },
                 args: "--config other/foo.js",
-                globs: ["test/**/*.js"],
+                globs: ["test/**/*.js", "test.js"],
                 modules: [new S("other/foo.js")],
             })
 
@@ -701,7 +701,7 @@ describe("cli loader", function () {
                     other: {"foo.js": "contents"},
                 },
                 args: "--config other/what.js",
-                globs: ["test/**/*.js"],
+                globs: ["test/**/*.js", "test.js"],
                 modules: [new S("other/what.js")],
             })
 
@@ -711,7 +711,7 @@ describe("cli loader", function () {
                     other: {"foo.config": "contents"},
                 },
                 args: "--config other/foo.config",
-                globs: ["test/**/*.js"],
+                globs: ["test/**/*.js", "test.js"],
                 modules: [new S("other/foo.config")],
             })
         })
@@ -931,7 +931,7 @@ describe("cli loader", function () {
                     ".tl.js": "contents",
                 },
                 args: "",
-                globs: ["test/**/*.js"],
+                globs: ["test/**/*.js", "test.js"],
                 modules: [new S(".tl.js")],
             })
 
@@ -1007,7 +1007,7 @@ describe("cli loader", function () {
                     },
                 },
                 args: "--config test/.tl.coffee",
-                globs: ["test/**/*.coffee"],
+                globs: ["test/**/*.coffee", "test.coffee"],
                 modules: [
                     new I(".coffee"),
                     new S("test/.tl.coffee"),
@@ -1087,7 +1087,7 @@ describe("cli loader", function () {
                     },
                 },
                 args: "--cwd module",
-                globs: ["module/test/**/*.js"],
+                globs: ["module/test/**/*.js", "module/test.js"],
                 modules: [new S("module/test/.tl.js")],
             })
 
@@ -1112,7 +1112,7 @@ describe("cli loader", function () {
                     },
                 },
                 args: "--cwd module/test",
-                globs: ["module/test/test/**/*.js"],
+                globs: ["module/test/test/**/*.js", "module/test/test.js"],
                 modules: [new S("module/test/test/.tl.js")],
             })
 
@@ -1146,7 +1146,10 @@ describe("cli loader", function () {
                     },
                 },
                 args: "--cwd module/foo/bar",
-                globs: ["module/foo/bar/test/**/*.js"],
+                globs: [
+                    "module/foo/bar/test/**/*.js",
+                    "module/foo/bar/test.js",
+                ],
                 modules: [new S("module/foo/bar/test/.tl.js")],
             })
 
@@ -1162,7 +1165,7 @@ describe("cli loader", function () {
                     },
                 },
                 args: "--cwd module --config test/.tl-config.js",
-                globs: ["module/test/**/*.js"],
+                globs: ["module/test/**/*.js", "module/test.js"],
                 modules: [new S("module/test/.tl-config.js")],
             })
 
@@ -1193,7 +1196,7 @@ describe("cli loader", function () {
                     "--cwd", "module",
                     "--config", abs("/other/test/.tl-config.js"),
                 ],
-                globs: ["module/test/**/*.js"],
+                globs: ["module/test/**/*.js", "module/test.js"],
                 modules: [new S("other/test/.tl-config.js")],
             })
 
@@ -1220,7 +1223,7 @@ describe("cli loader", function () {
                     },
                 },
                 args: ["--cwd", "module", abs("/other/test/**")],
-                globs: ["/other/test/**/*.js"],
+                globs: ["other/test/**/*.js"],
                 modules: [new S("other/test/.tl.js")],
             })
 

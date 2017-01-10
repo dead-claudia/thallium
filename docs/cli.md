@@ -1,6 +1,6 @@
 # CLI
 
-You can run your tests very easily through the CLI. If all your tests are in `test/**/*.js`, it's as easy as this:
+You can run your tests very easily through the CLI. If all your tests are in `test/**/*.js` or just `test.js`, it's as easy as this:
 
 ```sh
 tl
@@ -48,7 +48,7 @@ module.exports = {
      * various reasons. It uses node-glob under the hood, but it also supports
      * negation in the same way as the CLI.
      */
-    files: "test/**/*.js",
+    files: ["test/**/*.js", "test.js"],
 }
 ```
 
@@ -77,11 +77,7 @@ If you need to load a module before running the tests, it's very simple. Just `r
 ```js
 // .tl.js
 "use strict"
-
-const t = require("thallium")
-
 require("should")
-t.reporter(require("thallium/r/spec"))
 ```
 
 If you need to require something before even the config is loaded, like if you need to load a specific environment for your config in a complex CI scenario, or if you just need to shim something within `require` that may affect how your config is loaded, you can use the `--require` flag.
@@ -94,9 +90,10 @@ In the event this module does asynchronous work, you can also default-export a t
 
 ## Transpilers
 
-You may use any transpiler you please. For many popular transpilers and compiled languages, such as Babel, TypeScript, and CoffeeScript, you can simply use a `.tl.babel.js` or `.tl.coffee`, respectively, and Thallium will figure out that on its own and use that. The above config could also be expressed as this:
+You may use any transpiler you please. For many popular transpilers and compiled languages, such as Babel, TypeScript, and CoffeeScript, you can simply use a `.tl.babel.js` or `.tl.coffee`, respectively, and Thallium will figure out that on its own and use that. The default config could also be expressed as this:
 
 ```coffee
+# .tl.coffee
 module.exports =
     thallium: require 'thallium'
     files: 'test/**/*.coffee'
@@ -110,15 +107,16 @@ If you have your own custom in-house language you want to use, that isn't known 
 tl --require what:@company/what-lang
 ```
 
-Alternatively, the extension may also be inferred from the glob. So, this will try to load CoffeeScript's hook:
+Alternatively, the extension may also be inferred from the glob. So, this will register CoffeeScript's hook:
 
 ```sh
-tl tests/**/*.coffee
+tl src/**/*.spec.coffee
 ```
 
-This is useful if you only have one file, and you can include your reporters and plugins in the same file as your tests, and then it's a single command to run everything: `tl test.coffee`.
+This is useful if you only have one file, and you can include your reporters and plugins in the same file as your tests. Then, it's a single command to run everything: `tl test.coffee`.
 
 Notes:
 
 1. You have to already have the transpiler installed, like [`coffee-script`](http://npm.im/coffee-script) for [CoffeeScript](https://coffeescript.org) or [`ts-node`](http://npm.im/ts-node) and [`typescript`](http://npm.im/typescript) for [TypeScript](https://typescriptlang.com).
 2. Plain JavaScript config files take precedence over transpiled configs, so `.tl.js` will be found before `.tl.coffee` or `.tl.babel.js`.
+3. The default `spec` reporter is only added after all tests are loaded, right before running it. And it's only run if you're using the CLI, not if you're running it directly.

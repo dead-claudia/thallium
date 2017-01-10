@@ -84,6 +84,18 @@ describe("cli end-to-end (FLAKE)", /** @this */ function () {
         ],
     })
 
+    test("runs simple test file", {
+        args: ["--cwd", fixture("simple-single")],
+        code: 0,
+        timeout: 5000,
+        messages: [
+            "start = undefined",
+            "pass [0: test 1] = undefined",
+            "pass [1: test 2] = undefined",
+            "end = undefined",
+        ],
+    })
+
     test("runs small sized failing test suites", {
         args: ["--cwd", fixture("."), "full-js/**"],
         code: 1,
