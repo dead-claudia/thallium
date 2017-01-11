@@ -63,11 +63,11 @@ var Util = global.Util = {
 // Because PhantomJS sucks - Some tests are fails due to PhantomJS oddities, and
 // I can't get a reliable repro to work around them within clean-match or
 // clean-assert, despite significant efforts to avoid them within clean-match.
-// This adds a `fixPhantom` to `it`, `it.only`, and `it.skip`, used in the few
-// cases PhantomJS misbehaves.
+// This adds a `Util.phantomFix` to wrap `it` and friends, used in the few cases
+// PhantomJS misbehaves. It returns a possible proxy to the `it` argument.
 //
-// Note: `it.fixPhantom` and friends should *only* be used on the tests where
-// PhantomJS actually fails.
+// Note: `Util.phantomFix` should *only* be used on the tests where PhantomJS
+// actually fails, and it will log an error if the issue no longer appears.
 ;(function () {
     var isPhantom = (function () {
         if (global.window == null) return false
@@ -113,17 +113,13 @@ var Util = global.Util = {
             swallowIfBad)
     }
 
-    function wrapPhantom(it) {
-        it.fixPhantom = !isPhantom ? it : function (name, func) {
+    Util.phantomFix = function (it) {
+        return !isPhantom ? it : function (name, func) {
             it(name + " (wrapped)", /** @this */ function () {
                 return runWrapped(this.test, name, func)
             })
         }
     }
-
-    wrapPhantom(it)
-    wrapPhantom(it.only)
-    wrapPhantom(it.skip)
 })()
 
 // Inject a no-op into browsers (so the relevant tests actually run), but not
