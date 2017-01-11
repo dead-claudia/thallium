@@ -57,7 +57,74 @@ var Util = global.Util = {
     const: function (x) {
         return function () { return x }
     },
+
 }
+
+// Because PhantomJS sucks - Some tests are fails due to PhantomJS oddities, and
+// I can't get a reliable repro to work around them within clean-match or
+// clean-assert, despite significant efforts to avoid them within clean-match.
+// This adds a `fixPhantom` to `it`, `it.only`, and `it.skip`, used in the few
+// cases PhantomJS misbehaves.
+//
+// Note: `it.fixPhantom` and friends should *only* be used on the tests where
+// PhantomJS actually fails.
+;(function () {
+    var isPhantom = (function () {
+        if (global.window == null) return false
+        if (global.window.navigator == null) return false
+        if (global.window.navigator.userAgent == null) return false
+        return /phantomjs/i.test(global.window.navigator.userAgent)
+    })()
+
+    function fixErrors(key, value) {
+        if (value instanceof Error) {
+            return {name: value.name, message: value.message}
+        } else {
+            return value
+        }
+    }
+
+    function swallowIfBad(e) {
+        // Incorrect match failures will output identical JSON. Also, the issues
+        // only present themselves with objects, making things easier to check.
+        if (!(e instanceof assert.AssertionError)) throw e
+        if (e.expected == null || typeof e.expected !== "object") throw e
+        if (e.actual == null || typeof e.actual !== "object") throw e
+        if (JSON.stringify(e.expected, fixErrors) !==
+                JSON.stringify(e.actual, fixErrors)) {
+            throw e
+        }
+    }
+
+    function runWrapped(test, name, func) {
+        return new Promise(function (resolve, reject) {
+            if (func.length === 0) {
+                resolve(func())
+            } else {
+                func(function (e) { return e != null ? reject(e) : resolve() })
+            }
+        })
+        .then(
+            // So these will eventually get caught when they work again. (Don't
+            // fail the build, though.)
+            function () {
+                global.console.error("Test now passing: " + test.fullTitle())
+            },
+            swallowIfBad)
+    }
+
+    function wrapPhantom(it) {
+        it.fixPhantom = !isPhantom ? it : function (name, func) {
+            it(name + " (wrapped)", /** @this */ function () {
+                return runWrapped(this.test, name, func)
+            })
+        }
+    }
+
+    wrapPhantom(it)
+    wrapPhantom(it.only)
+    wrapPhantom(it.skip)
+})()
 
 // Inject a no-op into browsers (so the relevant tests actually run), but not
 // into older Node versions unsupported by jsdom and JS environments that don't

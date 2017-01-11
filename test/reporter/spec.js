@@ -29,15 +29,9 @@ describe("reporter spec", function () {
     })
 
     function stack(e) {
-        var lines = Util.R.getStack(e).split(/\r?\n/g)
-
-        lines[0] = "    " + c("fail", lines[0])
-
-        for (var i = 1; i < lines.length; i++) {
-            lines[i] = "      " + c("fail", lines[i])
-        }
-
-        return lines
+        return Util.R.readStack(e)
+            .split(/\r?\n/g)
+            .map(function (line) { return "      " + c("fail", line) })
     }
 
     function pass(name) {
@@ -140,9 +134,11 @@ describe("reporter spec", function () {
                 c("bright fail", "  ") + c("fail", "2 failing") + time("20ms"),
                 "",
                 "  " + c("plain", "1) one:"),
+                "    " + c("fail", "Error: sentinel"),
             ], stack(sentinel), [
                 "",
                 "  " + c("plain", "2) two:"),
+                "    " + c("fail", "Error: sentinel"),
             ], stack(sentinel), [
                 "",
             ]),
@@ -164,6 +160,7 @@ describe("reporter spec", function () {
                 c("bright fail", "  ") + c("fail", "1 failing"),
                 "",
                 "  " + c("plain", "1) two:"),
+                "    " + c("fail", "Error: sentinel"),
             ], stack(sentinel), [
                 "",
             ]),
@@ -185,6 +182,7 @@ describe("reporter spec", function () {
                 c("bright fail", "  ") + c("fail", "1 failing"),
                 "",
                 "  " + c("plain", "1) one:"),
+                "    " + c("fail", "Error: sentinel"),
             ], stack(sentinel), [
                 "",
             ]),
@@ -208,9 +206,25 @@ describe("reporter spec", function () {
                 c("bright fail", "  ") + c("fail", "2 failing") + time("20ms"),
                 "",
                 "  " + c("plain", "1) one:"),
+                "    " + c("fail", "AssertionError: Expected 1 to equal 2"),
+                "",
+                "      " + c("diff added", "+ expected") + " " +
+                    c("diff removed", "- actual"),
+                "",
+                "      " + c("diff removed", "-2"),
+                "      " + c("diff added", "+1"),
+                "",
             ], stack(assertion), [
                 "",
                 "  " + c("plain", "2) two:"),
+                "    " + c("fail", "AssertionError: Expected 1 to equal 2"),
+                "",
+                "      " + c("diff added", "+ expected") + " " +
+                    c("diff removed", "- actual"),
+                "",
+                "      " + c("diff removed", "-2"),
+                "      " + c("diff added", "+1"),
+                "",
             ], stack(assertion), [
                 "",
             ]),
@@ -232,6 +246,14 @@ describe("reporter spec", function () {
                 c("bright fail", "  ") + c("fail", "1 failing"),
                 "",
                 "  " + c("plain", "1) two:"),
+                "    " + c("fail", "AssertionError: Expected 1 to equal 2"),
+                "",
+                "      " + c("diff added", "+ expected") + " " +
+                    c("diff removed", "- actual"),
+                "",
+                "      " + c("diff removed", "-2"),
+                "      " + c("diff added", "+1"),
+                "",
             ], stack(assertion), [
                 "",
             ]),
@@ -253,6 +275,14 @@ describe("reporter spec", function () {
                 c("bright fail", "  ") + c("fail", "1 failing"),
                 "",
                 "  " + c("plain", "1) one:"),
+                "    " + c("fail", "AssertionError: Expected 1 to equal 2"),
+                "",
+                "      " + c("diff added", "+ expected") + " " +
+                    c("diff removed", "- actual"),
+                "",
+                "      " + c("diff removed", "-2"),
+                "      " + c("diff added", "+1"),
+                "",
             ], stack(assertion), [
                 "",
             ]),
@@ -327,6 +357,7 @@ describe("reporter spec", function () {
                 c("bright fail", "  ") + c("fail", "1 failing"),
                 "",
                 "  " + c("plain", "1) one:"),
+                "    " + c("fail", "Error: sentinel"),
             ], stack(sentinel), [
                 "",
             ]),
@@ -348,6 +379,7 @@ describe("reporter spec", function () {
                 c("bright fail", "  ") + c("fail", "1 failing"),
                 "",
                 "  " + c("plain", "1) two:"),
+                "    " + c("fail", "Error: sentinel"),
             ], stack(sentinel), [
                 "",
             ]),
@@ -618,15 +650,19 @@ describe("reporter spec", function () {
                 c("bright fail", "  ") + c("fail", "4 failing"),
                 "",
                 "  " + c("plain", "1) core (basic) returns a prototypal clone when not given a callback:"),
+                "    " + c("fail", "TypeError: undefined is not a function"),
             ], stack(badType), [
                 "",
                 "  " + c("plain", "2) cli normalize glob current directory normalizes a file:"),
+                "    " + c("fail", "Error: sentinel"),
             ], stack(sentinel), [
                 "",
                 "  " + c("plain", "3) cli normalize glob relative directory retains negative + trailing slashes:"),
+                "    " + c("fail", "TypeError: undefined is not a function"),
             ], stack(badType), [
                 "",
                 "  " + c("plain", "4) core (timeouts) gets own inline set timeout:"),
+                "    " + c("fail", "Error: sentinel"),
             ], stack(sentinel), [
                 "",
             ]),
@@ -655,6 +691,16 @@ describe("reporter spec", function () {
                 c("bright fail", "  ") + c("fail", "1 failing"),
                 "",
                 "  " + c("plain", "1) one:"),
+                "    " + c("fail", "AssertionError: Test:"),
+                "      " + c("fail", "  expected: {id: 1}"),
+                "      " + c("fail", "  found: {id: 2}"),
+                "",
+                "      " + c("diff added", "+ expected") + " " +
+                    c("diff removed", "- actual"),
+                "",
+                "      " + c("diff removed", "-{ id: 2 }"),
+                "      " + c("diff added", "+{ id: 1 }"),
+                "",
             ], stack(multiline), [
                 "",
             ]),
@@ -729,9 +775,11 @@ describe("reporter spec", function () {
                         time("20ms"),
                     "",
                     "  " + c("plain", "1) one:"),
+                    "    " + c("fail", "Error: sentinel"),
                 ], stack(sentinel), [
                     "",
                     "  " + c("plain", "2) two:"),
+                    "    " + c("fail", "Error: sentinel"),
                 ], stack(sentinel), [
                     "",
                     "",
@@ -742,9 +790,11 @@ describe("reporter spec", function () {
                         time("20ms"),
                     "",
                     "  " + c("plain", "1) one:"),
+                    "    " + c("fail", "Error: sentinel"),
                 ], stack(sentinel), [
                     "",
                     "  " + c("plain", "2) two:"),
+                    "    " + c("fail", "Error: sentinel"),
                 ], stack(sentinel), [
                     "",
                 ]),
@@ -771,6 +821,7 @@ describe("reporter spec", function () {
                     c("bright fail", "  ") + c("fail", "1 failing"),
                     "",
                     "  " + c("plain", "1) two:"),
+                    "    " + c("fail", "Error: sentinel"),
                 ], stack(sentinel), [
                     "",
                     "",
@@ -782,6 +833,7 @@ describe("reporter spec", function () {
                     c("bright fail", "  ") + c("fail", "1 failing"),
                     "",
                     "  " + c("plain", "1) two:"),
+                    "    " + c("fail", "Error: sentinel"),
                 ], stack(sentinel), [
                     "",
                 ]),
@@ -808,6 +860,7 @@ describe("reporter spec", function () {
                     c("bright fail", "  ") + c("fail", "1 failing"),
                     "",
                     "  " + c("plain", "1) one:"),
+                    "    " + c("fail", "Error: sentinel"),
                 ], stack(sentinel), [
                     "",
                     "",
@@ -819,6 +872,7 @@ describe("reporter spec", function () {
                     c("bright fail", "  ") + c("fail", "1 failing"),
                     "",
                     "  " + c("plain", "1) one:"),
+                    "    " + c("fail", "Error: sentinel"),
                 ], stack(sentinel), [
                     "",
                 ]),
@@ -846,9 +900,25 @@ describe("reporter spec", function () {
                         time("20ms"),
                     "",
                     "  " + c("plain", "1) one:"),
+                    "    " + c("fail", "AssertionError: Expected 1 to equal 2"),
+                    "",
+                    "      " + c("diff added", "+ expected") + " " +
+                        c("diff removed", "- actual"),
+                    "",
+                    "      " + c("diff removed", "-2"),
+                    "      " + c("diff added", "+1"),
+                    "",
                 ], stack(assertion), [
                     "",
                     "  " + c("plain", "2) two:"),
+                    "    " + c("fail", "AssertionError: Expected 1 to equal 2"),
+                    "",
+                    "      " + c("diff added", "+ expected") + " " +
+                        c("diff removed", "- actual"),
+                    "",
+                    "      " + c("diff removed", "-2"),
+                    "      " + c("diff added", "+1"),
+                    "",
                 ], stack(assertion), [
                     "",
                     "",
@@ -859,9 +929,25 @@ describe("reporter spec", function () {
                         time("20ms"),
                     "",
                     "  " + c("plain", "1) one:"),
+                    "    " + c("fail", "AssertionError: Expected 1 to equal 2"),
+                    "",
+                    "      " + c("diff added", "+ expected") + " " +
+                        c("diff removed", "- actual"),
+                    "",
+                    "      " + c("diff removed", "-2"),
+                    "      " + c("diff added", "+1"),
+                    "",
                 ], stack(assertion), [
                     "",
                     "  " + c("plain", "2) two:"),
+                    "    " + c("fail", "AssertionError: Expected 1 to equal 2"),
+                    "",
+                    "      " + c("diff added", "+ expected") + " " +
+                        c("diff removed", "- actual"),
+                    "",
+                    "      " + c("diff removed", "-2"),
+                    "      " + c("diff added", "+1"),
+                    "",
                 ], stack(assertion), [
                     "",
                 ]),
@@ -888,6 +974,14 @@ describe("reporter spec", function () {
                     c("bright fail", "  ") + c("fail", "1 failing"),
                     "",
                     "  " + c("plain", "1) two:"),
+                    "    " + c("fail", "AssertionError: Expected 1 to equal 2"),
+                    "",
+                    "      " + c("diff added", "+ expected") + " " +
+                        c("diff removed", "- actual"),
+                    "",
+                    "      " + c("diff removed", "-2"),
+                    "      " + c("diff added", "+1"),
+                    "",
                 ], stack(assertion), [
                     "",
                     "",
@@ -899,6 +993,14 @@ describe("reporter spec", function () {
                     c("bright fail", "  ") + c("fail", "1 failing"),
                     "",
                     "  " + c("plain", "1) two:"),
+                    "    " + c("fail", "AssertionError: Expected 1 to equal 2"),
+                    "",
+                    "      " + c("diff added", "+ expected") + " " +
+                        c("diff removed", "- actual"),
+                    "",
+                    "      " + c("diff removed", "-2"),
+                    "      " + c("diff added", "+1"),
+                    "",
                 ], stack(assertion), [
                     "",
                 ]),
@@ -925,6 +1027,14 @@ describe("reporter spec", function () {
                     c("bright fail", "  ") + c("fail", "1 failing"),
                     "",
                     "  " + c("plain", "1) one:"),
+                    "    " + c("fail", "AssertionError: Expected 1 to equal 2"),
+                    "",
+                    "      " + c("diff added", "+ expected") + " " +
+                        c("diff removed", "- actual"),
+                    "",
+                    "      " + c("diff removed", "-2"),
+                    "      " + c("diff added", "+1"),
+                    "",
                 ], stack(assertion), [
                     "",
                     "",
@@ -936,6 +1046,14 @@ describe("reporter spec", function () {
                     c("bright fail", "  ") + c("fail", "1 failing"),
                     "",
                     "  " + c("plain", "1) one:"),
+                    "    " + c("fail", "AssertionError: Expected 1 to equal 2"),
+                    "",
+                    "      " + c("diff added", "+ expected") + " " +
+                        c("diff removed", "- actual"),
+                    "",
+                    "      " + c("diff removed", "-2"),
+                    "      " + c("diff added", "+1"),
+                    "",
                 ], stack(assertion), [
                     "",
                 ]),

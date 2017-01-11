@@ -46,6 +46,7 @@
     "clean-assert": "^1.0.0",
     "clean-assert-util": "^1.0.1",
     "clean-match": "^1.0.2",
+    "diff": "^3.2.0",
     "glob": "^7.0.5",
     "interpret": "1",
     "minimatch": "^3.0.2",

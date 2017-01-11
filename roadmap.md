@@ -13,7 +13,7 @@ See the [changelog](https://github.com/isiahmeadows/thallium/blob/master/CHANGEL
 
 1. ~~Add OS X to the Travis build~~
     - ~~Travis has been having OS X issues lately, making debugging these errors a little harder~~
-2. Add diff support to all existing reporters
+2. ~~Add diff support to all existing reporters~~
 3. Create/finish DOM reporter
 4. Support flaky tests via first-class retries
     - This is a requirement to self-host the runner
@@ -27,6 +27,7 @@ See the [changelog](https://github.com/isiahmeadows/thallium/blob/master/CHANGEL
     - Add a `t.run()` option to run or skip these
 8. Move `t.only` to a `t.run()` option, deprecate it altogether
     - Now that `t.only` is detected at test run time, this is way easier to do, and it just makes more sense here than as a setter
+    - Also, accept an `except` option.
 
 ## 0.4.0
 
@@ -37,7 +38,7 @@ See the [changelog](https://github.com/isiahmeadows/thallium/blob/master/CHANGEL
 3. Transition to TypeScript internally
     - I'm having enough of the highly uninformative `TypeError: foo has no method bar`, `TypeError: Cannot read property 'bar' of undefined`, `TypeError: object #<Object> is not a function`, etc. (At least Node 6 gives the variable name...)
     - I get arrow functions and classes for free, without having to deal with Babel's monstrosity
-    - Downleveled async functions will drastically simplify both the runner and all the reporters (requires TS 2.1)
+    - Downleveled async functions will drastically simplify both the runner and all the reporters
     - It'll be a *lot* easier when most of the deprecated dynamic stuff like test inheritance is finally removed
 4. Add some promise-aware assertions
 5. Move `exports.files` config option to `t.files`

@@ -376,7 +376,7 @@ describe("core (reporters)", function () { // eslint-disable-line max-statements
         })
     })
 
-    it("called correctly with inline failing", function () {
+    it.fixPhantom("called correctly with inline failing", function () {
         var AssertionError = assert.AssertionError
         var tt = Util.create()
         var ret = []
@@ -395,7 +395,7 @@ describe("core (reporters)", function () { // eslint-disable-line max-statements
         })
     })
 
-    it("called correctly with inline both", function () {
+    it.fixPhantom("called correctly with inline both", function () {
         var AssertionError = assert.AssertionError
         var tt = Util.create()
         var ret = []
@@ -640,7 +640,7 @@ describe("core (reporters)", function () { // eslint-disable-line max-statements
         })
     })
 
-    it("called correctly with complex sequence", function () {
+    it.fixPhantom("called correctly with complex sequence", function () {
         var AssertionError = assert.AssertionError
         var tt = Util.create()
         var ret = []
@@ -791,7 +791,7 @@ describe("core (reporters)", function () { // eslint-disable-line max-statements
             })
     })
 
-    it("has repeatable output", function () {
+    it.fixPhantom("has repeatable output", function () {
         var AssertionError = assert.AssertionError
         var tt = Util.create()
         var ret = []
