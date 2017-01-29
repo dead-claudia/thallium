@@ -56,7 +56,7 @@ function printError(report) {
 
     if (!(err instanceof Error)) {
         return printRaw("value", inspect(err))
-    } else if (err.name !== "AssertionError") {
+    } else if (err.name !== "AssertionError" || err.showDiff === false) {
         // Let's *not* depend on the constructor being Thallium's...
         return print("  stack: |-")
         .then(() => printLines(err.stack, false))

@@ -110,7 +110,7 @@ describe("reporter dot", function () {
             })
         }
 
-        test("passing 2", {
+        test("pass 2", {
             input: [
                 n.start(),
                 n.pass([p("test", 0)]),
@@ -636,7 +636,7 @@ describe("reporter dot", function () {
                 ],
             })
 
-            test("passing 2", {
+            test("pass 2", {
                 input: [
                     n.start(),
                     n.pass([p("test", 0)]),

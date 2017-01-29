@@ -8,7 +8,7 @@
 
 var path = require("path")
 var cp = require("child_process")
-var fixture = require("../../test-util/cli/cli.js").fixture
+var fixture = require("../../test-util/cli/cli").fixture
 
 describe("cli end-to-end (FLAKE)", /** @this */ function () {
     this.retries(3)

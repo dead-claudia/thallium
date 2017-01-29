@@ -8,8 +8,7 @@
     "test": "node make"
   },
   "browser": {
-    "./lib/replaced/console.js": "./lib/replaced/console-browser.js",
-    "jsdom": false
+    "./lib/replaced/console.js": "./lib/replaced/console-browser.js"
   },
   "bin": {
     "tl": "bin/tl.js"
@@ -30,7 +29,6 @@
     "es6-promise": "^4.0.5",
     "eslint": "^3.4.0",
     "eslint-config-isiahmeadows": "^0.1.6",
-    "jsdom": "^9.4.0",
     "karma": "^1.1.0",
     "karma-browserify": "^5.0.5",
     "karma-chrome-launcher": "^2.0.0",

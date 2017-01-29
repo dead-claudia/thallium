@@ -25,51 +25,63 @@ See the [changelog](https://github.com/isiahmeadows/thallium/blob/master/CHANGEL
 7. Support failable tests
     - You may want to run a buggy test while still not letting it fail. It helps you know which tests are buggy, and to just not run them if they are
     - Add a `t.run()` option to run or skip these
-8. Move `t.only` to a `t.run()` option, deprecate it altogether
+8. Make `t.only` also a `t.run()` option
     - Now that `t.only` is detected at test run time, this is way easier to do, and it just makes more sense here than as a setter
-    - Also, accept an `except` option.
+    - Also, accept a `skip` option.
 
 ## 0.4.0
 
+Note that as of this version, only the primary API of the previous version will be supported as much as feasibly possible through `thallium/migrate`. Reporter and plugin APIs will not such have a wrapper available, but may use the utilities in `thallium/migrate/support` to use while transitioning.
+
 1. Remove all the previously deprecated methods/etc.
 2. Expose `thallium` as global `t` in bundle, tack existing `tl.*` exports onto it
-    - Expose `thallium/assert` as `assert` instead
+    - Expose `thallium/assert` as global `assert` instead
     - Don't expose `require("thallium")`
-3. Transition to TypeScript internally
-    - I'm having enough of the highly uninformative `TypeError: foo has no method bar`, `TypeError: Cannot read property 'bar' of undefined`, `TypeError: object #<Object> is not a function`, etc. (At least Node 6 gives the variable name...)
-    - I get arrow functions and classes for free, without having to deal with Babel's monstrosity
-    - Downleveled async functions will drastically simplify both the runner and all the reporters
-    - It'll be a *lot* easier when most of the deprecated dynamic stuff like test inheritance is finally removed
-4. Add some promise-aware assertions
-5. Move `exports.files` config option to `t.files`
+3. Add some promise-aware assertions (in `clean-assert`)
+4. Move `exports.files` config option to `t.files`
     - Change `exports.thallium` to default export
     - Ignored by core, but will mildly simplify CLI interface
     - Will make parallel interface much more consistent
-6. Allow full name matching of `t.only`
+5. Allow full name matching of `t.only`
+    - Detected via no array
     - Feature parity with most other heavy frameworks
-7. Add `t.runOptions` getter/setter
+6. Add `t.runOptions` getter/setter for default run options
+7. Add some useful things for test generation and reporters like getting the full test name
+8. Make reports backed by a per-run persistent tree, and convert the public API to expose only getters
+    - Abstracts away the internal representation
+    - Reduce reporter GC
+9. Add file watching support
+    - Just invoke the CLI with `--force-local` and the appropriate Node flags on each change. Way easier than trying to clean up `node_modules`, and you get more easily reproduced runs
+10. Add the ability to programmatically skip a test before it completes
+    - Required for integration tests
+    - `t.skip()`/`reflect.skip()` throws an `reflect.Skip` (an Error subclass) to skip a test
+11. Expose `thallium/internal` as `reflect.internal()`
+12. Expose a detached `reflect` via `t.reflect()`
+    - Mainly for easier testing/etc.
 
 ## 0.4.x
 (not blocking 0.4.0)
 
 1. Trim off internal stack traces when sending errors to reporters
-2. Add file watching support
-3. Integrate with Karma
-4. Add parallel testing support
+2. Integrate with Karma
+3. Add parallel testing support
     - This will involve a secondary child config
     - This will require a dedicated worker pool
     - Parallelism must be an option
-5. Add first-class support for multiple test groups and test group dependencies
+
+## 0.5
+
+1. Add first-class support for multiple test groups and test group dependencies
     - I see this a lot in Java circles, but not in JS circles
     - I could already use this to some degree here (I already frequently disable the end-to-end tests in normal development)
     - There must be a way to keep a test out of the default group
-6. Add ability to denote inter-test dependencies, and skip ones that depend on failed tests
+2. Add ability to denote inter-test dependencies, and skip ones that depend on failed tests
     - Sometimes, a test error can result in others starting with invalid state
     - It's sometimes easier to do integration-style tests, testing each step along the way (particularly useful for testing state machines)
     - This is something no existing test framework I'm aware of actually offers in any capacity
     - This could be done by adding a per-group boolean flag (skip rest of group if test in own group or group dependency fails)
 
-## 0.5.0
+## 0.6
 
 1. Reimplement [`util-inspect`](https://www.npmjs.com/package/util-inspect) for browsers based on Node's current [`util.inspect`](https://nodejs.org/api/util.html#util_util_inspect_object_options), since that is completely untested and completely unaware of ES6 :worried:
     - This will be published out of core
@@ -81,6 +93,14 @@ See the [changelog](https://github.com/isiahmeadows/thallium/blob/master/CHANGEL
 ## Later
 
 Here's the nice-to-haves, and so these are in no particular order:
+
+- Migrate to TypeScript internally (low priority)
+    - I'm having enough of the highly uninformative `TypeError: foo has no method bar`, `TypeError: Cannot read property 'bar' of undefined`, `TypeError: object #<Object> is not a function`, etc. (At least Node 6 gives the variable name...)
+    - I get arrow functions and classes for free, without having to deal with Babel's monstrosity
+    - Downleveled async functions will drastically simplify both the runner and all the reporters
+    - It'll be a *lot* easier when most of the deprecated dynamic stuff like test inheritance is finally removed
+
+- Self-host the runner
 
 - Write a few plugins/utilities for `describe`/`it` (likely trivial), etc
     - This will include more reporters as well

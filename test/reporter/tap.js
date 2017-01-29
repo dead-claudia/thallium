@@ -72,7 +72,7 @@ describe("reporter tap", function () { // eslint-disable-line max-statements
         ],
     })
 
-    test("passing 2", {
+    test("pass 2", {
         input: [
             n.start(),
             n.pass([p("test", 0)]),
@@ -659,7 +659,7 @@ describe("reporter tap", function () { // eslint-disable-line max-statements
             ],
         })
 
-        test("passing 2", {
+        test("pass 2", {
             input: [
                 n.start(),
                 n.pass([p("test", 0)]),
