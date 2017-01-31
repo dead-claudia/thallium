@@ -1,4 +1,4 @@
-*[Up](../README.md)*
+*[Up](./README.md)*
 
 # Getting Started
 

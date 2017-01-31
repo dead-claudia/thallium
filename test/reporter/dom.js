@@ -176,7 +176,7 @@ describe("reporter dom", function () { // eslint-disable-line max-statements
                     )
                 }
 
-                var runner = Util.r.dom(reporterOpts)
+                var runner = Util.dom.create(reporterOpts)
 
                 assert.equal(document().getElementById("tl"), context.root)
                 assert.ok(document().head.getElementsByTagName("style").length)

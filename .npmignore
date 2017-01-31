@@ -13,8 +13,6 @@
 /tsconfig.json
 
 # Any incomplete, in-progress feature goes here.
-/r/dom.js
-/r/dom.d.ts
 
 # Specific exclusion because it's used for post-install.
 !/scripts/update-clean-assert.js

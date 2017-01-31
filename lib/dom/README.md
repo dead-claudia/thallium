@@ -2,17 +2,6 @@
 
 Yes, this actually includes a script loader and CSS injection on top of everything else, so you only need 1-2 script elements. If you don't already have a `<div id="tl"></div>`, it's automatically added for you.
 
-Basic usage is as simple as this:
-
-```html
-<!doctype HTML>
-<meta charset="utf-8">
-<script
-    src="node_modules/thallium/thallium.js"
-    data-files="script.js test.js"
-    ></script>
-```
-
 Options:
 
 - `opts.title` - The title to set for the page.
@@ -21,7 +10,7 @@ Options:
 - `opts.preload` - An optional function to run before each load.
 - `opts.prerun` - An optional function to run after each load.
 - `opts.postrun` - An optional function to run after each run.
-- `opts.error` - A function to run on error,.
+- `opts.error` - A function to run on error.
 - `opts.thallium` - The Thallium instance to use, defaults to the global one.
 
 And as a shorthand, no `opts` implies the default opts, and if you pass an
@@ -40,8 +29,6 @@ rest work, too.
 
 Note that `data-*` callbacks are run in the global scope, and that
 `data-error` is called with a single `err` argument.
-
----
 
 ## Implementation notes
 

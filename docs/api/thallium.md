@@ -12,6 +12,7 @@ These are the most common methods you'll ever use.
 - [`t.only(...selectors)`](#only)
 - [`t.run()`](#run)
 - [Adding test hooks with `t.before(func)`, `t.beforeAll(func)`, `t.after(func)`, and `t.afterAll(func)`](#test-hooks)
+- [`t.clearTests()`](#clear-tests)
 
 <a id="tests"></a>
 ## Tests
@@ -171,7 +172,7 @@ If it's rejected, the rejection always caused by one of two things:
 Either way, it's fatal, the test run has already aborted, and state has already been reset. Because of this, it is actually safe to rerun the tests after a rejection, since it's not in an invalid state unless the error was from Thallium itself (in which [you definitely should report it](https://github.com/isiahmeadows/thallium/issues/new)).
 
 <a id="test-hooks"></a>
-# Adding test hooks
+## Adding test hooks
 
 ```js
 t.before(func)
@@ -192,3 +193,12 @@ Schedule a callback to run on every test. In each group, they're fired in the or
 5. Run all the `afterAll` hooks defined for this test only
 
 You may also run plugins within these hooks, and in the case of `before` and `after` hooks, you can even run plugins in the context of the child test itself.
+
+<a id="clear-tests"></a>
+## t.clearTests()
+
+```js
+t.clearTests()
+```
+
+Clear all previously defined tests. Mainly useful for automation, when you need to reload all the tests.

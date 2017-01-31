@@ -37,6 +37,7 @@ var Util = global.Util = {
 
     Reports: require("../lib/core/reports"),
     DOM: require("./dom"),
+    dom: require("../dom"),
 
     // Various dependencies used throughout the tests, minus the CLI tests. It's
     // easier to inject them into this bundle rather than to try to implement a

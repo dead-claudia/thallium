@@ -1,3 +1,5 @@
+*[Up](./README.md)*
+
 # Reporters
 
 Thallium comes with a few built-in reporters, but currently, they are a work in progress. At the time of writing, there are two reporters finished, but there are more to come:

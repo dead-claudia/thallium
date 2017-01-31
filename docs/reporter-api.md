@@ -1,3 +1,5 @@
+*[Up](./README.md)*
+
 # Reporter API
 
 If you want to create your own reporter, it's relatively straightforward to do so. Thallium reporters are simple functions that accept a set of event objects. It's written to be very unopinionated, easy to work with, and if you feel a need to convert it to something else, it's very straightforward to do.

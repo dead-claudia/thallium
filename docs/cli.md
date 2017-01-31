@@ -1,3 +1,5 @@
+*[Up](./README.md)*
+
 # CLI
 
 You can run your tests very easily through the CLI. If all your tests are in `test/**/*.js` or just `test.js`, it's as easy as this:

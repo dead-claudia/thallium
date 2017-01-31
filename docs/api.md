@@ -1,3 +1,5 @@
+*[Up](./README.md)*
+
 # API
 
 This has a very straightforward, intuitive core API. If you're new to this, you may also want to check out the [getting started guide](./getting-started.md), a simple walk-through tutorial on how to use this framework.

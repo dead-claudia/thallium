@@ -1,3 +1,5 @@
+*[Up](./README.md)*
+
 # Plugins
 
 Thallium is very, *very* modular and extensible. The plugin system was made to be as easy as possible to work with, yet still be very powerful. It's powerful enough that it enables almost all the core tests to be completely black-box, while still getting all the data it needs.
