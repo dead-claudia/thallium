@@ -1,6 +1,6 @@
 "use strict"
 
-var t = require("../../..")
+var t = require("thallium")
 
 t.test("works", function () {})
 t.test("doesn't work", function () {})

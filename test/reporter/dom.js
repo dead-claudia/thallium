@@ -56,19 +56,19 @@ describe("reporter dom", function () { // eslint-disable-line max-statements
             context.match = function (_) {
                 assert.match(this.root.inspect(), h("div", {id: "tl"}, [
                     h("div.tl-header", [
-                        h("div.tl-label", [
-                            h.text("Duration:"), h("em", [
+                        h("div.tl-duration", [
+                            h.text("Duration: "), h("em", [
                                 h.text(Util.R.formatTime(_.duration)),
                             ]),
                         ]),
-                        h("button.tl-toggle", {onclick: true}, [
-                            h.text("Passes:"), h("em", [h.text(_.pass)]),
+                        h("button.tl-toggle.tl-pass", {onclick: true}, [
+                            h.text("Passes: "), h("em", [h.text(_.pass)]),
                         ]),
-                        h("button.tl-toggle", {onclick: true}, [
-                            h.text("Failures:"), h("em", [h.text(_.fail)]),
+                        h("button.tl-toggle.tl-fail", {onclick: true}, [
+                            h.text("Failures: "), h("em", [h.text(_.fail)]),
                         ]),
-                        h("button.tl-toggle", {onclick: true}, [
-                            h.text("Skipped:"), h("em", [h.text(_.skip)]),
+                        h("button.tl-toggle.tl-skip", {onclick: true}, [
+                            h.text("Skipped: "), h("em", [h.text(_.skip)]),
                         ]),
                         h("button.tl-run", {onclick: true}, [h.text("Run")]),
                     ]),
@@ -100,18 +100,21 @@ describe("reporter dom", function () { // eslint-disable-line max-statements
 
             context.toLines = toLines
             function toLines(str) {
-                return str.split(/\r?\n|\r/g).map(function (line) {
-                    return h("span.tl-line", [h.text(line.trimRight())])
-                })
+                return h("div.tl-pre",
+                    str.split(/\r?\n|\r/g).map(function (line) {
+                        return h("span.tl-line", [h.text(line.trimRight())])
+                    })
+                )
             }
 
             function wrapDiff(diff) {
-                return h("div.tl-diff-display", [
-                    h("span.tl-diff-header", [
+                return h("div.tl-diff", [
+                    h("div.tl-diff-header", [
                         h("span.tl-diff-added", [h.text("+ expected")]),
                         h("span.tl-diff-removed", [h.text("- actual")]),
                     ]),
-                ].concat(diff))
+                    h("div.tl-pre", diff),
+                ])
             }
 
             context.fail = function (name, e, diff, speed, duration) { // eslint-disable-line max-params, max-len
@@ -121,13 +124,10 @@ describe("reporter dom", function () { // eslint-disable-line max-statements
 
                 return h("li.tl-test.tl-fail.tl-" + speed, [
                     showName(speed, name, duration),
-                    h("div.tl-fail-display", [
-                        h("div.tl-fail-message",
-                            toLines(e.name + ": " + e.message)
-                        ),
+                    h("div.tl-display", [
+                        h("div.tl-message", [toLines(e.name + ": " + e.message)]), // eslint-disable-line max-len
                         diff == null ? undefined : wrapDiff(diff),
-                        !stack ? undefined
-                            : h("div.tl-fail-stack", toLines(stack)),
+                        !stack ? undefined : h("div.tl-stack", [toLines(stack)]), // eslint-disable-line max-len
                     ]),
                 ])
             }
@@ -621,9 +621,10 @@ describe("reporter dom", function () { // eslint-disable-line max-statements
                 ]),
                 h("li.tl-error", [
                     h("h2", [h.text("Internal error")]),
-                    h("div.tl-error-message", _.toLines("TypeError: undefined is not a function")), // eslint-disable-line max-len
-                    !stack ? undefined
-                        : h("div.tl-error-stack", _.toLines(stack)),
+                    h("div.tl-display", [
+                        h("div.tl-message", [_.toLines("TypeError: undefined is not a function")]), // eslint-disable-line max-len
+                        !stack ? undefined : h("div.tl-stack", [_.toLines(stack)]), // eslint-disable-line max-len
+                    ]),
                 ]),
             ]})
         },

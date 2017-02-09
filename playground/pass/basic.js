@@ -1,6 +1,6 @@
 "use strict"
 
-var t = require("../..")
+var t = require("thallium")
 
 t.test("core (basic)", function () {
     t.test("has `base()`", function () {})

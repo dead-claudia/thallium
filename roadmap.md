@@ -14,7 +14,7 @@ See the [changelog](https://github.com/isiahmeadows/thallium/blob/master/CHANGEL
 1. ~~Add OS X to the Travis build~~
     - ~~Travis has been having OS X issues lately, making debugging these errors a little harder~~
 2. ~~Add diff support to all existing reporters~~
-3. Create/finish DOM reporter
+3. ~~Create/finish DOM reporter~~
 4. Support flaky tests via first-class retries
     - This is a requirement to self-host the runner
 5. ~~Move `thallium/match` and `thallium/assert` implementations out of core~~
@@ -58,6 +58,7 @@ Note that as of this version, only the primary API of the previous version will 
 11. Expose `thallium/internal` as `reflect.internal()`
 12. Expose a detached `reflect` via `t.reflect()`
     - Mainly for easier testing/etc.
+13. Load bundle automatically, and implement `data-*` attribute options.
 
 ## 0.4.x
 (not blocking 0.4.0)

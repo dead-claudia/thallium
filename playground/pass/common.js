@@ -1,6 +1,6 @@
 "use strict"
 
-var t = require("../..")
+var t = require("thallium")
 
 t.test("cli common", function () {
     t.test("isObjectLike()", function () {

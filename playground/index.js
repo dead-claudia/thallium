@@ -16,7 +16,7 @@ if (process.argv.length < 3 || process.argv.some(function (arg) {
     /* eslint-disable max-len */
 
     console.log()
-    console.log("Usage: node playground { type }")
+    console.log("Usage: node playground { type } | start")
     console.log()
     console.log("`type` refers to the directory to run, one of the following:")
     console.log()
@@ -30,8 +30,11 @@ if (process.argv.length < 3 || process.argv.some(function (arg) {
     console.log()
     console.log("If you want it with no subtests, use `flat/pass`, etc.")
     console.log()
-    console.log("To set the reporter and options, modify `playground/.tl.coffee` however you")
-    console.log("need to.")
+    console.log("To set the reporter and options, modify `playground/.tl.js` however you need")
+    console.log("to.")
+    console.log()
+    console.log("Additionally, you may run `node playground start` to start a server that serves")
+    console.log("up an HTML version to run the playground tests with the DOM runner")
 
     /* eslint-enable max-len */
 
@@ -40,25 +43,27 @@ if (process.argv.length < 3 || process.argv.some(function (arg) {
 
 var cp = require("child_process")
 var path = require("path")
-
+var http = require("http")
+var ecstatic = require("ecstatic")
 var dir = process.argv[2]
 
-if (!/^(flat\/)?(pass(-skip|-fail)?|skip(-fail)?|fail|all)$/.test(dir)) {
+if (dir === "start") {
+    http.createServer(ecstatic(path.dirname(__dirname)))
+    .listen(8080, function () {
+        console.log("Server is available at http://localhost:8080")
+    })
+} else if (!/^(flat\/)?(pass(-skip|-fail)?|skip(-fail)?|fail|all)$/.test(dir)) {
     throw new TypeError("argument must be a valid directory")
+} else {
+    // If only I could literally substitute the process...
+    cp.spawn(process.argv[0], [
+        path.resolve(__dirname, "../bin/tl.js"),
+        "--force-local",
+        path.resolve(__dirname, dir, "**/*.js"),
+    ], {
+        cwd: process.cwd(),
+        stdio: "inherit",
+    })
+    .on("exit", function (code) { if (code != null) process.exit(code) })
+    .on("close", function (code) { if (code != null) process.exit(code) })
 }
-
-// If only I could literally substitute the process...
-function exit(code) {
-    if (code != null) process.exit(code)
-}
-
-cp.spawn(process.argv[0], [
-    path.resolve(__dirname, "../bin/tl.js"),
-    "--force-local",
-    path.resolve(__dirname, dir, "**/*.js"),
-], {
-    cwd: process.cwd(),
-    stdio: "inherit",
-})
-.on("exit", exit)
-.on("close", exit)

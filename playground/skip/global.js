@@ -1,9 +1,9 @@
 "use strict"
 
-var t = require("../..")
+var t = require("thallium")
 
-t.testSkip("works")
-t.testSkip("doesn't work")
-t.testSkip("what")
-t.testSkip("ever")
-t.testSkip("you may stop now")
+t.testSkip("works", function () {})
+t.testSkip("doesn't work", function () {})
+t.testSkip("what", function () {})
+t.testSkip("ever", function () {})
+t.testSkip("you may stop now", function () {})

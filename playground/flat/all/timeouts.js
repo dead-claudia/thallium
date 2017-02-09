@@ -1,6 +1,6 @@
 "use strict"
 
-var t = require("../../..")
+var t = require("thallium")
 
 function fail(t) {
     t.fail("fail")

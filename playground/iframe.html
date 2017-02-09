@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<script src="../thallium.js"></script>
+<script>
+(function () {
+    "use strict"
+    var allowedDirs = /^(flat\/)?(pass(-skip|-fail)?|skip(-fail)?|fail|all)$/
+    var tl = window.require("thallium")
+    var prev, runner
+
+    window.require = function (name) {
+        if (name === "thallium") return tl.t
+        if (name === "thallium/assert") return tl.assert
+        throw new RangeError("Module '" + name + "' is not defined!")
+    }
+
+    window.addEventListener("message", function (e) {
+        // Silently drop unexpected messages
+        if ((e.origin || e.originalEvent.origin) !== "http://localhost:8080") {
+            return
+        }
+
+        if (!allowedDirs.test(e.data)) {
+            throw new TypeError(
+                "argument must be a valid directory, found " + e.data)
+        }
+
+        if (prev !== e.data) {
+            prev = e.data
+            runner = tl.dom([
+                e.data + "/basic.js",
+                e.data + "/common.js",
+                e.data + "/global.js",
+                e.data + "/timeouts.js",
+            ])
+        }
+
+        runner.run()
+    }, false)
+})()
+</script>

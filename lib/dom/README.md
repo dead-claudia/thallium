@@ -16,6 +16,8 @@ Options:
 And as a shorthand, no `opts` implies the default opts, and if you pass an
 array of files, that's also okay.
 
+<!-- Commented out pending update -->
+<!--
 Also, you can run them by specifying them as `data-*` attributes, as done in
 the basic usage. You need a minimum of `data-files` to run anything, but the
 rest work, too.
@@ -29,6 +31,7 @@ rest work, too.
 
 Note that `data-*` callbacks are run in the global scope, and that
 `data-error` is called with a single `err` argument.
+-->
 
 ## Implementation notes
 

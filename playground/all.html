@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<script src="../thallium.js"></script>
+<script>
+(function () {
+    "use strict"
+
+    var tl = window.require("thallium")
+
+    window.require = function (name) {
+        if (name === "thallium") return tl.t
+        if (name === "thallium/assert") return tl.assert
+        throw new RangeError("Module '" + name + "' is not defined!")
+    }
+
+    tl.dom([
+        "all/basic.js",
+        "all/common.js",
+        "all/global.js",
+        "all/timeouts.js",
+    ]).run()
+})()
+</script>

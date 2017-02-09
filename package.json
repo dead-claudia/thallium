@@ -26,6 +26,7 @@
     "chokidar": "^1.6.0",
     "coffee-script": "^1.10.0",
     "coffeelint": "^1.15.7",
+    "ecstatic": "^2.1.0",
     "es6-promise": "^4.0.5",
     "eslint": "^3.4.0",
     "eslint-config-isiahmeadows": "^0.1.6",

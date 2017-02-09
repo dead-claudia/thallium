@@ -2,7 +2,7 @@
 
 /* eslint-disable max-len */
 
-var t = require("../../..")
+var t = require("thallium")
 
 t.test("cli common isObjectLike() passes for objects and functions", function () {})
 t.test("cli common isObjectLike() fails for other things", function () {})

@@ -1,6 +1,6 @@
 "use strict"
 
-var t = require("../../..")
+var t = require("thallium")
 
 function fail(t) {
     t.fail("fail")
@@ -9,5 +9,5 @@ function fail(t) {
 t.test("works", function () {})
 t.test("doesn't work", fail)
 t.test("what", function () {})
-t.testSkip("ever")
+t.testSkip("ever", function () {})
 t.test("you may stop now", function () {})

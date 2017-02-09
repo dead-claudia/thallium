@@ -2,7 +2,7 @@
 
 /* eslint-disable max-len */
 
-var t = require("../../..")
+var t = require("thallium")
 
 t.test("cli common isObjectLike() passes for objects and functions", function () {})
 t.test("cli common isObjectLike() fails for other things", function () {})
@@ -14,9 +14,9 @@ t.test("cli common resolveDefault() gets CJS default primitives", function () {}
 t.test("cli common resolveDefault() gets ES6 default functions", function () {})
 t.test("cli common resolveDefault() gets ES6 default objects", function () {})
 t.test("cli common resolveDefault() gets ES6 default arrays", function () {})
-t.testSkip("cli common resolveDefault() gets ES6 default objects with `default` property")
-t.testSkip("cli common resolveDefault() gets ES6 default functions with `default` property")
-t.testSkip("cli common resolveDefault() gets ES6 default arrays with `default` property")
+t.testSkip("cli common resolveDefault() gets ES6 default objects with `default` property", function () {})
+t.testSkip("cli common resolveDefault() gets ES6 default functions with `default` property", function () {})
+t.testSkip("cli common resolveDefault() gets ES6 default arrays with `default` property", function () {})
 t.test("cli common resolveDefault() gets ES6 default primitives", function () {})
 t.test("cli common normalizeGlob() current directory normalizes a file", function () {})
 t.test("cli common normalizeGlob() current directory normalizes a glob", function () {})
@@ -36,7 +36,7 @@ t.test("cli common normalizeGlob() relative directory retains negative + trailin
 t.test("cli common normalizeGlob() edge cases normalizes `.` with a cwd of `.`", function () {})
 t.test("cli common normalizeGlob() edge cases normalizes `..` with a cwd of `.`", function () {})
 t.test("cli common normalizeGlob() edge cases normalizes `.` with a cwd of `..`", function () {})
-t.testSkip("cli common normalizeGlob() edge cases normalizes directories with a cwd of `..`")
+t.testSkip("cli common normalizeGlob() edge cases normalizes directories with a cwd of `..`", function () {})
 t.test("cli common normalizeGlob() edge cases removes excess `.`", function () {})
 t.test("cli common normalizeGlob() edge cases removes excess `..`", function () {})
 t.test("cli common normalizeGlob() edge cases removes excess combined junk", function () {})
@@ -48,5 +48,5 @@ t.test("cli common globParent() gets a base name from a flat file", function () 
 t.test("cli common globParent() gets a base name from character class pattern", function () {})
 t.test("cli common globParent() gets a base name from brace , expansion", function () {})
 t.test("cli common globParent() gets a base name from brace .. expansion", function () {})
-t.testSkip("cli common globParent() gets a base name from extglob")
-t.testSkip("cli common globParent() gets a base name from a complex brace glob")
+t.testSkip("cli common globParent() gets a base name from extglob", function () {})
+t.testSkip("cli common globParent() gets a base name from a complex brace glob", function () {})

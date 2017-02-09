@@ -1,6 +1,6 @@
 "use strict"
 
-var t = require("../../..")
+var t = require("thallium")
 
 t.test("core (timeouts) (FLAKE) succeeds with own", function () {})
 t.test("core (timeouts) (FLAKE) fails with own", function () {})

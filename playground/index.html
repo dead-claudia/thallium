@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<title>Thallium Playground</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/5.0.0/normalize.min.css">
+<style>
+#body {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: stretch;
+}
+
+#body h1, h2 {
+    color: #000;
+    margin: 0;
+    text-align: center;
+}
+
+#body .controls, #body .display {
+    display: flex;
+    flex-direction: column;
+    flex: 0 0 auto;
+
+    padding-bottom: 1em;
+    padding-top: 1em;
+}
+
+#refresh-button, #body .load-button {
+    text-align: center;
+    padding: 0.5em 1em;
+    border: 2px solid #000;
+    border-radius: 3em;
+    background-color: transparent;
+    margin: 0.25em 1em;
+}
+
+#body .controls {
+    width: 30%;
+    padding-left: 1em;
+}
+
+#body .display {
+    width: 65%;
+    padding-right: 1em;
+}
+
+#body .header {
+    margin: 0 auto;
+    text-align: center;
+    margin-top: 1em;
+}
+
+#body .header h1, #body .header p {
+    width: 100%;
+}
+
+#body .load-button {
+    text-align: center;
+    padding: 0.5em 1em;
+    border: 2px solid #000;
+    border-radius: 3em;
+    background-color: transparent;
+    margin: 0.25em 0.5em;
+}
+
+#body .load-wrapper {
+    display: flex;
+    flex-wrap: nowrap;
+    justify-content: center;
+    align-items: stretch;
+
+    margin: 1em auto;
+    padding-top: 1em;
+    padding-bottom: 1em;
+    width: 100%;
+
+    border: 1px solid #000;
+    border-radius: 3em;
+}
+
+#body .load-group {
+    flex: 1;
+    padding: 1em;
+}
+
+#body .load-group:first-child {
+    border-right: 1px solid #000;
+}
+
+#body .load-group-table {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    align-content: space-around;
+    padding-top: 0.5em;
+    padding-bottom: 0.5em;
+}
+
+#body .load-button {
+    flex: 0 1 auto;
+}
+
+#body .load-button:focus {
+    outline: none;
+}
+
+#body .load-button:active, #body .load-button.active {
+    background-color: #000;
+    color: white;
+}
+
+#body .display-wrap {
+    flex: 1;
+
+    margin: 0 auto;
+    width: 95%;
+    width: calc(100% - 4em);
+    height: 100%;
+
+    border: 1px solid #000;
+    border-radius: 3em;
+    padding: 2em;
+}
+
+#body .notice {
+    text-align: center;
+    margin: 0.5em auto;
+}
+</style>
+<div id="body">
+    <div class="controls">
+        <div class="header">
+            <h1>Thallium Playground</h1>
+            <p>
+                Click one of the buttons to load one of the playground sets into the
+                <code>&lt;iframe&gt;</code> below.
+            </p>
+        </div>
+        <div class="load-wrapper">
+            <div class="load-group">
+                <h2>Nested</h2>
+                <div class="load-group-table">
+                    <button class="load-button" data-dir="all">All</button>
+                    <button class="load-button" data-dir="pass">Pass Only</button>
+                    <button class="load-button" data-dir="fail">Fail Only</button>
+                    <button class="load-button" data-dir="skip">Skip Only</button>
+                    <button class="load-button" data-dir="pass-fail">Pass + Fail</button>
+                    <button class="load-button" data-dir="pass-skip">Pass + Skip</button>
+                    <button class="load-button" data-dir="skip-fail">Skip + Fail</button>
+                </div>
+            </div>
+            <div class="load-group">
+                <h2>Flat</h2>
+                <div class="load-group-table">
+                    <button class="load-button" data-dir="flat/all">All</button>
+                    <button class="load-button" data-dir="flat/pass">Pass Only</button>
+                    <button class="load-button" data-dir="flat/fail">Fail Only</button>
+                    <button class="load-button" data-dir="flat/skip">Skip Only</button>
+                    <button class="load-button" data-dir="flat/pass-fail">Pass + Fail</button>
+                    <button class="load-button" data-dir="flat/pass-skip">Pass + Skip</button>
+                    <button class="load-button" data-dir="flat/skip-fail">Skip + Fail</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="display">
+        <iframe class="display-wrap" src="./iframe.html"></iframe>
+        <small class="notice">Copyright &copy; Isiah Meadows, 2017 and later. Licensed under the ISC License.</small>
+    </div>
+</div>
+<script>
+(function () {
+    "use strict"
+
+    var active = document.querySelector("button.load-button[data-dir=all]")
+    var buttons = document.getElementsByClassName("load-button")
+    var iframe = document.querySelector("iframe.display-wrap")
+
+    Array.prototype.forEach.call(buttons, function (button) {
+        button.onclick = function () {
+            if (active !== button) {
+                active.className = active.className.replace(/\bactive\b/g, "")
+                button.className += " active"
+                active = button
+            }
+
+            iframe.contentWindow.postMessage(
+                button.getAttribute("data-dir"),
+                "http://localhost:8080")
+        }
+    })
+
+    iframe.contentWindow.addEventListener("DOMContentLoaded", function () {
+        active.className += " active"
+        iframe.contentWindow.postMessage("all", "http://localhost:8080")
+    })
+})()
+</script>

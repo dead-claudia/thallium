@@ -2,7 +2,7 @@
 
 /* eslint-disable max-len */
 
-var t = require("../../..")
+var t = require("thallium")
 
 t.test("core (basic) has `base()`", function () {})
 t.test("core (basic) has `test()`", function () {})
