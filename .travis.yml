@@ -30,7 +30,7 @@ install:
 
 script:
   - nvm use stable
-  - node make lint
+  - set -e; node make lint; set +e # Because Travis sucks.
   - nvm use ${TRAVIS_NODE_VERSION}
   - ./scripts/travis.sh
 

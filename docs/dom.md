@@ -2,14 +2,16 @@
 
 # Browser runner
 
-The browser bundle comes with its own runner, complete with script loading and a "Run" button. It's meant to be simple and easy to use, so you can get started very quickly. Here's how to use it:
+The browser bundle comes with its own runner, complete with script loading and a "Run" button. It's meant to be simple and easy to use, so you can get started very quickly.
+
+![./images/screenshot-dom.png]
+
+Here's how to use it:
 
 ```html
 <!-- test.html -->
 <!DOCTYPE html>
 <meta charset="utf-8">
-<!-- Thallium requires a Promise polyfill -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/native-promise-only/0.8.1/npo.js"></script>
 <script src="./node_modules/thallium/thallium.js"></script>
 <script>
 require("thallium").dom([
@@ -19,6 +21,7 @@ require("thallium").dom([
     "test/index.js",
     "test/ui.js",
 ])
+.run()
 </script>
 ```
 
@@ -33,8 +36,6 @@ You can also use it programmatically, and set it up on your own terms.
 ```html
 <!DOCTYPE html>
 <meta charset="utf-8">
-<!-- Thallium requires a Promise polyfill -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/native-promise-only/0.8.1/npo.js"></script>
 <script src="./node_modules/thallium/thallium.js"></script>
 <script>
 var dom = require("thallium").dom([
@@ -67,7 +68,7 @@ If you pass an array object (like in the above example), that is treated as a li
 `tl.dom()` returns an object two methods:
 
 - `run()` - Run the tests programmatically and return a promise resolved when done. Note that if tests are currently running, it'll return a promise resolved when the *current* run completes.
-- `detach()` - Detach the runner programmatically and return a promise resolved when done.
+- `detach()` - Detach the runner programmatically and return a promise resolved when done. The node is cleared, and runner destroyed, so this call is idempotent, and `run` will always throw.
 
 ## Further information
 

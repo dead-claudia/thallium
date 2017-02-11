@@ -2,39 +2,71 @@
 
 # Reporters
 
-Thallium comes with a few built-in reporters, but currently, they are a work in progress. At the time of writing, there are two reporters finished, but there are more to come:
+Thallium comes with a few useful built-in reporters to start with. If you are interested in writing your own, look [here](./reporter-api.md) instead. Here are the built-in ones:
 
-- `thallium/r/tap` - A [TAP-compatible](https://testanything.org) reporter, for you to use with various tools. Note that this never emits terminal colors.
-- `thallium/r/spec` - A reporter modeled very closely to Mocha's default `spec` reporter.
-- `thallium/r/dot` - A reporter modeled very closely to Mocha's default `dot` reporter.
+### Spec
 
-Each built-in reporter can be used like so:
+This is the default reporter, inspired by (and mostly a copy of design-wise) Mocha's `spec` reporter.
 
 ```js
-var spec = require("thallium/r/spec")
-
-t.reporter(spec)
+t.reporter(require("thallium/r/spec"))
 ```
 
-If you are interested in writing your own, consult the reporter API [here](./reporter-api.md)
+![spec pass](./images/screenshot-spec-pass.png)
+
+![spec fail](./images/screenshot-spec-fail.png)
+
+### Dot
+
+This is a more minimal reporter, where failing tests are marked by exclamation points, skipped tests blue dots, and slow tests yellow dots. It's inspired by Mocha's `dot` reporter, and looks fairly similar to it.
+
+```js
+t.reporter(require("thallium/r/dot"))
+```
+
+![dot pass](./images/screenshot-dot-pass.png)
+
+![dot fail](./images/screenshot-dot-fail.png)
+
+### TAP
+
+A [TAP-compatible](https://testanything.org) reporter, for you to use with various tools.
+
+```js
+t.reporter(require("thallium/r/tap"))
+```
+
+![tap pass](./images/screenshot-tap-pass.png)
+
+![tap fail](./images/screenshot-tap-fail.png)
+
+### DOM
+
+Although it's technically a [complete runner](./dom.md), it's presented here because it also features its own reporter.
+
+![dom runner](./images/screenshot-dom.png)
 
 ## Options
 
-Each reporter accepts an optional options object as its sole argument, so you may change how the output is printed. Do note that the width of the output for console reporters is dependent on the terminal height and width, or 75 if it's not. Here are the options accepted by each reporter.
-
-Here's a summary of the available options used across reporters (some reporters only support some of these options):
+Each built-in reporter also accepts various options, so you may change how the output is printed (i.e. if you're printing it to a non-terminal). These aren't necessarily accepted by all reporters, so do be aware of that.
 
 - `write(string)`
 
-    This is called with a string to print to the console, with newlines already normalized to the platform, and you may return a thenable that resolves when done.
+    This is called with a string to print to the console, with newlines already normalized to the platform. This may return a thenable resolved when done.
+
+    *Accepted by:* `tap`, `dot`, `spec`
 
 - `reset()`
 
-    This is called at the end of the stream, after all events are processed, and you may return a thenable that resolves when done. If you can support multiple runs, this is where you reset the state so it can run everything again with a clean slate.
+    This is called at the end of the stream, after all events are processed. This may return a thenable resolved when done.
+
+    *Accepted by:* `tap`, `dot`, `spec`
 
 - `color`
 
     A boolean for whether to use terminal color escapes in the output, regardless of whether the output is a terminal or not. Note that `--color` and `--no-color` on the command line and the environment variables `FORCE_COLOR` and `FORCE_NO_COLOR` take precedence over this.
+
+    *Accepted by:* `dot`, `spec`
 
 Note that for reporters that accept both `print` and `write`, you *have* to provide either neither or both, or you won't get the complete output, and the output you do get is completely undefined. Also, if you provide `print` and/or `write`, you must also pass `reset`.
 
