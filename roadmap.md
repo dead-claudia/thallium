@@ -15,8 +15,8 @@ See the [changelog](https://github.com/isiahmeadows/thallium/blob/master/CHANGEL
     - ~~Travis has been having OS X issues lately, making debugging these errors a little harder~~
 2. ~~Add diff support to all existing reporters~~
 3. ~~Create/finish DOM reporter~~
-4. Support flaky tests via first-class retries
-    - This is a requirement to self-host the runner
+4. ~~Support flaky tests via first-class retries~~
+    - ~~This is a requirement to self-host the runner~~
 5. ~~Move `thallium/match` and `thallium/assert` implementations out of core~~
     - ~~`thallium/match` is useful on its own~~
     - ~~Third-party assertions should be able to build off the same basic assertion primitives without depending on `thallium`~~
