@@ -8,3 +8,7 @@ trim_trailing_whitespace = true
 insert_final_newline = true
 root = true
 max_line_length = off
+
+# Rather not fight npm where it uses an indent of 2.
+[package.json]
+indent_size = 2
