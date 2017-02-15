@@ -1090,14 +1090,22 @@ describe("core (reporters)", function () { // eslint-disable-line max-statements
             var e = new Error("test\ntest")
 
             e.stack = e.message
-            assert.match(Util.R.getStack(e), "Error: test\ntest")
+            assert.match(
+                Util.R.getStack(e),
+                "Error: test" + Util.R.newline() + "test"
+            )
         })
 
         it("trims the message correctly", function () {
             var e = new Error("  test\n   test")
 
             e.stack = e.message + "\n at Foo "
-            assert.match(Util.R.getStack(e), "Error:   test\n   test\nat Foo")
+            assert.match(
+                Util.R.getStack(e),
+                "Error:   test" + Util.R.newline() +
+                "   test" + Util.R.newline() +
+                "at Foo"
+            )
         })
     })
 })
