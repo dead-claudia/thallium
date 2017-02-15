@@ -1,3 +1,4 @@
 * text eol=lf
+*.png binary
 /thallium.js binary
 /thallium-migrate.js binary
