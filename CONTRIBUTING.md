@@ -13,7 +13,9 @@ Here's an overview of the high level contributing process.
 ### Setup
 
 1. Install Node and npm. You can find installers and instructions [here](https://nodejs.org/en/download/), or if you use Linux, look [here](https://nodejs.org/en/download/package-manager/) instead.
+    - Note that if you're using Windows, you need to ensure during setup that it also installs both `node` and `npm` onto your PATH.
 2. Install [Git](https://git-scm.com/). You'll need this to clone the source.
+    - Note that if you're using Windows, you need to ensure during setup that it also installs `git` onto your PATH.
 3. [Fork this repo](https://help.github.com/articles/fork-a-repo/).
 4. Run `git clone https://github.com/<your-github-username>/thallium.git` to get the source and link it to your GitHub account.
 5. Run `cd thallium` to enter that directory, so the rest of the commands work.
