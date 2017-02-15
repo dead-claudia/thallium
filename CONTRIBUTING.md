@@ -16,9 +16,10 @@ Here's an overview of the high level contributing process.
 2. Install [Git](https://git-scm.com/). You'll need this to clone the source.
 3. [Fork this repo](https://help.github.com/articles/fork-a-repo/).
 4. Run `git clone https://github.com/<your-username>/thallium.git` to get the source.
-5. Run `git remote add upstream https://github.com/isiahmeadows/thallium.git` to set the upstream URL.
-6. Create a new branch with `git checkout -b <some-branch>`.
-7. Hack away, and fix whatever you need to. Don't forget to add tests for anything that was fixed.
+5. Run `cd thallium` to enter that directory, so the rest of the commands work.
+6. Run `git remote add upstream https://github.com/isiahmeadows/thallium.git` to set the upstream URL.
+7. Create a new branch with `git checkout -b <some-branch>`.
+8. Hack away, and fix whatever you need to. Don't forget to add tests for anything that was fixed.
 
 ### Sync with this repository
 
