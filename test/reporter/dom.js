@@ -20,8 +20,7 @@ describe("reporter dom", function () { // eslint-disable-line max-statements
 
         var it = opts.dom ? Util.DOM.it.dom : Util.DOM.it
 
-        it = opts.skip ? Util.DOM.it.skip : Util.DOM.it
-        it(name, function (h, mock) {
+        ;(opts.skip ? it.skip : it)(name, function (h, mock) {
             var context = Object.create(null)
             var t = context.t = {
                 _reporter: undefined,
