@@ -34,6 +34,8 @@ See the [changelog](https://github.com/isiahmeadows/thallium/blob/master/CHANGEL
 Note that as of this version, only the primary API of the previous version will be supported as much as feasibly possible through `thallium/migrate`. Reporter and plugin APIs will not such have a wrapper available, but may use the utilities in `thallium/migrate/support` to use while transitioning.
 
 1. Remove all the previously deprecated methods/etc.
+    - Additionally, seal all API types, as a safety net
+    - Remove `reflect.own*` properties and make all properties own and parasitically inherited from their parent, to avoid costly lookups (already done for attempts)
 2. Expose `thallium` as global `t` in bundle, tack existing `tl.*` exports onto it
     - Expose `thallium/assert` as global `assert` instead
     - Don't expose `require("thallium")`
@@ -47,18 +49,21 @@ Note that as of this version, only the primary API of the previous version will 
     - Feature parity with most other heavy frameworks
 6. Add `t.runOptions` getter/setter for default run options
 7. Add some useful things for test generation and reporters like getting the full test name
-8. Make reports backed by a per-run persistent tree, and convert the public API to expose only getters
+8. Make reports backed by a tree, and convert the public API to expose only getters
     - Abstracts away the internal representation
     - Reduce reporter GC
-9. Add file watching support
+9. Cache the settings for child tests after they are re-locked
+    - This gets rid of all the tree climbing nonsense that currently exists
+    - This will streamline settings a *lot* more
+10. Add file watching support
     - Just invoke the CLI with `--force-local` and the appropriate Node flags on each change. Way easier than trying to clean up `node_modules`, and you get more easily reproduced runs
-10. Add the ability to programmatically skip a test before it completes
+11. Add the ability to programmatically skip a test before it completes
     - Required for integration tests
     - `t.skip()`/`reflect.skip()` throws an `reflect.Skip` (an Error subclass) to skip a test
-11. Expose `thallium/internal` as `reflect.internal()`
-12. Expose a detached `reflect` via `t.reflect()`
+12. Expose `thallium/internal` as `reflect.internal()`
+13. Expose a detached `reflect` via `t.reflect()`
     - Mainly for easier testing/etc.
-13. Load bundle automatically, and implement `data-*` attribute options.
+14. Load bundle automatically, and implement `data-*` attribute options
 
 ## 0.4.x
 (not blocking 0.4.0)

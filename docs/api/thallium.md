@@ -103,11 +103,21 @@ Get or set the max timeout in milliseconds for async tests, so Thallium knows ho
 ## t.slow
 
 ```js
-var timeout = t.timeout // getter
-t.timeout = timeout // setter
+var slow = t.slow // getter
+t.slow = slow // setter
 ```
 
-Get or set the max slow threshold in milliseconds, so Thallium knows when it should consider a test to be slow. When accessing the property, it gets the current active threshold, or the default of `75` if none is set. When setting the property, set it to the duration you wish, `0` to inherit the parent's threshold (or default), or `Infinity` to disable it. When setting it, the timeout is floored to `0` in case it's negative.
+Get or set the max slow threshold in milliseconds, so Thallium knows when it should consider a test to be slow. When accessing the property, it gets the current active threshold, or the default of `75` if none is set. When setting the property, set it to the duration you wish, `0` to inherit the parent's threshold (or default), or `Infinity` to disable it. When setting it, the threshold is floored to `0` in case it's negative.
+
+<a id="attempts"></a>
+## t.attempts
+
+```js
+var attempts = t.attempts // getter
+t.attempts = attempts // setter
+```
+
+Get or set the max attempts allowed for that test, so Thallium knows how many retries are allowed before giving up. This is helpful for tests that depend on the file system or other external resources it isn't guaranteed to get or at least in any particular order. When accessing the property, it gets the current active attempt count, or the default of `1` if none was set, and is always positive. When setting the property, set it to the count you wish, `0` to reset it to the parent's attempt count, or `Infinity` to always retry on error (not recommended, since it'll be easy to create an infinite loop).
 
 <a id="only"></a>
 ## t.only(...paths)

@@ -18,6 +18,7 @@ Also note that `reflect` instances are persistent and tied to the backing test i
 - [`reflect.timeout`](#timeout)
 - [`reflect.ownSlow`](#ownslow)
 - [`reflect.slow`](#slow)
+- [`reflect.attempts`](#attempts)
 - [`reflect` test hooks](#test-hooks)
 - [Tests with `reflect.test("name", callback)` and `reflect.testSkip("name", callback)`](#tests)
 - [Reporter management with `reflect.reporter(reporter, arg)`, `reflect.hasReporter(reporter)`, and `reflect.removeReporter(reporter)`](#reporters)
@@ -114,6 +115,15 @@ reflect.slow // getter
 ```
 
 Get the currently active slow threshold, or the framework default of 2000 ms.
+
+<a id="attempts"></a>
+## reflect.attempts
+
+```js
+reflect.attempts // getter
+```
+
+Get the current attempt count, or the framework default of 1 attempt.
 
 <a id="test-hooks"></a>
 ## Reflect test hooks

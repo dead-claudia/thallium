@@ -119,6 +119,7 @@ task("watch", function () { watch("test") })
 task("watch:chrome", function () { watch("test:chrome") })
 task("watch:phantomjs", function () { watch("test:phantomjs") })
 task("watch:node", function () { watch("test:node") })
+task("watch:bundle", function () { watch("bundle") })
 
 task("bundle", function () {
     exec([
