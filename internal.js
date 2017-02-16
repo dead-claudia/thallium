@@ -50,8 +50,10 @@ exports.reports = {
         return new Reports.Pass(p(path), d(duration), s(slow))
     },
 
-    fail: function (path, value, duration, slow) {
-        return new Reports.Fail(p(path), value, d(duration), s(slow))
+    fail: function (path, value, duration, slow, isFailable) { // eslint-disable-line max-params, max-len
+        return new Reports.Fail(
+            p(path), value, d(duration), s(slow),
+            !!isFailable)
     },
 
     skip: function (path) {

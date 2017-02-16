@@ -19,6 +19,7 @@ Also note that `reflect` instances are persistent and tied to the backing test i
 - [`reflect.ownSlow`](#ownslow)
 - [`reflect.slow`](#slow)
 - [`reflect.attempts`](#attempts)
+- [`reflect.isfailable`](#isfailable)
 - [`reflect` test hooks](#test-hooks)
 - [Tests with `reflect.test("name", callback)` and `reflect.testSkip("name", callback)`](#tests)
 - [Reporter management with `reflect.reporter(reporter, arg)`, `reflect.hasReporter(reporter)`, and `reflect.removeReporter(reporter)`](#reporters)
@@ -124,6 +125,15 @@ reflect.attempts // getter
 ```
 
 Get the current attempt count, or the framework default of 1 attempt.
+
+<a id="isfailable"></a>
+## reflect.isFailable
+
+```js
+reflect.isFailable // getter
+```
+
+Get whether this test is failable.
 
 <a id="test-hooks"></a>
 ## Reflect test hooks

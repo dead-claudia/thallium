@@ -22,9 +22,8 @@ See the [changelog](https://github.com/isiahmeadows/thallium/blob/master/CHANGEL
     - ~~Third-party assertions should be able to build off the same basic assertion primitives without depending on `thallium`~~
     - ~~The assertions' core primitives are already fairly stable~~
 6. ~~Add `t.hasReporter()` so the CLI can detect no reporter set and add the appropriate default.~~
-7. Support failable tests
-    - You may want to run a buggy test while still not letting it fail. It helps you know which tests are buggy, and to just not run them if they are
-    - Add a `t.run()` option to run or skip these
+7. ~~Support failable tests~~
+    - ~~You may want to run a buggy test while still not letting it fail. It helps you know which tests are known buggy without explicitly skipping them~~
 8. Make `t.only` also a `t.run()` option
     - Now that `t.only` is detected at test run time, this is way easier to do, and it just makes more sense here than as a setter
     - Also, accept a `skip` option.
@@ -39,31 +38,33 @@ Note that as of this version, only the primary API of the previous version will 
 2. Expose `thallium` as global `t` in bundle, tack existing `tl.*` exports onto it
     - Expose `thallium/assert` as global `assert` instead
     - Don't expose `require("thallium")`
-3. Add some promise-aware assertions (in `clean-assert`)
-4. Move `exports.files` config option to `t.files`
+3. Return in the promise a result object of various statistics
+    - Also, return these within the `end` report
+4. Add some promise-aware assertions (in `clean-assert`)
+5. Move `exports.files` config option to `t.files`
     - Change `exports.thallium` to default export
     - Ignored by core, but will mildly simplify CLI interface
     - Will make parallel interface much more consistent
-5. Allow full name matching of `t.only`
+6. Allow full name matching of `t.only`
     - Detected via no array
     - Feature parity with most other heavy frameworks
-6. Add `t.runOptions` getter/setter for default run options
-7. Add some useful things for test generation and reporters like getting the full test name
-8. Make reports backed by a tree, and convert the public API to expose only getters
+7. Add `t.options` getter/setter for default run options
+8. Add some useful things for test generation and reporters like getting the full test name
+9. Make reports backed by a tree, and convert the public API to expose only getters
     - Abstracts away the internal representation
     - Reduce reporter GC
-9. Cache the settings for child tests after they are re-locked
+10. Cache the settings for child tests after they are re-locked
     - This gets rid of all the tree climbing nonsense that currently exists
     - This will streamline settings a *lot* more
-10. Add file watching support
+11. Add file watching support
     - Just invoke the CLI with `--force-local` and the appropriate Node flags on each change. Way easier than trying to clean up `node_modules`, and you get more easily reproduced runs
-11. Add the ability to programmatically skip a test before it completes
+12. Add the ability to programmatically skip a test before it completes
     - Required for integration tests
     - `t.skip()`/`reflect.skip()` throws an `reflect.Skip` (an Error subclass) to skip a test
-12. Expose `thallium/internal` as `reflect.internal()`
-13. Expose a detached `reflect` via `t.reflect()`
+13. Expose `thallium/internal` as `reflect.internal()`
+14. Expose a detached `reflect` via `t.reflect()`
     - Mainly for easier testing/etc.
-14. Load bundle automatically, and implement `data-*` attribute options
+15. Load bundle automatically, and implement `data-*` attribute options
 
 ## 0.4.x
 (not blocking 0.4.0)

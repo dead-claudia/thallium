@@ -77,28 +77,28 @@ describe("core (internal)", function () {
 
         it("correctly creates `fail` reports", function () {
             var report = n.fail([], {value: "hello"})
-            var expected = new Reports.Fail([], {value: "hello"}, 10, 75)
+            var expected = new Reports.Fail([], {value: "hello"}, 10, 75, false)
 
             assert.match(report, expected)
         })
 
         it("correctly creates `fail` reports with duration", function () {
             var report = n.fail([], {value: "hello"}, 20)
-            var expected = new Reports.Fail([], {value: "hello"}, 20, 75)
+            var expected = new Reports.Fail([], {value: "hello"}, 20, 75, false)
 
             assert.match(report, expected)
         })
 
         it("correctly creates `fail` reports with slow", function () {
             var report = n.fail([], {value: "hello"}, null, 10)
-            var expected = new Reports.Fail([], {value: "hello"}, 10, 10)
+            var expected = new Reports.Fail([], {value: "hello"}, 10, 10, false)
 
             assert.match(report, expected)
         })
 
         it("correctly creates `fail` reports with duration + slow", function () { // eslint-disable-line max-len
             var report = n.fail([], {value: "hello"}, 20, 10)
-            var expected = new Reports.Fail([], {value: "hello"}, 20, 10)
+            var expected = new Reports.Fail([], {value: "hello"}, 20, 10, false)
 
             assert.match(report, expected)
         })

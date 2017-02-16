@@ -9,6 +9,8 @@ These are the most common methods you'll ever use.
 - [Using reporters with `t.reporter(reporter, arg?)`](#reporter)
 - [`t.timeout`](#timeout)
 - [`t.slow`](#slow)
+- [`t.attempts`](#attempts)
+- [`t.isFailable`](#isFailable)
 - [`t.only(...selectors)`](#only)
 - [`t.run()`](#run)
 - [Adding test hooks with `t.before(func)`, `t.beforeAll(func)`, `t.after(func)`, and `t.afterAll(func)`](#test-hooks)
@@ -118,6 +120,16 @@ t.attempts = attempts // setter
 ```
 
 Get or set the max attempts allowed for that test, so Thallium knows how many retries are allowed before giving up. This is helpful for tests that depend on the file system or other external resources it isn't guaranteed to get or at least in any particular order. When accessing the property, it gets the current active attempt count, or the default of `1` if none was set, and is always positive. When setting the property, set it to the count you wish, `0` to reset it to the parent's attempt count, or `Infinity` to always retry on error (not recommended, since it'll be easy to create an infinite loop).
+
+<a id="isFailable"></a>
+## t.isFailable
+
+```js
+var isFailable = t.isFailable // getter
+t.isFailable = isFailable // setter
+```
+
+Get whether this test is failable, or set it as either failable/non-failable. Tests default to non-failable, but when you're working on cracking down a backlog of issues, you may want to still run the failing tests, but not have them failing the build while you're fixing them all.
 
 <a id="only"></a>
 ## t.only(...paths)
