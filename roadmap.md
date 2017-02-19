@@ -26,7 +26,7 @@ See the [changelog](https://github.com/isiahmeadows/thallium/blob/master/CHANGEL
     - ~~You may want to run a buggy test while still not letting it fail. It helps you know which tests are known buggy without explicitly skipping them~~
 8. Make `t.only` also a `t.run()` option
     - Now that `t.only` is detected at test run time, this is way easier to do, and it just makes more sense here than as a setter
-    - Also, accept a `skip` option.
+    - Also, accept a `skip` option to skip certain tests.
 
 ## 0.4.0
 

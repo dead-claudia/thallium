@@ -14,10 +14,6 @@ describe("core (reporters)", function () { // eslint-disable-line max-statements
         return {then: function (_, reject) { reject(value) }}
     }
 
-    function identity(r) {
-        return r
-    }
-
     function createSentinel(name) {
         var e = new Error(name)
 
@@ -769,7 +765,6 @@ describe("core (reporters)", function () { // eslint-disable-line max-statements
     // be comfortable with...
     it("reports internal errors", function () {
         var tt = Util.create()
-        var sentinel = createSentinel("sentinel")
         var reported
 
         tt.reporter(Util.const(function (report) {
@@ -777,17 +772,15 @@ describe("core (reporters)", function () { // eslint-disable-line max-statements
         }))
 
         tt.test("test", function () {
-            Object.defineProperty(tt.call(identity)._, "locked", {
-                get: function () { throw sentinel },
-                set: function () { throw sentinel },
-            })
+            tt._.root.current = undefined
+            tt._.root = undefined
         })
 
         return tt.run().then(
             function () { assert.fail("Expected a rejection") },
             function (rejected) {
-                assert.equal(rejected, sentinel)
-                assert.equal(reported, sentinel)
+                assert.is(Error, rejected)
+                assert.equal(reported, rejected)
             })
     })
 
