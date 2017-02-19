@@ -29,10 +29,11 @@ describe("reporter dot", function () {
     })
 
     function stack(e) {
-        var lines = Util.R.readStack(e).split(/\r?\n/g)
+        var lines = Util.R.readStack(e).trimRight().split(/\r?\n/g)
 
         for (var i = 0; i < lines.length; i++) {
-            lines[i] = "      " + c("fail", lines[i])
+            lines[i] = lines[i].trimRight()
+            if (lines[i]) lines[i] = "      " + c("fail", lines[i])
         }
 
         return lines

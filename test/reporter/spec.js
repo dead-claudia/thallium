@@ -29,9 +29,14 @@ describe("reporter spec", function () {
     })
 
     function stack(e) {
-        return Util.R.readStack(e)
-            .split(/\r?\n/g)
-            .map(function (line) { return "      " + c("fail", line) })
+        var lines = Util.R.readStack(e).trimRight().split(/\r?\n/g)
+
+        for (var i = 0; i < lines.length; i++) {
+            lines[i] = lines[i].trimRight()
+            if (lines[i]) lines[i] = "      " + c("fail", lines[i])
+        }
+
+        return lines
     }
 
     function pass(name) {
