@@ -1,5 +1,22 @@
 # Changelog
 
+## v0.3.11
+
+- Improve stack trace handling
+- Test against Node 7
+- Update docs in various places
+- Move `thallium/match` to `clean-match` (new package)
+- Move `thallium/assert` to `clean-assert` (new package, still aliased)
+- Move core of `thallium/assert` to `clean-assert-util` (new package)
+- Empty configs are now supported
+- Add `t.hasReporter` for the CLI
+- Run a `test.js` file by default as well as `test/**`
+- Print object diffs on assertion failures
+- Add a complete DOM reporter (patches welcome for making it look better)
+- Support reattempting tests via `t.attempts`/`reflect.attempts`
+- Support failable tests via `t.failable`/`reflect.failable`
+- Several bug fixes
+
 ## v0.3.10
 
 - Unbreak PhantomJS
