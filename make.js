@@ -187,7 +187,6 @@ task("release", function (args) {
         var changelogUpdated = false
         var treeDirty = false
 
-        exec("/usr/bin/env bash scripts/test.sh")
         exec("git status --porcelain", {silent: true}).stdout
         .split(/\r?\n/g)
         .filter(function (line) { return line !== "" })

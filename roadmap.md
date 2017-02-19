@@ -4,26 +4,9 @@ This list is in a very rough chronological order, with whatever's done struck th
 
 Do note that it isn't necessarily comprehensive, although I try to keep it somewhat up to date.
 
-## 0.3.0
+## Previous versions
 
-See the [changelog](https://github.com/isiahmeadows/thallium/blob/master/CHANGELOG.md#v030).
-
-## 0.3.x
-(not blocking 0.3.0)
-
-1. ~~Add OS X to the Travis build~~
-    - ~~Travis has been having OS X issues lately, making debugging these errors a little harder~~
-2. ~~Add diff support to all existing reporters~~
-3. ~~Create/finish DOM reporter~~
-4. ~~Support flaky tests via first-class retries~~
-    - ~~This is a requirement to self-host the runner~~
-5. ~~Move `thallium/match` and `thallium/assert` implementations out of core~~
-    - ~~`thallium/match` is useful on its own~~
-    - ~~Third-party assertions should be able to build off the same basic assertion primitives without depending on `thallium`~~
-    - ~~The assertions' core primitives are already fairly stable~~
-6. ~~Add `t.hasReporter()` so the CLI can detect no reporter set and add the appropriate default.~~
-7. ~~Support failable tests~~
-    - ~~You may want to run a buggy test while still not letting it fail. It helps you know which tests are known buggy without explicitly skipping them~~
+See the [changelog](https://github.com/isiahmeadows/thallium/blob/master/CHANGELOG.md).
 
 ## 0.4.0
 
