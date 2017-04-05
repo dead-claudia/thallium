@@ -1,5 +1,9 @@
 # Changelog
 
+## v0.3.12
+
+- Quit lying to transpiled ES6 module environments
+
 ## v0.3.11
 
 - Improve stack trace handling
