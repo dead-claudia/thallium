@@ -146,7 +146,9 @@ task("update", function (args) {
         }
     })
 
-    exec("npm install " + pkgs.join(" ") + saveFlag)
+    var client = which("yarn") ? "yarn" : "npm"
+
+    exec(client + " install " + pkgs.join(" ") + saveFlag)
 
     if (pkgs.indexOf("clean-assert") >= 0) {
         exec("node ./scripts/update-clean-assert.js")
