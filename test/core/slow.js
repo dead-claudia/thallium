@@ -155,60 +155,50 @@ describe("core (slow) (FLAKE)", /** @this */ function () {
         })
     })
 
-    function ownSlow(reflect) {
-        return reflect.ownSlow
-    }
-
     function slow(reflect) {
         return reflect.slow
     }
 
     it("gets own slow", function () {
         var tt = Util.create()
-        var active, raw
+        var active
 
         tt.test("test", function () {
             tt.slow = 50
             active = tt.call(slow)
-            raw = tt.call(ownSlow)
         })
 
         return tt.run().then(function () {
             assert.equal(active, 50)
-            assert.equal(raw, 50)
         })
     })
 
     it("gets inherited slow", function () {
         var tt = Util.create()
-        var active, raw
+        var active
 
         tt.test("test", function () {
             tt.slow = 50
             tt.test("inner", function () {
                 active = tt.call(slow)
-                raw = tt.call(ownSlow)
             })
         })
 
         return tt.run().then(function () {
             assert.equal(active, 50)
-            assert.equal(raw, 0)
         })
     })
 
     it("gets default slow", function () {
         var tt = Util.create()
-        var active, raw
+        var active
 
         tt.test("test", function () {
             active = tt.call(slow)
-            raw = tt.call(ownSlow)
         })
 
         return tt.run().then(function () {
             assert.equal(active, 75)
-            assert.equal(raw, 0)
         })
     })
 })

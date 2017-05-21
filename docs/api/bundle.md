@@ -81,4 +81,4 @@ t.use(function (t) {
 
 You can also find the definitions for this module in `thallium.d.ts` next to the bundle, in case you're using TypeScript with this.
 
-You can also use `thallium-migrate.js` in the root, which has most of the old API monkey-patched back in with deprecation warnings, to ease test migration. It also re-adds the old `assertions` and `create` functions to the exports.
+You can also use `thallium-migrate.js` in the root, which has most of the old API monkey-patched back in with deprecation warnings, to ease test migration. It also exports `thallium/migrate/support` via `tl.support`.

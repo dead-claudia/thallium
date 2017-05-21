@@ -2,7 +2,7 @@
 
 var Thallium = require("./lib/api/thallium")
 var Reports = require("./lib/core/reports")
-var Types = Reports.Types
+var HookStage = Reports.HookStage
 
 exports.root = function () {
     return new Thallium()
@@ -78,19 +78,19 @@ exports.reports = {
  */
 exports.hookErrors = {
     beforeAll: function (func, value) {
-        return new Reports.HookError(Types.BeforeAll, func, value)
+        return new Reports.HookError(HookStage.BeforeAll, func, value)
     },
 
     beforeEach: function (func, value) {
-        return new Reports.HookError(Types.BeforeEach, func, value)
+        return new Reports.HookError(HookStage.BeforeEach, func, value)
     },
 
     afterEach: function (func, value) {
-        return new Reports.HookError(Types.AfterEach, func, value)
+        return new Reports.HookError(HookStage.AfterEach, func, value)
     },
 
     afterAll: function (func, value) {
-        return new Reports.HookError(Types.AfterAll, func, value)
+        return new Reports.HookError(HookStage.AfterAll, func, value)
     },
 }
 

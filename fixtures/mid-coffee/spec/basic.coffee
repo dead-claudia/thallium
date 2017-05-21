@@ -106,13 +106,6 @@ t.test 'core (basic)', ->
                 tt.test 'test', ->
                 assert.match slice, []
 
-    t.test 'test()', ->
-        t.test 'returns a prototypal clone inside', ->
-            tt = create()
-            inner = undefined
-            tt.test 'test', -> inner = this
-            tt.run().then -> assert.equal Object.getPrototypeOf(inner), tt
-
     t.test 'run()', ->
         t.test 'runs child tests', ->
             tt = create()

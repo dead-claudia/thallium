@@ -113,60 +113,50 @@ describe("core (timeouts) (FLAKE)", /** @this */ function () {
         })
     })
 
-    function ownTimeout(reflect) {
-        return reflect.ownTimeout
-    }
-
     function timeout(reflect) {
         return reflect.timeout
     }
 
     it("gets own timeout", function () {
         var tt = Util.create()
-        var active, raw
+        var active
 
         tt.test("test", function () {
             tt.timeout = 50
             active = tt.call(timeout)
-            raw = tt.call(ownTimeout)
         })
 
         return tt.run().then(function () {
             assert.equal(active, 50)
-            assert.equal(raw, 50)
         })
     })
 
     it("gets inherited timeout", function () {
         var tt = Util.create()
-        var active, raw
+        var active
 
         tt.test("test", function () {
             tt.timeout = 50
             tt.test("inner", function () {
                 active = tt.call(timeout)
-                raw = tt.call(ownTimeout)
             })
         })
 
         return tt.run().then(function () {
             assert.equal(active, 50)
-            assert.equal(raw, 0)
         })
     })
 
     it("gets default timeout", function () {
         var tt = Util.create()
-        var active, raw
+        var active
 
         tt.test("test", function () {
             active = tt.call(timeout)
-            raw = tt.call(ownTimeout)
         })
 
         return tt.run().then(function () {
             assert.equal(active, 2000)
-            assert.equal(raw, 0)
         })
     })
 })

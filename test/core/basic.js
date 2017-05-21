@@ -179,23 +179,6 @@ describe("core (basic)", function () {
         })
     })
 
-    /**
-     * TODO: This is deprecated
-     */
-    describe("test()", function () {
-        it("returns a prototypal clone inside", function () {
-            var tt = Util.create()
-            var test
-
-            tt.test("test", function (tt) { test = tt })
-
-            return tt.run().then(function () {
-                assert.notEqual(test, tt)
-                assert.equal(Object.getPrototypeOf(test), tt)
-            })
-        })
-    })
-
     describe("run()", function () {
         it("runs child tests", function () {
             var tt = Util.create()

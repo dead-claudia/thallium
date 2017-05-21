@@ -12,49 +12,46 @@ See the [changelog](https://github.com/isiahmeadows/thallium/blob/master/CHANGEL
 
 Note that as of this version, only the primary API of the previous version will be supported as much as feasibly possible through `thallium/migrate`. Reporter and plugin APIs will not such have a wrapper available, but may use the utilities in `thallium/migrate/support` to use while transitioning.
 
-1. Remove all the previously deprecated methods/etc.
-    - Additionally, seal all exposed API types, as a safety net
-    - Remove `reflect.own*` properties and make all properties own and parasitically inherited from their parent, to avoid costly lookups (already done for attempts)
-2. Make this a monorepo using Lerna
-    - All dependencies merged in will encounter a minor version increment
-3. Add `--respawn-as` to allow respawning via a binary other than the default (e.g. Electron)
+1. ~~Remove all the previously deprecated methods/etc.~~
+    - ~~Remove `reflect.own*` properties and make them parasitically inherited from their parent, to avoid costly lookups (already done for attempts)~~
+2. Add `--respawn-as` to allow respawning via a binary other than the default (e.g. Electron)
     - This will force a respawn using a PATH lookup if necessary
-4. Add `--env` to allow setting environment on startup, before any respawning occurs
+3. Add `--env` to allow setting environment on startup, before any respawning occurs
     - This will force a respawn
-5. Make `t.only` also a `t.run()` option
+4. Make `t.only` also a `t.run()` option
     - Now that `t.only` is detected at test run time, this is way easier to do, and it just makes more sense here than as a setter
     - Also, accept a `skip` option to skip certain tests.
-6. Expose `thallium` as global `t` in bundle, tack existing `tl.*` exports onto it
+5. Expose `thallium` as global `t` in bundle, tack existing `tl.*` exports onto it
     - Expose `thallium/assert` as global `assert` instead
     - Don't expose `require("thallium")`
-7. Return in the promise a result object of various statistics
+6. Return in the promise a result object of various statistics
     - Also, return these within the `end` report
-8. Add some promise-aware assertions (in `clean-assert`)
-9. Move `exports.files` config option to `t.files`
+7. Add some promise-aware assertions (in `clean-assert`)
+8. Move `exports.files` config option to `t.files`
     - Change `exports.thallium` to default export
     - Ignored by core, but will mildly simplify CLI interface
     - Will make parallel interface much more consistent
-10. Allow full name matching of `t.only`
+9. Allow full name matching of `t.only`
     - Detected via no array
     - Feature parity with most other heavy frameworks
-11. Add `t.options` getter/setter for default run options
-12. Add some useful things for test generation and reporters like getting the full test name
-13. Make reports backed by a tree, and convert the public API to expose only getters
+10. Add `t.options` getter/setter for default run options
+11. Add some useful things for test generation and reporters like getting the full test name
+12. Make reports backed by a tree, and convert the public API to expose only getters
     - Abstracts away the internal representation
     - Reduce reporter GC
-14. Cache the settings for child tests after they are re-locked
+13. Cache the settings for child tests after they are re-locked
     - This gets rid of all the tree climbing nonsense that currently exists
     - This will streamline settings a *lot* more
-15. Add file watching support
+14. Add file watching support
     - Just invoke the CLI with `--force-local` and the appropriate Node flags on each change. Way easier than trying to clean up `node_modules`, and you get more easily reproduced runs
     - Mocha's magical behavior isn't helpful when dealing with globals (I've had enough pains in this repo already)
-16. Add the ability to programmatically skip a test before it completes
+15. Add the ability to programmatically skip a test before it completes
     - Required for integration tests
     - `t.skip()`/`reflect.skip()` throws an `reflect.Skip` (an Error subclass) to skip a test
-17. Expose `thallium/internal` as `reflect.internal()`
-18. Expose a detached `reflect` via `t.reflect()`
+16. Expose `thallium/internal` as `reflect.internal()`
+17. Expose a detached `reflect` via `t.reflect()`
     - Mainly for easier testing/etc.
-19. Load bundle automatically, and implement `data-*` attribute options
+18. Load bundle automatically, and implement `data-*` attribute options
 
 ## 0.4.x
 (not blocking 0.4.0)
@@ -103,6 +100,10 @@ Here's the nice-to-haves, and so these are in no particular order:
     - I get arrow functions and classes for free, without having to deal with Babel's monstrosity
     - Downleveled async functions will drastically simplify both the runner and all the reporters
     - It'll be a *lot* easier when most of the deprecated dynamic stuff like test inheritance is finally removed
+
+- Make this a monorepo using Lerna
+    - All dependencies merged in will encounter a minor version increment
+    - This will be a pretty non-trivial process.
 
 - Self-host the runner
 

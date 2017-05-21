@@ -14,12 +14,10 @@ Also note that `reflect` instances are persistent and tied to the backing test i
 - [`reflect.root`](#root)
 - [`reflect.isRoot`](#isroot)
 - [`reflect.isLocked`](#islocked)
-- [`reflect.ownTimeout`](#owntimeout)
 - [`reflect.timeout`](#timeout)
-- [`reflect.ownSlow`](#ownslow)
 - [`reflect.slow`](#slow)
 - [`reflect.attempts`](#attempts)
-- [`reflect.isfailable`](#isfailable)
+- [`reflect.isFailable`](#isfailable)
 - [`reflect` test hooks](#test-hooks)
 - [Tests with `reflect.test("name", callback)` and `reflect.testSkip("name", callback)`](#tests)
 - [Reporter management with `reflect.reporter(reporter, arg)`, `reflect.hasReporter(reporter)`, and `reflect.removeReporter(reporter)`](#reporters)
@@ -97,16 +95,7 @@ Get the own timeout, `0` if it's inherited, or `Infinity` if it was disabled.
 reflect.timeout // getter
 ```
 
-Get the currently active timeout, or the framework default of 2000 ms.
-
-<a id="ownslow"></a>
-## reflect.ownSlow
-
-```js
-reflect.ownSlow // getter
-```
-
-Get the own slow threshold, `0` if it's inherited, or `Infinity` if it was disabled.
+Get the current test timeout, `Infinity` if it was disabled, or the framework default of 2000 ms.
 
 <a id="slow"></a>
 ## reflect.slow
@@ -115,7 +104,7 @@ Get the own slow threshold, `0` if it's inherited, or `Infinity` if it was disab
 reflect.slow // getter
 ```
 
-Get the currently active slow threshold, or the framework default of 2000 ms.
+Get the current slow threshold, `Infinity` if it was disabled, or the framework default of 2000 ms.
 
 <a id="attempts"></a>
 ## reflect.attempts

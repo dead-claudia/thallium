@@ -185,4 +185,6 @@ Util.basic = function (desc, callback) {
     })
 }
 
-if (settings.migrate) Thallium.migrate()
+if (settings.migrate) {
+    require("../migrate") // eslint-disable-line global-require
+}

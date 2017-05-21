@@ -271,22 +271,10 @@ interface ReflectCommon {
     isLocked: boolean;
 
     /**
-     * Get the own, not necessarily active, timeout. 0 means inherit the
-     * parent's, and `Infinity` means it's disabled.
-     */
-    ownTimeout: number;
-
-    /**
      * Get the active timeout in milliseconds, not necessarily own, or the
      * framework default of 2000, if none was set.
      */
     timeout: number;
-
-    /**
-     * Get the own, not necessarily active, slow threshold. 0 means inherit the
-     * parent's, and `Infinity` means it's disabled.
-     */
-    ownSlow: number;
 
     /**
      * Get the active slow threshold in milliseconds, not necessarily own, or
@@ -376,7 +364,7 @@ export interface ReflectRoot extends ReflectCommon {
     isRoot: true;
 
     /**
-     * Whether a particulare reporter was registered
+     * Whether a particular reporter was registered
      */
     hasReporter(reporter: Reporter<any>): boolean;
 
@@ -394,6 +382,21 @@ export interface ReflectRoot extends ReflectCommon {
      * Remove a reporter.
      */
     removeReporter(reporter: Reporter<any>): void;
+
+    /**
+     * Get the test name.
+     */
+    name: void;
+
+    /**
+     * Get the test index.
+     */
+    index: void;
+
+    /**
+     * Get the parent test as a Reflect.
+     */
+    parent: void;
 }
 
 export interface ReflectChild extends ReflectCommon {
