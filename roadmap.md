@@ -21,10 +21,10 @@ Note that as of this version, only the primary API of the previous version will 
     - Now that `t.only` is detected at test run time, this is way easier to do, and it just makes more sense here than as a setter
     - Also, accept a `skip` option to skip certain tests.
     - `t.only` will be retained in `thallium/migrate`
-5. Expose `thallium` as global `t` in bundle, tack existing `tl.*` exports onto it
-    - Expose `thallium/assert` as global `assert` instead
-    - Don't expose `require("thallium")`
-    - Expose `thallium/migrate/support` as `t.support`
+5. ~~Expose `thallium` as global `t` in bundle, tack existing `tl.*` exports onto it~~
+    - ~~Expose `thallium/assert` as global `assert` instead~~
+    - ~~Don't expose `require("thallium")`~~
+    - ~~Expose `thallium/migrate/support` as `t.support`~~
 6. Return in the promise a result object of various statistics
     - Also, return these within the `end` report
 7. ~~Add some promise-aware assertions (in `clean-assert`)~~

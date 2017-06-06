@@ -128,11 +128,11 @@ test("node", function () {
 task("bundle", function () {
     exec([
         c("browserify"),
-        "-dr ./lib/browser-bundle.js:thallium -o thallium.js",
+        "-de ./lib/browser-bundle.js -o thallium.js",
     ])
     exec([
         c("browserify"),
-        "-dr ./migrate/bundle.js:thallium -o thallium-migrate.js",
+        "-de ./migrate/bundle.js -o thallium-migrate.js",
     ])
 })
 
