@@ -13,6 +13,8 @@ var fixture = require("../../test-util/cli/cli").fixture
 describe("cli end-to-end (FLAKE)", /** @this */ function () {
     this.retries(3)
 
+    var binary = path.resolve(__dirname, "../../bin/tl.js")
+
     function formatList(msgs) {
         return msgs
             .replace(/\r?\n/g, Util.R.newline())
@@ -21,8 +23,7 @@ describe("cli end-to-end (FLAKE)", /** @this */ function () {
     }
 
     function test(name, opts) {
-        opts.args.unshift("--force-local")
-        opts.args.unshift(path.resolve(__dirname, "../../bin/tl.js"))
+        opts.args.unshift(binary)
 
         if (Array.isArray(opts.messages)) {
             opts.messages = opts.messages.join(Util.R.newline())
@@ -30,11 +31,12 @@ describe("cli end-to-end (FLAKE)", /** @this */ function () {
 
         (opts.skip ? it.skip : it)(name, /** @this */ function () {
             this.slow(1500)
-            this.timeout(opts.timeout)
+            this.timeout(opts.timeout || 5000)
 
-            var child = cp.spawn(process.argv[0], opts.args, {
+            var child = cp.spawn(opts.program || process.argv[0], opts.args, {
                 stdio: [process.stdin, "pipe", process.stderr],
                 cwd: opts.cwd,
+                env: opts.env,
             })
 
             var output = ""
@@ -75,7 +77,6 @@ describe("cli end-to-end (FLAKE)", /** @this */ function () {
     test("runs simple valid tests", {
         args: ["--cwd", fixture("simple")],
         code: 0,
-        timeout: 5000,
         messages: [
             "start = undefined",
             "pass [0: test 1] = undefined",
@@ -87,7 +88,6 @@ describe("cli end-to-end (FLAKE)", /** @this */ function () {
     test("runs simple test file", {
         args: ["--cwd", fixture("simple-single")],
         code: 0,
-        timeout: 5000,
         messages: [
             "start = undefined",
             "pass [0: test 1] = undefined",
@@ -99,7 +99,6 @@ describe("cli end-to-end (FLAKE)", /** @this */ function () {
     test("runs small sized failing test suites", {
         args: ["--cwd", fixture("."), "full-js/**"],
         code: 1,
-        timeout: 5000,
 
         /* eslint-disable max-len */
         messages: [
@@ -303,14 +302,12 @@ describe("cli end-to-end (FLAKE)", /** @this */ function () {
         args: [],
         cwd: fixture("js-opts"),
         code: 0,
-        timeout: 5000,
         messages: optsMessages,
     })
 
     test("runs tests with .tl.opts and files", {
         args: [fixture("js-opts/test/**")],
         code: 0,
-        timeout: 5000,
         messages: optsMessages,
     })
 
@@ -318,7 +315,56 @@ describe("cli end-to-end (FLAKE)", /** @this */ function () {
         args: ["--opts", fixture("js-opts/config.opts")],
         cwd: fixture("js-opts"),
         code: 0,
-        timeout: 5000,
         messages: optsMessages,
+    })
+
+    var printArgs = process.platform === "win32"
+        ? fixture("binaries/print-args.cmd")
+        : fixture("binaries/print-args.sh")
+
+    test("runs tests with --respawn-as", {
+        args: ["--unknown", "--respawn-as", printArgs],
+        code: 0,
+        cwd: fixture("simple"),
+        env: {PROGRAM: process.argv[0], BINARY: binary},
+        messages: [
+            fixture("simple"), "--unknown",
+            binary, "--",
+            "start = undefined",
+            "pass [0: test 1] = undefined",
+            "pass [1: test 2] = undefined",
+            "end = undefined",
+        ],
+    })
+
+    test("runs tests with --env", {
+        args: ["--env", "ENV_FOO=11", "--env", "ENV_BAR=22"],
+        env: {ENV_FOO: "1", ENV_BAR: "2", ENV_BAZ: "3"},
+        cwd: fixture("env"),
+        code: 0,
+        messages: [
+            "ENV_FOO = 11",
+            "ENV_BAR = 22",
+            "ENV_BAZ = 3",
+        ],
+    })
+
+    test("runs tests with --respawn-as and --env", {
+        args: [
+            "--env", "ENV_FOO=11", "--env", "ENV_BAR=22",
+            "--respawn-as", printArgs,
+        ],
+        env: {
+            PROGRAM: process.argv[0], BINARY: binary,
+            ENV_FOO: "1", ENV_BAR: "2", ENV_BAZ: "3",
+        },
+        cwd: fixture("env"),
+        code: 0,
+        messages: [
+            fixture("env"), binary, "--",
+            "ENV_FOO = 11",
+            "ENV_BAR = 22",
+            "ENV_BAZ = 3",
+        ],
     })
 })

@@ -1,13 +1,11 @@
 version: '{build}'
 environment:
   matrix:
-    - nodejs_version: 4
-      task: test:node
-    - nodejs_version: 5
-      task: test:node
     - nodejs_version: 6
       task: test:node
     - nodejs_version: 7
+      task: test:node
+    - nodejs_version: 8
       task: test:node
     - nodejs_version: 6
       task: test:phantomjs

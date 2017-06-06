@@ -44,6 +44,10 @@ task("lint", function () {
 task("test", function () {
     target["test:chrome"]()
     target["test:firefox"]()
+    target["test:local"]()
+})
+
+task("test:local", function () {
     target["test:phantomjs"]()
     target["test:node"]()
 })

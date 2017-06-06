@@ -37,9 +37,12 @@ Options:
     Force-disable terminal colors for core reporters, so that even if the
     terminal does support colors, only raw Unicode is printed.
 
---respawn, --no-respawn
-    Allow or prevent respawning Node if there's unknown options. `--respawn` is
-    the default, so it only exists to override a previous `--no-respawn` flag.
+--env [key=value], -e [key=value]
+    Set an environment variable, or omit `value` to unset it.
+
+--respawn-as [file]
+    Respawn using a different binary than the one used to execute the runner.
+    Implies `--respawn` and causes `--no-respawn` to be ignored.
 
 All unknown options are passed directly to Node. For more details on each
 option, run the following command:

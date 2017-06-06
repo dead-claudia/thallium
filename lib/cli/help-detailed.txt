@@ -36,8 +36,8 @@ Options:
 
 --opts [opts]
     Use a custom opts file instead of trying to find a `.tl.opts` somewhere.
-    It's there in case you need to keep your options file somewhere else, and/or
-    under an alternative name.
+    It's there in case you need to keep your options file somewhere else,
+    and/or under an alternative name.
 
 --
     Stop parsing options past this point. Treat any further argument as a file.
@@ -54,14 +54,22 @@ Options:
     Force-disable terminal colors for core reporters, so that even if the
     terminal does support colors, only raw Unicode is printed.
 
---respawn, --no-respawn
-    Allow or prevent respawning Node if there's unknown options. `--respawn` is
-    the default, so it only exists to override a previous `--no-respawn` flag.
+--env [key=value], -e [key=value]
+    Set an environment variable, or omit `value` to unset it. This is useful for
+    setting relevant environment variables without resorting to either ugly
+    platform-specific code, additional dependencies, or boilerplate scripts.
+
+--respawn-as [file]
+    Respawn using a different binary than the one used to execute initially, so
+    you can do things like `--respawn-as electron` without having to invoke
+    Electron directly, or to respawn with a different Node version than that
+    used to start the CLI. This implies `--respawn`, and causes `--no-respawn`
+    to have no effect.
 
 All options are optional, and all unknown options are passed directly to Node.
-If no file globs are given, `test/**/*.{extname of config found}` is used as the
-default glob, with `test/.config.{extname}` being the default config, where the
-`extname` is inferred.
+If no file globs are given, `test/**/*.{extname of config found}` is used as
+the default glob, with `test/.config.{extname}` being the default config, where
+the `extname` is inferred.
 
 This tries to be sane by attempting to infer the general intent and preferring
 code over config in the CLI, so it's much easier to set up and run.

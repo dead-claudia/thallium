@@ -2,7 +2,7 @@
 
 /* eslint max-nested-callbacks: [2, 5] */
 
-var parse = require("../../lib/cli/parse")
+var parse = require("../../lib/cli/args").parse
 var Run = require("../../lib/cli/run")
 var Cli = require("../../test-util/cli/cli")
 

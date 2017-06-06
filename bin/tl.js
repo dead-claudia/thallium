@@ -1,12 +1,12 @@
 #!/usr/bin/env node
-/* eslint-env node */
 "use strict"
 
 /**
- * This script loads Thallium, and respawns Node if necessary with the proper
- * CLI flags (if other arguments are passed).
+ * This is a thin layer of indirection to find and execute the correct init, so
+ * it's not otherwise coupled to the CLI initialization process.
  *
- * It also tries to delegate to the local installation as much as possible.
+ * Note: this hijacks Node's module resolution algorithm to require files as if
+ * from a fake module in the correct base directory.
  */
 
 if (require.main !== module) {
@@ -15,31 +15,20 @@ if (require.main !== module) {
 
 var path = require("path")
 var Module = require("module")
-var parse = load(process.cwd(), "parse.js", false)
-var args = parse(process.argv.slice(2))
-var base = args.cwd != null ? path.resolve(args.cwd) : process.cwd()
+var init
 
-// Respawn with the local version
-load(base, "init.js", args.forceLocal)(args)
+try {
+    var baseDir = path.resolve(process.cwd())
+    var m = new Module(path.join(baseDir, "dummy.js"), undefined)
 
-// Prefer a local installation to a global one if at all possible
-function load(baseDir, name, forceLocal) {
-    // Hack: hijack Node's internal resolution algorithm to require the file
-    // as if from a fake module in the correct base directory. It also will
-    // avoid several bugs with the `resolve` module (Node's is necessarily more
-    // stable).
-    try {
-        if (!forceLocal) {
-            var m = new Module(path.resolve(baseDir, "dummy.js"), undefined)
-
-            m.filename = m.id
-            m.paths = Module._nodeModulePaths(baseDir)
-            m.loaded = true
-            return m.require("thallium/" + name)
-        }
-    } catch (_) {
-        // do nothing
-    }
-
-    return require("../lib/cli/" + name) // eslint-disable-line global-require
+    m.filename = m.id
+    m.paths = Module._nodeModulePaths(baseDir)
+    m.loaded = true
+    init = m.require("thallium/lib/cli/init.js")
+} catch (_) {
+    init = require("../lib/cli/init.js") // eslint-disable-line global-require
 }
+
+// Note: This *must* be called after module load, so that errors thrown don't
+// result in running the same code twice.
+init()

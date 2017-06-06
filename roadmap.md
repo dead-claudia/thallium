@@ -14,19 +14,19 @@ Note that as of this version, only the primary API of the previous version will 
 
 1. ~~Remove all the previously deprecated methods/etc.~~
     - ~~Remove `reflect.own*` properties and make them parasitically inherited from their parent, to avoid costly lookups (already done for attempts)~~
-2. Add `--respawn-as` to allow respawning via a binary other than the default (e.g. Electron)
-    - This will force a respawn using a PATH lookup if necessary
-3. Add `--env` to allow setting environment on startup, before any respawning occurs
-    - This will force a respawn
-4. Make `t.only` also a `t.run()` option
+2. ~~Add `--respawn-as` to allow respawning via a binary other than the default (e.g. Electron)~~
+    - ~~This will force a respawn using a PATH lookup if necessary~~
+3. ~~Add `--env` to allow setting environment on startup, before any respawning occurs~~
+4. Make `t.only` a `t.run()` option
     - Now that `t.only` is detected at test run time, this is way easier to do, and it just makes more sense here than as a setter
     - Also, accept a `skip` option to skip certain tests.
+    - `t.only` will be retained in `thallium/migrate`
 5. Expose `thallium` as global `t` in bundle, tack existing `tl.*` exports onto it
     - Expose `thallium/assert` as global `assert` instead
     - Don't expose `require("thallium")`
 6. Return in the promise a result object of various statistics
     - Also, return these within the `end` report
-7. Add some promise-aware assertions (in `clean-assert`)
+7. ~~Add some promise-aware assertions (in `clean-assert`)~~
 8. Move `exports.files` config option to `t.files`
     - Change `exports.thallium` to default export
     - Ignored by core, but will mildly simplify CLI interface
@@ -34,7 +34,7 @@ Note that as of this version, only the primary API of the previous version will 
 9. Allow full name matching of `t.only`
     - Detected via no array
     - Feature parity with most other heavy frameworks
-10. Add `t.options` getter/setter for default run options
+10. Add `t.options` getter/setter for default run (not CLI) options
 11. Add some useful things for test generation and reporters like getting the full test name
 12. Make reports backed by a tree, and convert the public API to expose only getters
     - Abstracts away the internal representation
@@ -43,7 +43,7 @@ Note that as of this version, only the primary API of the previous version will 
     - This gets rid of all the tree climbing nonsense that currently exists
     - This will streamline settings a *lot* more
 14. Add file watching support
-    - Just invoke the CLI with `--force-local` and the appropriate Node flags on each change. Way easier than trying to clean up `node_modules`, and you get more easily reproduced runs
+    - Just invoke the CLI on each change. Way easier than trying to clean up `node_modules`, and you get more easily reproduced runs
     - Mocha's magical behavior isn't helpful when dealing with globals (I've had enough pains in this repo already)
 15. Add the ability to programmatically skip a test before it completes
     - Required for integration tests

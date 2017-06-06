@@ -65,7 +65,7 @@ I personally frequently use `node make watch:node` when working on this, so I ha
 
 This is tested in [Travis CI](https://travis-ci.org/isiahmeadows/thallium) on Ubuntu against the following runtimes:
 
-- Node 4 and later on Windows, Linux (Ubuntu), and OS X
+- Node on [current LTS](https://github.com/nodejs/LTS/) and later on Windows, Linux (Ubuntu), and OS X
 - PhantomJS 2 on Windows, Linux (Ubuntu), and OS X
 - Chrome Stable on Linux (Ubuntu)
 - Firefox Stable, ESR, and Beta on Linux (Ubuntu)

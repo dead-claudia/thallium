@@ -3,7 +3,7 @@
 [![Travis Build Status](https://travis-ci.org/isiahmeadows/thallium.svg?branch=master)](https://travis-ci.org/isiahmeadows/thallium) [![AppVeyor Build status](https://ci.appveyor.com/api/projects/status/f9lhn8ivfwj39k7k?svg=true)](https://ci.appveyor.com/project/isiahmeadows/thallium)
 [![Join the chat at https://gitter.im/isiahmeadows/thallium](https://badges.gitter.im/isiahmeadows/thallium.svg)](https://gitter.im/isiahmeadows/thallium?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
-A simple, unopinionated, modular test framework meant to simplify your tests. It supports Node 4 and later, as well as PhantomJS 2 and browsers (tested in Chrome and Firefox).
+A simple, unopinionated, modular test framework meant to simplify your tests. It supports Node (from the [current LTS](https://github.com/nodejs/LTS/)), as well as PhantomJS 2 and browsers (tested in Chrome and Firefox).
 
 *Note that this is a huge work in progress, and is probably not suited for production projects.*
 

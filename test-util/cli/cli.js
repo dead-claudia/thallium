@@ -4,7 +4,7 @@ var path = require("path")
 var minimatch = require("minimatch")
 var interpret = require("interpret")
 var peach = require("../../lib/util").peach
-var parse = require("../../lib/cli/parse")
+var parse = require("../../lib/cli/args").parse
 var State = require("../../lib/cli/run").State
 var methods = require("../../lib/methods")
 
