@@ -4,7 +4,7 @@ var path = require("path")
 var Args = require("../../lib/cli/args")
 var hasOwn = Object.prototype.hasOwnProperty
 
-describe("cli args parsing", function () {
+describe("cli/args", function () {
     function alias(description, str, opts) {
         str = str.trim()
         var expected = new Args.Args()

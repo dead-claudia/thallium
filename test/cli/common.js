@@ -8,7 +8,7 @@
 var path = require("path")
 var Common = require("../../lib/cli/common")
 
-describe("cli common", function () {
+describe("cli/common", function () {
     var p = path.normalize
 
     describe("isObjectLike()", function () {

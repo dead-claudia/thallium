@@ -3,7 +3,7 @@
 /**
  * The DOM mock is very non-trivial, so it has to be tested.
  */
-describe("dom mock", function () {
+describe("test-util/dom-mock", function () {
     "use strict"
 
     function spy() {

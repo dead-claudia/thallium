@@ -3,7 +3,7 @@
 // correct, and it will *not* verify this.
 
 // Skipped because it hasn't been finished yet.
-describe("reporter dom", function () { // eslint-disable-line max-statements
+describe("reporter/dom", function () { // eslint-disable-line max-statements
     "use strict"
 
     var p = Util.p

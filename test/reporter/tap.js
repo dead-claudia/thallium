@@ -1,7 +1,7 @@
 // Note: the reports *must* be well formed. The reporter assumes the reports are
 // correct, and it will *not* verify this.
 
-describe("reporter tap", function () { // eslint-disable-line max-statements
+describe("reporter/tap", function () { // eslint-disable-line max-statements
     "use strict"
 
     var p = Util.p

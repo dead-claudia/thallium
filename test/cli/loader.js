@@ -7,7 +7,7 @@ var Cli = require("../../test-util/cli/cli")
 
 var hasOwn = Object.prototype.hasOwnProperty
 
-describe("cli loader", function () {
+describe("cli/loader", function () {
     describe("keysToRegExp()", function () { // eslint-disable-line max-statements, max-len
         it("exists", function () {
             assert.isFunction(Loader.keysToRegExp)

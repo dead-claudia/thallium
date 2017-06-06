@@ -6,7 +6,7 @@ var Transform = require("stream").Transform
 var fixture = require("../../test-util/cli/cli").fixture
 var GS = require("../../lib/cli/glob-stream")
 
-describe("cli glob stream", function () {
+describe("cli/glob-stream", function () {
     describe("addStream()", function () {
         it("throws error if stream is not readable", function () {
             var stream = new GS.Through()

@@ -1,4 +1,4 @@
-describe("core (asynchronous behavior)", function () {
+describe("core/async", function () {
     "use strict"
 
     var n = Util.n

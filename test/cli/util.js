@@ -5,7 +5,7 @@ var FSUtil = require("../../lib/cli/util")
 var fixture = require("../../test-util/cli/cli").fixture
 
 // Mostly sanity tests.
-describe("cli fs utils", function () {
+describe("cli/util", function () {
     var old
 
     beforeEach(function () { old = process.cwd() })

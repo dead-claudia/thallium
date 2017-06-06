@@ -1,4 +1,4 @@
-describe("core (reporters)", function () { // eslint-disable-line max-statements
+describe("core/reporters", function () { // eslint-disable-line max-statements
     "use strict"
 
     var n = Util.n

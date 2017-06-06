@@ -4,7 +4,7 @@
 // fixtures/mid-coffee/spec/basic.coffee, as it's trying to represent more
 // real-world usage.
 
-describe("core (basic)", function () {
+describe("core/basic", function () {
     "use strict"
 
     function identity(reflect) { return reflect }

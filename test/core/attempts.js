@@ -1,4 +1,4 @@
-describe("core (attempts)", function () {
+describe("core/attempts", function () {
     "use strict"
 
     var n = Util.n

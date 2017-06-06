@@ -1,7 +1,7 @@
 // Note that this entire section may be flaky on slower machines. Thankfully,
 // these have been tested against a slower machine, so it should hopefully not
 // be too bad.
-describe("core (slow) (FLAKE)", /** @this */ function () {
+describe("core/slow (FLAKE)", /** @this */ function () {
     "use strict"
 
     this.retries(3)

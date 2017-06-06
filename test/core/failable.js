@@ -1,4 +1,4 @@
-describe("core (isFailable)", function () {
+describe("core/failable", function () {
     "use strict"
 
     var n = Util.n

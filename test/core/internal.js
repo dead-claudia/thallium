@@ -1,4 +1,4 @@
-describe("core (internal)", function () {
+describe("core/internal", function () {
     "use strict"
 
     describe("reports", function () {
