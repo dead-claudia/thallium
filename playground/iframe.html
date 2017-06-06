@@ -5,12 +5,11 @@
 (function () {
     "use strict"
     var allowedDirs = /^(flat\/)?(pass(-skip|-fail)?|skip(-fail)?|fail|all)$/
-    var tl = window.require("thallium")
     var prev, runner
 
     window.require = function (name) {
-        if (name === "thallium") return tl.t
-        if (name === "thallium/assert") return tl.assert
+        if (name === "thallium") return t
+        if (name === "thallium/assert") return assert
         throw new RangeError("Module '" + name + "' is not defined!")
     }
 
@@ -27,7 +26,7 @@
 
         if (prev !== e.data) {
             prev = e.data
-            runner = tl.dom([
+            runner = t.dom([
                 e.data + "/basic.js",
                 e.data + "/common.js",
                 e.data + "/global.js",

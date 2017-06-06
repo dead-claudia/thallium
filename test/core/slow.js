@@ -6,8 +6,8 @@ describe("core/slow (FLAKE)", /** @this */ function () {
 
     this.retries(3)
 
-    var n = Util.n
-    var p = Util.p
+    var n = t.internal.reports
+    var p = t.internal.location
 
     function speed(data, type) {
         switch (type) {
@@ -31,7 +31,7 @@ describe("core/slow (FLAKE)", /** @this */ function () {
     }
 
     it("succeeds with own", function () {
-        var tt = Util.create()
+        var tt = t.internal.root()
         var ret = []
 
         tt.reporter(Util.push, {ret: ret, keep: true})
@@ -54,7 +54,7 @@ describe("core/slow (FLAKE)", /** @this */ function () {
     })
 
     it("hits middle with own", function () {
-        var tt = Util.create()
+        var tt = t.internal.root()
         var ret = []
 
         tt.reporter(Util.push, {ret: ret, keep: true})
@@ -78,7 +78,7 @@ describe("core/slow (FLAKE)", /** @this */ function () {
     })
 
     it("fails with own", function () {
-        var tt = Util.create()
+        var tt = t.internal.root()
         var ret = []
 
         tt.reporter(Util.push, {ret: ret, keep: true})
@@ -102,7 +102,7 @@ describe("core/slow (FLAKE)", /** @this */ function () {
     })
 
     it("succeeds with inherited", function () {
-        var tt = Util.create()
+        var tt = t.internal.root()
         var ret = []
 
         tt.reporter(Util.push, {ret: ret, keep: true})
@@ -129,7 +129,7 @@ describe("core/slow (FLAKE)", /** @this */ function () {
     })
 
     it("fails with inherited", function () {
-        var tt = Util.create()
+        var tt = t.internal.root()
         var ret = []
 
         tt.reporter(Util.push, {ret: ret, keep: true})
@@ -160,7 +160,7 @@ describe("core/slow (FLAKE)", /** @this */ function () {
     }
 
     it("gets own slow", function () {
-        var tt = Util.create()
+        var tt = t.internal.root()
         var active
 
         tt.test("test", function () {
@@ -174,7 +174,7 @@ describe("core/slow (FLAKE)", /** @this */ function () {
     })
 
     it("gets inherited slow", function () {
-        var tt = Util.create()
+        var tt = t.internal.root()
         var active
 
         tt.test("test", function () {
@@ -190,7 +190,7 @@ describe("core/slow (FLAKE)", /** @this */ function () {
     })
 
     it("gets default slow", function () {
-        var tt = Util.create()
+        var tt = t.internal.root()
         var active
 
         tt.test("test", function () {

@@ -4,11 +4,11 @@
 describe("reporter/tap", function () { // eslint-disable-line max-statements
     "use strict"
 
-    var p = Util.p
-    var n = Util.n
+    var p = t.internal.location
+    var n = t.internal.reports
 
     it("is not itself a reporter", function () {
-        var tap = Util.r.tap
+        var tap = t.r.tap
 
         assert.throws(TypeError, function () { tap(n.start()) })
         assert.throws(TypeError, function () { tap(n.enter([p("test", 0)])) })
@@ -20,11 +20,11 @@ describe("reporter/tap", function () { // eslint-disable-line max-statements
     })
 
     it("validates no arguments", function () {
-        Util.r.tap()
+        t.r.tap()
     })
 
     it("validates a single empty options object", function () {
-        Util.r.tap({})
+        t.r.tap({})
     })
 
     function stack(err) {
@@ -42,7 +42,7 @@ describe("reporter/tap", function () { // eslint-disable-line max-statements
         it(name, function () {
             var list = []
             var acc = ""
-            var reporter = Util.r.tap({
+            var reporter = t.r.tap({
                 write: function (str) {
                     // So lines are printed consistently.
                     var lines = (acc + str).split(/\r?\n/g)

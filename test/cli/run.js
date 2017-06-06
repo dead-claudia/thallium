@@ -7,8 +7,8 @@ var Run = require("../../lib/cli/run")
 var Cli = require("../../test-util/cli/cli")
 
 describe("cli/run", function () {
-    var n = Util.n
-    var p = Util.p
+    var n = t.internal.reports
+    var p = t.internal.location
 
     describe("exitReporter()", function () {
         var map = {
@@ -84,7 +84,7 @@ describe("cli/run", function () {
          */
 
         function run(opts) {
-            var tt = Util.create()
+            var tt = t.internal.root()
             var tree = opts.tree(tt)
 
             if (tree["node_modules"] == null) tree["node_modules"] = {}
@@ -337,7 +337,7 @@ describe("cli/run", function () {
 
         it("adheres to the config correctly", function () {
             var ret = []
-            var custom = Util.create()
+            var custom = t.internal.root()
 
             return run({
                 args: "",

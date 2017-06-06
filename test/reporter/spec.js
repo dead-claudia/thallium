@@ -5,11 +5,11 @@ describe("reporter/spec", function () {
     "use strict"
 
     var c = Util.R.color
-    var p = Util.p
-    var n = Util.n
+    var p = t.internal.location
+    var n = t.internal.reports
 
     it("is not itself a reporter", function () {
-        var spec = Util.r.spec
+        var spec = t.r.spec
 
         assert.throws(TypeError, function () { spec(n.start()) })
         assert.throws(TypeError, function () { spec(n.enter([p("test", 0)])) })
@@ -21,11 +21,11 @@ describe("reporter/spec", function () {
     })
 
     it("validates no arguments", function () {
-        Util.r.spec()
+        t.r.spec()
     })
 
     it("validates a single empty options object", function () {
-        Util.r.spec({})
+        t.r.spec({})
     })
 
     function stack(e) {
@@ -52,7 +52,7 @@ describe("reporter/spec", function () {
             it(name, function () {
                 var list = []
                 var acc = ""
-                var reporter = Util.r.spec({
+                var reporter = t.r.spec({
                     colors: colors,
                     write: function (str) {
                         // So lines are printed consistently.

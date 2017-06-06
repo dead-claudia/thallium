@@ -12,17 +12,16 @@ Here's how to use it:
 <!-- test.html -->
 <!DOCTYPE html>
 <meta charset="utf-8">
-<script src="./node_modules/thallium/thallium.js"></script>
-<script>
-require("thallium").dom([
-    "my-lib/common.js",
-    "my-lib/index.js",
-    "test/common.js",
-    "test/index.js",
-    "test/ui.js",
-])
-.run()
-</script>
+<script
+    src="./node_modules/thallium/thallium.js"
+    data-files="
+        my-lib/common.js
+        my-lib/index.js
+        test/common.js
+        test/index.js
+        test/ui.js
+    "
+></script>
 ```
 
 When you first load, and after you click `run`, your files all load in order and automatically, then all your tests run. If you need to expose any globals, or even load jQuery, you can do so, and the globals will be cleared for you each iteration. (It doesn't clean up event listeners for you, so do be aware of that.)

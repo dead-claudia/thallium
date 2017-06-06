@@ -10,8 +10,8 @@ describe("core/timeouts (FLAKE)", /** @this */ function () {
 
     this.retries(3)
 
-    var n = Util.n
-    var p = Util.p
+    var n = t.internal.reports
+    var p = t.internal.location
 
     function resolve() {
         return {then: function (resolve) { resolve() }}
@@ -26,7 +26,7 @@ describe("core/timeouts (FLAKE)", /** @this */ function () {
     }
 
     it("succeeds with own", function () {
-        var tt = Util.create()
+        var tt = t.internal.root()
         var ret = []
 
         tt.reporter(Util.push, ret)
@@ -47,7 +47,7 @@ describe("core/timeouts (FLAKE)", /** @this */ function () {
     })
 
     it("fails with own", function () {
-        var tt = Util.create()
+        var tt = t.internal.root()
         var ret = []
 
         tt.reporter(Util.push, ret)
@@ -68,7 +68,7 @@ describe("core/timeouts (FLAKE)", /** @this */ function () {
     })
 
     it("succeeds with inherited", function () {
-        var tt = Util.create()
+        var tt = t.internal.root()
         var ret = []
 
         tt.reporter(Util.push, ret)
@@ -90,7 +90,7 @@ describe("core/timeouts (FLAKE)", /** @this */ function () {
     })
 
     it("fails with inherited", function () {
-        var tt = Util.create()
+        var tt = t.internal.root()
         var ret = []
 
         tt.reporter(Util.push, ret)
@@ -118,7 +118,7 @@ describe("core/timeouts (FLAKE)", /** @this */ function () {
     }
 
     it("gets own timeout", function () {
-        var tt = Util.create()
+        var tt = t.internal.root()
         var active
 
         tt.test("test", function () {
@@ -132,7 +132,7 @@ describe("core/timeouts (FLAKE)", /** @this */ function () {
     })
 
     it("gets inherited timeout", function () {
-        var tt = Util.create()
+        var tt = t.internal.root()
         var active
 
         tt.test("test", function () {
@@ -148,7 +148,7 @@ describe("core/timeouts (FLAKE)", /** @this */ function () {
     })
 
     it("gets default timeout", function () {
-        var tt = Util.create()
+        var tt = t.internal.root()
         var active
 
         tt.test("test", function () {

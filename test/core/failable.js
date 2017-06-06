@@ -1,8 +1,8 @@
 describe("core/failable", function () {
     "use strict"
 
-    var n = Util.n
-    var p = Util.p
+    var n = t.internal.reports
+    var p = t.internal.location
 
     function immediate() {
         throw new Error("fail")
@@ -15,7 +15,7 @@ describe("core/failable", function () {
     }
 
     it("works with own immediate", function () {
-        var tt = Util.create()
+        var tt = t.internal.root()
         var ret = []
 
         tt.reporter(Util.push, ret)
@@ -37,7 +37,7 @@ describe("core/failable", function () {
     })
 
     it("works with own deferred", function () {
-        var tt = Util.create()
+        var tt = t.internal.root()
         var ret = []
 
         tt.reporter(Util.push, ret)
@@ -59,7 +59,7 @@ describe("core/failable", function () {
     })
 
     it("works with inherited", function () {
-        var tt = Util.create()
+        var tt = t.internal.root()
         var ret = []
 
         tt.reporter(Util.push, ret)
@@ -87,7 +87,7 @@ describe("core/failable", function () {
     }
 
     it("gets own isFailable", function () {
-        var tt = Util.create()
+        var tt = t.internal.root()
         var active
 
         tt.test("test", function () {
@@ -101,7 +101,7 @@ describe("core/failable", function () {
     })
 
     it("gets inherited isFailable", function () {
-        var tt = Util.create()
+        var tt = t.internal.root()
         var active
 
         tt.test("test", function () {
@@ -117,7 +117,7 @@ describe("core/failable", function () {
     })
 
     it("gets default isFailable", function () {
-        var tt = Util.create()
+        var tt = t.internal.root()
         var active
 
         tt.test("test", function () {

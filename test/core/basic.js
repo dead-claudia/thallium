@@ -14,13 +14,13 @@ describe("core/basic", function () {
             function parent(reflect) { return reflect.parent }
 
             it("works on the root instance", function () {
-                var tt = Util.create()
+                var tt = t.internal.root()
 
                 assert.equal(tt.call(parent), undefined)
             })
 
             it("works on children", function () {
-                var tt = Util.create()
+                var tt = t.internal.root()
                 var inner
 
                 tt.test("test", function () {
@@ -37,13 +37,13 @@ describe("core/basic", function () {
             function count(reflect) { return reflect.count }
 
             it("works with 0 tests", function () {
-                var tt = Util.create()
+                var tt = t.internal.root()
 
                 assert.equal(tt.call(count), 0)
             })
 
             it("works with 1 test", function () {
-                var tt = Util.create()
+                var tt = t.internal.root()
 
                 tt.test("test", function () {})
 
@@ -51,7 +51,7 @@ describe("core/basic", function () {
             })
 
             it("works with 2 tests", function () {
-                var tt = Util.create()
+                var tt = t.internal.root()
 
                 tt.test("test", function () {})
                 tt.test("test", function () {})
@@ -60,7 +60,7 @@ describe("core/basic", function () {
             })
 
             it("works with 3 tests", function () {
-                var tt = Util.create()
+                var tt = t.internal.root()
 
                 tt.test("test", function () {})
                 tt.test("test", function () {})
@@ -74,13 +74,13 @@ describe("core/basic", function () {
             function name(reflect) { return reflect.name }
 
             it("works with the root test", function () {
-                var tt = Util.create()
+                var tt = t.internal.root()
 
                 assert.equal(tt.call(name), undefined)
             })
 
             it("works with child tests", function () {
-                var tt = Util.create()
+                var tt = t.internal.root()
                 var child
 
                 tt.test("test", function () {
@@ -97,13 +97,13 @@ describe("core/basic", function () {
             function index(reflect) { return reflect.index }
 
             it("works with the root test", function () {
-                var tt = Util.create()
+                var tt = t.internal.root()
 
                 assert.equal(tt.call(index), undefined)
             })
 
             it("works with the first child test", function () {
-                var tt = Util.create()
+                var tt = t.internal.root()
                 var first
 
                 tt.test("test", function () {
@@ -116,7 +116,7 @@ describe("core/basic", function () {
             })
 
             it("works with the second child test", function () {
-                var tt = Util.create()
+                var tt = t.internal.root()
                 var second
 
                 tt.test("test", function () {})
@@ -134,13 +134,13 @@ describe("core/basic", function () {
             function children(reflect) { return reflect.children }
 
             it("works with 0 tests", function () {
-                var tt = Util.create()
+                var tt = t.internal.root()
 
                 assert.match(tt.call(children), [])
             })
 
             it("works with 1 test", function () {
-                var tt = Util.create()
+                var tt = t.internal.root()
                 var test
 
                 tt.test("test", function () {
@@ -153,7 +153,7 @@ describe("core/basic", function () {
             })
 
             it("works with 2 tests", function () {
-                var tt = Util.create()
+                var tt = t.internal.root()
                 var first, second
 
                 tt.test("first", function () {
@@ -170,7 +170,7 @@ describe("core/basic", function () {
             })
 
             it("returns a copy", function () {
-                var tt = Util.create()
+                var tt = t.internal.root()
                 var slice = tt.call(children)
 
                 tt.test("test", function () {})
@@ -181,7 +181,7 @@ describe("core/basic", function () {
 
     describe("run()", function () {
         it("runs child tests", function () {
-            var tt = Util.create()
+            var tt = t.internal.root()
             var called = 0
             var err
 
@@ -207,7 +207,7 @@ describe("core/basic", function () {
         }
 
         it("catches concurrent runs", function () {
-            var tt = Util.create()
+            var tt = t.internal.root()
             var res = tt.run()
 
             assert.throws(Error, function () { tt.run() })
@@ -215,7 +215,7 @@ describe("core/basic", function () {
         })
 
         it("allows non-concurrent runs with reporter error", function () {
-            var tt = Util.create()
+            var tt = t.internal.root()
             var sentinel = createSentinel("fail")
 
             tt.reporter(Util.const(function () { throw sentinel }))

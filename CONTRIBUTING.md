@@ -109,13 +109,7 @@ Note that I don't actually test the documentation's code, but please ensure it o
 
 - `scripts` - This contains various development scripts. It's generally uninteresting unless you like looking at shell scripts.
 
-- `test-util` - This contains various test-related utilities, including the mocks. Here's a few globals exported from `test-util/globals` you might appreciate knowing about:
-
-    - `t.reporter(Util.push, array | {ret: array, keep = false})` - A Thallium reporter that accepts an array destination to push its reports into. Use the second form, with `keep` set to `true`, if you want to retain the original `duration` and `slow` speeds.
-    - `Util.n.*` - Create a report node of a given type.
-    - `Util.p(name, index)` - Create a path node with a given name and index.
-
-    These are most frequently used for testing reporter output for whatever reason, and the latter two are usually locally aliased.
+- `test-util` - This contains various test-related utilities, including the mocks.
 
 ### Code style
 

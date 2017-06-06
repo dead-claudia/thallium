@@ -1,6 +1,7 @@
 "use strict"
 
 /* eslint-env mocha */
+/* global assert */
 
 /**
  * Global settings. These are also configurable in Node via the environment.
@@ -21,45 +22,28 @@ if (global.process != null && global.process.env != null) {
 /**
  * This exports everything as globals, and it is Browserified as well.
  */
-var Thallium = require("../lib/browser-bundle")
-var Tests = require("../lib/core/tests")
+require("../lib/browser-bundle")
+/* eslint-disable global-require */
 
-var assert = global.assert = Thallium.assert
 var Util = global.Util = {
-    r: Thallium.r,
-    create: Thallium.root,
-    n: Thallium.reports,
-    p: Thallium.location,
-    hooks: Thallium.hookErrors,
-    Tests: Tests,
-
-    /* eslint-disable global-require */
-
+    Tests: require("../lib/core/tests"),
     Reports: require("../lib/core/reports"),
     DOM: require("./dom"),
-    dom: require("../dom"),
 
     // Various dependencies used throughout the tests, minus the CLI tests. It's
     // easier to inject them into this bundle rather than to try to implement a
     // module loader.
-
     peach: require("../lib/util").peach,
-
-    // Chrome complains of an illegal invocation without a bound `this`.
-    setTimeout: function (func, duration) {
-        return global.setTimeout(func, duration)
-    },
-
     methods: require("../lib/methods"),
-    R: require("../lib/reporter/index"),
+    R: require("../lib/reporter"),
 
     /* eslint-enable global-require */
 
-    // For some of the reporters
-    const: function (x) {
-        return function () { return x }
-    },
+    // Chrome complains of an illegal invocation without a bound `this`.
+    setTimeout: global.setTimeout.bind(global),
 
+    // For some of the reporters
+    const: function (x) { return function () { return x } },
 }
 
 // Because PhantomJS sucks - Some tests are fails due to PhantomJS oddities, and
@@ -134,7 +118,7 @@ Util.push = function (ret) {
         ret = ret.ret
     }
 
-    return function push(report) {
+    return function (report) {
         // Any equality tests on either of these are inherently flaky.
         // Only add the relevant properties
         if (report.isFail || report.isError || report.isHook) {
@@ -154,35 +138,6 @@ Util.push = function (ret) {
 
         ret.push(report)
     }
-}
-
-var AssertionError = assert.AssertionError
-
-Util.fail = function (name) {
-    var args = []
-
-    for (var i = 1; i < arguments.length; i++) {
-        args.push(arguments[i])
-    }
-
-    // Silently swallowing exceptions is bad, so we can't use traditional
-    // Thallium assertions to test.
-    try {
-        assert[name].apply(undefined, args)
-    } catch (e) {
-        if (e instanceof AssertionError) return
-        throw e
-    }
-
-    throw new AssertionError(
-        "Expected t." + name + " to throw an AssertionError",
-        AssertionError)
-}
-
-Util.basic = function (desc, callback) {
-    describe(desc, function () {
-        it("works", callback)
-    })
 }
 
 if (settings.migrate) {

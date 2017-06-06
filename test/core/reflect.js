@@ -8,13 +8,13 @@ describe("core/reflect", function () {
         function identity(reflect) { return reflect }
 
         it("returns the correct instance", function () {
-            var tt = Util.create()
+            var tt = t.internal.root()
 
             assert.equal(tt.call(current), tt.call(identity))
         })
 
         it("returns the correct instance in a child test", function () {
-            var tt = Util.create()
+            var tt = t.internal.root()
             var inner, found
 
             tt.test("test", function (tt) {
@@ -96,7 +96,7 @@ describe("core/reflect", function () {
         describe("before all", function () {
             it("works with no tests", function () {
                 var called = 0
-                var tt = Util.create()
+                var tt = t.internal.root()
 
                 _.beforeAll(tt, function () { called++ })
 
@@ -107,7 +107,7 @@ describe("core/reflect", function () {
 
             it("works with one test", function () {
                 var called = 0
-                var tt = Util.create()
+                var tt = t.internal.root()
 
                 _.beforeAll(tt, function () { called++ })
                 tt.test("test", function () {})
@@ -119,7 +119,7 @@ describe("core/reflect", function () {
 
             it("works with two tests", function () {
                 var called = 0
-                var tt = Util.create()
+                var tt = t.internal.root()
 
                 _.beforeAll(tt, function () { called++ })
                 tt.test("test", function () {})
@@ -132,7 +132,7 @@ describe("core/reflect", function () {
 
             it("avoids child tests", function () {
                 var called = 0
-                var tt = Util.create()
+                var tt = t.internal.root()
 
                 _.beforeAll(tt, function () { called++ })
                 tt.test("test", function () {
@@ -146,7 +146,7 @@ describe("core/reflect", function () {
 
             it("works inside child tests", function () {
                 var called = 0
-                var tt = Util.create()
+                var tt = t.internal.root()
 
                 tt.test("test", function () {
                     _.beforeAll(tt, function () { called++ })
@@ -160,7 +160,7 @@ describe("core/reflect", function () {
 
             it("executes in the right order", function () {
                 var queue = []
-                var tt = Util.create()
+                var tt = t.internal.root()
 
                 _.beforeAll(tt, function () { queue.push("root") })
                 tt.test("test", function () {
@@ -177,7 +177,7 @@ describe("core/reflect", function () {
         describe("before each", function () {
             it("works with no tests", function () {
                 var called = 0
-                var tt = Util.create()
+                var tt = t.internal.root()
 
                 _.beforeEach(tt, function () { called++ })
 
@@ -188,7 +188,7 @@ describe("core/reflect", function () {
 
             it("works with one test", function () {
                 var called = 0
-                var tt = Util.create()
+                var tt = t.internal.root()
 
                 _.beforeEach(tt, function () { called++ })
                 tt.test("test", function () {})
@@ -200,7 +200,7 @@ describe("core/reflect", function () {
 
             it("works with two tests", function () {
                 var called = 0
-                var tt = Util.create()
+                var tt = t.internal.root()
 
                 _.beforeEach(tt, function () { called++ })
                 tt.test("test", function () {})
@@ -213,7 +213,7 @@ describe("core/reflect", function () {
 
             it("hits child tests", function () {
                 var called = 0
-                var tt = Util.create()
+                var tt = t.internal.root()
 
                 _.beforeEach(tt, function () { called++ })
                 tt.test("test", function () {
@@ -227,7 +227,7 @@ describe("core/reflect", function () {
 
             it("works inside child tests", function () {
                 var called = 0
-                var tt = Util.create()
+                var tt = t.internal.root()
 
                 tt.test("test", function () {
                     _.beforeEach(tt, function () { called++ })
@@ -241,7 +241,7 @@ describe("core/reflect", function () {
 
             it("executes in the right order", function () {
                 var queue = []
-                var tt = Util.create()
+                var tt = t.internal.root()
 
                 _.beforeEach(tt, function () { queue.push("root") })
                 tt.test("test", function () {
@@ -258,7 +258,7 @@ describe("core/reflect", function () {
         describe("after each", function () {
             it("works with no tests", function () {
                 var called = 0
-                var tt = Util.create()
+                var tt = t.internal.root()
 
                 _.afterEach(tt, function () { called++ })
 
@@ -269,7 +269,7 @@ describe("core/reflect", function () {
 
             it("works with one test", function () {
                 var called = 0
-                var tt = Util.create()
+                var tt = t.internal.root()
 
                 _.afterEach(tt, function () { called++ })
                 tt.test("test", function () {})
@@ -281,7 +281,7 @@ describe("core/reflect", function () {
 
             it("works with two tests", function () {
                 var called = 0
-                var tt = Util.create()
+                var tt = t.internal.root()
 
                 _.afterEach(tt, function () { called++ })
                 tt.test("test", function () {})
@@ -294,7 +294,7 @@ describe("core/reflect", function () {
 
             it("hits child tests", function () {
                 var called = 0
-                var tt = Util.create()
+                var tt = t.internal.root()
 
                 _.afterEach(tt, function () { called++ })
                 tt.test("test", function () {
@@ -308,7 +308,7 @@ describe("core/reflect", function () {
 
             it("works inside child tests", function () {
                 var called = 0
-                var tt = Util.create()
+                var tt = t.internal.root()
 
                 tt.test("test", function () {
                     _.afterEach(tt, function () { called++ })
@@ -322,7 +322,7 @@ describe("core/reflect", function () {
 
             it("executes in the right order", function () {
                 var queue = []
-                var tt = Util.create()
+                var tt = t.internal.root()
 
                 _.afterEach(tt, function () { queue.push("root") })
                 tt.test("test", function () {
@@ -339,7 +339,7 @@ describe("core/reflect", function () {
         describe("after all", function () {
             it("works with no tests", function () {
                 var called = 0
-                var tt = Util.create()
+                var tt = t.internal.root()
 
                 _.afterAll(tt, function () { called++ })
 
@@ -350,7 +350,7 @@ describe("core/reflect", function () {
 
             it("works with one test", function () {
                 var called = 0
-                var tt = Util.create()
+                var tt = t.internal.root()
 
                 _.afterAll(tt, function () { called++ })
                 tt.test("test", function () {})
@@ -362,7 +362,7 @@ describe("core/reflect", function () {
 
             it("works with two tests", function () {
                 var called = 0
-                var tt = Util.create()
+                var tt = t.internal.root()
 
                 _.afterAll(tt, function () { called++ })
                 tt.test("test", function () {})
@@ -375,7 +375,7 @@ describe("core/reflect", function () {
 
             it("avoids child tests", function () {
                 var called = 0
-                var tt = Util.create()
+                var tt = t.internal.root()
 
                 _.afterAll(tt, function () { called++ })
                 tt.test("test", function () {
@@ -389,7 +389,7 @@ describe("core/reflect", function () {
 
             it("works inside child tests", function () {
                 var called = 0
-                var tt = Util.create()
+                var tt = t.internal.root()
 
                 tt.test("test", function () {
                     _.afterAll(tt, function () { called++ })
@@ -403,7 +403,7 @@ describe("core/reflect", function () {
 
             it("executes in the right order", function () {
                 var queue = []
-                var tt = Util.create()
+                var tt = t.internal.root()
 
                 _.afterAll(tt, function () { queue.push("root") })
                 tt.test("test", function () {
@@ -420,7 +420,7 @@ describe("core/reflect", function () {
         describe("all hooks", function () {
             it("works with no tests", function () {
                 var queue = []
-                var tt = Util.create()
+                var tt = t.internal.root()
 
                 _.beforeAll(tt, function () { queue.push("before all") })
                 _.beforeEach(tt, function () { queue.push("before each") })
@@ -434,7 +434,7 @@ describe("core/reflect", function () {
 
             it("works with one test", function () {
                 var queue = []
-                var tt = Util.create()
+                var tt = t.internal.root()
 
                 _.beforeAll(tt, function () { queue.push("before all") })
                 _.beforeEach(tt, function () { queue.push("before each") })
@@ -454,7 +454,7 @@ describe("core/reflect", function () {
 
             it("works with two tests", function () {
                 var queue = []
-                var tt = Util.create()
+                var tt = t.internal.root()
 
                 _.beforeAll(tt, function () { queue.push("before all") })
                 _.beforeEach(tt, function () { queue.push("before each") })
@@ -477,7 +477,7 @@ describe("core/reflect", function () {
 
             it("works with child tests", function () {
                 var queue = []
-                var tt = Util.create()
+                var tt = t.internal.root()
 
                 _.beforeAll(tt, function () { queue.push("before all") })
                 _.beforeEach(tt, function () { queue.push("before each") })
@@ -501,7 +501,7 @@ describe("core/reflect", function () {
 
             it("works inside child tests", function () {
                 var queue = []
-                var tt = Util.create()
+                var tt = t.internal.root()
 
                 tt.test("test", function () {
                     _.beforeAll(tt, function () { queue.push("before all") }) // eslint-disable-line max-len
@@ -523,7 +523,7 @@ describe("core/reflect", function () {
 
             it("executes in the right order", function () {
                 var queue = []
-                var tt = Util.create()
+                var tt = t.internal.root()
 
                 _.beforeAll(tt, function () { queue.push("root before all") }) // eslint-disable-line max-len
                 _.beforeEach(tt, function () { queue.push("root before each") }) // eslint-disable-line max-len
@@ -556,7 +556,7 @@ describe("core/reflect", function () {
 
         describe("removing before all", function () {
             it("works", function () {
-                var tt = Util.create()
+                var tt = t.internal.root()
 
                 function callback() {}
                 _.beforeAll(tt, callback)
@@ -569,7 +569,7 @@ describe("core/reflect", function () {
 
         describe("removing before each", function () {
             it("works", function () {
-                var tt = Util.create()
+                var tt = t.internal.root()
 
                 function callback() {}
                 _.beforeEach(tt, callback)
@@ -582,7 +582,7 @@ describe("core/reflect", function () {
 
         describe("removing after each", function () {
             it("works", function () {
-                var tt = Util.create()
+                var tt = t.internal.root()
 
                 function callback() {}
                 _.beforeEach(tt, callback)
@@ -595,7 +595,7 @@ describe("core/reflect", function () {
 
         describe("removing after all", function () {
             it("works", function () {
-                var tt = Util.create()
+                var tt = t.internal.root()
 
                 function callback() {}
                 _.afterAll(tt, callback)

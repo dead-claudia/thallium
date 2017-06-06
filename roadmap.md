@@ -24,6 +24,7 @@ Note that as of this version, only the primary API of the previous version will 
 5. Expose `thallium` as global `t` in bundle, tack existing `tl.*` exports onto it
     - Expose `thallium/assert` as global `assert` instead
     - Don't expose `require("thallium")`
+    - Expose `thallium/migrate/support` as `t.support`
 6. Return in the promise a result object of various statistics
     - Also, return these within the `end` report
 7. ~~Add some promise-aware assertions (in `clean-assert`)~~

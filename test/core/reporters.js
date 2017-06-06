@@ -1,9 +1,9 @@
 describe("core/reporters", function () { // eslint-disable-line max-statements
     "use strict"
 
-    var n = Util.n
-    var p = Util.p
-    var hooks = Util.hooks
+    var n = t.internal.reports
+    var p = t.internal.location
+    var hooks = t.internal.hookErrors
 
     // Use thenables, not actual Promises.
     function resolve(value) {
@@ -23,7 +23,7 @@ describe("core/reporters", function () { // eslint-disable-line max-statements
 
     context("normal", function () {
         it("added to root correctly", function () {
-            var tt = Util.create()
+            var tt = t.internal.root()
             var ret = []
 
             assert.equal(tt.hasReporter, false)
@@ -44,7 +44,7 @@ describe("core/reporters", function () { // eslint-disable-line max-statements
         })
 
         it("errors if added to children", function () {
-            var tt = Util.create()
+            var tt = t.internal.root()
             var ret = []
             var successful
 
@@ -85,7 +85,7 @@ describe("core/reporters", function () { // eslint-disable-line max-statements
         })
 
         it("uses last added", function () {
-            var tt = Util.create()
+            var tt = t.internal.root()
             var ret1 = []
             var ret2 = []
             var ret3 = []
@@ -143,7 +143,7 @@ describe("core/reporters", function () { // eslint-disable-line max-statements
         }
 
         it("added to root correctly", function () {
-            var tt = Util.create()
+            var tt = t.internal.root()
 
             function reporter() { return Util.const() }
 
@@ -152,7 +152,7 @@ describe("core/reporters", function () { // eslint-disable-line max-statements
         })
 
         it("errors if added to children", function () {
-            var tt = Util.create()
+            var tt = t.internal.root()
             var successful
 
             function check(tt, reporter) {
@@ -194,7 +194,7 @@ describe("core/reporters", function () { // eslint-disable-line max-statements
         })
 
         it("removed individually correctly", function () {
-            var tt = Util.create()
+            var tt = t.internal.root()
 
             function reporter() { return Util.const() }
 
@@ -204,7 +204,7 @@ describe("core/reporters", function () { // eslint-disable-line max-statements
         })
 
         it("errors if \"removed\" from children", function () {
-            var tt = Util.create()
+            var tt = t.internal.root()
             var successful
 
             function reporter1() { return Util.const() }
@@ -260,7 +260,7 @@ describe("core/reporters", function () { // eslint-disable-line max-statements
         })
 
         it("only added once", function () {
-            var tt = Util.create()
+            var tt = t.internal.root()
             var ret1 = []
             var ret2 = []
             var ret3 = []
@@ -295,7 +295,7 @@ describe("core/reporters", function () { // eslint-disable-line max-statements
     })
 
     it("called correctly with sync passing", function () {
-        var tt = Util.create()
+        var tt = t.internal.root()
         var ret = []
 
         tt.reporter(Util.push, ret)
@@ -314,7 +314,7 @@ describe("core/reporters", function () { // eslint-disable-line max-statements
     })
 
     it("called correctly with sync failing", function () {
-        var tt = Util.create()
+        var tt = t.internal.root()
         var ret = []
         var sentinel = createSentinel("sentinel")
 
@@ -334,7 +334,7 @@ describe("core/reporters", function () { // eslint-disable-line max-statements
     })
 
     it("called correctly with sync both", function () {
-        var tt = Util.create()
+        var tt = t.internal.root()
         var ret = []
         var sentinel = createSentinel("sentinel")
 
@@ -354,7 +354,7 @@ describe("core/reporters", function () { // eslint-disable-line max-statements
     })
 
     it("called correctly with inline passing", function () {
-        var tt = Util.create()
+        var tt = t.internal.root()
         var ret = []
 
         tt.reporter(Util.push, ret)
@@ -374,7 +374,7 @@ describe("core/reporters", function () { // eslint-disable-line max-statements
 
     Util.phantomFix(it)("called correctly with inline failing", function () {
         var AssertionError = assert.AssertionError
-        var tt = Util.create()
+        var tt = t.internal.root()
         var ret = []
 
         tt.reporter(Util.push, ret)
@@ -393,7 +393,7 @@ describe("core/reporters", function () { // eslint-disable-line max-statements
 
     Util.phantomFix(it)("called correctly with inline both", function () {
         var AssertionError = assert.AssertionError
-        var tt = Util.create()
+        var tt = t.internal.root()
         var ret = []
 
         tt.reporter(Util.push, ret)
@@ -411,7 +411,7 @@ describe("core/reporters", function () { // eslint-disable-line max-statements
     })
 
     it("called correctly with async passing", function () {
-        var tt = Util.create()
+        var tt = t.internal.root()
         var ret = []
 
         tt.reporter(Util.push, ret)
@@ -430,7 +430,7 @@ describe("core/reporters", function () { // eslint-disable-line max-statements
     })
 
     it("called correctly with async failing", function () {
-        var tt = Util.create()
+        var tt = t.internal.root()
         var ret = []
         var sentinel = createSentinel("sentinel")
 
@@ -450,7 +450,7 @@ describe("core/reporters", function () { // eslint-disable-line max-statements
     })
 
     it("called correctly with async both", function () {
-        var tt = Util.create()
+        var tt = t.internal.root()
         var ret = []
         var sentinel = createSentinel("sentinel")
 
@@ -470,7 +470,7 @@ describe("core/reporters", function () { // eslint-disable-line max-statements
     })
 
     it("called correctly with async + promise passing", function () {
-        var tt = Util.create()
+        var tt = t.internal.root()
         var ret = []
 
         tt.reporter(Util.push, ret)
@@ -489,7 +489,7 @@ describe("core/reporters", function () { // eslint-disable-line max-statements
     })
 
     it("called correctly with async + promise failing", function () {
-        var tt = Util.create()
+        var tt = t.internal.root()
         var ret = []
         var sentinel = createSentinel("sentinel")
 
@@ -509,7 +509,7 @@ describe("core/reporters", function () { // eslint-disable-line max-statements
     })
 
     it("called correctly with async + promise both", function () {
-        var tt = Util.create()
+        var tt = t.internal.root()
         var ret = []
         var sentinel = createSentinel("sentinel")
 
@@ -529,7 +529,7 @@ describe("core/reporters", function () { // eslint-disable-line max-statements
     })
 
     it("called correctly with child passing tests", function () {
-        var tt = Util.create()
+        var tt = t.internal.root()
         var ret = []
 
         tt.reporter(Util.push, ret)
@@ -552,7 +552,7 @@ describe("core/reporters", function () { // eslint-disable-line max-statements
     })
 
     it("called correctly with child failing tests", function () {
-        var tt = Util.create()
+        var tt = t.internal.root()
         var ret = []
         var sentinel1 = createSentinel("sentinel one")
         var sentinel2 = createSentinel("sentinel two")
@@ -586,7 +586,7 @@ describe("core/reporters", function () { // eslint-disable-line max-statements
     })
 
     it("called correctly with child both", function () {
-        var tt = Util.create()
+        var tt = t.internal.root()
         var ret = []
         var sentinel1 = createSentinel("sentinel one")
         var sentinel2 = createSentinel("sentinel two")
@@ -620,7 +620,7 @@ describe("core/reporters", function () { // eslint-disable-line max-statements
     })
 
     it("locks itself when running", function () {
-        var tt = Util.create()
+        var tt = t.internal.root()
         var err
 
         tt.reporter(Util.const(function (report) {
@@ -638,7 +638,7 @@ describe("core/reporters", function () { // eslint-disable-line max-statements
 
     Util.phantomFix(it)("called correctly with complex sequence", function () {
         var AssertionError = assert.AssertionError
-        var tt = Util.create()
+        var tt = t.internal.root()
         var ret = []
         var sentinel = createSentinel("sentinel")
 
@@ -702,7 +702,7 @@ describe("core/reporters", function () { // eslint-disable-line max-statements
     })
 
     it("can return a resolving thenable", function () {
-        var tt = Util.create()
+        var tt = t.internal.root()
         var ret = []
         var push = Util.push(ret)
 
@@ -728,7 +728,7 @@ describe("core/reporters", function () { // eslint-disable-line max-statements
     })
 
     it("can return a rejecting thenable", function () {
-        var tt = Util.create()
+        var tt = t.internal.root()
         var sentinel = createSentinel("sentinel")
 
         tt.reporter(Util.const(function () {
@@ -744,7 +744,7 @@ describe("core/reporters", function () { // eslint-disable-line max-statements
     })
 
     it("reports reporter errors", function () {
-        var tt = Util.create()
+        var tt = t.internal.root()
         var sentinel = createSentinel("sentinel")
         var reported
 
@@ -764,7 +764,7 @@ describe("core/reporters", function () { // eslint-disable-line max-statements
     // This is a bit too tightly coupled to the implementation than I'd normally
     // be comfortable with...
     it("reports internal errors", function () {
-        var tt = Util.create()
+        var tt = t.internal.root()
         var reported
 
         tt.reporter(Util.const(function (report) {
@@ -786,7 +786,7 @@ describe("core/reporters", function () { // eslint-disable-line max-statements
 
     Util.phantomFix(it)("has repeatable output", function () {
         var AssertionError = assert.AssertionError
-        var tt = Util.create()
+        var tt = t.internal.root()
         var ret = []
         var sentinel = createSentinel("sentinel")
 
@@ -872,7 +872,7 @@ describe("core/reporters", function () { // eslint-disable-line max-statements
     })
 
     it("reports global `before all` failures", function () {
-        var tt = Util.create()
+        var tt = t.internal.root()
         var ret = []
         var sentinel = createSentinel("sentinel")
 
@@ -894,7 +894,7 @@ describe("core/reporters", function () { // eslint-disable-line max-statements
     })
 
     it("reports global `before each` failures", function () {
-        var tt = Util.create()
+        var tt = t.internal.root()
         var ret = []
         var sentinel = createSentinel("sentinel")
 
@@ -916,7 +916,7 @@ describe("core/reporters", function () { // eslint-disable-line max-statements
     })
 
     it("reports global `after each` failures", function () {
-        var tt = Util.create()
+        var tt = t.internal.root()
         var ret = []
         var sentinel = createSentinel("sentinel")
 
@@ -939,7 +939,7 @@ describe("core/reporters", function () { // eslint-disable-line max-statements
     })
 
     it("reports global `after all` failures", function () {
-        var tt = Util.create()
+        var tt = t.internal.root()
         var ret = []
         var sentinel = createSentinel("sentinel")
 
@@ -962,7 +962,7 @@ describe("core/reporters", function () { // eslint-disable-line max-statements
     })
 
     it("reports local `before all` failures", function () {
-        var tt = Util.create()
+        var tt = t.internal.root()
         var ret = []
         var sentinel = createSentinel("sentinel")
 
@@ -989,7 +989,7 @@ describe("core/reporters", function () { // eslint-disable-line max-statements
     })
 
     it("reports local `before each` failures", function () {
-        var tt = Util.create()
+        var tt = t.internal.root()
         var ret = []
         var sentinel = createSentinel("sentinel")
 
@@ -1016,7 +1016,7 @@ describe("core/reporters", function () { // eslint-disable-line max-statements
     })
 
     it("reports local `after each` failures", function () {
-        var tt = Util.create()
+        var tt = t.internal.root()
         var ret = []
         var sentinel = createSentinel("sentinel")
 
@@ -1044,7 +1044,7 @@ describe("core/reporters", function () { // eslint-disable-line max-statements
     })
 
     it("reports local `after all` failures", function () {
-        var tt = Util.create()
+        var tt = t.internal.root()
         var ret = []
         var sentinel = createSentinel("sentinel")
 

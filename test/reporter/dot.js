@@ -4,12 +4,12 @@
 describe("reporter/dot", function () {
     "use strict"
 
-    var p = Util.p
-    var n = Util.n
+    var p = t.internal.location
+    var n = t.internal.reports
     var c = Util.R.color
 
     it("is not itself a reporter", function () {
-        var dot = Util.r.dot
+        var dot = t.r.dot
 
         assert.throws(TypeError, function () { dot(n.start()) })
         assert.throws(TypeError, function () { dot(n.enter([p("test", 0)])) })
@@ -21,11 +21,11 @@ describe("reporter/dot", function () {
     })
 
     it("validates no arguments", function () {
-        Util.r.dot()
+        t.r.dot()
     })
 
     it("validates a single empty options object", function () {
-        Util.r.dot({})
+        t.r.dot({})
     })
 
     function stack(e) {
@@ -48,7 +48,7 @@ describe("reporter/dot", function () {
             it(name, function () {
                 var list = []
                 var acc = ""
-                var reporter = Util.r.dot({
+                var reporter = t.r.dot({
                     colors: colors,
 
                     write: function (str) {

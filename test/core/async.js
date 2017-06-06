@@ -1,11 +1,11 @@
 describe("core/async", function () {
     "use strict"
 
-    var n = Util.n
-    var p = Util.p
+    var n = t.internal.reports
+    var p = t.internal.location
 
     it("with sync tests", function () {
-        var tt = Util.create()
+        var tt = t.internal.root()
         var called = false
 
         tt.test("test", function () { called = true })
@@ -17,7 +17,7 @@ describe("core/async", function () {
     })
 
     it("with async tests + sync resolve", function () {
-        var tt = Util.create()
+        var tt = t.internal.root()
         var called = false
 
         tt.test("test", function () {
@@ -32,7 +32,7 @@ describe("core/async", function () {
     })
 
     it("with async tests + async resolve", function () {
-        var tt = Util.create()
+        var tt = t.internal.root()
         var called = false
 
         tt.test("test", function () {
@@ -51,7 +51,7 @@ describe("core/async", function () {
     })
 
     it("with async tests + duplicate thenable resolution", function () {
-        var tt = Util.create()
+        var tt = t.internal.root()
         var called = false
 
         tt.test("test", function () {
@@ -72,7 +72,7 @@ describe("core/async", function () {
     })
 
     it("with async tests + duplicate thenable rejection", function () {
-        var tt = Util.create()
+        var tt = t.internal.root()
         var called = false
         var ret = []
         var sentinel = new Error("sentinel")
@@ -105,7 +105,7 @@ describe("core/async", function () {
     })
 
     it("with async tests + mixed thenable (resolve first)", function () {
-        var tt = Util.create()
+        var tt = t.internal.root()
         var called = false
         var ret = []
         var sentinel = new Error("sentinel")
@@ -139,7 +139,7 @@ describe("core/async", function () {
     })
 
     it("with async tests + mixed thenable (reject first)", function () {
-        var tt = Util.create()
+        var tt = t.internal.root()
         var called = false
         var ret = []
         var sentinel = new Error("sentinel")

@@ -1,8 +1,8 @@
 describe("core/attempts", function () {
     "use strict"
 
-    var n = Util.n
-    var p = Util.p
+    var n = t.internal.reports
+    var p = t.internal.location
 
     function immediate(retries) {
         if (--retries.value) throw new Error("fail")
@@ -16,7 +16,7 @@ describe("core/attempts", function () {
     }
 
     it("succeeds with own immediate", function () {
-        var tt = Util.create()
+        var tt = t.internal.root()
         var ret = []
         var retries = {value: 3}
 
@@ -37,7 +37,7 @@ describe("core/attempts", function () {
     })
 
     it("succeeds with own deferred", function () {
-        var tt = Util.create()
+        var tt = t.internal.root()
         var ret = []
         var retries = {value: 3}
 
@@ -58,7 +58,7 @@ describe("core/attempts", function () {
     })
 
     it("fails with own immediate", function () {
-        var tt = Util.create()
+        var tt = t.internal.root()
         var ret = []
         var retries = {value: 5}
 
@@ -79,7 +79,7 @@ describe("core/attempts", function () {
     })
 
     it("fails with own deferred", function () {
-        var tt = Util.create()
+        var tt = t.internal.root()
         var ret = []
         var retries = {value: 5}
 
@@ -100,7 +100,7 @@ describe("core/attempts", function () {
     })
 
     it("succeeds with inherited", function () {
-        var tt = Util.create()
+        var tt = t.internal.root()
         var ret = []
         var retries = {value: 3}
 
@@ -123,7 +123,7 @@ describe("core/attempts", function () {
     })
 
     it("fails with inherited", function () {
-        var tt = Util.create()
+        var tt = t.internal.root()
         var ret = []
         var retries = {value: 5}
 
@@ -150,7 +150,7 @@ describe("core/attempts", function () {
     }
 
     it("gets own attempts", function () {
-        var tt = Util.create()
+        var tt = t.internal.root()
         var active
 
         tt.test("test", function () {
@@ -164,7 +164,7 @@ describe("core/attempts", function () {
     })
 
     it("gets inherited attempts", function () {
-        var tt = Util.create()
+        var tt = t.internal.root()
         var active
 
         tt.test("test", function () {
@@ -180,7 +180,7 @@ describe("core/attempts", function () {
     })
 
     it("gets default attempts", function () {
-        var tt = Util.create()
+        var tt = t.internal.root()
         var active
 
         tt.test("test", function () {

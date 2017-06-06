@@ -3,12 +3,12 @@
 describe("core/selection", function () {
     "use strict"
 
-    var p = Util.p
-    var n = Util.n
+    var p = t.internal.location
+    var n = t.internal.reports
 
     describe("skip", function () {
         it("filters correctly", function () {
-            var tt = Util.create()
+            var tt = t.internal.root()
             var ret = []
 
             tt.reporter(Util.push, ret)
@@ -42,7 +42,7 @@ describe("core/selection", function () {
 
     describe("only", function () {
         it("filters correctly with strings", function () {
-            var tt = Util.create()
+            var tt = t.internal.root()
             var ret = []
 
             tt.reporter(Util.push, ret)
@@ -70,7 +70,7 @@ describe("core/selection", function () {
         })
 
         it("filters correctly with regexps", function () {
-            var tt = Util.create()
+            var tt = t.internal.root()
             var ret = []
 
             tt.reporter(Util.push, ret)

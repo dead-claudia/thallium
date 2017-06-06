@@ -3,7 +3,7 @@ describe("core/internal", function () {
 
     describe("reports", function () {
         var Reports = Util.Reports
-        var n = Util.n
+        var n = t.internal.reports
 
         it("correctly creates `start` reports", function () {
             var report = n.start()

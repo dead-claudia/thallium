@@ -6,8 +6,8 @@
 describe("reporter/dom", function () { // eslint-disable-line max-statements
     "use strict"
 
-    var p = Util.p
-    var n = Util.n
+    var p = t.internal.location
+    var n = t.internal.reports
 
     // Easy checking
     test.skip = function (name, opts) {
@@ -15,6 +15,7 @@ describe("reporter/dom", function () { // eslint-disable-line max-statements
         opts.skip = true
         test(name, opts)
     }
+
     function test(name, opts) {
         if (Array.isArray(opts)) opts = {states: opts}
 
@@ -22,7 +23,7 @@ describe("reporter/dom", function () { // eslint-disable-line max-statements
 
         ;(opts.skip ? it.skip : it)(name, function (h, mock) {
             var context = Object.create(null)
-            var t = context.t = {
+            var inst = context.inst = {
                 _reporter: undefined,
                 _cleared: 0,
                 _runs: 0,
@@ -49,7 +50,7 @@ describe("reporter/dom", function () { // eslint-disable-line max-statements
                     })
                 },
             }
-            var reporterOpts = {thallium: t}
+            var reporterOpts = {thallium: inst}
 
             context.mock = mock
             context.match = function (_) {
@@ -175,15 +176,15 @@ describe("reporter/dom", function () { // eslint-disable-line max-statements
                     )
                 }
 
-                var runner = Util.dom.create(reporterOpts)
+                var runner = t.dom(reporterOpts)
 
                 assert.equal(document().getElementById("tl"), context.root)
                 assert.ok(document().head.getElementsByTagName("style").length)
                 return runner.run()
             })
             .then(function () {
-                assert.equal(context.t._runs, 1)
-                assert.equal(context.t._cleared, 1)
+                assert.equal(context.inst._runs, 1)
+                assert.equal(context.inst._cleared, 1)
                 return opts.after == null ? undefined : opts.after(context, h)
             })
         })
