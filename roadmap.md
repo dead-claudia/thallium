@@ -20,7 +20,7 @@ Note that as of this version, only the primary API of the previous version will 
 4. Make `t.only` a `t.run()` option
     - Now that `t.only` is detected at test run time, this is way easier to do, and it just makes more sense here than as a setter
     - Also, accept a `skip` option to skip certain tests.
-    - `t.only` will be retained in `thallium/migrate`
+    - Global `t.only` will be retained in `thallium/migrate`
 5. ~~Expose `thallium` as global `t` in bundle, tack existing `tl.*` exports onto it~~
     - ~~Expose `thallium/assert` as global `assert` instead~~
     - ~~Don't expose `require("thallium")`~~
@@ -32,7 +32,7 @@ Note that as of this version, only the primary API of the previous version will 
     - Change `exports.thallium` to default export
     - Ignored by core, but will mildly simplify CLI interface
     - Will make parallel interface much more consistent
-9. Allow full name matching of `t.only`
+9. Allow full name matching of `only` option
     - Detected via no array
     - Feature parity with most other heavy frameworks
 10. Add `t.options` getter/setter for default run (not CLI) options
@@ -52,7 +52,10 @@ Note that as of this version, only the primary API of the previous version will 
 16. Expose `thallium/internal` as `reflect.internal()`
 17. Expose a detached `reflect` via `t.reflect()`
     - Mainly for easier testing/etc.
-18. Load bundle automatically, and implement `data-*` attribute options
+18. ~~Load bundle automatically, and implement `data-*` attribute options~~
+19. Add `timeouts` boolean run option (default `true`) to disable timeouts globally
+20. Add `color` boolean run option (default system-dependent) to enable/disable colors
+    - Also provide this info to reporters per-report
 
 ## 0.4.x
 (not blocking 0.4.0)

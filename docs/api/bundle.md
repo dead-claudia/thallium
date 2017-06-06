@@ -6,7 +6,6 @@ The Thallium browser bundle works similarly to the browser API, but it's all in 
 
 ```html
 <!DOCTYPE html>
-<title>Thallium Tests</title>
 <!-- Load the bundle and your tests -->
 <script
     src="./node_modules/thallium/thallium.js"
@@ -55,13 +54,13 @@ t.run()
 - `t.r.spec` - The spec reporter, same as `require("thallium/r/spec")`.
 - `t.r.tap` - The tap reporter, same as `require("thallium/r/tap")`.
 - `t.internal` - The internal types, same as `require("thallium/internal")`
-- `t.settings` - Various settings to toggle. Each setting has a `setting.get()` and `setting.set(value)` method to get and set the setting, respectively.
+- `t.console` - Various console settings to toggle, exposed as properties.
 
-    - `t.settings.windowWidth: number` - The terminal window width as an integer, for reporters.
-    - `t.settings.newline: string` - The newline character to use, for reporters.
-    - `t.settings.symbols: {Pass, Fail, Dot}` - The string symbol to use for each of these, for reporters.
-    - `t.settings.defaultOpts: {print, write, reset}` - The default options to use. See the [reporter options](../reporters.md#options) for more details.
-    - `t.settings.colorSupport: {supported, forced}` - Set the default color support, in case you're using Rhino, Nashorn, etc., and wish to print terminal colors. Note that this is technically unsupported, but I would at least leave the door open for it.
+    - `t.console.windowWidth: number` - The terminal window width as an integer, for reporters.
+    - `t.console.newline: string` - The newline character to use, for reporters.
+    - `t.console.symbols: {Pass, Fail, Dot}` - The string symbol to use for each of these, for reporters.
+    - `t.console.defaults: {print, write, reset}` - The default options to use. See the [reporter options](../reporters.md#options) for more details.
+    - `t.console.colorSupport: {supported, forced}` - Set the default color support, in case you're using Rhino, Nashorn, etc., and wish to print terminal colors. Note that this is technically unsupported, but I would at least leave the door open for it.
 
 You can also find the definitions for this module in `thallium.d.ts` next to the bundle, in case you're using TypeScript with this.
 

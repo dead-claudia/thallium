@@ -7,7 +7,8 @@ var R = require("../lib/reporter")
 var inspect = require("clean-assert-util").inspect
 
 function shouldBreak(minLength, str) {
-    return str.length > R.windowWidth() - minLength || /\r?\n|[:?-]/.test(str)
+    return str.length > R.Console.windowWidth - minLength ||
+        /\r?\n|[:?-]/.test(str)
 }
 
 function template(_, report, tmpl, skip) {

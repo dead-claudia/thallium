@@ -7,18 +7,7 @@ describe("reporter/dot", function () {
     var p = t.internal.location
     var n = t.internal.reports
     var c = Util.R.color
-
-    it("is not itself a reporter", function () {
-        var dot = t.r.dot
-
-        assert.throws(TypeError, function () { dot(n.start()) })
-        assert.throws(TypeError, function () { dot(n.enter([p("test", 0)])) })
-        assert.throws(TypeError, function () { dot(n.leave([p("test", 0)])) })
-        assert.throws(TypeError, function () { dot(n.pass([p("test", 0)])) })
-        assert.throws(TypeError, function () { dot(n.fail([p("test", 0)])) })
-        assert.throws(TypeError, function () { dot(n.skip([p("test", 0)])) })
-        assert.throws(TypeError, function () { dot(n.end()) })
-    })
+    var Console = Util.R.Console
 
     it("validates no arguments", function () {
         t.r.dot()
@@ -74,14 +63,22 @@ describe("reporter/dot", function () {
         }
     }
 
-    function run(envColors, reporterColors) { // eslint-disable-line max-statements, max-len
-        Util.R.Colors.forceSet(envColors)
-        beforeEach(function () { Util.R.Colors.forceSet(envColors) })
-        afterEach(function () { Util.R.Colors.forceRestore() })
+    function forceSet(isSupported, isForced) {
+        Console.colorSupport.isSupported = !!isSupported
+        Console.colorSupport.isForced = !!isForced
+    }
 
-        var pass = c("fast", Util.R.symbols().Dot)
-        var fail = c("fail", Util.R.symbols().DotFail)
-        var skip = c("skip", Util.R.symbols().Dot)
+    function run(envColors, reporterColors) { // eslint-disable-line max-statements, max-len
+        var isSupported = Console.colorSupport.isSupported
+        var isForced = Console.colorSupport.isForced
+
+        forceSet(envColors, true)
+        beforeEach(function () { forceSet(envColors, true) })
+        afterEach(function () { forceSet(isSupported, isForced) })
+
+        var pass = c("fast", Console.symbols.Dot)
+        var fail = c("fail", Console.symbols.DotFail)
+        var skip = c("skip", Console.symbols.Dot)
         var test = makeTest(reporterColors)
 
         // So I can verify colors are enabled.
@@ -958,7 +955,7 @@ describe("reporter/dot", function () {
                 ]),
             })
 
-            Util.R.Colors.forceRestore()
+            forceSet(isSupported, isForced)
         })
     }
 
@@ -971,9 +968,9 @@ describe("reporter/dot", function () {
         var test = makeTest(true)
 
         // Speed affects `"pass"` and `"enter"` events only.
-        var fast = c("fast", Util.R.symbols().Dot)
-        var medium = c("medium", Util.R.symbols().Dot)
-        var slow = c("slow", Util.R.symbols().Dot)
+        var fast = c("fast", Console.symbols.Dot)
+        var medium = c("medium", Console.symbols.Dot)
+        var slow = c("slow", Console.symbols.Dot)
 
         function at(speed) {
             if (speed === "slow") return 80

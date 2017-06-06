@@ -17,8 +17,8 @@ describe("cli/e2e (FLAKE)", /** @this */ function () {
 
     function formatList(msgs) {
         return msgs
-            .replace(/\r?\n/g, Util.R.newline())
-            .replace(/\n{2,}/g, Util.R.newline())
+            .replace(/\r?\n/g, Util.R.Console.newline)
+            .replace(/\n{2,}/g, Util.R.Console.newline)
             .trim()
     }
 
@@ -26,7 +26,7 @@ describe("cli/e2e (FLAKE)", /** @this */ function () {
         opts.args.unshift(binary)
 
         if (Array.isArray(opts.messages)) {
-            opts.messages = opts.messages.join(Util.R.newline())
+            opts.messages = opts.messages.join(Util.R.Console.newline)
         }
 
         (opts.skip ? it.skip : it)(name, /** @this */ function () {

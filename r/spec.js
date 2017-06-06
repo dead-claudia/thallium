@@ -3,7 +3,6 @@
 // This is a reporter that mimics Mocha's `spec` reporter.
 
 var R = require("../lib/reporter")
-var c = R.color
 
 function indent(level) {
     var ret = ""
@@ -60,13 +59,13 @@ module.exports = R.on("spec", {
         } else if (report.isPass) {
             return printReport(_, report, function () {
                 var str =
-                    c("checkmark", R.symbols().Pass + " ") +
-                    c("pass", getName(_.state.level, report))
+                    R.color("checkmark", R.Console.symbols.Pass + " ") +
+                    R.color("pass", getName(_.state.level, report))
 
                 var speed = R.speed(report)
 
                 if (speed !== "fast") {
-                    str += c(speed, " (" + report.duration + "ms)")
+                    str += R.color(speed, " (" + report.duration + "ms)")
                 }
 
                 return str
@@ -80,13 +79,13 @@ module.exports = R.on("spec", {
             }
 
             return printReport(_, report, function () {
-                return c("fail",
+                return R.color("fail",
                     _.errors.length + ") " + getName(_.state.level, report) +
                     R.formatRest(report))
             })
         } else if (report.isSkip) {
             return printReport(_, report, function () {
-                return c("skip", "- " + getName(_.state.level, report))
+                return R.color("skip", "- " + getName(_.state.level, report))
             })
         }
 

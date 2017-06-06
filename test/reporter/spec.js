@@ -7,18 +7,7 @@ describe("reporter/spec", function () {
     var c = Util.R.color
     var p = t.internal.location
     var n = t.internal.reports
-
-    it("is not itself a reporter", function () {
-        var spec = t.r.spec
-
-        assert.throws(TypeError, function () { spec(n.start()) })
-        assert.throws(TypeError, function () { spec(n.enter([p("test", 0)])) })
-        assert.throws(TypeError, function () { spec(n.leave([p("test", 0)])) })
-        assert.throws(TypeError, function () { spec(n.pass([p("test", 0)])) })
-        assert.throws(TypeError, function () { spec(n.fail([p("test", 0)])) })
-        assert.throws(TypeError, function () { spec(n.skip([p("test", 0)])) })
-        assert.throws(TypeError, function () { spec(n.end()) })
-    })
+    var Console = Util.R.Console
 
     it("validates no arguments", function () {
         t.r.spec()
@@ -40,7 +29,8 @@ describe("reporter/spec", function () {
     }
 
     function pass(name) {
-        return c("checkmark", Util.R.symbols().Pass + " ") + c("pass", name)
+        return c("checkmark", Console.symbols.Pass + " ") +
+            c("pass", name)
     }
 
     function time(duration) {
@@ -71,10 +61,18 @@ describe("reporter/spec", function () {
         }
     }
 
+    function forceSet(isSupported, isForced) {
+        Console.colorSupport.isSupported = !!isSupported
+        Console.colorSupport.isForced = !!isForced
+    }
+
     function run(envColors, reporterColors) { // eslint-disable-line max-statements, max-len
-        Util.R.Colors.forceSet(envColors)
-        beforeEach(function () { Util.R.Colors.forceSet(envColors) })
-        afterEach(function () { Util.R.Colors.forceRestore() })
+        var isSupported = Console.colorSupport.isSupported
+        var isForced = Console.colorSupport.isForced
+
+        forceSet(envColors, true)
+        beforeEach(function () { forceSet(envColors, true) })
+        afterEach(function () { forceSet(isSupported, isForced) })
 
         var test = makeTest(reporterColors)
 
@@ -1065,7 +1063,7 @@ describe("reporter/spec", function () {
             })
         })
 
-        Util.R.Colors.forceRestore()
+        forceSet(isSupported, isForced)
     }
 
     context("no env color + no color opt", function () { run(false, false) })

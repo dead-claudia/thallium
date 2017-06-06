@@ -1085,7 +1085,7 @@ describe("core/reporters", function () { // eslint-disable-line max-statements
             e.stack = e.message
             assert.match(
                 Util.R.getStack(e),
-                "Error: test" + Util.R.newline() + "test"
+                "Error: test" + Util.R.Console.newline + "test"
             )
         })
 
@@ -1095,8 +1095,8 @@ describe("core/reporters", function () { // eslint-disable-line max-statements
             e.stack = e.message + "\n at Foo "
             assert.match(
                 Util.R.getStack(e),
-                "Error:   test" + Util.R.newline() +
-                "   test" + Util.R.newline() +
+                "Error:   test" + Util.R.Console.newline +
+                "   test" + Util.R.Console.newline +
                 "at Foo"
             )
         })

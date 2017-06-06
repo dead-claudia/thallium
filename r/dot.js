@@ -5,17 +5,18 @@
 var R = require("../lib/reporter")
 
 function width() {
-    return R.windowWidth() * 4 / 3 | 0
+    return R.Console.windowWidth * 4 / 3 | 0
 }
 
 function printDot(_, color) {
     function emit() {
-        return _.write(R.color(color,
-            color === "fail" ? R.symbols().DotFail : R.symbols().Dot))
+        return _.write(R.color(color, color === "fail"
+                ? R.Console.symbols.DotFail
+                : R.Console.symbols.Dot))
     }
 
     if (_.state.counter++ % width() === 0) {
-        return _.write(R.newline() + "  ").then(emit)
+        return _.write(R.Console.newline + "  ").then(emit)
     } else {
         return emit()
     }

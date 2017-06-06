@@ -7,18 +7,6 @@ describe("reporter/tap", function () { // eslint-disable-line max-statements
     var p = t.internal.location
     var n = t.internal.reports
 
-    it("is not itself a reporter", function () {
-        var tap = t.r.tap
-
-        assert.throws(TypeError, function () { tap(n.start()) })
-        assert.throws(TypeError, function () { tap(n.enter([p("test", 0)])) })
-        assert.throws(TypeError, function () { tap(n.leave([p("test", 0)])) })
-        assert.throws(TypeError, function () { tap(n.pass([p("test", 0)])) })
-        assert.throws(TypeError, function () { tap(n.fail([p("test", 0)])) })
-        assert.throws(TypeError, function () { tap(n.skip([p("test", 0)])) })
-        assert.throws(TypeError, function () { tap(n.end()) })
-    })
-
     it("validates no arguments", function () {
         t.r.tap()
     })

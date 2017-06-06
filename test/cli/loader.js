@@ -142,7 +142,7 @@ describe("cli/loader", function () {
             })
 
             var loader = Loader.makeSimple({util: util}, util.cwd(),
-                "./test/config.js")
+                "./test/config.js", false)
 
             return Loader.load(loader).then(function () {
                 assert.equal(spy.called, 1)
@@ -158,7 +158,7 @@ describe("cli/loader", function () {
             })
 
             var loader = Loader.makeSimple({util: util}, util.cwd(),
-                "./test/config.js")
+                "./test/config.js", false)
 
             return Loader.load(loader).then(function () {
                 assert.equal(spy1.called, 1)
@@ -177,7 +177,7 @@ describe("cli/loader", function () {
             })
 
             var loader = Loader.makeSimple({util: util}, util.cwd(),
-                "./test/config.js")
+                "./test/config.js", false)
 
             return Loader.load(loader).then(function () {
                 assert.equal(spy.called, 1)
@@ -195,7 +195,7 @@ describe("cli/loader", function () {
             })
 
             var loader = Loader.makeSimple({util: util}, util.cwd(),
-                "./test/config.js")
+                "./test/config.js", false)
 
             return Loader.load(loader).then(function () {
                 assert.equal(spy1.called, 1)
@@ -214,7 +214,7 @@ describe("cli/loader", function () {
             })
 
             var loader = Loader.makeSimple({util: util}, util.cwd(),
-                "./test/config.js")
+                "./test/config.js", false)
 
             return Loader.load(loader).then(function () {
                 assert.equal(spy1.called, 0)
@@ -234,7 +234,7 @@ describe("cli/loader", function () {
             })
 
             var loader = Loader.makeSimple({util: util}, util.cwd(),
-                "./test/config.js")
+                "./test/config.js", false)
 
             return Loader.load(loader).then(function () {
                 assert.equal(spy1.called, 0)
