@@ -24,9 +24,9 @@ try {
     m.filename = m.id
     m.paths = Module._nodeModulePaths(baseDir)
     m.loaded = true
-    init = m.require("thallium/lib/cli/init.js")
+    init = m.require("thallium/cli.js")
 } catch (_) {
-    init = require("../lib/cli/init.js") // eslint-disable-line global-require
+    init = require("../cli.js") // eslint-disable-line global-require
 }
 
 // Note: This *must* be called after module load, so that errors thrown don't

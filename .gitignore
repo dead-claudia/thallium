@@ -2,7 +2,5 @@
 
 # Tooling stuff
 /npm-debug.log
+/yarn-error.log
 /.eslintcache
-
-# Generated stuff
-/assert.d.ts
