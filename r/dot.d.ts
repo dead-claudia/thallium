@@ -2,10 +2,11 @@
 
 import {ReporterConsumer} from "../index.d";
 
-export interface DotOptions {
+export interface Options {
     write?(string: string): void | PromiseLike<void>;
     reset?(): void | PromiseLike<void>;
     color?: boolean;
 }
 
-export function dot(options?: DotOptions): ReporterConsumer;
+export default function dot(options?: Options): ReporterConsumer;
+export {default as dot};

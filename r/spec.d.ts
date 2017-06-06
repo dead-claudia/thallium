@@ -2,10 +2,11 @@
 
 import {ReporterConsumer} from "../index.d";
 
-export interface SpecOptions {
+export interface Options {
     write?(line: string): void | PromiseLike<void>;
     reset?(): void | PromiseLike<void>;
     color?: boolean;
 }
 
-export function spec(options?: SpecOptions): ReporterConsumer;
+export default function spec(options?: Options): ReporterConsumer;
+export {default as spec};

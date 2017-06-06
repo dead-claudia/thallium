@@ -118,37 +118,33 @@ describe("core/reporters", function () { // eslint-disable-line max-statements
     })
 
     context("reflect", function () {
-        function notHasReporter(tt, reporter) {
-            if (tt.call(function (r) { return r.hasReporter(reporter) })) {
+        function notHasReporter(tt, ref) {
+            if (tt.call(function (r) { return r.hasReporter(ref) })) {
                 assert.fail("Expected test to not have reporter {actual}", {
-                    actual: reporter,
+                    actual: ref,
                 })
             }
         }
 
-        function hasReporter(tt, reporter) {
-            if (!tt.call(function (r) { return r.hasReporter(reporter) })) {
+        function hasReporter(tt, ref) {
+            if (!tt.call(function (r) { return r.hasReporter(ref) })) {
                 assert.fail("Expected test to have reporter {expected}", {
-                    expected: reporter,
+                    expected: ref,
                 })
             }
         }
 
         function addReporter(reflect, reporter) {
-            reflect.reporter(reporter)
-        }
-
-        function removeReporter(reflect, reporter) {
-            reflect.removeReporter(reporter)
+            return reflect.reporter(reporter)
         }
 
         it("added to root correctly", function () {
-            var tt = t.internal.root()
-
             function reporter() { return Util.const() }
 
-            tt.call(addReporter, reporter)
-            hasReporter(tt, reporter)
+            var tt = t.internal.root()
+            var ref = tt.call(addReporter, reporter)
+
+            hasReporter(tt, ref)
         })
 
         it("errors if added to children", function () {
@@ -157,9 +153,9 @@ describe("core/reporters", function () { // eslint-disable-line max-statements
 
             function check(tt, reporter) {
                 if (successful) return
+                successful = true
                 try {
                     tt.call(addReporter, reporter)
-                    successful = true
                 } catch (e) {
                     successful = false
                 }
@@ -172,7 +168,7 @@ describe("core/reporters", function () { // eslint-disable-line max-statements
             function reporter5() { return Util.const() }
             function reporter6() { return Util.const() }
 
-            tt.call(addReporter, reporter6)
+            var ref = tt.call(addReporter, reporter6)
 
             tt.test("test", function () {
                 check(tt, reporter1)
@@ -184,12 +180,7 @@ describe("core/reporters", function () { // eslint-disable-line max-statements
 
             return tt.run().then(function () {
                 assert.equal(successful, false)
-                notHasReporter(tt, reporter1)
-                notHasReporter(tt, reporter2)
-                notHasReporter(tt, reporter3)
-                notHasReporter(tt, reporter4)
-                notHasReporter(tt, reporter5)
-                hasReporter(tt, reporter6)
+                hasReporter(tt, ref)
             })
         })
 
@@ -198,9 +189,12 @@ describe("core/reporters", function () { // eslint-disable-line max-statements
 
             function reporter() { return Util.const() }
 
-            tt.call(addReporter, reporter)
-            tt.call(removeReporter, reporter)
-            notHasReporter(tt, reporter)
+            var ref = tt.call(addReporter, reporter)
+
+            tt.call(function (reflect) {
+                reflect.removeReporter(ref)
+            })
+            notHasReporter(tt, ref)
         })
 
         it("errors if \"removed\" from children", function () {
@@ -216,25 +210,15 @@ describe("core/reporters", function () { // eslint-disable-line max-statements
 
             function checkAdd(tt, reporter) {
                 if (successful) return
+                successful = true
                 try {
                     tt.call(addReporter, reporter)
-                    successful = true
                 } catch (e) {
                     successful = false
                 }
             }
 
-            function checkRemove(tt, reporter) {
-                if (successful) return
-                try {
-                    tt.call(addReporter, reporter)
-                    successful = true
-                } catch (e) {
-                    successful = false
-                }
-            }
-
-            tt.call(addReporter, reporter6)
+            var ref = tt.call(addReporter, reporter6)
 
             tt.test("test", function () {
                 checkAdd(tt, reporter1)
@@ -242,20 +226,11 @@ describe("core/reporters", function () { // eslint-disable-line max-statements
                 checkAdd(tt, reporter3)
                 checkAdd(tt, reporter4)
                 checkAdd(tt, reporter5)
-
-                checkRemove(tt, reporter1)
-                checkRemove(tt, reporter2)
-                checkRemove(tt, reporter4)
             })
 
             return tt.run().then(function () {
                 assert.equal(successful, false)
-                notHasReporter(tt, reporter1)
-                notHasReporter(tt, reporter2)
-                notHasReporter(tt, reporter3)
-                notHasReporter(tt, reporter4)
-                notHasReporter(tt, reporter5)
-                hasReporter(tt, reporter6)
+                hasReporter(tt, ref)
             })
         })
 
@@ -279,17 +254,33 @@ describe("core/reporters", function () { // eslint-disable-line max-statements
             tt.test("test 1", function () {})
             tt.test("test 2", function () {})
 
-            var expected = [
-                n.start(),
-                n.pass([p("test 1", 0)]),
-                n.pass([p("test 2", 1)]),
-                n.end(),
-            ]
-
             return tt.run().then(function () {
-                assert.match(ret1, expected)
-                assert.match(ret2, expected)
-                assert.match(ret3, expected)
+                assert.match(ret1, [
+                    n.start(),
+                    n.start(),
+                    n.pass([p("test 1", 0)]),
+                    n.pass([p("test 1", 0)]),
+                    n.pass([p("test 2", 1)]),
+                    n.pass([p("test 2", 1)]),
+                    n.end(),
+                    n.end(),
+                ])
+                assert.match(ret2, [
+                    n.start(),
+                    n.pass([p("test 1", 0)]),
+                    n.pass([p("test 2", 1)]),
+                    n.end(),
+                ])
+                assert.match(ret3, [
+                    n.start(),
+                    n.start(),
+                    n.pass([p("test 1", 0)]),
+                    n.pass([p("test 1", 0)]),
+                    n.pass([p("test 2", 1)]),
+                    n.pass([p("test 2", 1)]),
+                    n.end(),
+                    n.end(),
+                ])
             })
         })
     })

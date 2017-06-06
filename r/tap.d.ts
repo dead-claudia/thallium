@@ -2,9 +2,10 @@
 
 import {ReporterConsumer} from "../index.d";
 
-export interface TapOptions {
+export interface Options {
     write?(line: string): void | PromiseLike<void>;
     reset?(): void | PromiseLike<void>;
 }
 
-export function tap(options?: TapOptions): ReporterConsumer;
+export default function tap(options?: Options): ReporterConsumer;
+export {default as tap};

@@ -241,9 +241,51 @@ export interface Callback {
  * but give plenty of access to details for plugin/reporter/etc. developers,
  * in case they need it.
  */
-export type Reflect = ReflectRoot | ReflectCommon;
+export interface Reflect {
+    /**
+     * Is this test the root, i.e. top level?
+     */
+    isRoot: boolean;
 
-interface ReflectCommon {
+    /**
+     * Whether a particular reporter was registered.
+     * @throws TypeError if this isn't the root
+     */
+    hasReporter(reporter: ReporterConsumer): boolean;
+
+    /**
+     * Add a reporter.
+     * @throws TypeError if this isn't the root.
+     */
+    reporter<T>(reporter: Reporter<T>, arg: T): ReporterConsumer;
+
+    /**
+     * Add a reporter.
+     * @throws TypeError if this isn't the root.
+     */
+    reporter(reporter: VoidReporter): ReporterConsumer;
+
+    /**
+     * Remove a reporter.
+     * @throws TypeError if this isn't the root.
+     */
+    removeReporter(reporter: ReporterConsumer): void;
+
+    /**
+     * Get the test name or `undefined` if this is the root.
+     */
+    name: string | undefined;
+
+    /**
+     * Get the test index or `undefined` if this is the root.
+     */
+    index: number | undefined;
+
+    /**
+     * Get the parent test as a Reflect or `undefined` if this is the root.
+     */
+    parent: Reflect | undefined;
+
     /**
      * Get the currently executing test.
      */
@@ -252,7 +294,7 @@ interface ReflectCommon {
     /**
      * Get the root test.
      */
-    root: ReflectRoot;
+    root: Reflect;
 
     /**
      * Get the current total test count.
@@ -263,7 +305,7 @@ interface ReflectCommon {
      * Get a copy of the current test list, as a Reflect collection. This is
      * intentionally a slice, so you can't mutate the real children.
      */
-    children: ReflectChild[];
+    children: Reflect[];
 
     /**
      * Is this locked (i.e. unsafe to modify)?
@@ -355,70 +397,6 @@ interface ReflectCommon {
      * Add a skipped block or inline test.
      */
     testSkip(name: string, callback: Callback): void;
-}
-
-export interface ReflectRoot extends ReflectCommon {
-    /**
-    * Is this test the root, i.e. top level?
-    */
-    isRoot: true;
-
-    /**
-     * Whether a particular reporter was registered
-     */
-    hasReporter(reporter: Reporter<any>): boolean;
-
-    /**
-     * Add a reporter.
-     */
-    reporter<T>(reporter: Reporter<T>, arg: T): void;
-
-    /**
-     * Add a reporter.
-     */
-    reporter(reporter: VoidReporter): void;
-
-    /**
-     * Remove a reporter.
-     */
-    removeReporter(reporter: Reporter<any>): void;
-
-    /**
-     * Get the test name.
-     */
-    name: void;
-
-    /**
-     * Get the test index.
-     */
-    index: void;
-
-    /**
-     * Get the parent test as a Reflect.
-     */
-    parent: void;
-}
-
-export interface ReflectChild extends ReflectCommon {
-    /**
-    * Is this test the root, i.e. top level?
-    */
-    isRoot: false;
-
-    /**
-     * Get the test name.
-     */
-    name: string;
-
-    /**
-     * Get the test index.
-     */
-    index: number;
-
-    /**
-     * Get the parent test as a Reflect.
-     */
-    parent: Reflect;
 }
 
 export interface Test {

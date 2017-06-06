@@ -1,7 +1,7 @@
-import dot, * as Dot from "../r/dot";
-import spec, * as Spec from "../r/spec";
-import tap, * as Tap from "../r/tap";
+import {dot, Options as DotOptions} from "../r/dot";
+import {spec, Options as SpecOptions} from "../r/spec";
+import {tap, Options as TapOptions} from "../r/tap";
 
-export {Dot, dot};
-export {Spec, spec};
-export {Tap, tap};
+export {dot, DotOptions};
+export {spec, SpecOptions};
+export {tap, TapOptions};
