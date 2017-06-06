@@ -120,6 +120,7 @@ function watch(task) {
 }
 
 task("watch", function () { watch("test") })
+task("watch:local", function () { watch("test:local") })
 task("watch:chrome", function () { watch("test:chrome") })
 task("watch:phantomjs", function () { watch("test:phantomjs") })
 task("watch:node", function () { watch("test:node") })
