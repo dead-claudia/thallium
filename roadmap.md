@@ -17,10 +17,9 @@ Note that as of this version, only the primary API of the previous version will 
 2. ~~Add `--respawn-as` to allow respawning via a binary other than the default (e.g. Electron)~~
     - ~~This will force a respawn using a PATH lookup if necessary~~
 3. ~~Add `--env` to allow setting environment on startup, before any respawning occurs~~
-4. Make `t.only` a `t.run()` option
-    - Now that `t.only` is detected at test run time, this is way easier to do, and it just makes more sense here than as a setter
-    - Also, accept a `skip` option to skip certain tests.
-    - Global `t.only` will be retained in `thallium/migrate`
+4. ~~Make `t.only` a `t.run()` option~~
+    - ~~Now that `t.only` is detected at test run time, this is way easier to do, and it just makes more sense here than as a setter~~
+    - ~~Also, accept a `skip` option to skip certain tests.~~
 5. ~~Expose `thallium` as global `t` in bundle, tack existing `tl.*` exports onto it~~
     - ~~Expose `thallium/assert` as global `assert` instead~~
     - ~~Don't expose `require("thallium")`~~
@@ -32,7 +31,7 @@ Note that as of this version, only the primary API of the previous version will 
     - Change `exports.thallium` to default export
     - Ignored by core, but will mildly simplify CLI interface
     - Will make parallel interface much more consistent
-9. Allow full name matching of `only` option
+9. Allow full name matching of `only`/`skip` option
     - Detected via no array
     - Feature parity with most other heavy frameworks
 10. Add `t.options` getter/setter for default run (not CLI) options

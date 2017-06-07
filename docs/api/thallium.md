@@ -12,7 +12,7 @@ These are the most common methods you'll ever use.
 - [`t.attempts`](#attempts)
 - [`t.isFailable`](#isFailable)
 - [`t.only(...selectors)`](#only)
-- [`t.run()`](#run)
+- [`t.run(opts?)`](#run)
 - [Adding test hooks with `t.before(func)`, `t.beforeAll(func)`, `t.after(func)`, and `t.afterAll(func)`](#test-hooks)
 - [`t.clearTests()`](#clear-tests)
 
@@ -180,18 +180,22 @@ Also, empty arrays match no test, and passing no arguments will prevent all test
 ## t.run()
 
 ```js
-t.run(callback)
-t.run().then(...)
+t.run(opts={}).then(...)
 ```
 
-This will run all your tests. If you're using the CLI, this is unnecessary, as it's handled for you, but if you're simply using a single test file, and you just want to use `node test.js`, you can use this. Also, it's good for if you're running it in the browser. It either accepts a Node-style error-first callback or returns a promise, called or resolved whenever the test is completed.
+This will run all your tests. If you're using the CLI, this is unnecessary, as it's handled for you, but if you're simply using a single test file, and you just want to use `node test.js`, you can use this. Also, it's good for if you're running it in the browser. It returns a promise resolved whenever the test is completed.
+
+The following options are accepted, none required:
+
+- `only` - Much like `t.only`, except it's specified and handled per-run.
+- `skip` - Skip tests in this run using the same kind of selector as `only`.
 
 If it's rejected, the rejection always caused by one of two things:
 
 1. A reporter threw/returned an error it didn't catch.
 2. Thallium itself threw an error it didn't catch.
 
-Either way, it's fatal, the test run has already aborted, and state has already been reset. Because of this, it is actually safe to rerun the tests after a rejection, since it's not in an invalid state unless the error was from Thallium itself (in which [you definitely should report it](https://github.com/isiahmeadows/thallium/issues/new)).
+Either case is fatal, but Thallium restores its state for a subsequent rerun (in case of flaky reporters). If it isn't, and the error isn't from the reporter, it's a bug [you definitely should report](https://github.com/isiahmeadows/thallium/issues/new))
 
 <a id="test-hooks"></a>
 ## Adding test hooks

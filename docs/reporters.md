@@ -9,7 +9,7 @@ Thallium comes with a few useful built-in reporters to start with. If you are in
 This is the default reporter, inspired by (and mostly a copy of design-wise) Mocha's `spec` reporter.
 
 ```js
-t.reporter(require("thallium/r/spec"))
+t.reporter(require("thallium/r/spec"), opts={})
 ```
 
 ![spec pass](./images/screenshot-spec-pass.png)
@@ -21,7 +21,7 @@ t.reporter(require("thallium/r/spec"))
 This is a more minimal reporter, where failing tests are marked by exclamation points, skipped tests blue dots, and slow tests yellow dots. It's inspired by Mocha's `dot` reporter, and looks fairly similar to it.
 
 ```js
-t.reporter(require("thallium/r/dot"))
+t.reporter(require("thallium/r/dot"), opts={})
 ```
 
 ![dot pass](./images/screenshot-dot-pass.png)
@@ -33,7 +33,7 @@ t.reporter(require("thallium/r/dot"))
 A [TAP-compatible](https://testanything.org) reporter, for you to use with various tools.
 
 ```js
-t.reporter(require("thallium/r/tap"))
+t.reporter(require("thallium/r/tap"), opts={})
 ```
 
 ![tap pass](./images/screenshot-tap-pass.png)
