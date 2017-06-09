@@ -4,7 +4,7 @@
 
 The browser bundle comes with its own runner, complete with script loading and a "Run" button. It's meant to be simple and easy to use, so you can get started very quickly.
 
-![./images/screenshot-dom.png]
+![dom runner](./images/screenshot-dom.png)
 
 Here's how to use it:
 
