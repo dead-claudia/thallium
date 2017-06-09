@@ -4,7 +4,6 @@
   "description": "A simple, unopinionated, modular test framework",
   "main": "index.js",
   "scripts": {
-    "postinstall": "node scripts/update-clean-assert.js || echo Warning: thallium/assert.d.ts is not set up! >&2",
     "test": "node make"
   },
   "browser": {
