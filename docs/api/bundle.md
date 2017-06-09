@@ -19,7 +19,7 @@ In Nashorn, you could do similar to what you would do in Node, taking advantage 
 load("thallium.js")
 
 // Print the results to the console with the spec reporter.
-t.reporter(t.r.spec, {
+t.reporter = ["spec", {
     // If nothing has printed yet, don't print a newline afterwards.
     lastIsNewline: true,
     out: java.lang.System.out,
@@ -35,7 +35,7 @@ t.reporter(t.r.spec, {
             this.out.println()
         }
     },
-})
+}]
 
 // Load your tests
 load("tests.js")

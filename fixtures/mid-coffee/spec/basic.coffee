@@ -10,24 +10,32 @@ assert = require 'thallium/assert'
 {root: create} = require 'thallium/internal'
 
 t.test 'core (basic)', ->
+    t.timeout = Infinity
     t.test 'reflect', ->
+        t.test 'get reflect', ->
+            t.test 'is equivalent to this/arg in tt.call()', ->
+                tt = create()
+                assert.equal tt.reflect, tt.call(-> this)
+                assert.equal tt.reflect, tt.call((x) -> x)
+
         t.test 'get parent', ->
             parent = -> @parent
 
             t.test 'works on the root instance', ->
-                assert.equal create().call(parent), undefined
+                assert.equal create().reflect.parent, undefined
 
             t.test 'works on children', ->
                 tt = create()
                 inner = undefined
-                tt.test 'test', -> inner = tt.call(parent)
-                tt.run().then -> assert.equal inner, tt.call(-> this)
+                tt.reporter = -> # Don't print anything
+                tt.test 'test', -> inner = tt.reflect.parent
+                tt.run().then -> assert.equal inner, tt.reflect
 
         t.test 'get count', ->
             tt = create()
-            count = -> @count
+            tt.reporter = -> # Don't print anything
             check = (name, expected) ->
-                found = tt.call(count)
+                found = tt.reflect.count
                 t.test name, -> assert.equal found, expected
 
             check 'works with 0 tests', 0
@@ -39,34 +47,33 @@ t.test 'core (basic)', ->
             check 'works with 3 tests', 3
 
             # Test this test itself
-            testCount = t.call count
+            testCount = t.reflect.count
             t.test 'works with itself', -> assert.equal testCount, 4
 
         t.test 'get name', ->
-            name = -> @name
-
             t.test 'works with the root test', ->
-                assert.equal create().call(name), undefined
+                assert.equal create().reflect.name, undefined
 
             t.test 'works with child tests', ->
                 tt = create()
                 child = undefined
-                tt.test 'test', -> child = tt.call(name)
+                tt.reporter = -> # Don't print anything
+                tt.test 'test', -> child = tt.reflect.name
                 tt.run().then -> assert.equal child, 'test'
 
             t.test 'works with itself', ->
-                assert.equal t.call(name), 'works with itself'
+                assert.equal t.reflect.name, 'works with itself'
 
         t.test 'get index', ->
             tt = create()
-            index = -> @index
             first = second = undefined
+            tt.reporter = -> # Don't print anything
 
             t.test 'works with the root test', ->
-                assert.equal tt.call(index), undefined
+                assert.equal tt.reflect.index, undefined
 
-            tt.test 'test', -> first = tt.call(index)
-            tt.test 'test', -> second = tt.call(index)
+            tt.test 'test', -> first = tt.reflect.index
+            tt.test 'test', -> second = tt.reflect.index
 
             tt.run().then ->
                 t.test 'works with the first child test', ->
@@ -76,33 +83,33 @@ t.test 'core (basic)', ->
                     assert.equal second, 1
 
                 t.test 'works with itself', ->
-                    assert.equal t.call(index), 3
+                    assert.equal t.reflect.index, 3
 
         t.test 'get children', ->
-            children = -> @children
-
             t.test 'works with 0 tests', ->
                 tt = create()
-                assert.match tt.call(children), []
+                assert.match tt.reflect.children, []
 
             t.test 'works with 1 test', ->
                 tt = create()
                 test = undefined
-                tt.test 'test', -> test = tt.call(-> this)
+                tt.reporter = -> # Don't print anything
+                tt.test 'test', -> test = tt.reflect
                 tt.run().then ->
-                    assert.match tt.call(children), [test]
+                    assert.match tt.reflect.children, [test]
 
             t.test 'works with 2 tests', ->
                 tt = create()
                 first = second = undefined
-                tt.test 'first', -> first = tt.call(-> this)
-                tt.test 'second', -> second = tt.call(-> this)
+                tt.reporter = -> # Don't print anything
+                tt.test 'first', -> first = tt.reflect
+                tt.test 'second', -> second = tt.reflect
                 tt.run().then ->
-                    assert.match tt.call(children), [first, second]
+                    assert.match tt.reflect.children, [first, second]
 
             t.test 'returns a copy', ->
                 tt = create()
-                slice = tt.call(children)
+                slice = tt.reflect.children
                 tt.test 'test', ->
                 assert.match slice, []
 
@@ -112,7 +119,7 @@ t.test 'core (basic)', ->
             called = 0
             err = undefined
 
-            tt.reporter -> (res) ->
+            tt.reporter = (res) ->
                 err = res.error if res.isFail
                 return
 

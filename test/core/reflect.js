@@ -4,22 +4,21 @@ describe("core/reflect", function () {
     "use strict"
 
     describe("get current", function () {
-        function current(reflect) { return reflect.current }
-        function identity(reflect) { return reflect }
-
         it("returns the correct instance", function () {
             var tt = t.internal.root()
 
-            assert.equal(tt.call(current), tt.call(identity))
+            assert.equal(tt.reflect.current, tt.reflect)
         })
 
         it("returns the correct instance in a child test", function () {
             var tt = t.internal.root()
             var inner, found
 
+            // Don't print anything
+            tt.reporter = function () {}
             tt.test("test", function (tt) {
-                inner = tt.call(identity)
-                found = tt.call(current)
+                inner = tt.reflect
+                found = tt.reflect.current
             })
 
             return tt.run().then(function () {
@@ -31,31 +30,23 @@ describe("core/reflect", function () {
     context("hooks on reflect", function () {
         run({
             beforeAll: function (tt, callback) {
-                tt.call(function (reflect) {
-                    reflect.beforeAll(callback)
-                    assert.equal(reflect.hasBeforeAll(callback), true)
-                })
+                tt.reflect.beforeAll(callback)
+                assert.equal(tt.reflect.hasBeforeAll(callback), true)
             },
 
             beforeEach: function (tt, callback) {
-                tt.call(function (reflect) {
-                    reflect.before(callback)
-                    assert.equal(reflect.hasBefore(callback), true)
-                })
+                tt.reflect.before(callback)
+                assert.equal(tt.reflect.hasBefore(callback), true)
             },
 
             afterAll: function (tt, callback) {
-                tt.call(function (reflect) {
-                    reflect.afterAll(callback)
-                    assert.equal(reflect.hasAfterAll(callback), true)
-                })
+                tt.reflect.afterAll(callback)
+                assert.equal(tt.reflect.hasAfterAll(callback), true)
             },
 
             afterEach: function (tt, callback) {
-                tt.call(function (reflect) {
-                    reflect.after(callback)
-                    assert.equal(reflect.hasAfter(callback), true)
-                })
+                tt.reflect.after(callback)
+                assert.equal(tt.reflect.hasAfter(callback), true)
             },
         })
     })
@@ -64,30 +55,22 @@ describe("core/reflect", function () {
         run({
             beforeAll: function (tt, callback) {
                 tt.beforeAll(callback)
-                tt.call(function (reflect) {
-                    assert.equal(reflect.hasBeforeAll(callback), true)
-                })
+                assert.equal(tt.reflect.hasBeforeAll(callback), true)
             },
 
             beforeEach: function (tt, callback) {
                 tt.before(callback)
-                tt.call(function (reflect) {
-                    assert.equal(reflect.hasBefore(callback), true)
-                })
+                assert.equal(tt.reflect.hasBefore(callback), true)
             },
 
             afterAll: function (tt, callback) {
                 tt.afterAll(callback)
-                tt.call(function (reflect) {
-                    assert.equal(reflect.hasAfterAll(callback), true)
-                })
+                assert.equal(tt.reflect.hasAfterAll(callback), true)
             },
 
             afterEach: function (tt, callback) {
                 tt.after(callback)
-                tt.call(function (reflect) {
-                    assert.equal(reflect.hasAfter(callback), true)
-                })
+                assert.equal(tt.reflect.hasAfter(callback), true)
             },
         })
     })
@@ -100,6 +83,8 @@ describe("core/reflect", function () {
 
                 _.beforeAll(tt, function () { called++ })
 
+                // Don't print anything
+                tt.reporter = function () {}
                 return tt.run().then(function () {
                     assert.equal(called, 0)
                 })
@@ -112,6 +97,8 @@ describe("core/reflect", function () {
                 _.beforeAll(tt, function () { called++ })
                 tt.test("test", function () {})
 
+                // Don't print anything
+                tt.reporter = function () {}
                 return tt.run().then(function () {
                     assert.equal(called, 1)
                 })
@@ -125,6 +112,8 @@ describe("core/reflect", function () {
                 tt.test("test", function () {})
                 tt.test("test", function () {})
 
+                // Don't print anything
+                tt.reporter = function () {}
                 return tt.run().then(function () {
                     assert.equal(called, 1)
                 })
@@ -139,6 +128,8 @@ describe("core/reflect", function () {
                     tt.test("test", function () {})
                 })
 
+                // Don't print anything
+                tt.reporter = function () {}
                 return tt.run().then(function () {
                     assert.equal(called, 1)
                 })
@@ -153,6 +144,8 @@ describe("core/reflect", function () {
                     tt.test("test", function () {})
                 })
 
+                // Don't print anything
+                tt.reporter = function () {}
                 return tt.run().then(function () {
                     assert.equal(called, 1)
                 })
@@ -168,6 +161,8 @@ describe("core/reflect", function () {
                     tt.test("test", function () {})
                 })
 
+                // Don't print anything
+                tt.reporter = function () {}
                 return tt.run().then(function () {
                     assert.match(queue, ["root", "inner"])
                 })
@@ -181,6 +176,8 @@ describe("core/reflect", function () {
 
                 _.beforeEach(tt, function () { called++ })
 
+                // Don't print anything
+                tt.reporter = function () {}
                 return tt.run().then(function () {
                     assert.equal(called, 0)
                 })
@@ -193,6 +190,8 @@ describe("core/reflect", function () {
                 _.beforeEach(tt, function () { called++ })
                 tt.test("test", function () {})
 
+                // Don't print anything
+                tt.reporter = function () {}
                 return tt.run().then(function () {
                     assert.equal(called, 1)
                 })
@@ -206,6 +205,8 @@ describe("core/reflect", function () {
                 tt.test("test", function () {})
                 tt.test("test", function () {})
 
+                // Don't print anything
+                tt.reporter = function () {}
                 return tt.run().then(function () {
                     assert.equal(called, 2)
                 })
@@ -220,6 +221,8 @@ describe("core/reflect", function () {
                     tt.test("test", function () {})
                 })
 
+                // Don't print anything
+                tt.reporter = function () {}
                 return tt.run().then(function () {
                     assert.equal(called, 2)
                 })
@@ -234,6 +237,8 @@ describe("core/reflect", function () {
                     tt.test("test", function () {})
                 })
 
+                // Don't print anything
+                tt.reporter = function () {}
                 return tt.run().then(function () {
                     assert.equal(called, 1)
                 })
@@ -249,6 +254,8 @@ describe("core/reflect", function () {
                     tt.test("test", function () {})
                 })
 
+                // Don't print anything
+                tt.reporter = function () {}
                 return tt.run().then(function () {
                     assert.match(queue, ["root", "root", "inner"])
                 })
@@ -262,6 +269,8 @@ describe("core/reflect", function () {
 
                 _.afterEach(tt, function () { called++ })
 
+                // Don't print anything
+                tt.reporter = function () {}
                 return tt.run().then(function () {
                     assert.equal(called, 0)
                 })
@@ -274,6 +283,8 @@ describe("core/reflect", function () {
                 _.afterEach(tt, function () { called++ })
                 tt.test("test", function () {})
 
+                // Don't print anything
+                tt.reporter = function () {}
                 return tt.run().then(function () {
                     assert.equal(called, 1)
                 })
@@ -287,6 +298,8 @@ describe("core/reflect", function () {
                 tt.test("test", function () {})
                 tt.test("test", function () {})
 
+                // Don't print anything
+                tt.reporter = function () {}
                 return tt.run().then(function () {
                     assert.equal(called, 2)
                 })
@@ -301,6 +314,8 @@ describe("core/reflect", function () {
                     tt.test("test", function () {})
                 })
 
+                // Don't print anything
+                tt.reporter = function () {}
                 return tt.run().then(function () {
                     assert.equal(called, 2)
                 })
@@ -315,6 +330,8 @@ describe("core/reflect", function () {
                     tt.test("test", function () {})
                 })
 
+                // Don't print anything
+                tt.reporter = function () {}
                 return tt.run().then(function () {
                     assert.equal(called, 1)
                 })
@@ -330,6 +347,8 @@ describe("core/reflect", function () {
                     tt.test("test", function () {})
                 })
 
+                // Don't print anything
+                tt.reporter = function () {}
                 return tt.run().then(function () {
                     assert.match(queue, ["inner", "root", "root"])
                 })
@@ -343,6 +362,8 @@ describe("core/reflect", function () {
 
                 _.afterAll(tt, function () { called++ })
 
+                // Don't print anything
+                tt.reporter = function () {}
                 return tt.run().then(function () {
                     assert.equal(called, 0)
                 })
@@ -355,6 +376,8 @@ describe("core/reflect", function () {
                 _.afterAll(tt, function () { called++ })
                 tt.test("test", function () {})
 
+                // Don't print anything
+                tt.reporter = function () {}
                 return tt.run().then(function () {
                     assert.equal(called, 1)
                 })
@@ -368,6 +391,8 @@ describe("core/reflect", function () {
                 tt.test("test", function () {})
                 tt.test("test", function () {})
 
+                // Don't print anything
+                tt.reporter = function () {}
                 return tt.run().then(function () {
                     assert.equal(called, 1)
                 })
@@ -382,6 +407,8 @@ describe("core/reflect", function () {
                     tt.test("test", function () {})
                 })
 
+                // Don't print anything
+                tt.reporter = function () {}
                 return tt.run().then(function () {
                     assert.equal(called, 1)
                 })
@@ -396,6 +423,8 @@ describe("core/reflect", function () {
                     tt.test("test", function () {})
                 })
 
+                // Don't print anything
+                tt.reporter = function () {}
                 return tt.run().then(function () {
                     assert.equal(called, 1)
                 })
@@ -411,6 +440,8 @@ describe("core/reflect", function () {
                     tt.test("test", function () {})
                 })
 
+                // Don't print anything
+                tt.reporter = function () {}
                 return tt.run().then(function () {
                     assert.match(queue, ["inner", "root"])
                 })
@@ -427,6 +458,8 @@ describe("core/reflect", function () {
                 _.afterEach(tt, function () { queue.push("after each") })
                 _.afterAll(tt, function () { queue.push("after all") })
 
+                // Don't print anything
+                tt.reporter = function () {}
                 return tt.run().then(function () {
                     assert.match(queue, [])
                 })
@@ -442,6 +475,8 @@ describe("core/reflect", function () {
                 _.afterAll(tt, function () { queue.push("after all") })
                 tt.test("test", function () {})
 
+                // Don't print anything
+                tt.reporter = function () {}
                 return tt.run().then(function () {
                     assert.match(queue, [
                         "before all",
@@ -463,6 +498,8 @@ describe("core/reflect", function () {
                 tt.test("test", function () {})
                 tt.test("test", function () {})
 
+                // Don't print anything
+                tt.reporter = function () {}
                 return tt.run().then(function () {
                     assert.match(queue, [
                         "before all",
@@ -487,6 +524,8 @@ describe("core/reflect", function () {
                     tt.test("test", function () {})
                 })
 
+                // Don't print anything
+                tt.reporter = function () {}
                 return tt.run().then(function () {
                     assert.match(queue, [
                         "before all",
@@ -511,6 +550,8 @@ describe("core/reflect", function () {
                     tt.test("test", function () {})
                 })
 
+                // Don't print anything
+                tt.reporter = function () {}
                 return tt.run().then(function () {
                     assert.match(queue, [
                         "before all",
@@ -537,6 +578,8 @@ describe("core/reflect", function () {
                     tt.test("test", function () {})
                 })
 
+                // Don't print anything
+                tt.reporter = function () {}
                 return tt.run().then(function () {
                     assert.match(queue, [
                         "root before all",
@@ -560,10 +603,8 @@ describe("core/reflect", function () {
 
                 function callback() {}
                 _.beforeAll(tt, callback)
-                tt.call(function (reflect) {
-                    reflect.removeBeforeAll(callback)
-                    assert.equal(reflect.hasBeforeAll(callback), false)
-                })
+                tt.reflect.removeBeforeAll(callback)
+                assert.equal(tt.reflect.hasBeforeAll(callback), false)
             })
         })
 
@@ -573,10 +614,8 @@ describe("core/reflect", function () {
 
                 function callback() {}
                 _.beforeEach(tt, callback)
-                tt.call(function (reflect) {
-                    reflect.removeBefore(callback)
-                    assert.equal(reflect.hasBefore(callback), false)
-                })
+                tt.reflect.removeBefore(callback)
+                assert.equal(tt.reflect.hasBefore(callback), false)
             })
         })
 
@@ -586,10 +625,8 @@ describe("core/reflect", function () {
 
                 function callback() {}
                 _.beforeEach(tt, callback)
-                tt.call(function (reflect) {
-                    reflect.removeAfter(callback)
-                    assert.equal(reflect.hasAfter(callback), false)
-                })
+                tt.reflect.removeAfter(callback)
+                assert.equal(tt.reflect.hasAfter(callback), false)
             })
         })
 
@@ -599,10 +636,8 @@ describe("core/reflect", function () {
 
                 function callback() {}
                 _.afterAll(tt, callback)
-                tt.call(function (reflect) {
-                    reflect.removeAfterAll(callback)
-                    assert.equal(reflect.hasAfterAll(callback), false)
-                })
+                tt.reflect.removeAfterAll(callback)
+                assert.equal(tt.reflect.hasAfterAll(callback), false)
             })
         })
     }

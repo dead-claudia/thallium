@@ -28,8 +28,8 @@ describe("reporter/dom", function () { // eslint-disable-line max-statements
                 _cleared: 0,
                 _runs: 0,
 
-                reporter: function (reporter, arg) {
-                    this._reporter = reporter(arg)
+                set reporter(reporter) {
+                    this._reporter = reporter
                 },
 
                 clearTests: function () {

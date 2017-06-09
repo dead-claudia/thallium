@@ -11,10 +11,10 @@ Observable = require 'any-observable'
 
 module.exports = (reflect) ->
     new Observable (observer) ->
-        reporter = -> (report) ->
+        reporter = (report) ->
             if report.end then observer.complete(report)
             else observer.next(report)
             return
 
-        reflect.reporter(reporter)
+        reflect.addReporter(reporter)
         -> reflect.removeReporter(reporter)

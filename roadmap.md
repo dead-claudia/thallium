@@ -24,17 +24,16 @@ Note that as of this version, only the primary API of the previous version will 
     - ~~Expose `thallium/assert` as global `assert` instead~~
     - ~~Don't expose `require("thallium")`~~
     - ~~Expose `thallium/migrate/support` as `t.support`~~
-6. Return in the promise a result object of various statistics
-    - Also, return these within the `end` report
+6. ~~Return in the `t.run()` promise a result object of various statistics~~
 7. ~~Add some promise-aware assertions (in `clean-assert`)~~
-8. Move `exports.files` config option to `t.files`
+8. ~~Move `exports.files` config option to `t.files`~~
     - Change `exports.thallium` to default export
     - Ignored by core, but will mildly simplify CLI interface
-    - Will make parallel interface much more consistent
+    - Will make eventual parallel interface much more consistent
 9. Allow full name matching of `only`/`skip` option
     - Detected via no array
     - Feature parity with most other heavy frameworks
-10. Add `t.options` getter/setter for default run (not CLI) options
+10. ~~Add `t.options` getter/setter for default run (not CLI) options~~
 11. Add some useful things for test generation and reporters like getting the full test name
 12. Make reports backed by a tree, and convert the public API to expose only getters
     - Abstracts away the internal representation
@@ -47,31 +46,45 @@ Note that as of this version, only the primary API of the previous version will 
     - Mocha's magical behavior isn't helpful when dealing with globals (I've had enough pains in this repo already)
 15. Add the ability to programmatically skip a test before it completes
     - Required for integration tests
-    - `t.skip()`/`reflect.skip()` throws an `reflect.Skip` (an Error subclass) to skip a test
-16. Expose `thallium/internal` as `reflect.internal()`
-17. Expose a detached `reflect` via `t.reflect()`
-    - Mainly for easier testing/etc.
-18. ~~Load bundle automatically, and implement `data-*` attribute options~~
-19. Add `timeouts` boolean run option (default `true`) to disable timeouts globally
-20. Add `color` boolean run option (default system-dependent) to enable/disable colors
+    - `t.skip()`/`reflect.skip()` throws an opaque non-error to skip a test
+16. ~~Expose a detached `reflect` via `t.reflect`~~
+    - ~~Mainly for easier testing/etc.~~
+17. ~~Load bundle automatically, and implement `data-*` attribute options~~
+18. Add `timeouts` boolean run option (default `true`) to disable timeouts globally
+    - Timeouts are then reported as `Infinity`
+19. Add `color` boolean run option (default system-dependent) to enable/disable colors
     - Also provide this info to reporters per-report
+20. ~~Make `t.only` a getter/setter~~
+21. ~~Allow reporters to be set as string references~~
+22. ~~Change `t.reporter` to accept either a function or an array.~~
 
 ## 0.4.x
 (not blocking 0.4.0)
 
-1. Trim off internal stack traces when sending errors to reporters
-2. Integrate with Karma
-3. Add parallel testing support
+1. Move to TypeScript/Webpack internally
+    - Can make library a *lot* smaller
+    - Can export both `.js` and `.mjs` bundles
+    - Rollup can't be used because I need multiple entry points
+    - Dynamic types are starting to become a productivity killer
+    - Now, all non-internal `lib/*` reads only exist for legacy reasons
+    - Some ES6 syntax is zero-cost (e.g. arrow functions, `for ... of` with arrays)
+2. Incrementally migrate into Lerna-powered monorepo
+    - Blocked on core TypeScript migration
+    - Will migrate inbound modules to TypeScript
+3. Trim off internal stack traces when sending errors to reporters
+4. Integrate with Karma
+5. Add parallel testing support
     - This will involve a secondary child config
     - This will require a dedicated worker pool
     - Parallelism must be adjustable, but off by default
-4. Investigate CLI initialization perf issues
+6. Investigate CLI initialization perf issues
     - The 0.4 changes will likely slow the initialization down further
     - I/O performance is one major concern
     - File watching will make this critical
-5. Self-host this repo's tests
+7. Self-host this repo's tests
     - It's beginning to stabilize at the API level
     - Might open up an early 1.0
+8. Create pathway for Mocha migration
 
 ## 0.5
 
@@ -88,7 +101,7 @@ Note that as of this version, only the primary API of the previous version will 
 ## 0.6
 
 1. Reimplement [`util-inspect`](https://www.npmjs.com/package/util-inspect) for browsers based on Node's current [`util.inspect`](https://nodejs.org/api/util.html#util_util_inspect_object_options), since that is completely untested and completely unaware of ES6 :worried:
-    - This will be published out of core
+    - This will be published as a separate module
 2. Create a nice REPL driver for Node, in addition to the CLI\*
     - This will just be a module + sugar binary, so you can use it with any language
 
@@ -98,17 +111,8 @@ Note that as of this version, only the primary API of the previous version will 
 
 Here's the nice-to-haves, and so these are in no particular order:
 
-- Migrate to TypeScript internally (low priority)
-    - I'm having enough of the highly uninformative `TypeError: foo has no method bar`, `TypeError: Cannot read property 'bar' of undefined`, `TypeError: object #<Object> is not a function`, etc. (At least Node 6 gives the variable name...)
-    - I get arrow functions and classes for free, without having to deal with Babel's monstrosity
-    - Downleveled async functions will drastically simplify both the runner and all the reporters
-    - It'll be a *lot* easier when most of the deprecated dynamic stuff like test inheritance is finally removed
-
-- Make this a monorepo using Lerna
-    - All dependencies merged in will encounter a minor version increment
-    - This will be a pretty non-trivial process.
-
-- Self-host the runner
+- Improve the existing DOM runner's styling
+    - It's admittedly ugly, and has a lot of room for improvement
 
 - Write a few plugins/utilities for `describe`/`it` (likely trivial), etc
     - This will include more reporters as well

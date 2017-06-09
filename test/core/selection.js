@@ -11,10 +11,10 @@ describe("core/selection", function () {
             var tt = t.internal.root()
             var ret = []
 
-            tt.reporter(Util.push, ret)
+            tt.reporter = Util.push(ret)
 
             tt.test("one", function () {
-                tt.testSkip("inner", function () { assert.fail("fail") })
+                tt.testSkip("inner", function () {})
                 tt.test("other", function () {})
             })
 
@@ -40,247 +40,116 @@ describe("core/selection", function () {
         })
     })
 
-    describe("skip (per-run)", function () {
-        it("filters correctly with strings", function () {
-            var tt = t.internal.root()
-            var ret = []
+    function testSel(result, name, init) {
+        describe(name, function () {
+            it("filters correctly with strings", function () {
+                var tt = t.internal.root()
+                var ret = []
 
-            tt.reporter(Util.push, ret)
+                tt.reporter = Util.push(ret)
 
-            tt.test("one", function () {
-                tt.test("inner", function () { assert.fail("fail") })
-                tt.test("other", function () {})
+                tt.test("one", function () {
+                    tt.test("inner", function () {})
+                    tt.test("other", function () {})
+                })
+
+                tt.test("two", function () {
+                    tt.test("inner", function () {})
+                    tt.test("other", function () {})
+                })
+
+                return init(tt, [["one", "inner"]]).then(function () {
+                    assert.match(ret, result)
+                })
             })
 
-            tt.test("two", function () {
-                tt.test("inner", function () {})
-                tt.test("other", function () {})
-            })
+            it("filters correctly with regexps", function () {
+                var tt = t.internal.root()
+                var ret = []
 
-            return tt.run({skip: [["one", "inner"]]}).then(function () {
-                assert.match(ret, [
-                    n.start(),
-                    n.enter([p("one", 0)]),
-                    n.skip([p("one", 0), p("inner", 0)]),
-                    n.pass([p("one", 0), p("other", 1)]),
-                    n.leave([p("one", 0)]),
-                    n.enter([p("two", 1)]),
-                    n.pass([p("two", 1), p("inner", 0)]),
-                    n.pass([p("two", 1), p("other", 1)]),
-                    n.leave([p("two", 1)]),
-                    n.end(),
-                ])
-            })
-        })
+                tt.reporter = Util.push(ret)
 
-        it("filters correctly with regexps", function () {
-            var tt = t.internal.root()
-            var ret = []
+                tt.test("one", function () {
+                    tt.test("inner", function () {})
+                    tt.test("other", function () {})
+                })
 
-            tt.reporter(Util.push, ret)
+                tt.test("two", function () {
+                    tt.test("inner", function () {})
+                    tt.test("other", function () {})
+                })
 
-            tt.test("one", function () {
-                tt.test("inner", function () { assert.fail("fail") })
-                tt.test("other", function () {})
-            })
-
-            tt.test("two", function () {
-                tt.test("inner", function () {})
-                tt.test("other", function () {})
-            })
-
-            return tt.run({skip: [[/^one$/, "inner"]]}).then(function () {
-                assert.match(ret, [
-                    n.start(),
-                    n.enter([p("one", 0)]),
-                    n.skip([p("one", 0), p("inner", 0)]),
-                    n.pass([p("one", 0), p("other", 1)]),
-                    n.leave([p("one", 0)]),
-                    n.enter([p("two", 1)]),
-                    n.pass([p("two", 1), p("inner", 0)]),
-                    n.pass([p("two", 1), p("other", 1)]),
-                    n.leave([p("two", 1)]),
-                    n.end(),
-                ])
+                return init(tt, [[/^one$/, "inner"]]).then(function () {
+                    assert.match(ret, result)
+                })
             })
         })
+    }
+
+    var skipOutput = [
+        n.start(),
+        n.enter([p("one", 0)]),
+        n.skip([p("one", 0), p("inner", 0)]),
+        n.pass([p("one", 0), p("other", 1)]),
+        n.leave([p("one", 0)]),
+        n.enter([p("two", 1)]),
+        n.pass([p("two", 1), p("inner", 0)]),
+        n.pass([p("two", 1), p("other", 1)]),
+        n.leave([p("two", 1)]),
+        n.end(),
+    ]
+
+    testSel(skipOutput, "skip (per-run)", function (tt, skip) {
+        return tt.run({skip: skip})
     })
 
-    describe("only (global)", function () {
-        it("filters correctly with strings", function () {
-            var tt = t.internal.root()
-            var ret = []
-
-            tt.reporter(Util.push, ret)
-            tt.only(["one", "inner"])
-
-            tt.test("one", function () {
-                tt.test("inner", function () {})
-                tt.test("other", function () { assert.fail("fail") })
-            })
-
-            tt.test("two", function () {
-                tt.test("inner", function () { assert.fail("fail") })
-                tt.test("other", function () { assert.fail("fail") })
-            })
-
-            return tt.run().then(function () {
-                assert.match(ret, [
-                    n.start(),
-                    n.enter([p("one", 0)]),
-                    n.pass([p("one", 0), p("inner", 0)]),
-                    n.leave([p("one", 0)]),
-                    n.end(),
-                ])
-            })
-        })
-
-        it("filters correctly with regexps", function () {
-            var tt = t.internal.root()
-            var ret = []
-
-            tt.reporter(Util.push, ret)
-            tt.only([/^one$/, "inner"])
-
-            tt.test("one", function () {
-                tt.test("inner", function () {})
-                tt.test("other", function () { assert.fail("fail") })
-            })
-
-            tt.test("two", function () {
-                tt.test("inner", function () { assert.fail("fail") })
-                tt.test("other", function () { assert.fail("fail") })
-            })
-
-            return tt.run().then(function () {
-                assert.match(ret, [
-                    n.start(),
-                    n.enter([p("one", 0)]),
-                    n.pass([p("one", 0), p("inner", 0)]),
-                    n.leave([p("one", 0)]),
-                    n.end(),
-                ])
-            })
-        })
+    testSel(skipOutput, "skip (defaults)", function (tt, skip) {
+        tt.options = {skip: skip}
+        return tt.run()
     })
 
-    describe("only (per-run)", function () {
-        it("filters correctly with strings", function () {
-            var tt = t.internal.root()
-            var ret = []
-
-            tt.reporter(Util.push, ret)
-
-            tt.test("one", function () {
-                tt.test("inner", function () {})
-                tt.test("other", function () { assert.fail("fail") })
-            })
-
-            tt.test("two", function () {
-                tt.test("inner", function () { assert.fail("fail") })
-                tt.test("other", function () { assert.fail("fail") })
-            })
-
-            return tt.run({only: [["one", "inner"]]}).then(function () {
-                assert.match(ret, [
-                    n.start(),
-                    n.enter([p("one", 0)]),
-                    n.pass([p("one", 0), p("inner", 0)]),
-                    n.leave([p("one", 0)]),
-                    n.end(),
-                ])
-            })
-        })
-
-        it("filters correctly with regexps", function () {
-            var tt = t.internal.root()
-            var ret = []
-
-            tt.reporter(Util.push, ret)
-
-            tt.test("one", function () {
-                tt.test("inner", function () {})
-                tt.test("other", function () { assert.fail("fail") })
-            })
-
-            tt.test("two", function () {
-                tt.test("inner", function () { assert.fail("fail") })
-                tt.test("other", function () { assert.fail("fail") })
-            })
-
-            return tt.run({only: [[/^one$/, "inner"]]}).then(function () {
-                assert.match(ret, [
-                    n.start(),
-                    n.enter([p("one", 0)]),
-                    n.pass([p("one", 0), p("inner", 0)]),
-                    n.leave([p("one", 0)]),
-                    n.end(),
-                ])
-            })
-        })
+    testSel(skipOutput, "skip (defaults + per-run)", function (tt, skip) {
+        tt.options = {skip: [["two", "inner"]]}
+        return tt.run({skip: skip})
     })
 
-    describe("only (global + per-run)", function () {
-        it("filters for intersection correctly with strings", function () {
-            var tt = t.internal.root()
-            var ret = []
+    var onlyOutput = [
+        n.start(),
+        n.enter([p("one", 0)]),
+        n.pass([p("one", 0), p("inner", 0)]),
+        n.leave([p("one", 0)]),
+        n.end(),
+    ]
 
-            tt.reporter(Util.push, ret)
-            tt.only(["one", "inner"])
-
-            tt.test("one", function () {
-                tt.test("inner", function () {})
-                tt.test("other", function () { assert.fail("fail") })
-            })
-
-            tt.test("two", function () {
-                tt.test("inner", function () { assert.fail("fail") })
-                tt.test("other", function () { assert.fail("fail") })
-            })
-
-            return tt.run({only: [
-                ["one", "inner"],
-                ["two", "inner"],
-            ]}).then(function () {
-                assert.match(ret, [
-                    n.start(),
-                    n.enter([p("one", 0)]),
-                    n.pass([p("one", 0), p("inner", 0)]),
-                    n.leave([p("one", 0)]),
-                    n.end(),
-                ])
-            })
-        })
-
-        it("filters for intersection correctly with regexps", function () {
-            var tt = t.internal.root()
-            var ret = []
-
-            tt.reporter(Util.push, ret)
-            tt.only([/^one$/, "inner"])
-
-            tt.test("one", function () {
-                tt.test("inner", function () {})
-                tt.test("other", function () { assert.fail("fail") })
-            })
-
-            tt.test("two", function () {
-                tt.test("inner", function () { assert.fail("fail") })
-                tt.test("other", function () { assert.fail("fail") })
-            })
-
-            return tt.run({only: [
-                [/^one$/, "inner"],
-                ["two", "inner"],
-            ]}).then(function () {
-                assert.match(ret, [
-                    n.start(),
-                    n.enter([p("one", 0)]),
-                    n.pass([p("one", 0), p("inner", 0)]),
-                    n.leave([p("one", 0)]),
-                    n.end(),
-                ])
-            })
-        })
+    testSel(onlyOutput, "only (global)", function (tt, only) {
+        tt.only = only
+        return tt.run()
     })
+
+    testSel(onlyOutput, "only (defaults)", function (tt, only) {
+        tt.options = {only: only}
+        return tt.run()
+    })
+
+    testSel(onlyOutput, "only (per-run)", function (tt, only) {
+        return tt.run({only: only})
+    })
+
+    testSel(onlyOutput, "only (defaults, per-run)", function (tt, only) {
+        tt.options = {only: []}
+        return tt.run({only: only})
+    })
+
+    testSel(onlyOutput, "only (global, per-run)", function (tt, only) {
+        tt.only = only.concat([["two", "inner"]])
+        return tt.run({only: only})
+    })
+
+    testSel(onlyOutput, "only (global, defaults, per-run)",
+        function (tt, only) {
+            tt.only = only.concat([["two", "inner"]])
+            tt.options = {only: []}
+            return tt.run({only: only})
+        }
+    )
 })

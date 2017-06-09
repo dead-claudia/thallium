@@ -10,72 +10,6 @@ describe("cli/run", function () {
     var n = t.internal.reports
     var p = t.internal.location
 
-    describe("exitReporter()", function () {
-        var map = {
-            fail: new Error("fail"),
-            error: new Error("fail"),
-        }
-
-        function execute(reporter, type) {
-            return Promise.resolve(
-                reporter(n[type]([p("test", 0)], map[type])))
-        }
-
-        ["start", "enter", "leave", "pass", "skip", "end"]
-        .forEach(function (type) {
-            it("doesn't trigger for \"" + type + "\" reports", function () {
-                var state = {fail: false}
-                var reporter = Run.exitReporter(state)
-
-                return execute(reporter, type)
-                .then(function () { assert.notOk(state.fail) })
-            })
-        })
-
-        ;["fail", "error"].forEach(function (type) {
-            it("does trigger for \"" + type + "\" reports", function () {
-                var state = {fail: false}
-                var reporter = Run.exitReporter(state)
-
-                return execute(reporter, type).then(function () {
-                    assert.ok(state.fail)
-                })
-            })
-        })
-
-        it("doesn't trigger from numerous calls", function () {
-            var state = {fail: false}
-            var reporter = Run.exitReporter(state)
-
-            return execute(reporter, "start")
-            .then(function () { return execute(reporter, "pass") })
-            .then(function () { return execute(reporter, "pass") })
-            .then(function () { assert.notOk(state.fail) })
-        })
-
-        it("stays triggered", function () {
-            var state = {fail: false}
-            var reporter = Run.exitReporter(state)
-
-            return execute(reporter, "start")
-            .then(function () { return execute(reporter, "fail") })
-            .then(function () { return execute(reporter, "pass") })
-            .then(function () { assert.ok(state.fail) })
-        })
-
-        it("is cleared on \"end\" + \"start\"", function () {
-            var state = {fail: false}
-            var reporter = Run.exitReporter(state)
-
-            return execute(reporter, "start")
-            .then(function () { return execute(reporter, "fail") })
-            .then(function () { return execute(reporter, "pass") })
-            .then(function () { return execute(reporter, "end") })
-            .then(function () { return execute(reporter, "start") })
-            .then(function () { assert.notOk(state.fail) })
-        })
-    })
-
     describe("run()", /* @this */ function () {
         this.slow(150)
 
@@ -109,7 +43,7 @@ describe("cli/run", function () {
                     return {
                         test: {
                             ".tl.js": function () {
-                                t.reporter(Util.push, ret)
+                                t.reporter = Util.push(ret)
                             },
 
                             "one.js": function () {
@@ -142,7 +76,7 @@ describe("cli/run", function () {
                     return {
                         test: {
                             ".tl.js": function () {
-                                t.reporter(Util.push, ret)
+                                t.reporter = Util.push(ret)
                             },
 
                             "one": function () {
@@ -174,7 +108,7 @@ describe("cli/run", function () {
                     return {
                         test: {
                             ".tl.coffee": function () {
-                                t.reporter(Util.push, ret)
+                                t.reporter = Util.push(ret)
                             },
 
                             "one.js": function () {
@@ -207,7 +141,7 @@ describe("cli/run", function () {
                     return {
                         test: {
                             ".tl.js": function () {
-                                t.reporter(Util.push, ret)
+                                t.reporter = Util.push(ret)
                             },
 
                             "one.js": function () {
@@ -321,7 +255,7 @@ describe("cli/run", function () {
                     return {
                         test: {
                             ".tl.js": function () {
-                                t.reporter(Util.push, ret)
+                                t.reporter = Util.push(ret)
                             },
 
                             "mod-one.js": function () { modOne(t) },
@@ -348,7 +282,7 @@ describe("cli/run", function () {
                         },
 
                         ".tl.js": function () {
-                            custom.reporter(Util.push, ret)
+                            custom.reporter = Util.push(ret)
 
                             return {
                                 thallium: custom,

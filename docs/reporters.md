@@ -9,7 +9,8 @@ Thallium comes with a few useful built-in reporters to start with. If you are in
 This is the default reporter, inspired by (and mostly a copy of design-wise) Mocha's `spec` reporter.
 
 ```js
-t.reporter(require("thallium/r/spec"), opts={})
+t.reporter = ["spec", opts={}]
+t.reporter = require("thallium/r/spec")(opts={})
 ```
 
 ![spec pass](./images/screenshot-spec-pass.png)
@@ -21,7 +22,8 @@ t.reporter(require("thallium/r/spec"), opts={})
 This is a more minimal reporter, where failing tests are marked by exclamation points, skipped tests blue dots, and slow tests yellow dots. It's inspired by Mocha's `dot` reporter, and looks fairly similar to it.
 
 ```js
-t.reporter(require("thallium/r/dot"), opts={})
+t.reporter = ["dot", opts={}]
+t.reporter = require("thallium/r/dot")(opts={})
 ```
 
 ![dot pass](./images/screenshot-dot-pass.png)
@@ -33,7 +35,8 @@ t.reporter(require("thallium/r/dot"), opts={})
 A [TAP-compatible](https://testanything.org) reporter, for you to use with various tools.
 
 ```js
-t.reporter(require("thallium/r/tap"), opts={})
+t.reporter = ["tap", opts={}]
+t.reporter = require("thallium/r/tap")(opts={})
 ```
 
 ![tap pass](./images/screenshot-tap-pass.png)
@@ -72,6 +75,6 @@ Note that for reporters that accept both `print` and `write`, you *have* to prov
 
 Here's what options the reporters themselves accept:
 
-- `thallium/r/tap` - `write(line)` and `reset()`
-- `thallium/r/spec` - `write(line)`, `reset()`, and `color`
-- `thallium/r/dot` - `write(string)`, `reset()`, and `color`
+- `tap` - `write(line)` and `reset()`
+- `spec` - `write(line)`, `reset()`, and `color`
+- `dot` - `write(string)`, `reset()`, and `color`

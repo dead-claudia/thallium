@@ -20,7 +20,7 @@ describe("core/attempts", function () {
         var ret = []
         var retries = {value: 3}
 
-        tt.reporter(Util.push, ret)
+        tt.reporter = Util.push(ret)
 
         tt.test("test", function () {
             tt.attempts = 3
@@ -41,7 +41,7 @@ describe("core/attempts", function () {
         var ret = []
         var retries = {value: 3}
 
-        tt.reporter(Util.push, ret)
+        tt.reporter = Util.push(ret)
 
         tt.test("test", function () {
             tt.attempts = 3
@@ -62,7 +62,7 @@ describe("core/attempts", function () {
         var ret = []
         var retries = {value: 5}
 
-        tt.reporter(Util.push, ret)
+        tt.reporter = Util.push(ret)
 
         tt.test("test", function () {
             tt.attempts = 3
@@ -83,7 +83,7 @@ describe("core/attempts", function () {
         var ret = []
         var retries = {value: 5}
 
-        tt.reporter(Util.push, ret)
+        tt.reporter = Util.push(ret)
 
         tt.test("test", function () {
             tt.attempts = 3
@@ -104,7 +104,7 @@ describe("core/attempts", function () {
         var ret = []
         var retries = {value: 3}
 
-        tt.reporter(Util.push, ret)
+        tt.reporter = Util.push(ret)
 
         tt.test("test", function () {
             tt.attempts = 3
@@ -127,7 +127,7 @@ describe("core/attempts", function () {
         var ret = []
         var retries = {value: 5}
 
-        tt.reporter(Util.push, ret)
+        tt.reporter = Util.push(ret)
 
         tt.test("test", function () {
             tt.attempts = 3
@@ -145,17 +145,15 @@ describe("core/attempts", function () {
         })
     })
 
-    function attempts(reflect) {
-        return reflect.attempts
-    }
-
     it("gets own attempts", function () {
         var tt = t.internal.root()
         var active
 
+        // Don't print anything
+        tt.reporter = function () {}
         tt.test("test", function () {
             tt.attempts = 5
-            active = tt.call(attempts)
+            active = tt.reflect.attempts
         })
 
         return tt.run().then(function () {
@@ -167,10 +165,12 @@ describe("core/attempts", function () {
         var tt = t.internal.root()
         var active
 
+        // Don't print anything
+        tt.reporter = function () {}
         tt.test("test", function () {
             tt.attempts = 5
             tt.test("inner", function () {
-                active = tt.call(attempts)
+                active = tt.reflect.attempts
             })
         })
 
@@ -183,8 +183,10 @@ describe("core/attempts", function () {
         var tt = t.internal.root()
         var active
 
+        // Don't print anything
+        tt.reporter = function () {}
         tt.test("test", function () {
-            active = tt.call(attempts)
+            active = tt.reflect.attempts
         })
 
         return tt.run().then(function () {

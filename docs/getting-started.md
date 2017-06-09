@@ -146,7 +146,7 @@ testing
     - things work
 ```
 
-We could also skip tests with `t.only`, in which they won't even show up, much less run. If we dropped `t.only(["testing", "other"])` in the top scope of the test file, nothing would be run. Do be careful to not put this into version control, though.
+We could also skip tests with `t.only`, in which they won't even show up, much less run. If we dropped `t.only = [["testing", "other"]]` in the top scope of the test file, nothing would be run. Do be careful to not put this into version control, though.
 
 ```js
 "use strict";
@@ -156,7 +156,7 @@ const assert = require("thallium/assert");
 const myModule = require("../index.js");
 
 // Here's your .only filter
-t.only(["testing", "other"]);
+t.only = [["testing", "other"]];
 
 t.test("testing", function () {
     t.test("things work", function () {
@@ -210,7 +210,7 @@ Well...it's nice and all to have this pretty spec reporter, but what if we want 
 const t = require("thallium");
 
 // Register the reporter - don't forget to call it as well
-t.reporter(require("thallium/r/tap"));
+t.reporter = ["tap"];
 ```
 
 And then, install tap-nyan and run `tl` again.
@@ -235,7 +235,7 @@ If you would rather your test files be somewhere else (e.g. `file.spec.js` inste
 const t = require("thallium");
 
 // If we use a config, we have to always specify the reporter we want to use.
-t.reporter(require("thallium/r/spec"));
+t.reporter = ["spec"];
 
 // Specify our files here. This could also be an array of files.
 exports.files = "**/*.spec.js";
@@ -395,7 +395,7 @@ var thallium = require("thallium");
 var t = thallium.t;
 var assert = thallium.assert;
 
-t.reporter(thallium.r.spec);
+t.reporter = ["spec"];
 
 // Define the tests
 t.test("testing", function () {
@@ -425,7 +425,7 @@ const t = require("thallium");
 const assert = require("thallium/assert");
 const myModule = require("../index.js"); // From earlier
 
-t.reporter(require("thallium/r/spec"));
+t.reporter = ["spec"];
 
 // Define the tests
 t.test("testing", () => {

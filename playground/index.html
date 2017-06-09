@@ -178,19 +178,22 @@
     var buttons = document.getElementsByClassName("load-button")
     var iframe = document.querySelector("iframe.display-wrap")
 
-    Array.prototype.forEach.call(buttons, function (button) {
-        button.onclick = function () {
-            if (active !== button) {
-                active.className = active.className.replace(/\bactive\b/g, "")
-                button.className += " active"
-                active = button
-            }
-
-            iframe.contentWindow.postMessage(
-                button.getAttribute("data-dir"),
-                "http://localhost:8080")
+    /** @this {HTMLButtonElement} */
+    function onclick() {
+        if (active !== this) {
+            active.className = active.className.replace(/\bactive\b/g, "")
+            this.className += " active"
+            active = this
         }
-    })
+
+        iframe.contentWindow.postMessage(
+            this.getAttribute("data-dir"),
+            "http://localhost:8080")
+    }
+
+    for (var i = 0; i < buttons.length; i++) {
+        buttons[i].onclick = onclick
+    }
 
     iframe.contentWindow.addEventListener("DOMContentLoaded", function () {
         active.className += " active"

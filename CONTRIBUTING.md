@@ -216,7 +216,7 @@ Note that I don't actually test the documentation's code, but please ensure it o
     var tt = t.create()
     var ret = []
 
-    tt.reporter(Util.push, ret)
+    tt.reporter = Util.push(ret)
 
     tt.test("test", function () {})
     tt.test("test", function () {})

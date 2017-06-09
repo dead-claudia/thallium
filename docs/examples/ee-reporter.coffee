@@ -5,12 +5,10 @@
 #
 # API:
 #
-# wrap(reporter: (arg) => EventEmitter): Reporter
+# wrap(reporter: EventEmitter): Reporter
 #
 # Events are the same as the report `type` property in the API, and each event
 # handler is called with the report as the sole argument.
-module.exports = (reporter) -> (arg) ->
-    emitter = reporter(arg)
-    (report) ->
-        emitter.emit(report.type, report)
-        return
+module.exports = (emitter) -> (report) ->
+    emitter.emit(report.type, report)
+    return

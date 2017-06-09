@@ -18,7 +18,7 @@ describe("core/failable", function () {
         var tt = t.internal.root()
         var ret = []
 
-        tt.reporter(Util.push, ret)
+        tt.reporter = Util.push(ret)
 
         tt.test("test", function () {
             tt.isFailable = true
@@ -40,7 +40,7 @@ describe("core/failable", function () {
         var tt = t.internal.root()
         var ret = []
 
-        tt.reporter(Util.push, ret)
+        tt.reporter = Util.push(ret)
 
         tt.test("test", function () {
             tt.isFailable = true
@@ -62,7 +62,7 @@ describe("core/failable", function () {
         var tt = t.internal.root()
         var ret = []
 
-        tt.reporter(Util.push, ret)
+        tt.reporter = Util.push(ret)
 
         tt.test("test", function () {
             tt.isFailable = true
@@ -82,19 +82,17 @@ describe("core/failable", function () {
         })
     })
 
-    function isFailable(reflect) {
-        return reflect.isFailable
-    }
-
     it("gets own isFailable", function () {
         var tt = t.internal.root()
         var active
 
         tt.test("test", function () {
             tt.isFailable = true
-            active = tt.call(isFailable)
+            active = tt.reflect.isFailable
         })
 
+        // Don't print anything
+        tt.reporter = function () {}
         return tt.run().then(function () {
             assert.equal(active, true)
         })
@@ -107,10 +105,12 @@ describe("core/failable", function () {
         tt.test("test", function () {
             tt.isFailable = true
             tt.test("inner", function () {
-                active = tt.call(isFailable)
+                active = tt.reflect.isFailable
             })
         })
 
+        // Don't print anything
+        tt.reporter = function () {}
         return tt.run().then(function () {
             assert.equal(active, true)
         })
@@ -121,9 +121,11 @@ describe("core/failable", function () {
         var active
 
         tt.test("test", function () {
-            active = tt.call(isFailable)
+            active = tt.reflect.isFailable
         })
 
+        // Don't print anything
+        tt.reporter = function () {}
         return tt.run().then(function () {
             assert.equal(active, false)
         })

@@ -29,7 +29,12 @@ describe("cli/e2e (FLAKE)", /** @this */ function () {
             opts.messages = opts.messages.join(Util.R.Console.newline)
         }
 
-        (opts.skip ? it.skip : it)(name, /** @this */ function () {
+        var define = it
+
+        if (opts.skip) define = it.skip
+        if (opts.only) define = it.only
+
+        define(name, /** @this */ function () {
             this.slow(1500)
             this.timeout(opts.timeout || 5000)
 
@@ -39,10 +44,27 @@ describe("cli/e2e (FLAKE)", /** @this */ function () {
                 env: opts.env,
             })
 
+            // Workaround for https://github.com/nodejs/node/issues/13538
+            function kill() {
+                child.kill()
+            }
+
+            process.on("exit", kill)
+
             var output = ""
 
             child.stdout.setEncoding("utf-8")
             child.stdout.on("data", function (data) { output += data })
+
+            function listen(name) {
+                return new Promise(function (resolve, reject) {
+                    child.on(name, function (code, signal) {
+                        if (signal == null) return resolve(code)
+                        return reject(
+                            new Error("terminated with signal " + signal))
+                    })
+                })
+            }
 
             return Promise.all([
                 new Promise(function (resolve, reject) {
@@ -50,20 +72,8 @@ describe("cli/e2e (FLAKE)", /** @this */ function () {
                     child.stdout.on("error", reject)
                     child.stdout.on("end", resolve)
                 }),
-                new Promise(function (resolve, reject) {
-                    child.on("close", function (code, signal) {
-                        if (signal == null) return resolve(code)
-                        return reject(
-                            new Error("terminated with signal " + signal))
-                    })
-                }),
-                new Promise(function (resolve, reject) {
-                    child.on("exit", function (code, signal) {
-                        if (signal == null) return resolve(code)
-                        return reject(
-                            new Error("terminated with signal " + signal))
-                    })
-                }),
+                listen("close"),
+                listen("exit"),
             ])
             .then(function (list) {
                 var code = list[1] != null ? list[1] : list[2]
@@ -71,6 +81,10 @@ describe("cli/e2e (FLAKE)", /** @this */ function () {
                 assert.equal(formatList(output), formatList(opts.messages))
                 assert.equal(code, opts.code)
             })
+            .then(
+                function () { process.removeListener("exit", kill) },
+                function (e) { process.removeListener("exit", kill); throw e }
+            )
         })
     }
 
@@ -127,34 +141,37 @@ describe("cli/e2e (FLAKE)", /** @this */ function () {
         "start = undefined",
         "enter [0: core (basic)] = undefined",
         "enter [0: core (basic)] > [0: reflect] = undefined",
-        "enter [0: core (basic)] > [0: reflect] > [0: get parent] = undefined",
-        "pass [0: core (basic)] > [0: reflect] > [0: get parent] > [0: works on the root instance] = undefined",
-        "pass [0: core (basic)] > [0: reflect] > [0: get parent] > [1: works on children] = undefined",
-        "leave [0: core (basic)] > [0: reflect] > [0: get parent] = undefined",
-        "enter [0: core (basic)] > [0: reflect] > [1: get count] = undefined",
-        "pass [0: core (basic)] > [0: reflect] > [1: get count] > [0: works with 0 tests] = undefined",
-        "pass [0: core (basic)] > [0: reflect] > [1: get count] > [1: works with 1 test] = undefined",
-        "pass [0: core (basic)] > [0: reflect] > [1: get count] > [2: works with 2 tests] = undefined",
-        "pass [0: core (basic)] > [0: reflect] > [1: get count] > [3: works with 3 tests] = undefined",
-        "pass [0: core (basic)] > [0: reflect] > [1: get count] > [4: works with itself] = undefined",
-        "leave [0: core (basic)] > [0: reflect] > [1: get count] = undefined",
-        "enter [0: core (basic)] > [0: reflect] > [2: get name] = undefined",
-        "pass [0: core (basic)] > [0: reflect] > [2: get name] > [0: works with the root test] = undefined",
-        "pass [0: core (basic)] > [0: reflect] > [2: get name] > [1: works with child tests] = undefined",
-        "pass [0: core (basic)] > [0: reflect] > [2: get name] > [2: works with itself] = undefined",
-        "leave [0: core (basic)] > [0: reflect] > [2: get name] = undefined",
-        "enter [0: core (basic)] > [0: reflect] > [3: get index] = undefined",
-        "pass [0: core (basic)] > [0: reflect] > [3: get index] > [0: works with the root test] = undefined",
-        "pass [0: core (basic)] > [0: reflect] > [3: get index] > [1: works with the first child test] = undefined",
-        "pass [0: core (basic)] > [0: reflect] > [3: get index] > [2: works with the second child test] = undefined",
-        "pass [0: core (basic)] > [0: reflect] > [3: get index] > [3: works with itself] = undefined",
-        "leave [0: core (basic)] > [0: reflect] > [3: get index] = undefined",
-        "enter [0: core (basic)] > [0: reflect] > [4: get children] = undefined",
-        "pass [0: core (basic)] > [0: reflect] > [4: get children] > [0: works with 0 tests] = undefined",
-        "pass [0: core (basic)] > [0: reflect] > [4: get children] > [1: works with 1 test] = undefined",
-        "pass [0: core (basic)] > [0: reflect] > [4: get children] > [2: works with 2 tests] = undefined",
-        "pass [0: core (basic)] > [0: reflect] > [4: get children] > [3: returns a copy] = undefined",
-        "leave [0: core (basic)] > [0: reflect] > [4: get children] = undefined",
+        "enter [0: core (basic)] > [0: reflect] > [0: get reflect] = undefined",
+        "pass [0: core (basic)] > [0: reflect] > [0: get reflect] > [0: is equivalent to this/arg in tt.call()] = undefined",
+        "leave [0: core (basic)] > [0: reflect] > [0: get reflect] = undefined",
+        "enter [0: core (basic)] > [0: reflect] > [1: get parent] = undefined",
+        "pass [0: core (basic)] > [0: reflect] > [1: get parent] > [0: works on the root instance] = undefined",
+        "pass [0: core (basic)] > [0: reflect] > [1: get parent] > [1: works on children] = undefined",
+        "leave [0: core (basic)] > [0: reflect] > [1: get parent] = undefined",
+        "enter [0: core (basic)] > [0: reflect] > [2: get count] = undefined",
+        "pass [0: core (basic)] > [0: reflect] > [2: get count] > [0: works with 0 tests] = undefined",
+        "pass [0: core (basic)] > [0: reflect] > [2: get count] > [1: works with 1 test] = undefined",
+        "pass [0: core (basic)] > [0: reflect] > [2: get count] > [2: works with 2 tests] = undefined",
+        "pass [0: core (basic)] > [0: reflect] > [2: get count] > [3: works with 3 tests] = undefined",
+        "pass [0: core (basic)] > [0: reflect] > [2: get count] > [4: works with itself] = undefined",
+        "leave [0: core (basic)] > [0: reflect] > [2: get count] = undefined",
+        "enter [0: core (basic)] > [0: reflect] > [3: get name] = undefined",
+        "pass [0: core (basic)] > [0: reflect] > [3: get name] > [0: works with the root test] = undefined",
+        "pass [0: core (basic)] > [0: reflect] > [3: get name] > [1: works with child tests] = undefined",
+        "pass [0: core (basic)] > [0: reflect] > [3: get name] > [2: works with itself] = undefined",
+        "leave [0: core (basic)] > [0: reflect] > [3: get name] = undefined",
+        "enter [0: core (basic)] > [0: reflect] > [4: get index] = undefined",
+        "pass [0: core (basic)] > [0: reflect] > [4: get index] > [0: works with the root test] = undefined",
+        "pass [0: core (basic)] > [0: reflect] > [4: get index] > [1: works with the first child test] = undefined",
+        "pass [0: core (basic)] > [0: reflect] > [4: get index] > [2: works with the second child test] = undefined",
+        "pass [0: core (basic)] > [0: reflect] > [4: get index] > [3: works with itself] = undefined",
+        "leave [0: core (basic)] > [0: reflect] > [4: get index] = undefined",
+        "enter [0: core (basic)] > [0: reflect] > [5: get children] = undefined",
+        "pass [0: core (basic)] > [0: reflect] > [5: get children] > [0: works with 0 tests] = undefined",
+        "pass [0: core (basic)] > [0: reflect] > [5: get children] > [1: works with 1 test] = undefined",
+        "pass [0: core (basic)] > [0: reflect] > [5: get children] > [2: works with 2 tests] = undefined",
+        "pass [0: core (basic)] > [0: reflect] > [5: get children] > [3: returns a copy] = undefined",
+        "leave [0: core (basic)] > [0: reflect] > [5: get children] = undefined",
         "leave [0: core (basic)] > [0: reflect] = undefined",
         "enter [0: core (basic)] > [1: run()] = undefined",
         "pass [0: core (basic)] > [1: run()] > [0: runs child tests] = undefined",

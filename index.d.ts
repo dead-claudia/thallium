@@ -1,5 +1,7 @@
 /* tslint:disable */
 
+import {DotOptions, SpecOptions, TapOptions} from "./r";
+
 export interface Location {
     name: string;
     index: number;
@@ -211,30 +213,7 @@ export interface AfterAllReport extends HookReportBase<"after all"> {
     isAfterAll: true;
 }
 
-export type Reporter<T> = ArgReporter<T> | VoidReporter;
-export type ReporterConsumer = (report: Report) => any | PromiseLike<any>;
-
-export interface ArgReporter<T> {
-    (arg: T): (report: Report) => any | PromiseLike<any>;
-}
-
-export interface VoidReporter {
-    (): (report: Report) => any | PromiseLike<any>;
-}
-
-export type Plugin<T, R> = ArgPlugin<T, R> | VoidPlugin<R>;
-
-export interface ArgPlugin<T, R> {
-    (reflect: Reflect, arg: T): R;
-}
-
-export interface VoidPlugin<R> {
-    (reflect: Reflect): R;
-}
-
-export interface Callback {
-    (): any | PromiseLike<any>;
-}
+export type Reporter = (report: Report) => any | PromiseLike<any>;
 
 /**
  * Contains several internal methods that are not as useful for most users,
@@ -249,27 +228,24 @@ export interface Reflect {
 
     /**
      * Whether a particular reporter was registered.
-     * @throws TypeError if this isn't the root
+     *
+     * @throws TypeError if this isn't in the root
      */
-    hasReporter(reporter: ReporterConsumer): boolean;
+    hasReporter(reporter: Reporter): boolean;
 
     /**
      * Add a reporter.
-     * @throws TypeError if this isn't the root.
+     *
+     * @throws TypeError if this isn't in the root.
      */
-    reporter<T>(reporter: Reporter<T>, arg: T): ReporterConsumer;
-
-    /**
-     * Add a reporter.
-     * @throws TypeError if this isn't the root.
-     */
-    reporter(reporter: VoidReporter): ReporterConsumer;
+    addReporter<T extends Reporter>(reporter: T): T;
 
     /**
      * Remove a reporter.
-     * @throws TypeError if this isn't the root.
+     *
+     * @throws TypeError if this isn't in the root.
      */
-    removeReporter(reporter: ReporterConsumer): void;
+    removeReporter(reporter: Reporter): void;
 
     /**
      * Get the test name or `undefined` if this is the root.
@@ -328,105 +304,119 @@ export interface Reflect {
      * Add a hook to be run before each subtest, including their subtests and so
      * on.
      */
-    before(func: Callback): void;
+    before(func: () => any | PromiseLike<any>): void;
 
     /**
      * Add a hook to be run once before all subtests are run.
      */
-    beforeAll(func: Callback): void;
+    beforeAll(func: () => any | PromiseLike<any>): void;
 
     /**
      * Add a hook to be run after each subtest, including their subtests and so
      * on.
      */
-    after(func: Callback): void;
+    after(func: () => any | PromiseLike<any>): void;
 
     /**
      * Add a hook to be run once after all subtests are run.
      */
-    afterAll(func: Callback): void;
+    afterAll(func: () => any | PromiseLike<any>): void;
 
     /**
      * Whether a hook was previously added with `t.before` or `reflect.before`.
      */
-    hasBefore(func: Callback): boolean;
+    hasBefore(func: () => any | PromiseLike<any>): boolean;
 
     /**
      * Whether a hook was previously added with `t.beforeAll` or
      * `reflect.beforeAll`.
      */
-    hasBeforeAll(func: Callback): boolean;
+    hasBeforeAll(func: () => any | PromiseLike<any>): boolean;
 
     /**
      * Whether a hook was previously added with `t.after` or`reflect.after`.
      */
-    hasAfter(func: Callback): boolean;
+    hasAfter(func: () => any | PromiseLike<any>): boolean;
 
     /**
      * Whether a hook was previously added with `t.afterAll` or
      * `reflect.afterAll`.
      */
-    hasAfterAll(func: Callback): boolean;
+    hasAfterAll(func: () => any | PromiseLike<any>): boolean;
 
     /**
      * Remove a hook previously added with `t.before` or `reflect.before`.
      */
-    removeBefore(func: Callback): void;
+    removeBefore(func: () => any | PromiseLike<any>): void;
 
     /**
      * Remove a hook previously added with `t.beforeAll` or `reflect.beforeAll`.
      */
-    removeBeforeAll(func: Callback): void;
+    removeBeforeAll(func: () => any | PromiseLike<any>): void;
 
     /**
      * Remove a hook previously added with `t.after` or`reflect.after`.
      */
-    removeAfter(func: Callback): void;
+    removeAfter(func: () => any | PromiseLike<any>): void;
 
     /**
      * Remove a hook previously added with `t.afterAll` or `reflect.afterAll`.
      */
-    removeAfterAll(func: Callback): void;
+    removeAfterAll(func: () => any | PromiseLike<any>): void;
 
     /**
      * Add a block or inline test.
      */
-    test(name: string, callback: Callback): void;
+    test(name: string, callback: () => any | PromiseLike<any>): void;
 
     /**
      * Add a skipped block or inline test.
      */
-    testSkip(name: string, callback: Callback): void;
+    testSkip(name: string, callback: () => any | PromiseLike<any>): void;
+}
+
+export interface RunOptions {
+    only: Array<string | RegExp>[];
+    skip: Array<string | RegExp>[];
+}
+
+export interface RunResult {
+    isSuccess: boolean;
 }
 
 export interface Test {
     /**
-     * Friendly alias for ES6 module transpilers.
+     * Get a raw reflect instance.
      */
-    default: this;
+    reflect: Reflect;
 
     /**
      * Call a plugin and return the result. The plugin is called with a Reflect
      * instance for access to plenty of potentially useful internal details.
      */
-    call<T, R>(plugin: Plugin<T, R>, arg: T): R;
-    call<R>(plugin: VoidPlugin<R>): R;
+    call<R>(plugin: (reflect: Reflect) => R): R;
 
     /**
+     * NOTE: This is a write-only property.
      * Whitelist specific tests, using array-based selectors where each entry
      * is either a string or regular expression.
      */
-    only(...selectors: Array<string | RegExp>[]): void;
+    only: Array<string | RegExp>[];
 
     /**
-     * Add a reporter. Throws an error if this isn't in the root test.
+     * NOTE: This is a write-only property.
+     * Add a reporter.
+     *
+     * @throws TypeError if this isn't in the root
      */
-    reporter<T>(reporter: Reporter<T>, arg: T): void;
-
-    /**
-     * Add a reporter. Throws an error if this isn't in the root test.
-     */
-    reporter(reporter: VoidReporter): void;
+    reporter: (
+        // This *must* be kept up to date with the available reporters in
+        // `thallium/r`.
+        | ["dot"] | ["dot", DotOptions]
+        | ["spec"] | ["spec", SpecOptions]
+        | ["tap"] | ["tap", TapOptions]
+        | Reporter
+    );
 
     /**
      * Get the current timeout. 0 means inherit the parent's, and `Infinity`
@@ -449,41 +439,51 @@ export interface Test {
     slow: number;
 
     /**
-     * Run the tests (or the test's tests if it's not a base instance).
+     * NOTE: This is a write-only property.
+     * Set various default options.
+     *
+     * @throws TypeError if this isn't in the root
      */
-    run(): Promise<void>;
+    options: RunOptions;
+
+    /**
+     * Run the tests.
+     *
+     * @throws TypeError if this isn't in the root
+     */
+    run(opts?: RunOptions): Promise<RunResult>;
 
     /**
      * Add a test.
      */
-    test(name: string, body: Callback): this;
+    test(name: string, body: () => any | PromiseLike<any>): this;
 
     /**
      * Add a skipped test.
      */
-    testSkip(name: string, body: Callback): this;
+    testSkip(name: string, body: () => any | PromiseLike<any>): this;
 
     /**
      * Add a hook to be run before each subtest, including their subtests and so
      * on.
      */
-    before(func: Callback): void;
+    before(func: () => any | PromiseLike<any>): void;
 
     /**
      * Add a hook to be run once before all subtests are run.
      */
-    beforeAll(func: Callback): void;
+    beforeAll(func: () => any | PromiseLike<any>): void;
 
     /**
      * Add a hook to be run after each subtest, including their subtests and so
      * on.
      */
-    after(func: Callback): void;
+    after(func: () => any | PromiseLike<any>): void;
 
     /**
      * Add a hook to be run once after all subtests are run.
      */
-    afterAll(func: Callback): void;
+    afterAll(func: () => any | PromiseLike<any>): void;
 }
 
 declare const t: Test;

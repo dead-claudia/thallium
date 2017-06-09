@@ -6,13 +6,14 @@ These are the most common methods you'll ever use.
 
 - [Tests with `t.test(name, callback)` and `t.testSkip(name, callback)`](#tests)
 - [Using plugins with `t.call(plugin)`](#call)
-- [Using reporters with `t.reporter(reporter, arg?)`](#reporter)
+- [Reflection with `t.reflect`](#reflect)
+- [Using reporters with `t.reporter = reporter`](#reporter)
 - [`t.timeout`](#timeout)
 - [`t.slow`](#slow)
 - [`t.attempts`](#attempts)
 - [`t.isFailable`](#isFailable)
-- [`t.only(...selectors)`](#only)
-- [`t.run(opts?)`](#run)
+- [`t.only`](#only)
+- [`t.run(opts?)` and `t.options`](#run)
 - [Adding test hooks with `t.before(func)`, `t.beforeAll(func)`, `t.after(func)`, and `t.afterAll(func)`](#test-hooks)
 - [`t.clearTests()`](#clear-tests)
 
@@ -77,19 +78,29 @@ t.test 'reads files correctly', ->
 ## Using plugins
 
 ```js
-t.call(plugin, arg=undefined)
+t.call(plugin)
 ```
 
-Call a [plugin](../plugins.md) with an optional `arg`, and return its result.
+Call a [plugin](../plugins.md) and return its result.
+
+<a id="reflect"></a>
+## Reflection
+
+```js
+t.reflect // getter
+```
+
+Get a [Reflect](../reflect.md) instance, the same value that's passed to plugins invoked with `t.call()`.
 
 <a id="reporter"></a>
 ## Using reporters
 
 ```js
-t.reporter(reporter, arg=undefined)
+t.reporter = ["builtin", opts={}] // setter
+t.reporter = reporter // setter
 ```
 
-Use a [reporter](../reporters.md) with an optional `arg`. Note that this only works at the root level, and it replaces any old one that was previously used.
+Use a [reporter](../reporters.md). The first version uses a built-in reporter given by name (with optional options), and the second a reporter reference. Note that this only works at the root level, and it replaces any old one that was previously used.
 
 <a id="timeout"></a>
 ## t.timeout
@@ -135,15 +146,18 @@ Get whether this test is failable, or set it as either failable/non-failable. Te
 ## t.only(...paths)
 
 ```js
-t.only(...paths)
+t.only = [...paths] // setter
 ```
 
-Only run tests that are inside this path. This can be set for a parent test or even subtests. It's a lot like Mocha's `--grep` or `--fgrep`, but far more flexible. Also, only the whitelisted subtests contained in the `paths` run, and inner block/async tests aren't even initialized.
+Only run tests that are inside this path. This can be set globally before tests are run. It's a lot like Mocha's `--grep` or `--fgrep`, but far more flexible. Also, only the whitelisted subtests contained in the `paths` run, and inner block/async tests aren't even initialized.
 
 The `paths` are used as an exclusive union of tests and their children to run.
 
 ```js
-t.only(["one"], ["two", "inner 1"])
+t.only = [
+    ["one"],
+    ["two", "inner 1"],
+]
 
 t.test("one", t => {
     t.test("inner").equal(1, 1)
@@ -177,18 +191,14 @@ t.test("two", t => {
 Also, empty arrays match no test, and passing no arguments will prevent all tests from running.
 
 <a id="run"></a>
-## t.run()
+## t.run(opts?) and t.options
 
 ```js
+t.options = opts // setter, optional
 t.run(opts={}).then(...)
 ```
 
 This will run all your tests. If you're using the CLI, this is unnecessary, as it's handled for you, but if you're simply using a single test file, and you just want to use `node test.js`, you can use this. Also, it's good for if you're running it in the browser. It returns a promise resolved whenever the test is completed.
-
-The following options are accepted, none required:
-
-- `only` - Much like `t.only`, except it's specified and handled per-run.
-- `skip` - Skip tests in this run using the same kind of selector as `only`.
 
 If it's rejected, the rejection always caused by one of two things:
 
@@ -196,6 +206,13 @@ If it's rejected, the rejection always caused by one of two things:
 2. Thallium itself threw an error it didn't catch.
 
 Either case is fatal, but Thallium restores its state for a subsequent rerun (in case of flaky reporters). If it isn't, and the error isn't from the reporter, it's a bug [you definitely should report](https://github.com/isiahmeadows/thallium/issues/new))
+
+You can set the options per-test, or you may also specify default options by assigning them to `t.options` (write-only) before they're run (like in your config).
+
+The following options are accepted, none required:
+
+- `only` - Much like `t.only`, except it's specified and handled per-run.
+- `skip` - Skip tests in this run using the same kind of selector as `only`.
 
 <a id="test-hooks"></a>
 ## Adding test hooks

@@ -4,7 +4,7 @@ This directory contains a few examples that augment the documentation. These are
 
 - [Event Emitter wrapper plugin for reporters](./ee-reporter.js) + [CoffeeScript version](./ee-reporter.coffee)
 
-- Wrap `t.reporter()` in a plugin to [return an Observable](./observable-reporter.js) + [CoffeeScript version](./observable-reporter.coffee)
+- Wrap `reflect.{add,remove}Reporter()` in a plugin to [return an Observable](./observable-reporter.js) + [CoffeeScript version](./observable-reporter.coffee)
 
 - A [basic TAP-generating reporter](./tap-reporter.js) + [CoffeeScript version](./tap-reporter.coffee) that is a bit simpler and stripped down than the [main one](../reporters.md).
 

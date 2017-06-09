@@ -60,8 +60,8 @@ From here, you may use global plugins, global reporters, or even instantiate a c
 // Your .tl.js
 const t = require("thallium")
 
-t.reporter(require("my-reporter"))
-t.use(require("my-thallium-integration"))
+t.reporter = require("my-reporter")
+t.call(require("my-thallium-integration"))
 ```
 
 This config is searched for from the bottom of the glob's parent all the way to the root, so if you specify a glob of `test/**/*.js` from inside a `/home/my-name/projects/module`, Thallium will still be able to find a config all the way at `projects/.tl.js`, if it can't find one at `projects/module/test/.tl.js` or `projects/module/.tl.js`.

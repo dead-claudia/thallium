@@ -2,6 +2,6 @@
 
 var t = require("../../..")
 
-t.reporter(require("../../../test-util/cli/pipe-reporter"))
+t.reporter = require("../../../test-util/cli/pipe-reporter")
 
 module.exports = {thallium: t, files: "./*.js"}

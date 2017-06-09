@@ -29,7 +29,7 @@ describe("core/timeouts (FLAKE)", /** @this */ function () {
         var tt = t.internal.root()
         var ret = []
 
-        tt.reporter(Util.push, ret)
+        tt.reporter = Util.push(ret)
 
         tt.test("test", function () {
             // It's highly unlikely the engine will take this long to finish
@@ -50,7 +50,7 @@ describe("core/timeouts (FLAKE)", /** @this */ function () {
         var tt = t.internal.root()
         var ret = []
 
-        tt.reporter(Util.push, ret)
+        tt.reporter = Util.push(ret)
 
         tt.test("test", function () {
             tt.timeout = 50
@@ -71,7 +71,7 @@ describe("core/timeouts (FLAKE)", /** @this */ function () {
         var tt = t.internal.root()
         var ret = []
 
-        tt.reporter(Util.push, ret)
+        tt.reporter = Util.push(ret)
 
         tt.test("test", function () {
             tt.timeout = 50
@@ -93,7 +93,7 @@ describe("core/timeouts (FLAKE)", /** @this */ function () {
         var tt = t.internal.root()
         var ret = []
 
-        tt.reporter(Util.push, ret)
+        tt.reporter = Util.push(ret)
 
         tt.test("test", function () {
             tt.timeout = 50
@@ -113,19 +113,17 @@ describe("core/timeouts (FLAKE)", /** @this */ function () {
         })
     })
 
-    function timeout(reflect) {
-        return reflect.timeout
-    }
-
     it("gets own timeout", function () {
         var tt = t.internal.root()
         var active
 
         tt.test("test", function () {
             tt.timeout = 50
-            active = tt.call(timeout)
+            active = tt.reflect.timeout
         })
 
+        // Don't print anything
+        tt.reporter = function () {}
         return tt.run().then(function () {
             assert.equal(active, 50)
         })
@@ -138,10 +136,12 @@ describe("core/timeouts (FLAKE)", /** @this */ function () {
         tt.test("test", function () {
             tt.timeout = 50
             tt.test("inner", function () {
-                active = tt.call(timeout)
+                active = tt.reflect.timeout
             })
         })
 
+        // Don't print anything
+        tt.reporter = function () {}
         return tt.run().then(function () {
             assert.equal(active, 50)
         })
@@ -152,9 +152,11 @@ describe("core/timeouts (FLAKE)", /** @this */ function () {
         var active
 
         tt.test("test", function () {
-            active = tt.call(timeout)
+            active = tt.reflect.timeout
         })
 
+        // Don't print anything
+        tt.reporter = function () {}
         return tt.run().then(function () {
             assert.equal(active, 2000)
         })

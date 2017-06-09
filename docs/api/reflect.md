@@ -4,7 +4,7 @@
 
 Most of these are probably only interesting if you're writing [plugins](./plugins.md). They permit some more low-level introspection of individual tests, and make it easier to do some of the other things you need to do.
 
-This is what's passed into the callback of `t.call(plugin)`.
+This is what's passed into the callback of `t.call(plugin)`, but you can also get one via `t.reflect`.
 
 Also note that `reflect` instances are persistent and tied to the backing test instance. What does this mean? It means as long as you access the same backing test, you get the same `reflect` instance. And because subtests are cleared after running, previous `reflect` instances won't carry over to the next `t.run()`.
 
@@ -20,7 +20,7 @@ Also note that `reflect` instances are persistent and tied to the backing test i
 - [`reflect.isFailable`](#isfailable)
 - [`reflect` test hooks](#test-hooks)
 - [Tests with `reflect.test("name", callback)` and `reflect.testSkip("name", callback)`](#tests)
-- [Reporter management with `reflect.reporter(reporter, arg)`, `reflect.hasReporter(reporter)`, and `reflect.removeReporter(reporter)`](#reporters)
+- [Reporter management with `reflect.addReporter(reporter)`, `reflect.hasReporter(reporter)`, and `reflect.removeReporter(reporter)`](#reporters)
 - [`reflect.name`](#name)
 - [`reflect.index`](#index)
 - [`reflect.parent`](#parent)
@@ -162,26 +162,26 @@ const co = require("co");
 const myModule = require("./index.js");
 
 // Create your wrapper
-const test = t.call(reflect => (name, body) => {
+function test(name, body) {
     if ({}.toString.call(body) === "[object GeneratorFunction]") {
-        return reflect.test(name, co.wrap(body));
+        return t.reflect.test(name, co.wrap(body));
     } else {
-        return reflect.test(name, body);
+        return t.reflect.test(name, body);
     }
-});
+}
 
 // And have some async fun!
-function asyncComputation() {
+function readAsync() {
     return new Promise(resolve => {
-        setTimeout(() => resolve(myModule.value), 10)
+        setTimeout(() => resolve(myModule.value), 10);
     });
 }
 
 test("testing", function *() {
-    test("things work", function *() {
-        const myValue = yield asyncComputation()
-        const yourValue = "string";
+    const expectedValue = yield readAsync();
 
+    test("things work", function *() {
+        const myValue = yield myModule.doSomething();
         assert.equal(myValue, yourValue);
     });
 });
@@ -191,14 +191,14 @@ test("testing", function *() {
 ## Reporter management
 
 ```js
-reflect.reporter(reporter, arg=undefined)
+reflect.addReporter(reporter)
 reflect.hasReporter(reporter)
 reflect.removeReporter(reporter)
 ```
 
 Add, check for existence of, or remove a [reporter](../reporters.md), with an optional `arg` to pass to it. Note that this only exists on the root `reflect`, and not any children.
 
-Note that this list is completely separate from the primary reporter set by [`t.reporter(reporter, arg)`](./thallium.md#reporter).
+Note that this list is completely separate from the primary reporter set by [`t.reporter = reporter`](./thallium.md#reporter).
 
 <a id="name"></a>
 ## reflect.name

@@ -33,7 +33,7 @@ t.test 'core (timeouts) (FLAKE)', ->
         tt = create()
         ret = []
 
-        tt.reporter push, ret
+        tt.reporter = push(ret)
 
         tt.test 'test', ->
             # It's highly unlikely the engine will take this long to finish.
@@ -51,7 +51,7 @@ t.test 'core (timeouts) (FLAKE)', ->
         tt = create()
         ret = []
 
-        tt.reporter push, ret
+        tt.reporter = push(ret)
 
         tt.test 'test', ->
             tt.timeout = 50
@@ -69,7 +69,7 @@ t.test 'core (timeouts) (FLAKE)', ->
         tt = create()
         ret = []
 
-        tt.reporter push, ret
+        tt.reporter = push(ret)
 
         tt.test 'test', ->
             tt.timeout = 50
@@ -88,7 +88,7 @@ t.test 'core (timeouts) (FLAKE)', ->
         tt = create()
         ret = []
 
-        tt.reporter push, ret
+        tt.reporter = push(ret)
 
         tt.test 'test', ->
             tt.timeout = 50
@@ -112,8 +112,9 @@ t.test 'core (timeouts) (FLAKE)', ->
 
         tt.test 'test', ->
             tt.timeout = 50
-            active = tt.call -> @timeout
+            active = tt.reflect.timeout
 
+        tt.reporter = -> # Don't print anything
         tt.run().then ->
             assert.equal active, 50
 
@@ -124,8 +125,9 @@ t.test 'core (timeouts) (FLAKE)', ->
         tt.test 'test', ->
             tt.timeout = 50
             tt.test 'inner', ->
-                active = tt.call -> @timeout
+                active = tt.reflect.timeout
 
+        tt.reporter = -> # Don't print anything
         tt.run().then ->
             assert.equal active, 50
 
@@ -134,7 +136,8 @@ t.test 'core (timeouts) (FLAKE)', ->
         active = undefined
 
         tt.test 'test', ->
-            active = tt.call -> @timeout
+            active = tt.reflect.timeout
 
+        tt.reporter = -> # Don't print anything
         tt.run().then ->
             assert.equal active, 2000

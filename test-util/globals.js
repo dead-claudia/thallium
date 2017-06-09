@@ -41,9 +41,6 @@ var Util = global.Util = {
 
     // Chrome complains of an illegal invocation without a bound `this`.
     setTimeout: global.setTimeout.bind(global),
-
-    // For some of the reporters
-    const: function (x) { return function () { return x } },
 }
 
 // Because PhantomJS sucks - Some tests are fails due to PhantomJS oddities, and

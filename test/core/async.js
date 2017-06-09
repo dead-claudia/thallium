@@ -8,6 +8,8 @@ describe("core/async", function () {
         var tt = t.internal.root()
         var called = false
 
+        // Don't print anything
+        tt.reporter = function () {}
         tt.test("test", function () { called = true })
 
         var ret = tt.run().then(function () { assert.ok(called) })
@@ -20,6 +22,8 @@ describe("core/async", function () {
         var tt = t.internal.root()
         var called = false
 
+        // Don't print anything
+        tt.reporter = function () {}
         tt.test("test", function () {
             called = true
             return {then: function (resolve) { resolve() }}
@@ -35,6 +39,8 @@ describe("core/async", function () {
         var tt = t.internal.root()
         var called = false
 
+        // Don't print anything
+        tt.reporter = function () {}
         tt.test("test", function () {
             called = true
             return {
@@ -54,6 +60,8 @@ describe("core/async", function () {
         var tt = t.internal.root()
         var called = false
 
+        // Don't print anything
+        tt.reporter = function () {}
         tt.test("test", function () {
             called = true
             return {
@@ -79,8 +87,7 @@ describe("core/async", function () {
 
         sentinel.marker = function () {}
 
-        tt.reporter(Util.push, ret)
-
+        tt.reporter = Util.push(ret)
         tt.test("test", function () {
             called = true
             return {
@@ -112,8 +119,7 @@ describe("core/async", function () {
 
         sentinel.marker = function () {}
 
-        tt.reporter(Util.push, ret)
-
+        tt.reporter = Util.push(ret)
         tt.test("test", function () {
             called = true
             return {
@@ -146,8 +152,7 @@ describe("core/async", function () {
 
         sentinel.marker = function () {}
 
-        tt.reporter(Util.push, ret)
-
+        tt.reporter = Util.push(ret)
         tt.test("test", function () {
             called = true
 

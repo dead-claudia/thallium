@@ -54,17 +54,10 @@ declare namespace t {
     type BeforeEachReport = Thallium.BeforeEachReport;
     type AfterEachReport = Thallium.AfterEachReport;
     type AfterAllReport = Thallium.AfterAllReport;
-    type Reporter<T> = Thallium.Reporter<T>;
-    type ArgReporter<T> = Thallium.ArgReporter<T>;
-    type VoidReporter = Thallium.VoidReporter;
-    type ReporterConsumer = Thallium.ReporterConsumer;
-    type Plugin<T, R> = Thallium.Plugin<T, R>;
-    type ArgPlugin<T, R> = Thallium.ArgPlugin<T, R>;
-    type VoidPlugin<R> = Thallium.VoidPlugin<R>;
-    type Callback = Thallium.Callback;
+    type Reporter = Thallium.Reporter;
     type Reflect = Thallium.Reflect;
-    type ReflectRoot = Thallium.ReflectRoot;
-    type ReflectChild = Thallium.ReflectChild;
+    type RunOptions = Thallium.RunOptions;
+    type Test = Thallium.Test;
 
     namespace r {
         type DotOptions = Reporters.DotOptions;

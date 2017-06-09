@@ -88,7 +88,7 @@ You can also easily add reporters specific to your plugin:
 
 ```js
 module.exports = reflect => {
-    reflect.reporter(require("my-reporter"))
+    reflect.addReporter(require("my-reporter"))
 }
 ```
 
