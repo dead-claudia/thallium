@@ -6,4 +6,4 @@ IF NOT "%~1"=="" (
     SHIFT
     GOTO :loop
 )
-%PROGRAM% %BINARY%
+"%PROGRAM%" "%BINARY%"
