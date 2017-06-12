@@ -20,7 +20,7 @@ describe("cli/util", function () {
 
     describe("load()", function () {
         it("works", function () {
-            assert.equal(
+            return assert.async.equal(
                 FSUtil.load("./test-module.js", fixture("util")),
                 "hi!")
         })

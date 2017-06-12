@@ -283,14 +283,12 @@ describe("cli/run", function () {
 
                         ".tl.js": function () {
                             custom.reporter = Util.push(ret)
+                            custom.files = [
+                                "totally-not-a-test/**/*.coffee",
+                                "whatever/**/*.js",
+                            ]
 
-                            return {
-                                thallium: custom,
-                                files: [
-                                    "totally-not-a-test/**/*.coffee",
-                                    "whatever/**/*.js",
-                                ],
-                            }
+                            return Promise.resolve(custom)
                         },
 
                         "totally-not-a-test": {

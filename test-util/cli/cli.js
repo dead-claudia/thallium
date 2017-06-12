@@ -209,18 +209,18 @@ methods(Mock, {
         }
 
         if (interpretMocks[file] != null) {
-            return interpretMocks[file]
+            return Promise.resolve(interpretMocks[file])
         }
 
         if (interpretModules[file]) {
-            return undefined
+            return Promise.resolve()
         }
 
         var target = this.resolve(file)
 
         // Directories are initialized as objects.
         if (!hasOwn.call(this._files, target)) {
-            throw notFound(file)
+            return Promise.reject(notFound(file))
         }
 
         var entry = this._files[target]
@@ -234,10 +234,12 @@ methods(Mock, {
         }
 
         if (entry == null) {
-            throw notFound(file)
+            return Promise.reject(notFound(file))
         }
 
-        return entry.load()
+        return new Promise(function (resolve) {
+            resolve(entry.load())
+        })
     },
 
     readGlob: function (globs) {

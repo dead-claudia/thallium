@@ -15,6 +15,7 @@ These are the most common methods you'll ever use.
 - [`t.only`](#only)
 - [`t.run(opts?)` and `t.options`](#run)
 - [Adding test hooks with `t.before(func)`, `t.beforeAll(func)`, `t.after(func)`, and `t.afterAll(func)`](#test-hooks)
+- [`t.files`](#files)
 - [`t.clearTests()`](#clear-tests)
 
 <a id="tests"></a>
@@ -236,6 +237,16 @@ Schedule a callback to run on every test. In each group, they're fired in the or
 5. Run all the `afterAll` hooks defined for this test only
 
 You may also run plugins within these hooks, and in the case of `before` and `after` hooks, you can even run plugins in the context of the child test itself.
+
+<a id="files"></a>
+## t.files
+
+```js
+var files = t.files // getter
+t.files = files // setter
+```
+
+Get the files to be executed, or set them to what you want. See the [CLI configuration section](./cli.md#configuration) for more details.
 
 <a id="clear-tests"></a>
 ## t.clearTests()

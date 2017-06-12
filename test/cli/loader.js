@@ -128,13 +128,17 @@ describe("cli/loader", function () {
         return spy
     }
 
+    function makePromise() {
+        return Promise.resolve()
+    }
+
     describe("makeSimple()", function () {
         it("exists", function () {
             assert.isFunction(Loader.makeSimple)
         })
 
         it("loads a normal module", function () {
-            var spy = makeSpy()
+            var spy = makeSpy(makePromise)
             var util = Cli.mock({
                 test: {
                     "config.js": spy,
@@ -251,11 +255,11 @@ describe("cli/loader", function () {
             assert.isFunction(Loader.makeInterpret)
         })
 
-        function throwMissing() {
+        function missing() {
             var e = new Error()
 
             e.code = "MODULE_NOT_FOUND"
-            throw e
+            return e
         }
 
         // Note that this tests by temporarily patching `interpret.jsVariants`,
@@ -271,7 +275,7 @@ describe("cli/loader", function () {
         it("loads a null module", function () {
             interpret.jsVariants[".js"] = null
 
-            var spy = makeSpy()
+            var spy = makeSpy(makePromise)
             var loader = Loader.makeInterpret({util: {load: spy}},
                 "base", ".js")
 
@@ -283,7 +287,7 @@ describe("cli/loader", function () {
         it("loads a module string", function () {
             interpret.jsVariants[".js"] = "module"
 
-            var spy = makeSpy()
+            var spy = makeSpy(makePromise)
             var loader = Loader.makeInterpret({util: {load: spy}},
                 "base", ".js")
 
@@ -296,12 +300,14 @@ describe("cli/loader", function () {
         it("loads a module object", function () {
             function sentinel() {}
 
-            var registerSpy = makeSpy()
+            var registerSpy = makeSpy(makePromise)
             var mock = interpret.jsVariants[".js"] = {
                 module: "module",
                 register: registerSpy,
             }
-            var loaderSpy = makeSpy(function () { return sentinel })
+            var loaderSpy = makeSpy(function () {
+                return Promise.resolve(sentinel)
+            })
             var loader = Loader.makeInterpret({util: {load: loaderSpy}},
                 "base", ".js")
 
@@ -316,7 +322,7 @@ describe("cli/loader", function () {
 
         it("loads first module in string array", function () {
             interpret.jsVariants[".js"] = ["foo", "bar"]
-            var loaderSpy = makeSpy()
+            var loaderSpy = makeSpy(makePromise)
             var loader = Loader.makeInterpret({util: {load: loaderSpy}},
                 "base", ".js")
 
@@ -329,7 +335,8 @@ describe("cli/loader", function () {
         it("loads second module in string array", function () {
             interpret.jsVariants[".js"] = ["foo", "bar"]
             var loaderSpy = makeSpy(function (mod) {
-                if (mod === "foo") throwMissing()
+                if (mod === "foo") return Promise.reject(missing())
+                return Promise.resolve()
             })
             var loader = Loader.makeInterpret({util: {load: loaderSpy}},
                 "base", ".js")
@@ -345,8 +352,8 @@ describe("cli/loader", function () {
             function sentinel1() {}
             function sentinel2() {}
 
-            var registerSpy1 = makeSpy()
-            var registerSpy2 = makeSpy()
+            var registerSpy1 = makeSpy(makePromise)
+            var registerSpy2 = makeSpy(makePromise)
 
             interpret.jsVariants[".js"] = [{
                 module: "foo",
@@ -357,9 +364,9 @@ describe("cli/loader", function () {
             }]
 
             var loaderSpy = makeSpy(function (mod) {
-                if (mod === "foo") return sentinel1
-                if (mod === "bar") return sentinel2
-                return undefined
+                if (mod === "foo") return Promise.resolve(sentinel1)
+                if (mod === "bar") return Promise.resolve(sentinel2)
+                return Promise.resolve()
             })
             var loader = Loader.makeInterpret({util: {load: loaderSpy}},
                 "base", ".js")
@@ -373,8 +380,8 @@ describe("cli/loader", function () {
         it("loads second module in object array", function () {
             function sentinel() {}
 
-            var registerSpy1 = makeSpy()
-            var registerSpy2 = makeSpy()
+            var registerSpy1 = makeSpy(makePromise)
+            var registerSpy2 = makeSpy(makePromise)
 
             var mock = interpret.jsVariants[".js"] = [{
                 module: "foo",
@@ -385,9 +392,9 @@ describe("cli/loader", function () {
             }]
 
             var loaderSpy = makeSpy(function (mod) {
-                if (mod === "foo") return throwMissing()
-                if (mod === "bar") return sentinel
-                return undefined
+                if (mod === "foo") return Promise.reject(missing())
+                if (mod === "bar") return Promise.resolve(sentinel)
+                return Promise.resolve()
             })
             var loader = Loader.makeInterpret({util: {load: loaderSpy}},
                 "base", ".js")
@@ -407,7 +414,7 @@ describe("cli/loader", function () {
             function sentinel1() {}
             function sentinel2() {}
 
-            var registerSpy = makeSpy()
+            var registerSpy = makeSpy(makePromise)
 
             interpret.jsVariants[".js"] = ["foo", {
                 module: "bar",
@@ -415,9 +422,9 @@ describe("cli/loader", function () {
             }]
 
             var loaderSpy = makeSpy(function (mod) {
-                if (mod === "foo") return sentinel1
-                if (mod === "bar") return sentinel2
-                return undefined
+                if (mod === "foo") return Promise.resolve(sentinel1)
+                if (mod === "bar") return Promise.resolve(sentinel2)
+                return Promise.resolve()
             })
             var loader = Loader.makeInterpret({util: {load: loaderSpy}},
                 "base", ".js")
@@ -432,7 +439,7 @@ describe("cli/loader", function () {
         it("loads second module in string + object array", function () {
             function sentinel() {}
 
-            var registerSpy = makeSpy()
+            var registerSpy = makeSpy(makePromise)
 
             var mock = interpret.jsVariants[".js"] = ["foo", {
                 module: "bar",
@@ -440,9 +447,9 @@ describe("cli/loader", function () {
             }]
 
             var loaderSpy = makeSpy(function (mod) {
-                if (mod === "foo") return throwMissing()
-                if (mod === "bar") return sentinel
-                return undefined
+                if (mod === "foo") return Promise.reject(missing())
+                if (mod === "bar") return Promise.resolve(sentinel)
+                return Promise.resolve()
             })
             var loader = Loader.makeInterpret({util: {load: loaderSpy}},
                 "base", ".js")
@@ -461,7 +468,7 @@ describe("cli/loader", function () {
             function sentinel1() {}
             function sentinel2() {}
 
-            var registerSpy = makeSpy()
+            var registerSpy = makeSpy(makePromise)
 
             var mock = interpret.jsVariants[".js"] = [{
                 module: "foo",
@@ -469,9 +476,9 @@ describe("cli/loader", function () {
             }, "bar"]
 
             var loaderSpy = makeSpy(function (mod) {
-                if (mod === "foo") return sentinel1
-                if (mod === "bar") return sentinel2
-                return undefined
+                if (mod === "foo") return Promise.resolve(sentinel1)
+                if (mod === "bar") return Promise.resolve(sentinel2)
+                return Promise.resolve()
             })
             var loader = Loader.makeInterpret({util: {load: loaderSpy}},
                 "base", ".js")
@@ -488,7 +495,7 @@ describe("cli/loader", function () {
         it("loads second module in object + string array", function () {
             function sentinel() {}
 
-            var registerSpy = makeSpy()
+            var registerSpy = makeSpy(makePromise)
 
             interpret.jsVariants[".js"] = [{
                 module: "foo",
@@ -496,9 +503,9 @@ describe("cli/loader", function () {
             }, "bar"]
 
             var loaderSpy = makeSpy(function (mod) {
-                if (mod === "foo") return throwMissing()
-                if (mod === "bar") return sentinel
-                return undefined
+                if (mod === "foo") return Promise.reject(missing())
+                if (mod === "bar") return Promise.resolve(sentinel)
+                return Promise.resolve()
             })
             var loader = Loader.makeInterpret({util: {load: loaderSpy}},
                 "base", ".js")

@@ -27,9 +27,9 @@ Note that as of this version, only the primary API of the previous version will 
 6. ~~Return in the `t.run()` promise a result object of various statistics~~
 7. ~~Add some promise-aware assertions (in `clean-assert`)~~
 8. ~~Move `exports.files` config option to `t.files`~~
-    - Change `exports.thallium` to default export
-    - Ignored by core, but will mildly simplify CLI interface
-    - Will make eventual parallel interface much more consistent
+    - ~~Change `exports.thallium` to default export~~
+    - ~~Ignored by core, but will mildly simplify CLI interface~~
+    - ~~Will make eventual parallel interface much more consistent~~
 9. Allow full name matching of `only`/`skip` option
     - Detected via no array
     - Feature parity with most other heavy frameworks
@@ -38,9 +38,9 @@ Note that as of this version, only the primary API of the previous version will 
 12. Make reports backed by a tree, and convert the public API to expose only getters
     - Abstracts away the internal representation
     - Reduce reporter GC
-13. Cache the settings for child tests after they are re-locked
-    - This gets rid of all the tree climbing nonsense that currently exists
-    - This will streamline settings a *lot* more
+13. ~~Cache the settings for child tests after they are re-locked~~
+    - ~~This gets rid of all the tree climbing nonsense that currently exists~~
+    - ~~This will streamline settings a *lot* more~~
 14. Add file watching support
     - Just invoke the CLI on each change. Way easier than trying to clean up `node_modules`, and you get more easily reproduced runs
     - Mocha's magical behavior isn't helpful when dealing with globals (I've had enough pains in this repo already)
@@ -52,11 +52,13 @@ Note that as of this version, only the primary API of the previous version will 
 17. ~~Load bundle automatically, and implement `data-*` attribute options~~
 18. Add `timeouts` boolean run option (default `true`) to disable timeouts globally
     - Timeouts are then reported as `Infinity`
-19. Add `color` boolean run option (default system-dependent) to enable/disable colors
+19. Add `slow` boolean run option (default `true`) to disable slow thresholds globally
+    - Slow thresholds are then reported as `Infinity`
+20. Add `color` boolean run option (default system-dependent) to enable/disable colors
     - Also provide this info to reporters per-report
-20. ~~Make `t.only` a getter/setter~~
-21. ~~Allow reporters to be set as string references~~
-22. ~~Change `t.reporter` to accept either a function or an array.~~
+21. ~~Make `t.only` a getter/setter~~
+22. ~~Allow reporters to be set as string references~~
+23. ~~Change `t.reporter` to accept either a function or an array.~~
 
 ## 0.4.x
 (not blocking 0.4.0)

@@ -35,23 +35,25 @@ This file is loaded via `require` automatically, no extra flags or anything, and
 // Your .tl.js, with default values
 "use strict"
 
-module.exports = {
-    /**
-     * This tells Thallium what module, in case you're using some sort of
-     * wrapper for it.
-     */
-    thallium: require("thallium"),
+const t = require("thallium")
 
-    /**
-     * This gives Thallium one or more globs (it can be an array of them) to use
-     * to find and load test files, relative to the config itself. Note that
-     * this intentionally does not match dot files unless you explicitly specify
-     * one, because Thallium, among others like ESLint, will use those for
-     * various reasons. It uses node-glob under the hood, but it also supports
-     * negation in the same way as the CLI.
-     */
-    files: ["test/**/*.js", "test.js"],
-}
+/**
+ * This gives Thallium an array of one or more globs to use to find and load
+ * test files, relative to the config itself. Note that this intentionally does
+ * not match dot files unless you explicitly specify one, because Thallium,
+ * among others like ESLint, will use those for various reasons. It uses
+ * node-glob under the hood, but it also supports negation in the same way as
+ * the CLI.
+ *
+ * Also, note that this is not used by core itself.
+ */
+t.files = ["test/**/*.js", "test.js"]
+
+/**
+* This tells Thallium what module, in case you're using some sort of
+* wrapper for it. By default, the local "thallium" module is used.
+*/
+module.exports = t
 ```
 
 From here, you may use global plugins, global reporters, or even instantiate a connection to a remote server. The file is literally executed as code, so you may put anything you want on it.
@@ -88,7 +90,7 @@ If you need to require something before even the config is loaded, like if you n
 tl --require ./load-env.js tests/**/*.js
 ```
 
-In the event this module does asynchronous work, you can also default-export a thenable that resolves when you're done. This will block all further loading until the module finishes, so make sure it does resolve eventually.
+In the event this module does asynchronous work, you can also default-export a thenable that resolves when you're done. This will block all further loading until the module finishes, so make sure it does resolve eventually. It can come in handy when you want to use Rollup to build your modules before running the tests.
 
 ## Transpilers
 
@@ -96,9 +98,9 @@ You may use any transpiler you please. For many popular transpilers and compiled
 
 ```coffee
 # .tl.coffee
-module.exports =
-    thallium: require 'thallium'
-    files: 'test/**/*.coffee'
+t = require 'thallium'
+t.files = 'test/**/*.coffee'
+module.exports = t
 ```
 
 Any language whose extension is already known to be a JS variant by [interpret](http://npm.im/interpret) will be found, and `.babel.js` won't be confused with plain `.js`. This means that even some of the less well known variants like [Wisp (`.wisp`)](http://npm.im/wisp) and [Earl Grey (`.eg`)](https://npm.im/earlgrey) will also be detected.
@@ -121,4 +123,5 @@ Notes:
 
 1. You have to already have the transpiler installed, like [`coffee-script`](http://npm.im/coffee-script) for [CoffeeScript](https://coffeescript.org) or [`ts-node`](http://npm.im/ts-node) and [`typescript`](http://npm.im/typescript) for [TypeScript](https://typescriptlang.com).
 2. Plain JavaScript config files take precedence over transpiled configs, so `.tl.js` will be found before `.tl.coffee` or `.tl.babel.js`.
-3. The default `spec` reporter is only added after all tests are loaded, right before running it. And it's only run if you're using the CLI, not if you're running it directly.
+3. The default `spec` reporter is only added after all tests are loaded, right before running it.
+4. Require hooks can be registered asynchronously, but due to limitations in Node's algorithm, they can't actually be *executed* asynchronously.
