@@ -2,6 +2,10 @@
 
 var t = require("thallium")
 
+function skip() {
+    t.skip()
+}
+
 t.test("cli common", function () {
     t.test("isObjectLike()", function () {
         t.test("passes for objects and functions", function () {})
@@ -17,9 +21,9 @@ t.test("cli common", function () {
         t.test("gets ES6 default functions", function () {})
         t.test("gets ES6 default objects", function () {})
         t.test("gets ES6 default arrays", function () {})
-        t.testSkip("gets ES6 default objects with `default` property", function () {}) // eslint-disable-line max-len
-        t.testSkip("gets ES6 default functions with `default` property", function () {}) // eslint-disable-line max-len
-        t.testSkip("gets ES6 default arrays with `default` property", function () {}) // eslint-disable-line max-len
+        t.test("gets ES6 default objects with `default` property", skip)
+        t.test("gets ES6 default functions with `default` property", skip)
+        t.test("gets ES6 default arrays with `default` property", skip)
         t.test("gets ES6 default primitives", function () {})
     })
 
@@ -52,7 +56,7 @@ t.test("cli common", function () {
             t.test("normalizes `.` with a cwd of `.`", function () {})
             t.test("normalizes `..` with a cwd of `.`", function () {})
             t.test("normalizes `.` with a cwd of `..`", function () {})
-            t.testSkip("normalizes directories with a cwd of `..`", function () {}) // eslint-disable-line max-len
+            t.test("normalizes directories with a cwd of `..`", skip)
             t.test("removes excess `.`", function () {})
             t.test("removes excess `..`", function () {})
             t.test("removes excess combined junk", function () {})
@@ -68,7 +72,7 @@ t.test("cli common", function () {
         t.test("gets a base name from character class pattern", function () {})
         t.test("gets a base name from brace , expansion", function () {})
         t.test("gets a base name from brace .. expansion", function () {})
-        t.testSkip("gets a base name from extglob", function () {})
-        t.testSkip("gets a base name from a complex brace glob", function () {})
+        t.test("gets a base name from extglob", skip)
+        t.test("gets a base name from a complex brace glob", skip)
     })
 })

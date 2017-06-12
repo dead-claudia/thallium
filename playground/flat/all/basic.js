@@ -15,4 +15,4 @@ t.test("core (basic) returns the current instance when given a callback", fail)
 t.test("core (basic) returns a prototypal clone when not given a callback", fail) // eslint-disable-line max-len
 t.test("core (basic) runs block tests within tests", function () {})
 t.test("core (basic) runs successful inline tests within tests", function () {})
-t.testSkip("core (basic) accepts a callback with `t.run()`", function () {})
+t.test("core (basic) accepts a callback with `t.run()`", function () { t.skip() }) // eslint-disable-line max-len

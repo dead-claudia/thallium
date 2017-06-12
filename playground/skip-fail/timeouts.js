@@ -11,12 +11,12 @@ function fail() {
 }
 
 t.test("core (timeouts) (FLAKE)", function () {
-    t.testSkip("succeeds with own", function () {})
-    t.testSkip("fails with own", function () {})
-    t.testSkip("succeeds with inherited", function () {})
-    t.testSkip("fails with inherited", function () {})
+    t.test("succeeds with own", function () { t.skip() })
+    t.test("fails with own", function () { t.skip() })
+    t.test("succeeds with inherited", function () { t.skip() })
+    t.test("fails with inherited", function () { t.skip() })
     t.test("gets own set timeout", fail)
     t.test("gets own inline set timeout", fail)
     t.test("gets own sync inner timeout", fail)
-    t.testSkip("gets default timeout", function () {})
+    t.test("gets default timeout", function () { t.skip() })
 })

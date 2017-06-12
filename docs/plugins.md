@@ -26,11 +26,6 @@ module.exports = reflect => ({
         if (isGeneratorFunction(callback)) callback = co.wrap(callback);
         return reflect.test(name, callback);
     },
-
-    testSkip: function (name, callback) {
-        if (isGeneratorFunction(callback)) callback = co.wrap(callback);
-        return reflect.testSkip(name, callback);
-    },
 });
 ```
 
@@ -48,10 +43,6 @@ module.exports = (reflect) ->
     test: (name, callback) ->
         callback = co.wrap(callback) if isGeneratorFunction(callback)
         reflect.test name, callback
-
-    testSkip: (name, callback) ->
-        callback = co.wrap(callback) if isGeneratorFunction(callback)
-        reflect.testSkip name, callback
 ```
 
 Using this plugin is as simple as this:
@@ -65,7 +56,8 @@ p.test("test", function *() {
     assert.equal(result, "foo")
 })
 
-p.testSkip("other", function *() {
+p.test("other", function *() {
+    t.skip()
     const result = yield doSomethingElseAsync()
     assert.equal(result, "bar")
 })
@@ -79,7 +71,8 @@ p.test 'test', ->
     result = yield doSomethingAsync()
     assert.equal result, 'foo'
 
-p.testSkip 'other', ->
+p.test 'other', ->
+    t.skip()
     result = yield doSomethingElseAsync()
     assert.equal result, 'bar'
 ```

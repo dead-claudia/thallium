@@ -10,11 +10,11 @@ function fail() {
     )
 }
 
-t.testSkip("core (timeouts) (FLAKE) succeeds with own", function () {})
-t.testSkip("core (timeouts) (FLAKE) fails with own", function () {})
-t.testSkip("core (timeouts) (FLAKE) succeeds with inherited", function () {})
-t.testSkip("core (timeouts) (FLAKE) fails with inherited", function () {})
+t.test("core (timeouts) (FLAKE) succeeds with own", function () { t.skip() })
+t.test("core (timeouts) (FLAKE) fails with own", function () { t.skip() })
+t.test("core (timeouts) (FLAKE) succeeds with inherited", function () { t.skip() }) // eslint-disable-line max-len
+t.test("core (timeouts) (FLAKE) fails with inherited", function () { t.skip() })
 t.test("core (timeouts) (FLAKE) gets own set timeout", fail)
 t.test("core (timeouts) (FLAKE) gets own inline set timeout", fail)
 t.test("core (timeouts) (FLAKE) gets own sync inner timeout", fail)
-t.testSkip("core (timeouts) (FLAKE) gets default timeout", function () {})
+t.test("core (timeouts) (FLAKE) gets default timeout", function () { t.skip() })

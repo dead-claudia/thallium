@@ -6,15 +6,47 @@ describe("core/selection", function () {
     var p = t.internal.location
     var n = t.internal.reports
 
-    describe("skip (per-test)", function () {
-        it("filters correctly", function () {
+    describe("skip (dynamic)", function () {
+        it("filters correctly from instance", function () {
             var tt = t.internal.root()
             var ret = []
 
             tt.reporter = Util.push(ret)
 
             tt.test("one", function () {
-                tt.testSkip("inner", function () {})
+                tt.test("inner", function () { tt.skip() })
+                tt.test("other", function () {})
+            })
+
+            tt.test("two", function () {
+                tt.test("inner", function () {})
+                tt.test("other", function () {})
+            })
+
+            return tt.run().then(function () {
+                assert.match(ret, [
+                    n.start(),
+                    n.enter([p("one", 0)]),
+                    n.skip([p("one", 0), p("inner", 0)]),
+                    n.pass([p("one", 0), p("other", 1)]),
+                    n.leave([p("one", 0)]),
+                    n.enter([p("two", 1)]),
+                    n.pass([p("two", 1), p("inner", 0)]),
+                    n.pass([p("two", 1), p("other", 1)]),
+                    n.leave([p("two", 1)]),
+                    n.end(),
+                ])
+            })
+        })
+
+        it("filters correctly from reflect", function () {
+            var tt = t.internal.root()
+            var ret = []
+
+            tt.reporter = Util.push(ret)
+
+            tt.test("one", function () {
+                tt.test("inner", function () { tt.reflect.skip() })
                 tt.test("other", function () {})
             })
 

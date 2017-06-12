@@ -19,7 +19,8 @@ Also note that `reflect` instances are persistent and tied to the backing test i
 - [`reflect.attempts`](#attempts)
 - [`reflect.isFailable`](#isfailable)
 - [`reflect` test hooks](#test-hooks)
-- [Tests with `reflect.test("name", callback)` and `reflect.testSkip("name", callback)`](#tests)
+- [Tests with `reflect.test("name", callback)`](#tests)
+- [`reflect.skip()`](#skip)
 - [Reporter management with `reflect.addReporter(reporter)`, `reflect.hasReporter(reporter)`, and `reflect.removeReporter(reporter)`](#reporters)
 - [`reflect.name`](#name)
 - [`reflect.index`](#index)
@@ -148,7 +149,6 @@ Schedule a callback to run on every test. They work [exactly like the main API m
 
 ```
 t.test("name", callback)
-t.testSkip("name", callback)
 ```
 
 Just like [how you would normally define tests](./thallium.md#tests), you can also add tests via plugins, in case you want to create a test wrapper. This might be useful for, say, a wrapper that enables you to define tests with `co` generator bodies.
@@ -162,13 +162,13 @@ const co = require("co");
 const myModule = require("./index.js");
 
 // Create your wrapper
-function test(name, body) {
+const test = t.call(reflect => (name, body) => {
     if ({}.toString.call(body) === "[object GeneratorFunction]") {
-        return t.reflect.test(name, co.wrap(body));
+        return reflect.test(name, co.wrap(body));
     } else {
-        return t.reflect.test(name, body);
+        return reflect.test(name, body);
     }
-}
+})
 
 // And have some async fun!
 function readAsync() {
@@ -186,6 +186,15 @@ test("testing", function *() {
     });
 });
 ```
+
+<a id="skip"></a>
+## reflect.skip()
+
+```js
+reflect.skip()
+```
+
+Throw an opaque non-error to signify that this test should be skipped. Thallium will catch it and handle it specially to mark the test as skipped rather than failed.
 
 <a id="reporters"></a>
 ## Reporter management

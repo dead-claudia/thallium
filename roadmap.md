@@ -44,9 +44,10 @@ Note that as of this version, only the primary API of the previous version will 
 14. Add file watching support
     - Just invoke the CLI on each change. Way easier than trying to clean up `node_modules`, and you get more easily reproduced runs
     - Mocha's magical behavior isn't helpful when dealing with globals (I've had enough pains in this repo already)
-15. Add the ability to programmatically skip a test before it completes
-    - Required for integration tests
-    - `t.skip()`/`reflect.skip()` throws an opaque non-error to skip a test
+15. ~~Add the ability to programmatically skip a test before it completes~~
+    - ~~Required for integration tests~~
+    - ~~`t.skip()`/`reflect.skip()` throws an opaque non-error to skip a test~~
+    - ~~Deprecate `t.testSkip` (and shim in `thallium/migrate`)~~
 16. ~~Expose a detached `reflect` via `t.reflect`~~
     - ~~Mainly for easier testing/etc.~~
 17. ~~Load bundle automatically, and implement `data-*` attribute options~~

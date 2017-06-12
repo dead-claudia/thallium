@@ -4,7 +4,8 @@
 
 These are the most common methods you'll ever use.
 
-- [Tests with `t.test(name, callback)` and `t.testSkip(name, callback)`](#tests)
+- [Tests with `t.test(name, callback)`](#tests)
+- [`t.skip()`](#skip)
 - [Using plugins with `t.call(plugin)`](#call)
 - [Reflection with `t.reflect`](#reflect)
 - [Using reporters with `t.reporter = reporter`](#reporter)
@@ -23,7 +24,6 @@ These are the most common methods you'll ever use.
 
 ```js
 t.test("name", callback)
-t.testSkip("name", callback)
 ```
 
 The basic test definition method, used for defining block tests. Should be familiar to you if you have used Mocha, Tape or similar.
@@ -43,7 +43,14 @@ t.test '1 should equal 1', ->
 
 This calls the callback on a separate event loop tick with the state correctly set to that test.
 
-You can skip block tests with `t.testSkip("name", callback)`, which works the same way, except the test is reported as skipped instead, and the body not run.
+<a id="skip"></a>
+## t.skip()
+
+```js
+t.skip()
+```
+
+Throw an opaque non-error to signify that this test should be skipped. Thallium will catch it and handle it specially to mark the test as skipped rather than failed.
 
 ### Async tests
 

@@ -11,11 +11,11 @@ Reporters are called with an event and return possibly a thenable resolved on co
 There are nine types of reports. You can check for these using `report.isStart`, `report.isEnter`, and so on, which return `true` if the event is of that respective type or `false` otherwise. You may also check for it with `report.type`, which returns a string name of the type below. Note that an event only has one type, so `report.isPass` and `report.isFail` cannot both be `true`.
 
 - `start` - Marks the start of all running tests, and is the first event fired.
-- `enter` - Marks the start of all child tests within a single test block.
-- `leave` - Marks the end of all child tests within a single test block.
-- `pass` - Marks a passing test block with no children.
-- `fail` - Marks a failing test block with no children. The `value` is the error that was thrown, untouched.
-- `skip` - Marks a skipped test block with no children, via `t.testSkip()`.
+- `enter` - Marks the start of all child tests within a single test group.
+- `leave` - Marks the end of all child tests within a single test group.
+- `pass` - Marks a passing test with no children.
+- `fail` - Marks a failing test with no children. The `value` is the error that was thrown, untouched.
+- `skip` - Marks a skipped test
 - `end` - Marks the end of all running tests, and is the last event fired.
 - `error` - An internal/reporter error `value`, provided for pretty-printing and the ability to close resources.
 - `hook` - A hook error info `value`, provided for pretty-printing and the ability to close resources.
@@ -72,7 +72,7 @@ Events are called in the following order:
 - Any other test:
 
     - `pass` if all assertions passed
-    - `skip` if it was skipped via `t.testSkip()`
+    - `skip` if it was skipped
     - `fail` if any assertion failed
 
 - Successive hooks failing:

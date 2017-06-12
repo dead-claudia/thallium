@@ -118,7 +118,7 @@ testing
     ✖ things work
 ```
 
-Now, let's skip that known-failing test. So, instead of using `t.test`, you have to use `t.testSkip`:
+Now, let's skip that known-failing test. So, we just tack `t.skip()` to the start of the body:
 
 ```js
 "use strict";
@@ -129,7 +129,8 @@ const myModule = require("../index.js");
 
 t.test("testing", () => {
     // This test won't even run.
-    t.testSkip("things work", () => {
+    t.test("things work", () => {
+        t.skip();
         const yourValue = "nope";
 
         assert.equal(myModule.value, yourValue); // Doesn't even run

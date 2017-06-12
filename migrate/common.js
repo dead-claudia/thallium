@@ -1,5 +1,16 @@
 "use strict"
 
+/**
+ * @fileoverview
+ * This module exports the following utility functions:
+ *
+ * - `Common.showDeprecation()` - Allow deprecation messages to be shown.
+ * - `Common.hideDeprecation()` - Prevent deprecation messages from being shown.
+ * - `Common.warn(...args)` - Print a deprecation warning
+ * - `Common.deprecate(message, func)` - Wrap a function to print a deprecation
+ *   message before its first use.
+ */
+
 // To suppress deprecation messages
 var suppressDeprecation = true
 

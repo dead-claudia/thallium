@@ -370,9 +370,9 @@ export interface Reflect {
     test(name: string, callback: () => any | PromiseLike<any>): void;
 
     /**
-     * Add a skipped block or inline test.
+     * Skip this test.
      */
-    testSkip(name: string, callback: () => any | PromiseLike<any>): void;
+    skip(): never;
 }
 
 export interface RunOptions {
@@ -459,9 +459,9 @@ export interface Test {
     test(name: string, body: () => any | PromiseLike<any>): this;
 
     /**
-     * Add a skipped test.
+     * Skip this test.
      */
-    testSkip(name: string, body: () => any | PromiseLike<any>): this;
+    skip(): never;
 
     /**
      * Add a hook to be run before each subtest, including their subtests and so

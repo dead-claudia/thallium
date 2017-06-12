@@ -9,5 +9,5 @@ function fail(t) {
 t.test("works", function () {})
 t.test("doesn't work", fail)
 t.test("what", function () {})
-t.testSkip("ever", function () {})
+t.test("ever", function () { t.skip() })
 t.test("you may stop now", function () {})
