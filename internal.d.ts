@@ -1,9 +1,8 @@
 import {
     Test, Location,
     StartReport, EnterReport, LeaveReport, PassReport,
-    FailReport, SkipReport, EndReport, ErrorReport, HookReport,
+    FailReport, SkipReport, EndReport, ErrorReport,
     BeforeAllReport, BeforeEachReport, AfterEachReport, AfterAllReport,
-    HookStage, HookError,
 } from "./index";
 
 /**
@@ -52,54 +51,27 @@ export namespace reports {
      */
     export function error(error: any): EndReport;
 
-    /**
-     * Create a `hook` report. Mostly useful for testing reporters.
-     */
-    export function hook(path: Location[], hookError: HookError<HookStage>): HookReport;
+    export namespace hook {
+        /**
+         * Create a `hook` report. Mostly useful for testing reporters.
+         */
+        export function beforeAll(path: Location[], rootPath: Location[], func: (...args: any[]) => any, error: any): BeforeAllReport;
 
-    /**
-     * Create a `hook` report. Mostly useful for testing reporters.
-     */
-    export function hook(path: Location[], hookError: HookError<"before all">): BeforeAllReport;
+        /**
+         * Create a `hook` report. Mostly useful for testing reporters.
+         */
+        export function beforeEach(path: Location[], rootPath: Location[], func: (...args: any[]) => any, error: any): BeforeEachReport;
 
-    /**
-     * Create a `hook` report. Mostly useful for testing reporters.
-     */
-    export function hook(path: Location[], hookError: HookError<"before each">): BeforeEachReport;
+        /**
+         * Create a `hook` report. Mostly useful for testing reporters.
+         */
+        export function afterEach(path: Location[], rootPath: Location[], func: (...args: any[]) => any, error: any): AfterEachReport;
 
-    /**
-     * Create a `hook` report. Mostly useful for testing reporters.
-     */
-    export function hook(path: Location[], hookError: HookError<"after each">): AfterEachReport;
-
-    /**
-     * Create a `hook` report. Mostly useful for testing reporters.
-     */
-    export function hook(path: Location[], hookError: HookError<"after all">): AfterAllReport;
-}
-
-type Hook = (...args: any[]) => any;
-
-export namespace hookErrors {
-    /**
-     * Create a new `before all` hook error, mainly for testing reporters.
-     */
-    export function beforeAll(func: Hook, error: any): HookError<"before all">;
-
-    /**
-     * Create a new `before each` hook error, mainly for testing reporters.
-     */
-    export function beforeEach(func: Hook, error: any): HookError<"before each">;
-
-    /**
-     * Create a new `after each` hook error, mainly for testing reporters.
-     */
-    export function afterEach(func: Hook, error: any): HookError<"after each">;
-
-    /**
-     * Create a new `after all` hook error, mainly for testing reporters.
-     */
-    export function afterAll(func: Hook, error: any): HookError<"after all">;
+        /**
+         * Create a `hook` report. Mostly useful for testing reporters.
+         */
+        export function afterAll(path: Location[], rootPath: Location[], func: (...args: any[]) => any, error: any): AfterAllReport;
+    }
 }
 
 /**

@@ -16,7 +16,10 @@ export type ReportType =
     "skip" |
     "end" |
     "error" |
-    "hook";
+    "before all" |
+    "before each" |
+    "after each" |
+    "after all";
 
 export type Report =
     StartReport |
@@ -27,7 +30,10 @@ export type Report =
     SkipReport |
     EndReport |
     ErrorReport |
-    HookReport;
+    BeforeAllReport |
+    BeforeEachReport |
+    AfterEachReport |
+    AfterAllReport;
 
 interface ReportBase<T extends ReportType> {
     type: T;
@@ -149,25 +155,13 @@ export interface ErrorReport extends ReportBase<"error"> {
     isHook: false;
 }
 
-export type HookStage =
-    "before all" |
-    "before each" |
-    "after each" |
-    "after all";
-
-export interface HookError<S extends HookStage> {
-    stage: S;
-    name: string;
-    error: any;
-}
-
-interface HookReportBase<S extends HookStage> extends ReportBase<"hook"> {
+interface HookReportBase<S extends ReportType> extends ReportBase<S> {
     stage: S;
     path: Location[];
+    rootPath: Location[];
     name: string;
     error: any;
 
-    hookError: HookError<S>;
     isStart: false;
     isEnter: false;
     isLeave: false;
@@ -178,12 +172,6 @@ interface HookReportBase<S extends HookStage> extends ReportBase<"hook"> {
     isError: false;
     isHook: true;
 }
-
-export type HookReport =
-    BeforeAllReport |
-    BeforeEachReport |
-    AfterEachReport |
-    AfterAllReport;
 
 export interface BeforeAllReport extends HookReportBase<"before all"> {
     isBeforeAll: true;

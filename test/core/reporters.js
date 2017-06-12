@@ -3,7 +3,6 @@ describe("core/reporters", function () { // eslint-disable-line max-statements
 
     var n = t.internal.reports
     var p = t.internal.location
-    var hooks = t.internal.hookErrors
 
     // Use thenables, not actual Promises.
     function resolve(value) {
@@ -857,7 +856,7 @@ describe("core/reporters", function () { // eslint-disable-line max-statements
         return tt.run().then(function () {
             assert.match(ret, [
                 n.start(),
-                n.hook([], [], hooks.beforeAll(fail, sentinel)),
+                n.hook.beforeAll([], [], fail, sentinel),
                 n.end(),
             ])
         })
@@ -879,7 +878,7 @@ describe("core/reporters", function () { // eslint-disable-line max-statements
         return tt.run().then(function () {
             assert.match(ret, [
                 n.start(),
-                n.hook([p("foo", 0)], [], hooks.beforeEach(fail, sentinel)),
+                n.hook.beforeEach([p("foo", 0)], [], fail, sentinel),
                 n.end(),
             ])
         })
@@ -902,7 +901,7 @@ describe("core/reporters", function () { // eslint-disable-line max-statements
             assert.match(ret, [
                 n.start(),
                 n.pass([p("foo", 0)]),
-                n.hook([p("foo", 0)], [], hooks.afterEach(fail, sentinel)),
+                n.hook.afterEach([p("foo", 0)], [], fail, sentinel),
                 n.end(),
             ])
         })
@@ -925,7 +924,7 @@ describe("core/reporters", function () { // eslint-disable-line max-statements
             assert.match(ret, [
                 n.start(),
                 n.pass([p("foo", 0)]),
-                n.hook([], [], hooks.afterAll(fail, sentinel)),
+                n.hook.afterAll([], [], fail, sentinel),
                 n.end(),
             ])
         })
@@ -951,8 +950,7 @@ describe("core/reporters", function () { // eslint-disable-line max-statements
                 n.start(),
                 n.enter([p("foo", 0)]),
                 n.leave([p("foo", 0)]),
-                n.hook([p("foo", 0)], [p("foo", 0)],
-                    hooks.beforeAll(fail, sentinel)),
+                n.hook.beforeAll([p("foo", 0)], [p("foo", 0)], fail, sentinel),
                 n.end(),
             ])
         })
@@ -977,8 +975,8 @@ describe("core/reporters", function () { // eslint-disable-line max-statements
             assert.match(ret, [
                 n.start(),
                 n.enter([p("foo", 0)]),
-                n.hook([p("foo", 0), p("inner", 0)], [p("foo", 0)],
-                    hooks.beforeEach(fail, sentinel)),
+                n.hook.beforeEach([p("foo", 0), p("inner", 0)], [p("foo", 0)],
+                    fail, sentinel),
                 n.leave([p("foo", 0)]),
                 n.end(),
             ])
@@ -1005,8 +1003,8 @@ describe("core/reporters", function () { // eslint-disable-line max-statements
                 n.start(),
                 n.enter([p("foo", 0)]),
                 n.pass([p("foo", 0), p("inner", 0)]),
-                n.hook([p("foo", 0), p("inner", 0)], [p("foo", 0)],
-                    hooks.afterEach(fail, sentinel)),
+                n.hook.afterEach([p("foo", 0), p("inner", 0)], [p("foo", 0)],
+                    fail, sentinel),
                 n.leave([p("foo", 0)]),
                 n.end(),
             ])
@@ -1034,8 +1032,7 @@ describe("core/reporters", function () { // eslint-disable-line max-statements
                 n.enter([p("foo", 0)]),
                 n.pass([p("foo", 0), p("inner", 0)]),
                 n.leave([p("foo", 0)]),
-                n.hook([p("foo", 0)], [p("foo", 0)],
-                    hooks.afterAll(fail, sentinel)),
+                n.hook.afterAll([p("foo", 0)], [p("foo", 0)], fail, sentinel),
                 n.end(),
             ])
         })

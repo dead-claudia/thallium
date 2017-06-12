@@ -2,7 +2,7 @@
 
 var Thallium = require("./lib/api/thallium")
 var Reports = require("./lib/core/reports")
-var HookStage = Reports.HookStage
+var Types = Reports.Types
 
 exports.root = function () {
     return new Thallium()
@@ -25,72 +25,67 @@ function p(path) {
     throw new TypeError("Expected `path` to be an array of locations")
 }
 
-function h(value) {
-    if (value != null && typeof value._ === "number") return value
-    throw new TypeError("Expected `value` to be a hook error")
-}
-
 /**
  * Create a new report, mainly for testing reporters.
  */
 exports.reports = {
     start: function () {
-        return new Reports.Start()
+        return Reports.start()
     },
 
     enter: function (path, duration, slow) {
-        return new Reports.Enter(p(path), d(duration), s(slow))
+        return Reports.enter(p(path), d(duration), s(slow))
     },
 
     leave: function (path) {
-        return new Reports.Leave(p(path))
+        return Reports.leave(p(path))
     },
 
     pass: function (path, duration, slow) {
-        return new Reports.Pass(p(path), d(duration), s(slow))
+        return Reports.pass(p(path), d(duration), s(slow))
     },
 
     fail: function (path, value, duration, slow, isFailable) { // eslint-disable-line max-params, max-len
-        return new Reports.Fail(
+        return Reports.fail(
             p(path), value, d(duration), s(slow),
             !!isFailable)
     },
 
     skip: function (path) {
-        return new Reports.Skip(p(path))
+        return Reports.skip(p(path))
     },
 
     end: function () {
-        return new Reports.End()
+        return Reports.end()
     },
 
     error: function (value) {
-        return new Reports.Error(value)
+        return Reports.error(value)
     },
 
-    hook: function (path, rootPath, value) {
-        return new Reports.Hook(p(path), p(rootPath), h(value))
-    },
-}
+    /**
+     * Create a new hook error, mainly for testing reporters.
+     */
+    hook: {
+        beforeAll: function (path, rootPath, func, value) {
+            return Reports.hook(Types.BeforeAll, p(path), p(rootPath),
+                func, value)
+        },
 
-/**
- * Create a new hook error, mainly for testing reporters.
- */
-exports.hookErrors = {
-    beforeAll: function (func, value) {
-        return new Reports.HookError(HookStage.BeforeAll, func, value)
-    },
+        beforeEach: function (path, rootPath, func, value) {
+            return Reports.hook(Types.BeforeEach, p(path), p(rootPath),
+                func, value)
+        },
 
-    beforeEach: function (func, value) {
-        return new Reports.HookError(HookStage.BeforeEach, func, value)
-    },
+        afterEach: function (path, rootPath, func, value) {
+            return Reports.hook(Types.AfterEach, p(path), p(rootPath),
+                func, value)
+        },
 
-    afterEach: function (func, value) {
-        return new Reports.HookError(HookStage.AfterEach, func, value)
-    },
-
-    afterAll: function (func, value) {
-        return new Reports.HookError(HookStage.AfterAll, func, value)
+        afterAll: function (path, rootPath, func, value) {
+            return Reports.hook(Types.AfterAll, p(path), p(rootPath),
+                func, value)
+        },
     },
 }
 

@@ -39,8 +39,6 @@ declare namespace t {
     type Location = Thallium.Location;
     type ReportType = Thallium.ReportType;
     type Report = Thallium.Report;
-    type HookStage = Thallium.HookStage;
-    type HookError<S extends HookStage> = Thallium.HookError<S>;
     type StartReport = Thallium.StartReport;
     type EnterReport = Thallium.EnterReport;
     type LeaveReport = Thallium.LeaveReport;
@@ -49,7 +47,6 @@ declare namespace t {
     type SkipReport = Thallium.SkipReport;
     type EndReport = Thallium.EndReport;
     type ErrorReport = Thallium.ErrorReport;
-    type HookReport = Thallium.HookReport;
     type BeforeAllReport = Thallium.BeforeAllReport;
     type BeforeEachReport = Thallium.BeforeEachReport;
     type AfterEachReport = Thallium.AfterEachReport;

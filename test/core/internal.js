@@ -7,119 +7,119 @@ describe("core/internal", function () {
 
         it("correctly creates `start` reports", function () {
             var report = n.start()
-            var expected = new Reports.Start()
+            var expected = Reports.start()
 
             assert.match(report, expected)
         })
 
         it("correctly creates `enter` reports", function () {
             var report = n.enter([])
-            var expected = new Reports.Enter([], 10, 75)
+            var expected = Reports.enter([], 10, 75)
 
             assert.match(report, expected)
         })
 
         it("correctly creates `enter` reports with duration", function () {
             var report = n.enter([], 20)
-            var expected = new Reports.Enter([], 20, 75)
+            var expected = Reports.enter([], 20, 75)
 
             assert.match(report, expected)
         })
 
         it("correctly creates `enter` reports with slow", function () {
             var report = n.enter([], undefined, 10)
-            var expected = new Reports.Enter([], 10, 10)
+            var expected = Reports.enter([], 10, 10)
 
             assert.match(report, expected)
         })
 
         it("correctly creates `enter` reports with duration + slow", function () { // eslint-disable-line max-len
             var report = n.enter([], 20, 10)
-            var expected = new Reports.Enter([], 20, 10)
+            var expected = Reports.enter([], 20, 10)
 
             assert.match(report, expected)
         })
 
         it("correctly creates `leave` reports", function () {
             var report = n.leave([])
-            var expected = new Reports.Leave([])
+            var expected = Reports.leave([])
 
             assert.match(report, expected)
         })
 
         it("correctly creates `pass` reports", function () {
             var report = n.pass([])
-            var expected = new Reports.Pass([], 10, 75)
+            var expected = Reports.pass([], 10, 75)
 
             assert.match(report, expected)
         })
 
         it("correctly creates `pass` reports with duration", function () {
             var report = n.pass([], 20)
-            var expected = new Reports.Pass([], 20, 75)
+            var expected = Reports.pass([], 20, 75)
 
             assert.match(report, expected)
         })
 
         it("correctly creates `pass` reports with slow", function () {
             var report = n.pass([], null, 10)
-            var expected = new Reports.Pass([], 10, 10)
+            var expected = Reports.pass([], 10, 10)
 
             assert.match(report, expected)
         })
 
         it("correctly creates `pass` reports with duration + slow", function () { // eslint-disable-line max-len
             var report = n.pass([], 20, 10)
-            var expected = new Reports.Pass([], 20, 10)
+            var expected = Reports.pass([], 20, 10)
 
             assert.match(report, expected)
         })
 
         it("correctly creates `fail` reports", function () {
             var report = n.fail([], {value: "hello"})
-            var expected = new Reports.Fail([], {value: "hello"}, 10, 75, false)
+            var expected = Reports.fail([], {value: "hello"}, 10, 75, false)
 
             assert.match(report, expected)
         })
 
         it("correctly creates `fail` reports with duration", function () {
             var report = n.fail([], {value: "hello"}, 20)
-            var expected = new Reports.Fail([], {value: "hello"}, 20, 75, false)
+            var expected = Reports.fail([], {value: "hello"}, 20, 75, false)
 
             assert.match(report, expected)
         })
 
         it("correctly creates `fail` reports with slow", function () {
             var report = n.fail([], {value: "hello"}, null, 10)
-            var expected = new Reports.Fail([], {value: "hello"}, 10, 10, false)
+            var expected = Reports.fail([], {value: "hello"}, 10, 10, false)
 
             assert.match(report, expected)
         })
 
         it("correctly creates `fail` reports with duration + slow", function () { // eslint-disable-line max-len
             var report = n.fail([], {value: "hello"}, 20, 10)
-            var expected = new Reports.Fail([], {value: "hello"}, 20, 10, false)
+            var expected = Reports.fail([], {value: "hello"}, 20, 10, false)
 
             assert.match(report, expected)
         })
 
         it("correctly creates `skip` reports", function () {
             var report = n.skip([])
-            var expected = new Reports.Skip([])
+            var expected = Reports.skip([])
 
             assert.match(report, expected)
         })
 
         it("correctly creates `end` reports", function () {
             var report = n.end()
-            var expected = new Reports.End()
+            var expected = Reports.end()
 
             assert.match(report, expected)
         })
 
         it("correctly creates `error` reports", function () {
             var report = n.error({value: "hello"})
-            var expected = new Reports.Error({value: "hello"})
+            var expected = Reports.error({value: "hello"})
 
             assert.match(report, expected)
         })
