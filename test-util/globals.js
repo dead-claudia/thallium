@@ -67,18 +67,6 @@ var Util = global.Util = {
         }
     }
 
-    function swallowIfBad(e) {
-        // Incorrect match failures will output identical JSON. Also, the issues
-        // only present themselves with objects, making things easier to check.
-        if (!(e instanceof assert.AssertionError)) throw e
-        if (e.expected == null || typeof e.expected !== "object") throw e
-        if (e.actual == null || typeof e.actual !== "object") throw e
-        if (JSON.stringify(e.expected, fixErrors) !==
-                JSON.stringify(e.actual, fixErrors)) {
-            throw e
-        }
-    }
-
     function runWrapped(test, name, func) {
         return new Promise(function (resolve, reject) {
             if (func.length === 0) {
@@ -93,7 +81,19 @@ var Util = global.Util = {
             function () {
                 global.console.error("Test now passing: " + test.fullTitle())
             },
-            swallowIfBad)
+            function (e) {
+                // Incorrect match failures will output identical JSON. Also,
+                // the issues only present themselves with objects, making
+                // things easier to check.
+                if (e instanceof assert.AssertionError ||
+                    e.expected == null || typeof e.expected !== "object" ||
+                    e.actual == null || typeof e.actual !== "object" ||
+                    JSON.stringify(e.expected, fixErrors) !==
+                        JSON.stringify(e.actual, fixErrors)
+                ) {
+                    throw e
+                }
+            })
     }
 
     Util.phantomFix = !isPhantom
@@ -107,28 +107,9 @@ var Util = global.Util = {
         }
 })()
 
-Util.push = function (ret, keep) {
-    return function (report) {
-        // Any equality tests on either of these are inherently flaky.
-        // Only add the relevant properties
-        if (report.isFail || report.isError || report.isHook) {
-            assert.hasOwn(report, "error")
-        }
+var Reports = require("./reports")
 
-        if (report.isEnter || report.isPass || report.isFail) {
-            assert.hasOwn(report, "duration")
-            assert.hasOwn(report, "slow")
-            assert.isNumber(report.duration)
-            assert.isNumber(report.slow)
-            if (!keep) {
-                report.duration = 10
-                report.slow = 75
-            }
-        }
-
-        ret.push(report)
-    }
-}
+Util.push = Reports.push
 
 if (settings.migrate) {
     require("../migrate") // eslint-disable-line global-require

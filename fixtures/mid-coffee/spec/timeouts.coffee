@@ -8,27 +8,12 @@ is trying to represent more real-world usage.
 t = require 'thallium'
 assert = require 'thallium/assert'
 {reports: n, location: p, root: create} = require 'thallium/internal'
+{push} = require '../../../test-util/reports'
 
 # Note that this entire section may be flaky on slower machines. Thankfully,
 # these have been tested against a slower machine, so it should hopefully not
 # be too bad.
 t.test 'core (timeouts) (FLAKE)', ->
-    push = (ret) -> (report) ->
-        # Any equality tests on either of these are inherently flaky.
-        # Only add the relevant properties
-        if report.isFail || report.isError || report.isHook
-            assert.hasOwn report, 'error'
-
-        if report.isEnter || report.isPass || report.isFail
-            assert.hasOwn report, 'duration'
-            assert.hasOwn report, 'slow'
-            assert.isNumber report.duration
-            assert.isNumber report.slow
-            report.duration = 10
-            report.slow = 75
-
-        ret.push(report)
-
     t.test 'succeeds with own', ->
         tt = create()
         ret = []
