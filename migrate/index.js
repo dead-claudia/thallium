@@ -50,3 +50,18 @@ methods(Reflect, {
             return reflectTest.call(this, name, reflectSkip.bind(this))
         }),
 })
+
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ * - `reflect.isRoot` is deprecated in favor of checking                     *
+ *   `reflect.parent != null` directly.                                      *
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+var reflectIsRoot = Common.deprecate(
+    "`reflect.isRoot` is deprecated. Please use `reflect.parent != null` " +
+    "instead.",
+    /** @this */ function () { // eslint-disable-line no-unused-vars, max-len
+        return this._.parent != null
+    })
+
+methods(Reflect, {
+    get isRoot() { return reflectIsRoot.call(this) },
+})

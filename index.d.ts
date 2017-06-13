@@ -210,11 +210,6 @@ export type Reporter = (report: Report) => any | PromiseLike<any>;
  */
 export interface Reflect {
     /**
-     * Is this test the root, i.e. top level?
-     */
-    isRoot: boolean;
-
-    /**
      * Whether a particular reporter was registered.
      *
      * @throws TypeError if this isn't in the root

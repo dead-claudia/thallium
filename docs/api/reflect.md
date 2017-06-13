@@ -12,7 +12,6 @@ Also note that `reflect` instances are persistent and tied to the backing test i
 - [`reflect.count`](#count)
 - [`reflect.children`](#children)
 - [`reflect.root`](#root)
-- [`reflect.isRoot`](#isroot)
 - [`reflect.isLocked`](#islocked)
 - [`reflect.timeout`](#timeout)
 - [`reflect.slow`](#slow)
@@ -61,15 +60,6 @@ reflect.root // getter
 ```
 
 Get the `reflect` instance for the root test.
-
-<a id="isroot"></a>
-## reflect.isRoot
-
-```js
-reflect.isRoot // getter
-```
-
-Whether or not this is the root test.
 
 <a id="islocked"></a>
 ## reflect.isLocked
