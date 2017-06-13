@@ -34,7 +34,7 @@ describe("core/slow (FLAKE)", /** @this */ function () {
         var tt = t.internal.root()
         var ret = []
 
-        tt.reporter = Util.push({ret: ret, keep: true})
+        tt.reporter = Util.push(ret, true)
 
         tt.test("test", function () {
             // It's highly unlikely the engine will take this long to finish.
@@ -57,7 +57,7 @@ describe("core/slow (FLAKE)", /** @this */ function () {
         var tt = t.internal.root()
         var ret = []
 
-        tt.reporter = Util.push({ret: ret, keep: true})
+        tt.reporter = Util.push(ret, true)
 
         tt.test("test", function () {
             // It's highly unlikely the engine will take this long to finish.
@@ -81,7 +81,7 @@ describe("core/slow (FLAKE)", /** @this */ function () {
         var tt = t.internal.root()
         var ret = []
 
-        tt.reporter = Util.push({ret: ret, keep: true})
+        tt.reporter = Util.push(ret, true)
 
         tt.test("test", function () {
             tt.slow = 50
@@ -105,7 +105,7 @@ describe("core/slow (FLAKE)", /** @this */ function () {
         var tt = t.internal.root()
         var ret = []
 
-        tt.reporter = Util.push({ret: ret, keep: true})
+        tt.reporter = Util.push(ret, true)
 
         tt.test("test", function () {
             tt.slow = 50
@@ -132,7 +132,7 @@ describe("core/slow (FLAKE)", /** @this */ function () {
         var tt = t.internal.root()
         var ret = []
 
-        tt.reporter = Util.push({ret: ret, keep: true})
+        tt.reporter = Util.push(ret, true)
 
         tt.test("test", function () {
             tt.slow = 50

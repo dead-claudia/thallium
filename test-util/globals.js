@@ -107,14 +107,7 @@ var Util = global.Util = {
         }
 })()
 
-Util.push = function (ret) {
-    var keep = false
-
-    if (!Array.isArray(ret)) {
-        keep = ret.keep
-        ret = ret.ret
-    }
-
+Util.push = function (ret, keep) {
     return function (report) {
         // Any equality tests on either of these are inherently flaky.
         // Only add the relevant properties
