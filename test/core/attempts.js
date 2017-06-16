@@ -22,9 +22,9 @@ describe("core/attempts", function () {
                 return immediate(ctx)
             })
         },
-        expected: r.root([
+        expected: [
             r.pass("test"),
-        ]),
+        ],
     })
 
     r.test("succeeds with own deferred", {
@@ -35,9 +35,9 @@ describe("core/attempts", function () {
                 return deferred(ctx)
             })
         },
-        expected: r.root([
+        expected: [
             r.pass("test"),
-        ]),
+        ],
     })
 
     r.test("fails with own immediate", {
@@ -48,9 +48,9 @@ describe("core/attempts", function () {
                 return immediate(ctx)
             })
         },
-        expected: r.root([
+        expected: [
             r.fail("test", new Error("fail")),
-        ]),
+        ],
     })
 
     r.test("fails with own deferred", {
@@ -61,9 +61,9 @@ describe("core/attempts", function () {
                 return deferred(ctx)
             })
         },
-        expected: r.root([
+        expected: [
             r.fail("test", new Error("fail")),
-        ]),
+        ],
     })
 
     r.test("succeeds with inherited", {
@@ -74,11 +74,11 @@ describe("core/attempts", function () {
                 tt.test("inner", function () { return immediate(ctx) })
             })
         },
-        expected: r.root([
+        expected: [
             r.suite("test", [
                 r.pass("inner"),
             ]),
-        ]),
+        ],
     })
 
     r.test("fails with inherited", {
@@ -89,11 +89,11 @@ describe("core/attempts", function () {
                 tt.test("inner", function () { return deferred(ctx) })
             })
         },
-        expected: r.root([
+        expected: [
             r.suite("test", [
                 r.fail("inner", new Error("fail")),
             ]),
-        ]),
+        ],
     })
 
     r.test("gets own attempts", {

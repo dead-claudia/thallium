@@ -8,11 +8,11 @@ describe("reporter/tap", function () { // eslint-disable-line max-statements
     var n = t.internal.reports
 
     it("validates no arguments", function () {
-        t.r.tap()
+        Util.r.tap()
     })
 
     it("validates a single empty options object", function () {
-        t.r.tap({})
+        Util.r.tap({})
     })
 
     function stack(err) {
@@ -30,7 +30,7 @@ describe("reporter/tap", function () { // eslint-disable-line max-statements
         it(name, function () {
             var list = []
             var acc = ""
-            var reporter = t.r.tap({
+            var reporter = Util.r.tap({
                 write: function (str) {
                     // So lines are printed consistently.
                     var lines = (acc + str).split(/\r?\n/g)

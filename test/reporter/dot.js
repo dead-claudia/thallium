@@ -10,11 +10,11 @@ describe("reporter/dot", function () {
     var Console = Util.R.Console
 
     it("validates no arguments", function () {
-        t.r.dot()
+        Util.r.dot()
     })
 
     it("validates a single empty options object", function () {
-        t.r.dot({})
+        Util.r.dot({})
     })
 
     function stack(e) {
@@ -37,7 +37,7 @@ describe("reporter/dot", function () {
             it(name, function () {
                 var list = []
                 var acc = ""
-                var reporter = t.r.dot({
+                var reporter = Util.r.dot({
                     colors: colors,
 
                     write: function (str) {

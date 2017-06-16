@@ -18,9 +18,9 @@ describe("cli/run", function () {
 
         function test(name, opts) {
             it(name, function () {
-                return r.wrap(opts.expected, function (reporter, check) {
+                return r.wrap(opts.expected, function (_) {
                     var tt = t.internal.root()
-                    var tree = opts.tree(tt, reporter)
+                    var tree = opts.tree(tt, _.push.bind(_))
 
                     if (tree["node_modules"] == null) tree["node_modules"] = {}
                     tree["node_modules"].thallium = function () { return tt }
@@ -35,7 +35,7 @@ describe("cli/run", function () {
                     return Run.run(parse(args), Cli.mock(tree))
                     .then(function (code) {
                         assert.equal(code, opts.code || 0)
-                        check()
+                        _.check()
                     })
                 })
             })
@@ -60,10 +60,10 @@ describe("cli/run", function () {
                     },
                 }
             },
-            expected: r.root([
+            expected: [
                 r.pass("test 1", 0),
                 r.pass("test 2", 1),
-            ]),
+            ],
         })
 
         test("doesn't run tests without extensions", {
@@ -85,9 +85,9 @@ describe("cli/run", function () {
                     },
                 }
             },
-            expected: r.root([
+            expected: [
                 r.pass("test 2", 0),
-            ]),
+            ],
         })
 
         test("doesn't run tests without extensions", {
@@ -109,9 +109,9 @@ describe("cli/run", function () {
                     },
                 }
             },
-            expected: r.root([
+            expected: [
                 r.pass("test 2", 0),
-            ]),
+            ],
         })
 
         test("doesn't run tests with wrong extensions", {
@@ -133,9 +133,9 @@ describe("cli/run", function () {
                     },
                 }
             },
-            expected: r.root([
+            expected: [
                 r.pass("test 2", 0),
-            ]),
+            ],
         })
 
         test("runs failing tests", {
@@ -160,10 +160,10 @@ describe("cli/run", function () {
                 }
             },
             code: 1,
-            expected: r.root([
+            expected: [
                 r.pass("test 1"),
                 r.fail("test 2", new assert.AssertionError("oops")),
-            ]),
+            ],
         })
 
         function isNope(x) {
@@ -230,7 +230,7 @@ describe("cli/run", function () {
                 }
             },
             code: 1,
-            expected: r.root([
+            expected: [
                 r.suite("mod-one", [
                     r.pass("1 === 1"),
                     r.fail("foo()", new assert.AssertionError(
@@ -248,7 +248,7 @@ describe("cli/run", function () {
                     r.fail("what a fail...", new assert.AssertionError(
                         "Expected 'yep' to be a nope", undefined, "yep")),
                 ]),
-            ]),
+            ],
         })
 
         test("adheres to the config correctly", {
@@ -284,10 +284,10 @@ describe("cli/run", function () {
                     },
                 }
             },
-            expected: r.root([
+            expected: [
                 r.pass("test"),
                 r.pass("other"),
-            ]),
+            ],
         })
     })
 })

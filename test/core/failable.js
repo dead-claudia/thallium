@@ -20,9 +20,9 @@ describe("core/failable", function () {
                 return immediate()
             })
         },
-        expected: r.root([
+        expected: [
             r.fail("test", new Error("fail"), {isFailable: true}),
-        ]),
+        ],
     })
 
     r.test("works with own deferred", {
@@ -32,9 +32,9 @@ describe("core/failable", function () {
                 return deferred()
             })
         },
-        expected: r.root([
+        expected: [
             r.fail("test", new Error("fail"), {isFailable: true}),
-        ]),
+        ],
     })
 
     r.test("works with inherited", {
@@ -44,11 +44,11 @@ describe("core/failable", function () {
                 tt.test("inner", function () { return immediate() })
             })
         },
-        expected: r.root([
+        expected: [
             r.suite("test", [
                 r.fail("inner", new Error("fail"), {isFailable: true}),
             ]),
-        ]),
+        ],
     })
 
     r.test("gets own isFailable", {

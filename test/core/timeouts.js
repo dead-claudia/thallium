@@ -32,9 +32,9 @@ describe("core/timeouts (FLAKE)", /** @this */ function () {
                 return resolve()
             })
         },
-        expected: r.root([
+        expected: [
             r.pass("test"),
-        ]),
+        ],
     })
 
     r.test("fails with own", {
@@ -45,9 +45,9 @@ describe("core/timeouts (FLAKE)", /** @this */ function () {
                 return delay(200)
             })
         },
-        expected: r.root([
+        expected: [
             r.fail("test", new Error("Timeout of 50 reached")),
-        ]),
+        ],
     })
 
     r.test("succeeds with inherited", {
@@ -57,11 +57,11 @@ describe("core/timeouts (FLAKE)", /** @this */ function () {
                 tt.test("inner", function () { return resolve() })
             })
         },
-        expected: r.root([
+        expected: [
             r.suite("test", [
                 r.pass("inner"),
             ]),
-        ]),
+        ],
     })
 
     r.test("fails with inherited", {
@@ -72,11 +72,11 @@ describe("core/timeouts (FLAKE)", /** @this */ function () {
                 tt.test("inner", function () { return delay(200) })
             })
         },
-        expected: r.root([
+        expected: [
             r.suite("test", [
                 r.fail("inner", new Error("Timeout of 50 reached")),
             ]),
-        ]),
+        ],
     })
 
     r.test("gets own timeout", {

@@ -10,11 +10,11 @@ describe("reporter/spec", function () {
     var Console = Util.R.Console
 
     it("validates no arguments", function () {
-        t.r.spec()
+        Util.r.spec()
     })
 
     it("validates a single empty options object", function () {
-        t.r.spec({})
+        Util.r.spec({})
     })
 
     function stack(e) {
@@ -42,7 +42,7 @@ describe("reporter/spec", function () {
             it(name, function () {
                 var list = []
                 var acc = ""
-                var reporter = t.r.spec({
+                var reporter = Util.r.spec({
                     colors: colors,
                     write: function (str) {
                         // So lines are printed consistently.

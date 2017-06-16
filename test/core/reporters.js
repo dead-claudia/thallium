@@ -12,20 +12,30 @@ describe("core/reporters", function () { // eslint-disable-line max-statements
         return {then: function (_, reject) { reject(value) }}
     }
 
+    function wrap3(tree1, tree2, tree3, callback) {
+        return r.wrap(tree1, function (_1) {
+            return r.wrap(tree2, function (_2) {
+                return r.wrap(tree3, function (_3) {
+                    return callback(_1, _2, _3)
+                })
+            })
+        })
+    }
+
     context("normal", function () {
         it("added to root correctly", function () {
-            return r.wrap(r.root([
+            return r.wrap([
                 r.pass("test 1"),
                 r.pass("test 2"),
-            ]), function (reporter, check) {
+            ], function (_) {
                 var tt = t.internal.root()
 
                 assert.equal(tt.hasReporter, false)
-                tt.reporter = reporter
+                tt.reporter = _.push.bind(_)
                 assert.equal(tt.hasReporter, true)
                 tt.test("test 1", function () {})
                 tt.test("test 2", function () {})
-                return tt.run().then(check)
+                return tt.run().then(_.check.bind(_))
             })
         })
 
@@ -41,41 +51,34 @@ describe("core/reporters", function () { // eslint-disable-line max-statements
                     })
                 })
             },
-            expected: r.root([
+            expected: [
                 r.pass("test"),
-            ]),
+            ],
         })
 
-        /* eslint-disable max-nested-callbacks */
         it("uses last added", function () {
-            return r.wrap([], function (push1, check1) {
-                return r.wrap(r.root([
-                    r.pass("test 1"),
-                    r.pass("test 2"),
-                ]), function (push2, check2) {
-                    return r.wrap([], function (push3, check3) {
-                        var tt = t.internal.root()
+            return wrap3(undefined, [
+                r.pass("test 1"),
+                r.pass("test 2"),
+            ], undefined, function (_1, _2, _3) {
+                var tt = t.internal.root()
 
-                        tt.reporter = push1
-                        tt.reporter = push2
-                        tt.reporter = push3
+                tt.reporter = _1.push.bind(_1)
+                var push2 = tt.reporter = _2.push.bind(_2)
+                var push3 = tt.reporter = _3.push.bind(_3)
 
-                        tt.reporter = push3
-                        tt.reporter = push2
+                tt.reporter = push3
+                tt.reporter = push2
 
-                        tt.test("test 1", function () {})
-                        tt.test("test 2", function () {})
+                tt.test("test 1", function () {})
+                tt.test("test 2", function () {})
 
-                        return tt.run().then(function () {
-                            check1()
-                            check2()
-                            check3()
-                        })
-                    })
-                })
+                return tt.run()
+                .then(_1.check.bind(_1))
+                .then(_2.check.bind(_2))
+                .then(_3.check.bind(_3))
             })
         })
-        /* eslint-enable max-nested-callbacks */
     })
 
     context("reflect", function () {
@@ -118,9 +121,9 @@ describe("core/reporters", function () { // eslint-disable-line max-statements
                     notHasReporter(tt, inner)
                 })
             },
-            expected: r.root([
+            expected: [
                 r.pass("test"),
-            ]),
+            ],
             after: function (tt) {
                 hasReporter(tt, this.reporter)
             },
@@ -150,46 +153,40 @@ describe("core/reporters", function () { // eslint-disable-line max-statements
                     })
                 })
             },
-            expected: r.root([
+            expected: [
                 r.pass("test"),
-            ]),
+            ],
             after: function (tt) {
                 hasReporter(tt, this.reporter)
             },
         })
 
         it("only added once", function () {
-            var expected = r.root([
+            var expected = [
                 r.pass("test 1"),
                 r.pass("test 2"),
-            ])
+            ]
 
-            /* eslint-disable max-nested-callbacks */
-            return r.wrap(expected, function (push1, check1) {
-                return r.wrap(expected, function (push2, check2) {
-                    return r.wrap(expected, function (push3, check3) {
-                        var tt = t.internal.root()
+            return wrap3(expected, expected, expected, function (_1, _2, _3) {
+                var tt = t.internal.root()
+                var push1, push3
 
-                        // Silence it
-                        tt.reporter = function () {}
-                        tt.reflect.addReporter(push1)
-                        tt.reflect.addReporter(push2)
-                        tt.reflect.addReporter(push3)
+                // Silence it
+                tt.reporter = function () {}
+                tt.reflect.addReporter(push1 = _1.push.bind(_1))
+                tt.reflect.addReporter(_2.push.bind(_2))
+                tt.reflect.addReporter(push3 = _3.push.bind(_3))
 
-                        tt.reflect.addReporter(push3)
-                        tt.reflect.addReporter(push1)
+                tt.reflect.addReporter(push3)
+                tt.reflect.addReporter(push1)
 
-                        tt.test("test 1", function () {})
-                        tt.test("test 2", function () {})
-                        return tt.run().then(function () {
-                            check1()
-                            check2()
-                            check3()
-                        })
-                    })
-                })
+                tt.test("test 1", function () {})
+                tt.test("test 2", function () {})
+                return tt.run()
+                .then(_1.check.bind(_1))
+                .then(_2.check.bind(_2))
+                .then(_3.check.bind(_3))
             })
-            /* eslint-enable max-nested-callbacks */
         })
     })
 
@@ -198,10 +195,10 @@ describe("core/reporters", function () { // eslint-disable-line max-statements
             tt.test("test", function () {})
             tt.test("test", function () {})
         },
-        expected: r.root([
+        expected: [
             r.pass("test"),
             r.pass("test"),
-        ]),
+        ],
     })
 
     r.test("called correctly with sync failing", {
@@ -209,10 +206,10 @@ describe("core/reporters", function () { // eslint-disable-line max-statements
             tt.test("one", function () { throw new Error("sentinel") })
             tt.test("two", function () { throw new Error("sentinel") })
         },
-        expected: r.root([
+        expected: [
             r.fail("one", new Error("sentinel")),
             r.fail("two", new Error("sentinel")),
-        ]),
+        ],
     })
 
     r.test("called correctly with sync both", {
@@ -220,10 +217,10 @@ describe("core/reporters", function () { // eslint-disable-line max-statements
             tt.test("one", function () { throw new Error("sentinel") })
             tt.test("two", function () {})
         },
-        expected: r.root([
+        expected: [
             r.fail("one", new Error("sentinel")),
             r.pass("two"),
-        ]),
+        ],
     })
 
     r.test("called correctly with inline passing", {
@@ -231,10 +228,10 @@ describe("core/reporters", function () { // eslint-disable-line max-statements
             tt.test("test", function () {})
             tt.test("test", function () {})
         },
-        expected: r.root([
+        expected: [
             r.pass("test"),
             r.pass("test"),
-        ]),
+        ],
     })
 
     r.test("called correctly with inline failing", {
@@ -243,10 +240,10 @@ describe("core/reporters", function () { // eslint-disable-line max-statements
             tt.test("one", function () { assert.fail("fail") })
             tt.test("two", function () { assert.fail("fail") })
         },
-        expected: r.root([
+        expected: [
             r.fail("one", new assert.AssertionError("fail")),
             r.fail("two", new assert.AssertionError("fail")),
-        ]),
+        ],
     })
 
     r.test("called correctly with inline both", {
@@ -255,10 +252,10 @@ describe("core/reporters", function () { // eslint-disable-line max-statements
             tt.test("one", function () { assert.fail("fail") })
             tt.test("two", function () {})
         },
-        expected: r.root([
+        expected: [
             r.fail("one", new assert.AssertionError("fail")),
             r.pass("two"),
-        ]),
+        ],
     })
 
     r.test("called correctly with async passing", {
@@ -266,10 +263,10 @@ describe("core/reporters", function () { // eslint-disable-line max-statements
             tt.test("test", function () { return resolve() })
             tt.test("test", function () {})
         },
-        expected: r.root([
+        expected: [
             r.pass("test"),
             r.pass("test"),
-        ]),
+        ],
     })
 
     r.test("called correctly with async failing", {
@@ -277,10 +274,10 @@ describe("core/reporters", function () { // eslint-disable-line max-statements
             tt.test("one", function () { return reject(new Error("sentinel")) })
             tt.test("two", function () { throw new Error("sentinel") })
         },
-        expected: r.root([
+        expected: [
             r.fail("one", new Error("sentinel")),
             r.fail("two", new Error("sentinel")),
-        ]),
+        ],
     })
 
     r.test("called correctly with async both", {
@@ -288,10 +285,10 @@ describe("core/reporters", function () { // eslint-disable-line max-statements
             tt.test("one", function () { return reject(new Error("sentinel")) })
             tt.test("two", function () { return resolve() })
         },
-        expected: r.root([
+        expected: [
             r.fail("one", new Error("sentinel")),
             r.pass("two"),
-        ]),
+        ],
     })
 
     r.test("called correctly with async + promise passing", {
@@ -299,10 +296,10 @@ describe("core/reporters", function () { // eslint-disable-line max-statements
             tt.test("test", function () { return resolve() })
             tt.test("test", function () {})
         },
-        expected: r.root([
+        expected: [
             r.pass("test"),
             r.pass("test"),
-        ]),
+        ],
     })
 
     r.test("called correctly with async + promise failing", {
@@ -310,10 +307,10 @@ describe("core/reporters", function () { // eslint-disable-line max-statements
             tt.test("one", function () { return reject(new Error("sentinel")) })
             tt.test("two", function () { throw new Error("sentinel") })
         },
-        expected: r.root([
+        expected: [
             r.fail("one", new Error("sentinel")),
             r.fail("two", new Error("sentinel")),
-        ]),
+        ],
     })
 
     r.test("called correctly with async + promise both", {
@@ -321,10 +318,10 @@ describe("core/reporters", function () { // eslint-disable-line max-statements
             tt.test("one", function () { return reject(new Error("sentinel")) })
             tt.test("two", function () { return resolve() })
         },
-        expected: r.root([
+        expected: [
             r.fail("one", new Error("sentinel")),
             r.pass("two"),
-        ]),
+        ],
     })
 
     r.test("called correctly with child passing tests", {
@@ -334,12 +331,12 @@ describe("core/reporters", function () { // eslint-disable-line max-statements
                 tt.test("two", function () {})
             })
         },
-        expected: r.root([
+        expected: [
             r.suite("test", [
                 r.pass("one"),
                 r.pass("two"),
             ]),
-        ]),
+        ],
     })
 
     r.test("called correctly with child failing tests", {
@@ -362,7 +359,7 @@ describe("core/reporters", function () { // eslint-disable-line max-statements
                 })
             })
         },
-        expected: r.root([
+        expected: [
             r.suite("parent one", [
                 r.fail("child one", new Error("sentinel one")),
                 r.fail("child two", new Error("sentinel one")),
@@ -371,7 +368,7 @@ describe("core/reporters", function () { // eslint-disable-line max-statements
                 r.fail("child one", new Error("sentinel two")),
                 r.fail("child two", new Error("sentinel two")),
             ]),
-        ]),
+        ],
     })
 
     r.test("called correctly with child both", {
@@ -390,7 +387,7 @@ describe("core/reporters", function () { // eslint-disable-line max-statements
                 tt.test("child two", function () {})
             })
         },
-        expected: r.root([
+        expected: [
             r.suite("parent one", [
                 r.fail("child one", new Error("sentinel one")),
                 r.pass("child two"),
@@ -399,7 +396,7 @@ describe("core/reporters", function () { // eslint-disable-line max-statements
                 r.fail("child one", new Error("sentinel two")),
                 r.pass("child two"),
             ]),
-        ]),
+        ],
     })
 
     r.test("locks itself when running", {
@@ -458,7 +455,7 @@ describe("core/reporters", function () { // eslint-disable-line max-statements
                 tt.test("1 === 2", function () { assert.equal(1, 2) })
             })
         },
-        expected: r.root([
+        expected: [
             r.suite("mod-one", [
                 r.pass("1 === 1"),
                 r.fail("foo()", new assert.AssertionError(
@@ -474,20 +471,20 @@ describe("core/reporters", function () { // eslint-disable-line max-statements
                 r.fail("1 === 2", new assert.AssertionError(
                     "Expected 1 to equal 2", 2, 1)),
             ]),
-        ]),
+        ],
     })
 
     it("can return a resolving thenable", function () {
-        return r.wrap(r.root([
+        return r.wrap([
             r.pass("test"),
             r.pass("test"),
-        ]), function (push, check) {
+        ], function (_) {
             var tt = t.internal.root()
 
             tt.reporter = function (arg) {
                 return {
                     then: function (resolve) {
-                        resolve(push(arg))
+                        resolve(_.push(arg))
                     },
                 }
             }
@@ -495,7 +492,7 @@ describe("core/reporters", function () { // eslint-disable-line max-statements
             tt.test("test", function () {})
             tt.test("test", function () {})
 
-            return tt.run().then(check)
+            return tt.run().then(_.check.bind(_))
         })
     })
 
@@ -598,7 +595,7 @@ describe("core/reporters", function () { // eslint-disable-line max-statements
                 tt.test("1 === 2", function () { assert.equal(1, 2) })
             })
         },
-        expected: r.root([
+        expected: [
             r.suite("mod-one", [
                 r.pass("1 === 1"),
                 r.fail("foo()", new assert.AssertionError(
@@ -614,7 +611,7 @@ describe("core/reporters", function () { // eslint-disable-line max-statements
                 r.fail("1 === 2", new assert.AssertionError(
                     "Expected 1 to equal 2", 2, 1)),
             ]),
-        ]),
+        ],
     })
 
     function hookFail() {
@@ -626,10 +623,10 @@ describe("core/reporters", function () { // eslint-disable-line max-statements
             tt.beforeAll(hookFail)
             tt.test("foo", function () {})
         },
-        expected: r.root([
+        expected: [
             r.origin(hookFail),
             r.suiteHook("before all", hookFail, new Error("sentinel")),
-        ]),
+        ],
     })
 
     r.test("reports global `before each` failures", {
@@ -637,10 +634,10 @@ describe("core/reporters", function () { // eslint-disable-line max-statements
             tt.before(hookFail)
             tt.test("foo", function () {})
         },
-        expected: r.root([
+        expected: [
             r.origin(hookFail),
             r.testHook("foo", "before each", hookFail, new Error("sentinel")),
-        ]),
+        ],
     })
 
     r.test("reports global `after each` failures", {
@@ -648,11 +645,11 @@ describe("core/reporters", function () { // eslint-disable-line max-statements
             tt.after(hookFail)
             tt.test("foo", function () {})
         },
-        expected: r.root([
+        expected: [
             r.origin(hookFail),
             r.pass("foo"),
             r.testHook("foo", "after each", hookFail, new Error("sentinel")),
-        ]),
+        ],
     })
 
     r.test("reports global `after all` failures", {
@@ -660,11 +657,11 @@ describe("core/reporters", function () { // eslint-disable-line max-statements
             tt.afterAll(hookFail)
             tt.test("foo", function () {})
         },
-        expected: r.root([
+        expected: [
             r.origin(hookFail),
             r.pass("foo"),
             r.suiteHook("after all", hookFail, new Error("sentinel")),
-        ]),
+        ],
     })
 
     // FIXME: the hook is emitted after the suite ends.
@@ -676,12 +673,12 @@ describe("core/reporters", function () { // eslint-disable-line max-statements
                 tt.test("inner", function () {})
             })
         },
-        expected: r.root([
+        expected: [
             r.suite("foo", [
                 r.origin(hookFail),
                 r.suiteHook("before all", hookFail, new Error("sentinel")),
             ]),
-        ]),
+        ],
     })
 
     r.test("reports local `before each` failures", {
@@ -691,13 +688,13 @@ describe("core/reporters", function () { // eslint-disable-line max-statements
                 tt.test("inner", function () {})
             })
         },
-        expected: r.root([
+        expected: [
             r.suite("foo", [
                 r.origin(hookFail),
                 r.testHook("inner", "before each", hookFail,
                     new Error("sentinel")),
             ]),
-        ]),
+        ],
     })
 
     r.test("reports local `after each` failures", {
@@ -707,14 +704,14 @@ describe("core/reporters", function () { // eslint-disable-line max-statements
                 tt.test("inner", function () {})
             })
         },
-        expected: r.root([
+        expected: [
             r.suite("foo", [
                 r.origin(hookFail),
                 r.pass("inner"),
                 r.testHook("inner", "after each", hookFail,
                     new Error("sentinel")),
             ]),
-        ]),
+        ],
     })
 
     // FIXME: the hook is emitted after the suite ends.
@@ -726,13 +723,13 @@ describe("core/reporters", function () { // eslint-disable-line max-statements
                 tt.test("inner", function () {})
             })
         },
-        expected: r.root([
+        expected: [
             r.suite("foo", [
                 r.origin(hookFail),
                 r.pass("inner"),
                 r.suiteHook("after all", hookFail, new Error("sentinel")),
             ]),
-        ]),
+        ],
     })
 
     context("stack traces", function () {

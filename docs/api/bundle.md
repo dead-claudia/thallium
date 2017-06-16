@@ -49,10 +49,6 @@ t.run()
 - `t` - The primary API, from `require("thallium")`.
 - `assert` - The assertions namespace, from `require("clean-assert")`.
 - `t.dom` - The DOM runner's programmatic API. You can find more details on that [here](../dom.md).
-- `t.r` - Each of the reporters live here. You can find more details on these [here](../reporters.md).
-- `t.r.dot` - The dot reporter, same as `require("thallium/r/dot")`.
-- `t.r.spec` - The spec reporter, same as `require("thallium/r/spec")`.
-- `t.r.tap` - The tap reporter, same as `require("thallium/r/tap")`.
 - `t.internal` - The internal types, same as `require("thallium/internal")`
 - `t.console` - Various console settings to toggle, exposed as properties.
 

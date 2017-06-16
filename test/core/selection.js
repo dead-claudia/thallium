@@ -18,7 +18,7 @@ describe("core/selection", function () {
                     tt.test("other", function () {})
                 })
             },
-            expected: r.root([
+            expected: [
                 r.suite("one", [
                     r.skip("inner"),
                     r.pass("other"),
@@ -27,7 +27,7 @@ describe("core/selection", function () {
                     r.pass("inner"),
                     r.pass("other"),
                 ]),
-            ]),
+            ],
         })
 
         r.test("filters correctly from reflect", {
@@ -42,7 +42,7 @@ describe("core/selection", function () {
                     tt.test("other", function () {})
                 })
             },
-            expected: r.root([
+            expected: [
                 r.suite("one", [
                     r.skip("inner"),
                     r.pass("other"),
@@ -51,7 +51,7 @@ describe("core/selection", function () {
                     r.pass("inner"),
                     r.pass("other"),
                 ]),
-            ]),
+            ],
         })
     })
 
@@ -84,7 +84,7 @@ describe("core/selection", function () {
         })
     }
 
-    var skipOutput = r.root([
+    var skipOutput = [
         r.suite("one", [
             r.skip("inner"),
             r.pass("other"),
@@ -93,7 +93,7 @@ describe("core/selection", function () {
             r.pass("inner"),
             r.pass("other"),
         ]),
-    ])
+    ]
 
     test("skip (per-run)", {
         expected: skipOutput,
@@ -111,11 +111,11 @@ describe("core/selection", function () {
         init: function (tt) { tt.options = {skip: [["two", "inner"]]} },
     })
 
-    var onlyOutput = r.root([
+    var onlyOutput = [
         r.suite("one", [
             r.pass("inner"),
         ]),
-    ])
+    ]
 
     test("only (global)", {
         expected: onlyOutput,

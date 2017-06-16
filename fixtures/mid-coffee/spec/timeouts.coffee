@@ -21,7 +21,7 @@ t.test 'core (timeouts) (FLAKE)', ->
                 tt.timeout = 10
                 then: (resolve) -> resolve()
 
-        expected: r.root [
+        expected: [
             r.pass 'test'
         ]
 
@@ -32,7 +32,7 @@ t.test 'core (timeouts) (FLAKE)', ->
                 # It's highly unlikely the engine will take this long to finish
                 then: (resolve) -> setTimeout resolve, 200
 
-        expected: r.root [
+        expected: [
             r.fail 'test', new Error('Timeout of 50 reached')
         ]
 
@@ -42,7 +42,7 @@ t.test 'core (timeouts) (FLAKE)', ->
                 tt.timeout = 50
                 tt.test 'inner', -> then: (resolve) -> resolve()
 
-        expected: r.root [
+        expected: [
             r.suite 'test', [
                 r.pass 'inner'
             ]
@@ -57,7 +57,7 @@ t.test 'core (timeouts) (FLAKE)', ->
                     # finish.
                     then: (resolve) -> setTimeout resolve, 200
 
-        expected: r.root [
+        expected: [
             r.suite 'test', [
                 r.fail 'inner', new Error('Timeout of 50 reached')
             ]

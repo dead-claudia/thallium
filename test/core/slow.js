@@ -57,9 +57,9 @@ describe("core/slow (FLAKE)", /** @this */ function () {
             })
         },
         expected: function () {
-            return r.root([
+            return [
                 r.pass("test", {duration: this.duration, slow: 10}),
-            ])
+            ]
         },
     })
 
@@ -78,9 +78,9 @@ describe("core/slow (FLAKE)", /** @this */ function () {
             })
         },
         expected: function () {
-            return r.root([
+            return [
                 r.pass("test", {duration: this.duration, slow: 100}),
-            ])
+            ]
         },
     })
 
@@ -99,9 +99,9 @@ describe("core/slow (FLAKE)", /** @this */ function () {
             })
         },
         expected: function () {
-            return r.root([
+            return [
                 r.pass("test", {duration: this.duration, slow: 50}),
-            ])
+            ]
         },
     })
 
@@ -124,11 +124,11 @@ describe("core/slow (FLAKE)", /** @this */ function () {
             })
         },
         expected: function () {
-            return r.root([
+            return [
                 r.suite("test", {duration: this.duration1, slow: 50}, [
                     r.pass("inner", {duration: this.duration2, slow: 50}),
                 ]),
-            ])
+            ]
         },
     })
 
@@ -151,11 +151,11 @@ describe("core/slow (FLAKE)", /** @this */ function () {
             })
         },
         expected: function () {
-            return r.root([
+            return [
                 r.suite("test", {duration: this.duration1, slow: 50}, [
                     r.pass("inner", {duration: this.duration2, slow: 50}),
                 ]),
-            ])
+            ]
         },
     })
 

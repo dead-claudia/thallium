@@ -75,9 +75,9 @@ describe("core/async", function () {
                 }
             })
         },
-        expected: r.root([
+        expected: [
             r.fail("test", new Error("sentinel")),
-        ]),
+        ],
     })
 
     test("with async tests + mixed thenable (resolve first)", {
@@ -94,9 +94,9 @@ describe("core/async", function () {
                 }
             })
         },
-        expected: r.root([
+        expected: [
             r.pass("test"),
-        ]),
+        ],
     })
 
     test("with async tests + mixed thenable (reject first)", {
@@ -113,8 +113,8 @@ describe("core/async", function () {
                 }
             })
         },
-        expected: r.root([
+        expected: [
             r.fail("test", new Error("sentinel")),
-        ]),
+        ],
     })
 })
