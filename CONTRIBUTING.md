@@ -210,28 +210,4 @@ Note that I don't actually test the documentation's code, but please ensure it o
 
 - If you're on Linux and have [`nvm`](https://github.com/creationix/nvm) installed, there's a little `scripts/test.sh` script in the root you can run, which will test everything Travis will on your local machine, installing versions that don't exist if necessary. Note that it doesn't actually update existing installations for you, though. It's not quite *that* magical, and I don't suspect you'd want that, either.
 
-- For the tests, feel free to use the framework's own plugin and reporter system to your advantage to simplify your testing. They are very well tested, and if any of the assertions or plugin/reporter APIs break, you'll know it immediately. For example, I used [`t.reporter`](./docs/reporter-api.md) with the `t.match` assertion to test the reporter output throughout the tests. Here's a modified example from one of the tests:
-
-    ```js
-    var tt = t.create()
-    var ret = []
-
-    tt.reporter = Util.push(ret)
-
-    tt.test("test", function () {})
-    tt.test("test", function () {})
-
-    return tt.run().then(function () {
-        t.match(ret, [
-            n("start", [])
-            n("start", [p("test", 0)])
-            n("end", [p("test", 0)])
-            n("pass", [p("test", 0)])
-            n("start", [p("test", 1)])
-            n("end", [p("test", 1)])
-            n("pass", [p("test", 1)])
-            n("end", [])
-            n("exit", [])
-        ])
-    })
-    ```
+- For the tests, feel free to use the framework's own plugin and reporter system to your advantage to simplify your testing. They are very well tested, and if any of the assertions or plugin/reporter APIs break, you'll know it immediately. For example, I used [`t.reporter`](./docs/reporter-api.md) with `assert.match` to test the reporter output throughout the tests.

@@ -1,8 +1,7 @@
 describe("core/failable", function () {
     "use strict"
 
-    var n = t.internal.reports
-    var p = t.internal.location
+    var r = Util.report
 
     function immediate() {
         throw new Error("fail")
@@ -14,120 +13,78 @@ describe("core/failable", function () {
         }}
     }
 
-    it("works with own immediate", function () {
-        var tt = t.internal.root()
-        var ret = []
-
-        tt.reporter = Util.push(ret)
-
-        tt.test("test", function () {
-            tt.isFailable = true
-            return immediate()
-        })
-
-        return tt.run().then(function () {
-            assert.match(ret, [
-                n.start(),
-                n.fail(
-                    [p("test", 0)], new Error("fail"),
-                    undefined, undefined, true),
-                n.end(),
-            ])
-        })
-    })
-
-    it("works with own deferred", function () {
-        var tt = t.internal.root()
-        var ret = []
-
-        tt.reporter = Util.push(ret)
-
-        tt.test("test", function () {
-            tt.isFailable = true
-            return deferred()
-        })
-
-        return tt.run().then(function () {
-            assert.match(ret, [
-                n.start(),
-                n.fail(
-                    [p("test", 0)], new Error("fail"),
-                    undefined, undefined, true),
-                n.end(),
-            ])
-        })
-    })
-
-    it("works with inherited", function () {
-        var tt = t.internal.root()
-        var ret = []
-
-        tt.reporter = Util.push(ret)
-
-        tt.test("test", function () {
-            tt.isFailable = true
-            tt.test("inner", function () { return immediate() })
-        })
-
-        return tt.run().then(function () {
-            assert.match(ret, [
-                n.start(),
-                n.enter([p("test", 0)]),
-                n.fail(
-                    [p("test", 0), p("inner", 0)], new Error("fail"),
-                    undefined, undefined, true),
-                n.leave([p("test", 0)]),
-                n.end(),
-            ])
-        })
-    })
-
-    it("gets own isFailable", function () {
-        var tt = t.internal.root()
-        var active
-
-        tt.test("test", function () {
-            tt.isFailable = true
-            active = tt.reflect.isFailable
-        })
-
-        // Don't print anything
-        tt.reporter = function () {}
-        return tt.run().then(function () {
-            assert.equal(active, true)
-        })
-    })
-
-    it("gets inherited isFailable", function () {
-        var tt = t.internal.root()
-        var active
-
-        tt.test("test", function () {
-            tt.isFailable = true
-            tt.test("inner", function () {
-                active = tt.reflect.isFailable
+    r.test("works with own immediate", {
+        init: function (tt) {
+            tt.test("test", function () {
+                tt.isFailable = true
+                return immediate()
             })
-        })
-
-        // Don't print anything
-        tt.reporter = function () {}
-        return tt.run().then(function () {
-            assert.equal(active, true)
-        })
+        },
+        expected: r.root([
+            r.fail("test", new Error("fail"), {isFailable: true}),
+        ]),
     })
 
-    it("gets default isFailable", function () {
-        var tt = t.internal.root()
-        var active
+    r.test("works with own deferred", {
+        init: function (tt) {
+            tt.test("test", function () {
+                tt.isFailable = true
+                return deferred()
+            })
+        },
+        expected: r.root([
+            r.fail("test", new Error("fail"), {isFailable: true}),
+        ]),
+    })
 
-        tt.test("test", function () {
-            active = tt.reflect.isFailable
-        })
+    r.test("works with inherited", {
+        init: function (tt) {
+            tt.test("test", function () {
+                tt.isFailable = true
+                tt.test("inner", function () { return immediate() })
+            })
+        },
+        expected: r.root([
+            r.suite("test", [
+                r.fail("inner", new Error("fail"), {isFailable: true}),
+            ]),
+        ]),
+    })
 
-        // Don't print anything
-        tt.reporter = function () {}
-        return tt.run().then(function () {
-            assert.equal(active, false)
-        })
+    r.test("gets own isFailable", {
+        init: function (tt, ctx) {
+            tt.test("test", function () {
+                tt.isFailable = true
+                ctx.isFailable = tt.reflect.isFailable
+            })
+        },
+        after: function () {
+            assert.equal(this.isFailable, true)
+        },
+    })
+
+    r.test("gets inherited isFailable", {
+        init: function (tt, ctx) {
+            tt.test("test", function () {
+                tt.isFailable = true
+                tt.test("inner", function () {
+                    ctx.isFailable = tt.reflect.isFailable
+                })
+            })
+        },
+        after: function () {
+            assert.equal(this.isFailable, true)
+        },
+    })
+
+    r.test("gets default isFailable", {
+        init: function (tt, ctx) {
+            tt.test("test", function () {
+                ctx.isFailable = tt.reflect.isFailable
+            })
+        },
+        after: function () {
+            assert.equal(this.isFailable, false)
+        },
     })
 })

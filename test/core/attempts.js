@@ -1,196 +1,136 @@
 describe("core/attempts", function () {
     "use strict"
 
-    var n = t.internal.reports
-    var p = t.internal.location
+    var r = Util.report
 
-    function immediate(retries) {
-        if (--retries.value) throw new Error("fail")
+    function immediate(ctx) {
+        if (--ctx.attempts) throw new Error("fail")
     }
 
-    function deferred(retries) {
+    function deferred(ctx) {
         return {then: function (resolve, reject) {
-            if (--retries.value) reject(new Error("fail"))
+            if (--ctx.attempts) reject(new Error("fail"))
             resolve()
         }}
     }
 
-    it("succeeds with own immediate", function () {
-        var tt = t.internal.root()
-        var ret = []
-        var retries = {value: 3}
-
-        tt.reporter = Util.push(ret)
-
-        tt.test("test", function () {
-            tt.attempts = 3
-            return immediate(retries)
-        })
-
-        return tt.run().then(function () {
-            assert.match(ret, [
-                n.start(),
-                n.pass([p("test", 0)]),
-                n.end(),
-            ])
-        })
-    })
-
-    it("succeeds with own deferred", function () {
-        var tt = t.internal.root()
-        var ret = []
-        var retries = {value: 3}
-
-        tt.reporter = Util.push(ret)
-
-        tt.test("test", function () {
-            tt.attempts = 3
-            return deferred(retries)
-        })
-
-        return tt.run().then(function () {
-            assert.match(ret, [
-                n.start(),
-                n.pass([p("test", 0)]),
-                n.end(),
-            ])
-        })
-    })
-
-    it("fails with own immediate", function () {
-        var tt = t.internal.root()
-        var ret = []
-        var retries = {value: 5}
-
-        tt.reporter = Util.push(ret)
-
-        tt.test("test", function () {
-            tt.attempts = 3
-            return immediate(retries)
-        })
-
-        return tt.run().then(function () {
-            assert.match(ret, [
-                n.start(),
-                n.fail([p("test", 0)], new Error("fail")),
-                n.end(),
-            ])
-        })
-    })
-
-    it("fails with own deferred", function () {
-        var tt = t.internal.root()
-        var ret = []
-        var retries = {value: 5}
-
-        tt.reporter = Util.push(ret)
-
-        tt.test("test", function () {
-            tt.attempts = 3
-            return deferred(retries)
-        })
-
-        return tt.run().then(function () {
-            assert.match(ret, [
-                n.start(),
-                n.fail([p("test", 0)], new Error("fail")),
-                n.end(),
-            ])
-        })
-    })
-
-    it("succeeds with inherited", function () {
-        var tt = t.internal.root()
-        var ret = []
-        var retries = {value: 3}
-
-        tt.reporter = Util.push(ret)
-
-        tt.test("test", function () {
-            tt.attempts = 3
-            tt.test("inner", function () { return immediate(retries) })
-        })
-
-        return tt.run().then(function () {
-            assert.match(ret, [
-                n.start(),
-                n.enter([p("test", 0)]),
-                n.pass([p("test", 0), p("inner", 0)]),
-                n.leave([p("test", 0)]),
-                n.end(),
-            ])
-        })
-    })
-
-    it("fails with inherited", function () {
-        var tt = t.internal.root()
-        var ret = []
-        var retries = {value: 5}
-
-        tt.reporter = Util.push(ret)
-
-        tt.test("test", function () {
-            tt.attempts = 3
-            tt.test("inner", function () { return deferred(retries) })
-        })
-
-        return tt.run().then(function () {
-            assert.match(ret, [
-                n.start(),
-                n.enter([p("test", 0)]),
-                n.fail([p("test", 0), p("inner", 0)], new Error("fail")),
-                n.leave([p("test", 0)]),
-                n.end(),
-            ])
-        })
-    })
-
-    it("gets own attempts", function () {
-        var tt = t.internal.root()
-        var active
-
-        // Don't print anything
-        tt.reporter = function () {}
-        tt.test("test", function () {
-            tt.attempts = 5
-            active = tt.reflect.attempts
-        })
-
-        return tt.run().then(function () {
-            assert.equal(active, 5)
-        })
-    })
-
-    it("gets inherited attempts", function () {
-        var tt = t.internal.root()
-        var active
-
-        // Don't print anything
-        tt.reporter = function () {}
-        tt.test("test", function () {
-            tt.attempts = 5
-            tt.test("inner", function () {
-                active = tt.reflect.attempts
+    r.test("succeeds with own immediate", {
+        attempts: 3,
+        init: function (tt, ctx) {
+            tt.test("test", function () {
+                tt.attempts = 3
+                return immediate(ctx)
             })
-        })
-
-        return tt.run().then(function () {
-            assert.equal(active, 5)
-        })
+        },
+        expected: r.root([
+            r.pass("test"),
+        ]),
     })
 
-    it("gets default attempts", function () {
-        var tt = t.internal.root()
-        var active
+    r.test("succeeds with own deferred", {
+        attempts: 3,
+        init: function (tt, ctx) {
+            tt.test("test", function () {
+                tt.attempts = 3
+                return deferred(ctx)
+            })
+        },
+        expected: r.root([
+            r.pass("test"),
+        ]),
+    })
 
-        // Don't print anything
-        tt.reporter = function () {}
-        tt.test("test", function () {
-            active = tt.reflect.attempts
-        })
+    r.test("fails with own immediate", {
+        attempts: 5,
+        init: function (tt, ctx) {
+            tt.test("test", function () {
+                tt.attempts = 3
+                return immediate(ctx)
+            })
+        },
+        expected: r.root([
+            r.fail("test", new Error("fail")),
+        ]),
+    })
 
-        return tt.run().then(function () {
-            assert.equal(active, 1)
-        })
+    r.test("fails with own deferred", {
+        attempts: 5,
+        init: function (tt, ctx) {
+            tt.test("test", function () {
+                tt.attempts = 3
+                return deferred(ctx)
+            })
+        },
+        expected: r.root([
+            r.fail("test", new Error("fail")),
+        ]),
+    })
+
+    r.test("succeeds with inherited", {
+        attempts: 3,
+        init: function (tt, ctx) {
+            tt.test("test", function () {
+                tt.attempts = 3
+                tt.test("inner", function () { return immediate(ctx) })
+            })
+        },
+        expected: r.root([
+            r.suite("test", [
+                r.pass("inner"),
+            ]),
+        ]),
+    })
+
+    r.test("fails with inherited", {
+        attempts: 5,
+        init: function (tt, ctx) {
+            tt.test("test", function () {
+                tt.attempts = 3
+                tt.test("inner", function () { return deferred(ctx) })
+            })
+        },
+        expected: r.root([
+            r.suite("test", [
+                r.fail("inner", new Error("fail")),
+            ]),
+        ]),
+    })
+
+    r.test("gets own attempts", {
+        init: function (tt, ctx) {
+            tt.test("test", function () {
+                tt.attempts = 5
+                ctx.active = tt.reflect.attempts
+            })
+        },
+        after: function () {
+            assert.equal(this.active, 5)
+        },
+    })
+
+    r.test("gets inherited attempts", {
+        init: function (tt, ctx) {
+            tt.test("test", function () {
+                tt.attempts = 5
+                tt.test("inner", function () {
+                    ctx.active = tt.reflect.attempts
+                })
+            })
+        },
+
+        after: function () {
+            assert.equal(this.active, 5)
+        },
+    })
+
+    r.test("gets default attempts", {
+        init: function (tt, ctx) {
+            tt.test("test", function () {
+                ctx.active = tt.reflect.attempts
+            })
+        },
+        after: function () {
+            assert.equal(this.active, 1)
+        },
     })
 })

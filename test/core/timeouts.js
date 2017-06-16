@@ -10,8 +10,7 @@ describe("core/timeouts (FLAKE)", /** @this */ function () {
 
     this.retries(3)
 
-    var n = t.internal.reports
-    var p = t.internal.location
+    var r = Util.report
 
     function resolve() {
         return {then: function (resolve) { resolve() }}
@@ -25,140 +24,95 @@ describe("core/timeouts (FLAKE)", /** @this */ function () {
         }
     }
 
-    it("succeeds with own", function () {
-        var tt = t.internal.root()
-        var ret = []
-
-        tt.reporter = Util.push(ret)
-
-        tt.test("test", function () {
-            // It's highly unlikely the engine will take this long to finish
-            tt.timeout = 10
-            return resolve()
-        })
-
-        return tt.run().then(function () {
-            assert.match(ret, [
-                n.start(),
-                n.pass([p("test", 0)]),
-                n.end(),
-            ])
-        })
-    })
-
-    it("fails with own", function () {
-        var tt = t.internal.root()
-        var ret = []
-
-        tt.reporter = Util.push(ret)
-
-        tt.test("test", function () {
-            tt.timeout = 50
-            // It's highly unlikely the engine will take this long to finish
-            return delay(200)
-        })
-
-        return tt.run().then(function () {
-            assert.match(ret, [
-                n.start(),
-                n.fail([p("test", 0)], new Error("Timeout of 50 reached")),
-                n.end(),
-            ])
-        })
-    })
-
-    it("succeeds with inherited", function () {
-        var tt = t.internal.root()
-        var ret = []
-
-        tt.reporter = Util.push(ret)
-
-        tt.test("test", function () {
-            tt.timeout = 50
-            tt.test("inner", function () { return resolve() })
-        })
-
-        return tt.run().then(function () {
-            assert.match(ret, [
-                n.start(),
-                n.enter([p("test", 0)]),
-                n.pass([p("test", 0), p("inner", 0)]),
-                n.leave([p("test", 0)]),
-                n.end(),
-            ])
-        })
-    })
-
-    it("fails with inherited", function () {
-        var tt = t.internal.root()
-        var ret = []
-
-        tt.reporter = Util.push(ret)
-
-        tt.test("test", function () {
-            tt.timeout = 50
-            // It's highly unlikely the engine will take this long to finish
-            tt.test("inner", function () { return delay(200) })
-        })
-
-        return tt.run().then(function () {
-            assert.match(ret, [
-                n.start(),
-                n.enter([p("test", 0)]),
-                n.fail([p("test", 0), p("inner", 0)],
-                    new Error("Timeout of 50 reached")),
-                n.leave([p("test", 0)]),
-                n.end(),
-            ])
-        })
-    })
-
-    it("gets own timeout", function () {
-        var tt = t.internal.root()
-        var active
-
-        tt.test("test", function () {
-            tt.timeout = 50
-            active = tt.reflect.timeout
-        })
-
-        // Don't print anything
-        tt.reporter = function () {}
-        return tt.run().then(function () {
-            assert.equal(active, 50)
-        })
-    })
-
-    it("gets inherited timeout", function () {
-        var tt = t.internal.root()
-        var active
-
-        tt.test("test", function () {
-            tt.timeout = 50
-            tt.test("inner", function () {
-                active = tt.reflect.timeout
+    r.test("succeeds with own", {
+        init: function (tt) {
+            tt.test("test", function () {
+                // It's highly unlikely the engine will take this long to finish
+                tt.timeout = 10
+                return resolve()
             })
-        })
-
-        // Don't print anything
-        tt.reporter = function () {}
-        return tt.run().then(function () {
-            assert.equal(active, 50)
-        })
+        },
+        expected: r.root([
+            r.pass("test"),
+        ]),
     })
 
-    it("gets default timeout", function () {
-        var tt = t.internal.root()
-        var active
+    r.test("fails with own", {
+        init: function (tt) {
+            tt.test("test", function () {
+                tt.timeout = 50
+                // It's highly unlikely the engine will take this long to finish
+                return delay(200)
+            })
+        },
+        expected: r.root([
+            r.fail("test", new Error("Timeout of 50 reached")),
+        ]),
+    })
 
-        tt.test("test", function () {
-            active = tt.reflect.timeout
-        })
+    r.test("succeeds with inherited", {
+        init: function (tt) {
+            tt.test("test", function () {
+                tt.timeout = 50
+                tt.test("inner", function () { return resolve() })
+            })
+        },
+        expected: r.root([
+            r.suite("test", [
+                r.pass("inner"),
+            ]),
+        ]),
+    })
 
-        // Don't print anything
-        tt.reporter = function () {}
-        return tt.run().then(function () {
-            assert.equal(active, 2000)
-        })
+    r.test("fails with inherited", {
+        init: function (tt) {
+            tt.test("test", function () {
+                tt.timeout = 50
+                // It's highly unlikely the engine will take this long to finish
+                tt.test("inner", function () { return delay(200) })
+            })
+        },
+        expected: r.root([
+            r.suite("test", [
+                r.fail("inner", new Error("Timeout of 50 reached")),
+            ]),
+        ]),
+    })
+
+    r.test("gets own timeout", {
+        init: function (tt, ctx) {
+            tt.test("test", function () {
+                tt.timeout = 50
+                ctx.active = tt.reflect.timeout
+            })
+        },
+        after: function () {
+            assert.equal(this.active, 50)
+        },
+    })
+
+    r.test("gets inherited timeout", {
+        init: function (tt, ctx) {
+            tt.test("test", function () {
+                tt.timeout = 50
+                tt.test("inner", function () {
+                    ctx.active = tt.reflect.timeout
+                })
+            })
+        },
+        after: function () {
+            assert.equal(this.active, 50)
+        },
+    })
+
+    r.test("gets default timeout", {
+        init: function (tt, ctx) {
+            tt.test("test", function () {
+                ctx.active = tt.reflect.timeout
+            })
+        },
+        after: function () {
+            assert.equal(this.active, 2000)
+        },
     })
 })

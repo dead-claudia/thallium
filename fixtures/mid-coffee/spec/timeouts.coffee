@@ -7,122 +7,82 @@ is trying to represent more real-world usage.
 
 t = require 'thallium'
 assert = require 'thallium/assert'
-{reports: n, location: p, root: create} = require 'thallium/internal'
-{push} = require '../../../test-util/reports'
+{root: create} = require 'thallium/internal'
+r = require '../../../test-util/reports'
 
 # Note that this entire section may be flaky on slower machines. Thankfully,
 # these have been tested against a slower machine, so it should hopefully not
 # be too bad.
 t.test 'core (timeouts) (FLAKE)', ->
-    t.test 'succeeds with own', ->
-        tt = create()
-        ret = []
-
-        tt.reporter = push(ret)
-
-        tt.test 'test', ->
-            # It's highly unlikely the engine will take this long to finish.
-            tt.timeout = 10
-            then: (resolve) -> resolve()
-
-        tt.run().then ->
-            assert.match ret, [
-                n.start()
-                n.pass [p('test', 0)]
-                n.end()
-            ]
-
-    t.test 'fails with own', ->
-        tt = create()
-        ret = []
-
-        tt.reporter = push(ret)
-
-        tt.test 'test', ->
-            tt.timeout = 50
-            # It's highly unlikely the engine will take this long to finish
-            then: (resolve) -> setTimeout resolve, 200
-
-        tt.run().then ->
-            assert.match ret, [
-                n.start()
-                n.fail [p('test', 0)], new Error 'Timeout of 50 reached'
-                n.end()
-            ]
-
-    t.test 'succeeds with inherited', ->
-        tt = create()
-        ret = []
-
-        tt.reporter = push(ret)
-
-        tt.test 'test', ->
-            tt.timeout = 50
-            tt.test 'inner', -> then: (resolve) -> resolve()
-
-        tt.run().then ->
-            assert.match ret, [
-                n.start()
-                n.enter [p('test', 0)]
-                n.pass [p('test', 0), p('inner', 0)]
-                n.leave [p('test', 0)]
-                n.end()
-            ]
-
-    t.test 'fails with inherited', ->
-        tt = create()
-        ret = []
-
-        tt.reporter = push(ret)
-
-        tt.test 'test', ->
-            tt.timeout = 50
-            tt.test 'inner', ->
+    t.test 'succeeds with own', -> r.check
+        init: (tt) ->
+            tt.test 'test', ->
                 # It's highly unlikely the engine will take this long to finish.
+                tt.timeout = 10
+                then: (resolve) -> resolve()
+
+        expected: r.root [
+            r.pass 'test'
+        ]
+
+    t.test 'fails with own', -> r.check
+        init: (tt) ->
+            tt.test 'test', ->
+                tt.timeout = 50
+                # It's highly unlikely the engine will take this long to finish
                 then: (resolve) -> setTimeout resolve, 200
 
-        tt.run().then ->
-            assert.match ret, [
-                n.start()
-                n.enter [p('test', 0)]
-                n.fail [p('test', 0), p('inner', 0)],
-                    new Error 'Timeout of 50 reached'
-                n.leave [p('test', 0)]
-                n.end()
+        expected: r.root [
+            r.fail 'test', new Error('Timeout of 50 reached')
+        ]
+
+    t.test 'succeeds with inherited', -> r.check
+        init: (tt) ->
+            tt.test 'test', ->
+                tt.timeout = 50
+                tt.test 'inner', -> then: (resolve) -> resolve()
+
+        expected: r.root [
+            r.suite 'test', [
+                r.pass 'inner'
             ]
+        ]
 
-    t.test 'gets own timeout', ->
-        tt = create()
-        active = undefined
+    t.test 'fails with inherited', -> r.check
+        init: (tt) ->
+            tt.test 'test', ->
+                tt.timeout = 50
+                tt.test 'inner', ->
+                    # It's highly unlikely the engine will take this long to
+                    # finish.
+                    then: (resolve) -> setTimeout resolve, 200
 
-        tt.test 'test', ->
-            tt.timeout = 50
-            active = tt.reflect.timeout
+        expected: r.root [
+            r.suite 'test', [
+                r.fail 'inner', new Error('Timeout of 50 reached')
+            ]
+        ]
 
-        tt.reporter = -> # Don't print anything
-        tt.run().then ->
-            assert.equal active, 50
+    t.test 'gets own timeout', -> r.check
+        init: (tt) ->
+            tt.test 'test', =>
+                tt.timeout = 50
+                @active = tt.reflect.timeout
+        after: ->
+            assert.equal @active, 50
 
-    t.test 'gets inherited timeout', ->
-        tt = create()
-        active = undefined
+    t.test 'gets inherited timeout', -> r.check
+        init: (tt) ->
+            tt.test 'test', =>
+                tt.timeout = 50
+                tt.test 'inner', =>
+                    @active = tt.reflect.timeout
+        after: ->
+            assert.equal @active, 50
 
-        tt.test 'test', ->
-            tt.timeout = 50
-            tt.test 'inner', ->
-                active = tt.reflect.timeout
-
-        tt.reporter = -> # Don't print anything
-        tt.run().then ->
-            assert.equal active, 50
-
-    t.test 'gets default timeout', ->
-        tt = create()
-        active = undefined
-
-        tt.test 'test', ->
-            active = tt.reflect.timeout
-
-        tt.reporter = -> # Don't print anything
-        tt.run().then ->
-            assert.equal active, 2000
+    t.test 'gets default timeout', -> r.check
+        init: (tt) ->
+            tt.test 'test', =>
+                @active = tt.reflect.timeout
+        after: ->
+            assert.equal @active, 2000

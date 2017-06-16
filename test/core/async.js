@@ -1,180 +1,120 @@
 describe("core/async", function () {
     "use strict"
 
-    var n = t.internal.reports
-    var p = t.internal.location
+    var r = Util.report
 
-    it("with sync tests", function () {
-        var tt = t.internal.root()
-        var called = false
-
-        // Don't print anything
-        tt.reporter = function () {}
-        tt.test("test", function () { called = true })
-
-        var ret = tt.run().then(function () { assert.ok(called) })
-
-        assert.notOk(called)
-        return ret
-    })
-
-    it("with async tests + sync resolve", function () {
-        var tt = t.internal.root()
-        var called = false
-
-        // Don't print anything
-        tt.reporter = function () {}
-        tt.test("test", function () {
-            called = true
-            return {then: function (resolve) { resolve() }}
-        })
-
-        var ret = tt.run().then(function () { assert.ok(called) })
-
-        assert.notOk(called)
-        return ret
-    })
-
-    it("with async tests + async resolve", function () {
-        var tt = t.internal.root()
-        var called = false
-
-        // Don't print anything
-        tt.reporter = function () {}
-        tt.test("test", function () {
-            called = true
-            return {
-                then: function (resolve) {
-                    Util.setTimeout(resolve, 0)
+    function test(name, opts) {
+        it(name, function () {
+            var called = false
+            var ret = r.check({
+                init: function (tt) {
+                    opts.init(tt, function () { called = true })
                 },
-            }
+                expected: opts.expected,
+            })
+            .then(function () { assert.equal(called, true) })
+
+            assert.equal(called, false)
+            return ret
         })
+    }
 
-        var ret = tt.run().then(function () { assert.ok(called) })
-
-        assert.notOk(called)
-        return ret
+    test("with sync tests", {
+        init: function (tt, setCalled) {
+            tt.test("test", setCalled)
+        },
     })
 
-    it("with async tests + duplicate thenable resolution", function () {
-        var tt = t.internal.root()
-        var called = false
-
-        // Don't print anything
-        tt.reporter = function () {}
-        tt.test("test", function () {
-            called = true
-            return {
-                then: function (resolve) {
-                    resolve()
-                    resolve()
-                    resolve()
-                },
-            }
-        })
-
-        var ret = tt.run().then(function () { assert.ok(called) })
-
-        assert.notOk(called)
-        return ret
+    test("with async tests + sync resolve", {
+        init: function (tt, setCalled) {
+            tt.test("test", function () {
+                setCalled()
+                return {then: function (resolve) { resolve() }}
+            })
+        },
     })
 
-    it("with async tests + duplicate thenable rejection", function () {
-        var tt = t.internal.root()
-        var called = false
-        var ret = []
-        var sentinel = new Error("sentinel")
-
-        sentinel.marker = function () {}
-
-        tt.reporter = Util.push(ret)
-        tt.test("test", function () {
-            called = true
-            return {
-                then: function (_, reject) {
-                    reject(sentinel)
-                    reject()
-                    reject()
-                },
-            }
-        })
-
-        var result = tt.run().then(function () {
-            assert.match(ret, [
-                n.start(),
-                n.fail([p("test", 0)], sentinel),
-                n.end(),
-            ])
-        })
-
-        assert.notOk(called)
-        return result
+    test("with async tests + async resolve", {
+        init: function (tt, setCalled) {
+            tt.test("test", function () {
+                setCalled()
+                return {
+                    then: function (resolve) {
+                        Util.setTimeout(resolve, 0)
+                    },
+                }
+            })
+        },
     })
 
-    it("with async tests + mixed thenable (resolve first)", function () {
-        var tt = t.internal.root()
-        var called = false
-        var ret = []
-        var sentinel = new Error("sentinel")
-
-        sentinel.marker = function () {}
-
-        tt.reporter = Util.push(ret)
-        tt.test("test", function () {
-            called = true
-            return {
-                then: function (resolve, reject) {
-                    resolve()
-                    reject(sentinel)
-                    resolve()
-                    reject()
-                },
-            }
-        })
-
-        var result = tt.run().then(function () {
-            assert.match(ret, [
-                n.start(),
-                n.pass([p("test", 0)]),
-                n.end(),
-            ])
-        })
-
-        assert.notOk(called)
-        return result
+    test("with async tests + duplicate thenable resolution", {
+        init: function (tt, setCalled) {
+            tt.test("test", function () {
+                setCalled()
+                return {
+                    then: function (resolve) {
+                        resolve()
+                        resolve()
+                        resolve()
+                    },
+                }
+            })
+        },
     })
 
-    it("with async tests + mixed thenable (reject first)", function () {
-        var tt = t.internal.root()
-        var called = false
-        var ret = []
-        var sentinel = new Error("sentinel")
+    test("with async tests + duplicate thenable rejection", {
+        init: function (tt, setCalled) {
+            tt.test("test", function () {
+                setCalled()
+                return {
+                    then: function (_, reject) {
+                        reject(new Error("sentinel"))
+                        reject()
+                        reject()
+                    },
+                }
+            })
+        },
+        expected: r.root([
+            r.fail("test", new Error("sentinel")),
+        ]),
+    })
 
-        sentinel.marker = function () {}
+    test("with async tests + mixed thenable (resolve first)", {
+        init: function (tt, setCalled) {
+            tt.test("test", function () {
+                setCalled()
+                return {
+                    then: function (resolve, reject) {
+                        resolve()
+                        reject(new Error("sentinel"))
+                        resolve()
+                        reject()
+                    },
+                }
+            })
+        },
+        expected: r.root([
+            r.pass("test"),
+        ]),
+    })
 
-        tt.reporter = Util.push(ret)
-        tt.test("test", function () {
-            called = true
-
-            return {
-                then: function (resolve, reject) {
-                    reject(sentinel)
-                    resolve()
-                    reject()
-                    resolve()
-                },
-            }
-        })
-
-        var result = tt.run().then(function () {
-            assert.match(ret, [
-                n.start(),
-                n.fail([p("test", 0)], sentinel),
-                n.end(),
-            ])
-        })
-
-        assert.notOk(called)
-        return result
+    test("with async tests + mixed thenable (reject first)", {
+        init: function (tt, setCalled) {
+            tt.test("test", function () {
+                setCalled()
+                return {
+                    then: function (resolve, reject) {
+                        reject(new Error("sentinel"))
+                        resolve()
+                        reject()
+                        resolve()
+                    },
+                }
+            })
+        },
+        expected: r.root([
+            r.fail("test", new Error("sentinel")),
+        ]),
     })
 })

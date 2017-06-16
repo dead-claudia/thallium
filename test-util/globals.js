@@ -28,6 +28,7 @@ require("../lib/browser-bundle")
 var Util = global.Util = {
     Tests: require("../lib/core/tests"),
     Reports: require("../lib/core/reports"),
+    ReportsTree: require("../lib/core/reports-tree"),
     DOM: require("./dom"),
 
     // Various dependencies used throughout the tests, minus the CLI tests. It's
@@ -81,10 +82,10 @@ var Util = global.Util = {
             function () {
                 global.console.error("Test now passing: " + test.fullTitle())
             },
+            // Incorrect match failures will output identical JSON. Also,
+            // the issues only present themselves with objects, making
+            // things easier to check.
             function (e) {
-                // Incorrect match failures will output identical JSON. Also,
-                // the issues only present themselves with objects, making
-                // things easier to check.
                 if (e instanceof assert.AssertionError ||
                     e.expected == null || typeof e.expected !== "object" ||
                     e.actual == null || typeof e.actual !== "object" ||
@@ -107,9 +108,7 @@ var Util = global.Util = {
         }
 })()
 
-var Reports = require("./reports")
-
-Util.push = Reports.push
+Util.report = require("./reports")
 
 if (settings.migrate) {
     require("../migrate") // eslint-disable-line global-require
