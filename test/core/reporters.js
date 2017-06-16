@@ -664,9 +664,7 @@ describe("core/reporters", function () { // eslint-disable-line max-statements
         ],
     })
 
-    // FIXME: the hook is emitted after the suite ends.
     r.test("reports local `before all` failures", {
-        it: it.skip,
         init: function (tt) {
             tt.test("foo", function () {
                 tt.beforeAll(hookFail)
@@ -714,9 +712,7 @@ describe("core/reporters", function () { // eslint-disable-line max-statements
         ],
     })
 
-    // FIXME: the hook is emitted after the suite ends.
     r.test("reports local `after all` failures", {
-        it: it.skip,
         init: function (tt) {
             tt.test("foo", function () {
                 tt.afterAll(hookFail)
