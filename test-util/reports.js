@@ -2,6 +2,7 @@
 
 var Internal = require("../internal")
 var assert = require("clean-assert")
+var Constants = require("../lib/core/constants")
 var Reports = require("../lib/core/reports")
 var methods = require("../lib/methods")
 var Util = require("../lib/util")
@@ -14,12 +15,12 @@ function getPath(report) {
         report = report.parent
     }
 
-    return path
+    return path.reverse()
 }
 
 function convertHook(report, stage) {
-    return Reports.hook(stage, getPath(report), getPath(report.origin),
-        report, report.error)
+    return Reports.hook(stage, getPath(report.parent), getPath(report.origin),
+        {name: report.hookName}, report.error)
 }
 
 var convert = {
@@ -40,8 +41,8 @@ var convert = {
     },
 
     "fail": function (report) {
-        return Reports.fail(getPath(report), report.duration, report.slow,
-            report.isFailable)
+        return Reports.fail(getPath(report), report.error, report.duration,
+            report.slow, report.isFailable)
     },
 
     "skip": function (report) {
@@ -50,6 +51,10 @@ var convert = {
 
     "end": function () {
         return Reports.end()
+    },
+
+    "error": function (report) {
+        return Reports.error(report.error)
     },
 
     "before all": function (report) {
@@ -61,7 +66,11 @@ var convert = {
     },
 
     "after each": function (report) {
-        return convertHook(report, Reports.Types.AfterEach)
+        return Reports.hook(Reports.Types.AfterEach,
+            getPath(report.parent.parent == null ? report.parent : report),
+            getPath(report.origin),
+            {name: report.hookName},
+            report.error)
     },
 
     "after all": function (report) {
@@ -76,14 +85,15 @@ var Type = Object.freeze({
     FailOpt: 3,
     Skip: 4,
     Origin: 5,
-    SuiteBeforeAll: 6,
-    SuiteBeforeEach: 7,
-    SuiteAfterEach: 8,
-    SuiteAfterAll: 9,
-    TestBeforeAll: 10,
-    TestBeforeEach: 11,
-    TestAfterEach: 12,
-    TestAfterAll: 13,
+    Error: 6,
+    SuiteBeforeAll: 7,
+    SuiteBeforeEach: 8,
+    SuiteAfterEach: 9,
+    SuiteAfterAll: 10,
+    TestBeforeAll: 11,
+    TestBeforeEach: 12,
+    TestAfterEach: 13,
+    TestAfterAll: 14,
 })
 
 var Render = [
@@ -136,6 +146,13 @@ var Render = [
         r.hooks.push(node.func)
         r.origins.push(r.path())
         return false
+    },
+
+    // Type.Error
+    function (r, node) {
+        r.push(Reports.error(node.error))
+        // Easiest way to abort: force a stack unwind
+        throw r
     },
 
     // Type.SuiteBeforeAll
@@ -256,20 +273,29 @@ function checkReport(ret, report, sanitize) {
 function walk(tree, func) {
     var r = new Renderer()
 
-    r.push(Reports.start())
-    r.renderChildren(tree)
-    r.push(Reports.end())
+    try {
+        r.push(Reports.start())
+        r.renderChildren(tree)
+        r.push(Reports.end())
+    } catch (e) {
+        if (e !== r) throw e
+    }
     return Util.peach(r.list, func)
 }
 
 function Wrap(expected) {
-    this.ret = []
+    this.cooked = []
+    this.raw = []
     this.expected = expected
 }
 
 methods(Wrap, {
+    get: function (index) {
+        return this.raw[index]
+    },
     push: function (report) {
-        checkReport(this.ret, report, true)
+        this.raw.push(report)
+        checkReport(this.cooked, report, true)
     },
     check: function () {
         var tree = []
@@ -285,7 +311,7 @@ methods(Wrap, {
                 return undefined
             }
         })
-        .then(function () { assert.match(self.ret, tree) })
+        .then(function () { assert.match(tree, self.cooked) })
     },
 })
 
@@ -296,7 +322,7 @@ exports.wrap = function (expected, init) {
 }
 
 function Check(opts, tt) {
-    this.ret = []
+    this.reports = []
     this.opts = opts
     this.tt = tt
 }
@@ -317,7 +343,7 @@ methods(Check, {
             }
         })
         .then(function () {
-            assert.match(self.ret, list)
+            assert.match(self.reports, list)
             if (self.opts.after == null) return undefined
             return self.opts.after(self.tt, self.opts)
         })
@@ -340,12 +366,12 @@ function check(opts) {
     // Any equality tests on either of these are inherently flaky.
     if (opts != null && opts.each != null) {
         tt.reporter = function (report) {
-            report = checkReport(state.ret, report, false)
+            report = checkReport(state.reports, report, false)
             return opts.each(report, opts)
         }
     } else {
         tt.reporter = function (report) {
-            checkReport(state.ret, report, true)
+            checkReport(state.reports, report, true)
         }
     }
 
@@ -353,7 +379,7 @@ function check(opts) {
     .then(function () { return state.test() })
     .then(function () {
         if (!opts.repeat) return undefined
-        state.ret.length = 0
+        state.reports.length = 0
         return state.test()
     })
 }
@@ -376,7 +402,8 @@ function timed(type, name, opts) {
     return {
         type: type, name: name,
         duration: opts != null && opts.duration != null ? opts.duration : 10,
-        slow: opts != null && opts.slow != null ? opts.slow : 75,
+        slow: opts != null && opts.slow != null
+            ? opts.slow : Constants.defaultSlow,
     }
 }
 
@@ -419,6 +446,10 @@ exports.origin = function (func) {
     }
 
     return {type: Type.Origin, func: func}
+}
+
+exports.error = function (error) {
+    return {type: Type.Error, error: error}
 }
 
 var SuiteStage = Object.freeze({

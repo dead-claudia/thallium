@@ -23,6 +23,7 @@ require("../lib/browser-bundle")
 
 /* eslint-disable global-require */
 global.Util = Object.freeze({
+    Reports: require("../lib/core/reports-tree"),
     DOM: require("./dom"),
     r: require("../r"),
 
