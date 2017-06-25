@@ -9,19 +9,16 @@
  * Non-DOM API:
  *
  * - `Util.DOM.init(callback)` - Create a new mock based on this.
- * - `Util.DOM.initGlobal(callback)` - Create a new mock based on the global.
  * - `Util.DOM.it(name, body)` - Define a wrapped test that injects the mock
  *   created by `Util.DOM.init` into the global variables `window` and
  *   `document`, cleaning them up on test success and failure. Includes `skip`
  *   and `only` members for consistency.
  * - `Util.DOM.it.dom(name, body)` - Same as above, including `skip` and `only`.
- *
- * Note that `Util.DOM.initGlobal` is `undefined` if no global `window` or
- * `document` are available.
  */
 
 var methods = require("../lib/methods")
 var D = require("../lib/dom/inject")
+var Util = require("../lib/util")
 var hasOwn = Object.prototype.hasOwnProperty
 
 var globalDocument = global.document
@@ -505,10 +502,9 @@ function createMock(opts) {
         var ref = {active: true}
 
         frameLoop(ref)
-        return Promise.resolve(p).then(
-            function () { ref.active = false },
-            function (e) { ref.active = false; throw e }
-        )
+        return Util.pfinally(Promise.resolve(p), function () {
+            ref.active = false
+        })
     }
 
     return {
@@ -592,24 +588,12 @@ function invokeList(list) {
 
 exports.init = function (func) {
     invokeList(hooks.before)
-    return Promise.resolve(createMock(new MockInject())).then(func).then(
-        function () { invokeList(hooks.after) },
-        function (e) { invokeList(hooks.after); throw e })
-}
-
-exports.initGlobal = globalWindow != null
-    ? function (func) {
-        invokeList(hooks.before)
-        return Promise.resolve(createMock(new NativeInject())).then(func).then(
-            function () { invokeList(hooks.after) },
-            function (e) { invokeList(hooks.after); throw e })
-    }
-    : undefined
-
-function cleanup() {
-    D.document = globalDocument
-    D.window = globalWindow
-    invokeList(hooks.after)
+    return Util.pfinally(
+        Util.ptry(function () {
+            return func(createMock(new MockInject()))
+        }),
+        function () { invokeList(hooks.after) }
+    )
 }
 
 function inject(Inject, func) {
@@ -620,34 +604,42 @@ function inject(Inject, func) {
         D.document = mock.document
         D.window = mock.window
 
-        return new Promise(function (resolve) { resolve(func(mock.h, mock)) })
-        .then(cleanup, function (e) { cleanup(); throw e })
+        return Util.pfinally(
+            Util.ptry(function () { return func(mock.h, mock) }),
+            function () {
+                D.document = globalDocument
+                D.window = globalWindow
+                invokeList(hooks.after)
+            }
+        )
     }
 }
 
 exports.D = D
 
-exports.it = function (name, body) {
-    global.it(name, inject(MockInject, body))
+function makeIt(Inject) {
+    var it
+
+    if (Inject != null) {
+        it = function () {}
+        it.only = function () {}
+        it.skip = function () {}
+    } else {
+        it = function (name, body) {
+            global.it(name, inject(Inject, body))
+        }
+
+        it.only = function (name, body) {
+            global.it.only(name, inject(Inject, body))
+        }
+
+        it.skip = function (name) {
+            global.it.skip(name, function () {})
+        }
+    }
+
+    return it
 }
 
-exports.it.only = function (name, body) {
-    global.it.only(name, inject(MockInject, body))
-}
-
-exports.it.skip = function (name) {
-    global.it.skip(name, function () {})
-}
-exports.it.dom = function (name, body) {
-    if (globalWindow == null) return
-    global.it(name, inject(NativeInject, body))
-}
-
-exports.it.dom.only = function (name, body) {
-    if (globalWindow == null) return
-    global.it.only(name, inject(NativeInject, body))
-}
-
-exports.it.dom.skip = function (name) {
-    global.it.skip(name, function () {})
-}
+exports.it = makeIt(MockInject)
+exports.it.dom = makeIt(globalWindow != null ? NativeInject : undefined)

@@ -526,4 +526,7 @@ describe("test-util/dom-mock", function () {
             mock.h("button", {onclick: true})
         )
     }))
+
+    // FIXME: test `inspect` - it's causing silent failures in the DOM runner's
+    // tests.
 })

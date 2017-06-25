@@ -5,8 +5,7 @@ describe("reporter/tap", function () { // eslint-disable-line max-statements
     "use strict"
 
     // FIXME: Update to new report type
-    var p = t.internal.location
-    var n = t.internal.reports
+    var r = Util.report
 
     it("validates no arguments", function () {
         Util.r.tap()
@@ -42,17 +41,21 @@ describe("reporter/tap", function () { // eslint-disable-line max-statements
                 reset: function () {},
             })
 
-            return Util.peach(opts.input, reporter).then(function () {
+            if (opts.repeat) opts.output = opts.output.concat(opts.output)
+
+            return r.walk(opts.input, reporter)
+            .then(function () {
+                if (!opts.repeat) return undefined
+                return r.walk(opts.input, reporter)
+            })
+            .then(function () {
                 assert.match(list, opts.output)
             })
         })
     }
 
     test("empty test", {
-        input: [
-            n.start(),
-            n.end(),
-        ],
+        input: [],
         output: [
             "TAP version 13",
             "1..0",
@@ -63,10 +66,8 @@ describe("reporter/tap", function () { // eslint-disable-line max-statements
 
     test("pass 2", {
         input: [
-            n.start(),
-            n.pass([p("test", 0)]),
-            n.pass([p("test", 1)]),
-            n.end(),
+            r.pass("test"),
+            r.pass("test"),
         ],
         output: [
             "TAP version 13",
@@ -83,10 +84,8 @@ describe("reporter/tap", function () { // eslint-disable-line max-statements
 
     test("fail 2 with Error", {
         input: [
-            n.start(),
-            n.fail([p("one", 0)], sentinel),
-            n.fail([p("two", 1)], sentinel),
-            n.end(),
+            r.fail("one", sentinel),
+            r.fail("two", sentinel),
         ],
         output: [].concat([
             "TAP version 13",
@@ -107,10 +106,8 @@ describe("reporter/tap", function () { // eslint-disable-line max-statements
 
     test("pass + fail with Error", {
         input: [
-            n.start(),
-            n.pass([p("one", 0)]),
-            n.fail([p("two", 1)], sentinel),
-            n.end(),
+            r.pass("one"),
+            r.fail("two", sentinel),
         ],
         output: [].concat([
             "TAP version 13",
@@ -129,10 +126,8 @@ describe("reporter/tap", function () { // eslint-disable-line max-statements
 
     test("fail with Error + pass", {
         input: [
-            n.start(),
-            n.fail([p("one", 0)], sentinel),
-            n.pass([p("two", 1)]),
-            n.end(),
+            r.fail("one", sentinel),
+            r.pass("two"),
         ],
         output: [].concat([
             "TAP version 13",
@@ -154,10 +149,8 @@ describe("reporter/tap", function () { // eslint-disable-line max-statements
 
     test("fail 2 with AssertionError", {
         input: [
-            n.start(),
-            n.fail([p("one", 0)], assertion),
-            n.fail([p("two", 1)], assertion),
-            n.end(),
+            r.fail("one", assertion),
+            r.fail("two", assertion),
         ],
         output: [].concat([
             "TAP version 13",
@@ -184,10 +177,8 @@ describe("reporter/tap", function () { // eslint-disable-line max-statements
 
     test("pass + fail with AssertionError", {
         input: [
-            n.start(),
-            n.pass([p("one", 0)]),
-            n.fail([p("two", 1)], assertion),
-            n.end(),
+            r.pass("one"),
+            r.fail("two", assertion),
         ],
         output: [].concat([
             "TAP version 13",
@@ -209,10 +200,8 @@ describe("reporter/tap", function () { // eslint-disable-line max-statements
 
     test("fail with AssertionError + pass", {
         input: [
-            n.start(),
-            n.fail([p("one", 0)], assertion),
-            n.pass([p("two", 1)]),
-            n.end(),
+            r.fail("one", assertion),
+            r.pass("two"),
         ],
         output: [].concat([
             "TAP version 13",
@@ -234,10 +223,8 @@ describe("reporter/tap", function () { // eslint-disable-line max-statements
 
     test("skip 2", {
         input: [
-            n.start(),
-            n.skip([p("one", 0)]),
-            n.skip([p("two", 1)]),
-            n.end(),
+            r.skip("one"),
+            r.skip("two"),
         ],
         output: [
             "TAP version 13",
@@ -252,10 +239,8 @@ describe("reporter/tap", function () { // eslint-disable-line max-statements
 
     test("pass + skip", {
         input: [
-            n.start(),
-            n.pass([p("one", 0)]),
-            n.skip([p("two", 1)]),
-            n.end(),
+            r.pass("one"),
+            r.skip("two"),
         ],
         output: [
             "TAP version 13",
@@ -271,10 +256,8 @@ describe("reporter/tap", function () { // eslint-disable-line max-statements
 
     test("skip + pass", {
         input: [
-            n.start(),
-            n.skip([p("one", 0)]),
-            n.pass([p("two", 1)]),
-            n.end(),
+            r.skip("one"),
+            r.pass("two"),
         ],
         output: [
             "TAP version 13",
@@ -290,10 +273,8 @@ describe("reporter/tap", function () { // eslint-disable-line max-statements
 
     test("fail + skip", {
         input: [
-            n.start(),
-            n.fail([p("one", 0)], sentinel),
-            n.skip([p("two", 1)]),
-            n.end(),
+            r.fail("one", sentinel),
+            r.skip("two"),
         ],
         output: [].concat([
             "TAP version 13",
@@ -312,10 +293,8 @@ describe("reporter/tap", function () { // eslint-disable-line max-statements
 
     test("skip + fail", {
         input: [
-            n.start(),
-            n.skip([p("one", 0)]),
-            n.fail([p("two", 1)], sentinel),
-            n.end(),
+            r.skip("one"),
+            r.fail("two", sentinel),
         ],
         output: [].concat([
             "TAP version 13",
@@ -336,12 +315,12 @@ describe("reporter/tap", function () { // eslint-disable-line max-statements
 
     test("internal errors", {
         input: [
-            n.start(),
-            n.enter([p("test", 0)]),
-            n.enter([p("test", 0), p("inner", 0)]),
-            n.fail([p("test", 0), p("inner", 0), p("fail", 0)], badType),
-            n.leave([p("test", 0), p("inner", 0)]),
-            n.error(badType),
+            r.suite("test", [
+                r.suite("inner", [
+                    r.fail("fail", badType),
+                    r.error(badType),
+                ]),
+            ]),
         ],
         output: [].concat([
             "TAP version 13",
@@ -364,62 +343,60 @@ describe("reporter/tap", function () { // eslint-disable-line max-statements
         /* eslint-disable max-len */
 
         input: [
-            n.start(),
-            n.enter([p("core (basic)", 0)]),
-            n.pass([p("core (basic)", 0), p("has `base()`", 0)]),
-            n.pass([p("core (basic)", 0), p("has `test()`", 1)]),
-            n.pass([p("core (basic)", 0), p("has `parent()`", 2)]),
-            n.pass([p("core (basic)", 0), p("can accept a string + function", 3)]),
-            n.pass([p("core (basic)", 0), p("can accept a string", 4)]),
-            n.pass([p("core (basic)", 0), p("returns the current instance when given a callback", 5)]),
-            n.pass([p("core (basic)", 0), p("returns a prototypal clone when not given a callback", 6)]),
-            n.pass([p("core (basic)", 0), p("runs block tests within tests", 7)]),
-            n.pass([p("core (basic)", 0), p("runs successful inline tests within tests", 8)]),
-            n.pass([p("core (basic)", 0), p("accepts a callback with `run()`", 9)]),
-            n.leave([p("core (basic)", 0)]),
-            n.enter([p("cli normalize glob", 1)]),
-            n.enter([p("cli normalize glob", 1), p("current directory", 0)]),
-            n.pass([p("cli normalize glob", 1), p("current directory", 0), p("normalizes a file", 0)]),
-            n.pass([p("cli normalize glob", 1), p("current directory", 0), p("normalizes a glob", 1)]),
-            n.pass([p("cli normalize glob", 1), p("current directory", 0), p("retains trailing slashes", 2)]),
-            n.pass([p("cli normalize glob", 1), p("current directory", 0), p("retains negative", 3)]),
-            n.pass([p("cli normalize glob", 1), p("current directory", 0), p("retains negative + trailing slashes", 4)]),
-            n.leave([p("cli normalize glob", 1), p("current directory", 0)]),
-            n.enter([p("cli normalize glob", 1), p("absolute directory", 1)]),
-            n.pass([p("cli normalize glob", 1), p("absolute directory", 1), p("normalizes a file", 0)]),
-            n.pass([p("cli normalize glob", 1), p("absolute directory", 1), p("normalizes a glob", 1)]),
-            n.pass([p("cli normalize glob", 1), p("absolute directory", 1), p("retains trailing slashes", 2)]),
-            n.pass([p("cli normalize glob", 1), p("absolute directory", 1), p("retains negative", 3)]),
-            n.pass([p("cli normalize glob", 1), p("absolute directory", 1), p("retains negative + trailing slashes", 4)]),
-            n.leave([p("cli normalize glob", 1), p("absolute directory", 1)]),
-            n.enter([p("cli normalize glob", 1), p("relative directory", 2)]),
-            n.pass([p("cli normalize glob", 1), p("relative directory", 2), p("normalizes a file", 0)]),
-            n.pass([p("cli normalize glob", 1), p("relative directory", 2), p("normalizes a glob", 1)]),
-            n.pass([p("cli normalize glob", 1), p("relative directory", 2), p("retains trailing slashes", 2)]),
-            n.pass([p("cli normalize glob", 1), p("relative directory", 2), p("retains negative", 3)]),
-            n.pass([p("cli normalize glob", 1), p("relative directory", 2), p("retains negative + trailing slashes", 4)]),
-            n.leave([p("cli normalize glob", 1), p("relative directory", 2)]),
-            n.enter([p("cli normalize glob", 1), p("edge cases", 3)]),
-            n.pass([p("cli normalize glob", 1), p("edge cases", 3), p("normalizes `.` with a cwd of `.`", 0)]),
-            n.pass([p("cli normalize glob", 1), p("edge cases", 3), p("normalizes `..` with a cwd of `.`", 1)]),
-            n.pass([p("cli normalize glob", 1), p("edge cases", 3), p("normalizes `.` with a cwd of `..`", 2)]),
-            n.pass([p("cli normalize glob", 1), p("edge cases", 3), p("normalizes directories with a cwd of `..`", 3)]),
-            n.pass([p("cli normalize glob", 1), p("edge cases", 3), p("removes excess `.`", 4)]),
-            n.pass([p("cli normalize glob", 1), p("edge cases", 3), p("removes excess `..`", 5)]),
-            n.pass([p("cli normalize glob", 1), p("edge cases", 3), p("removes excess combined junk", 6)]),
-            n.leave([p("cli normalize glob", 1), p("edge cases", 3)]),
-            n.leave([p("cli normalize glob", 1)]),
-            n.enter([p("core (timeouts)", 2)]),
-            n.pass([p("core (timeouts)", 2), p("succeeds with own", 0)]),
-            n.pass([p("core (timeouts)", 2), p("fails with own", 1)]),
-            n.pass([p("core (timeouts)", 2), p("succeeds with inherited", 2)]),
-            n.pass([p("core (timeouts)", 2), p("fails with inherited", 3)]),
-            n.pass([p("core (timeouts)", 2), p("gets own set timeout", 4)]),
-            n.pass([p("core (timeouts)", 2), p("gets own inline set timeout", 5)]),
-            n.pass([p("core (timeouts)", 2), p("gets own sync inner timeout", 6)]),
-            n.pass([p("core (timeouts)", 2), p("gets default timeout", 7)]),
-            n.leave([p("core (timeouts)", 2)]),
-            n.end(),
+            r.suite("core (basic)", [
+                r.pass("has `base()`"),
+                r.pass("has `test()`"),
+                r.pass("has `parent()`"),
+                r.pass("can accept a string + function"),
+                r.pass("can accept a string"),
+                r.pass("returns the current instance when given a callback"),
+                r.pass("returns a prototypal clone when not given a callback"),
+                r.pass("runs block tests within tests"),
+                r.pass("runs successful inline tests within tests"),
+                r.pass("accepts a callback with `run()`"),
+            ]),
+            r.suite("cli normalize glob", [
+                r.suite("current directory", [
+                    r.pass("normalizes a file"),
+                    r.pass("normalizes a glob"),
+                    r.pass("retains trailing slashes"),
+                    r.pass("retains negative"),
+                    r.pass("retains negative + trailing slashes"),
+                ]),
+                r.suite("absolute directory", [
+                    r.pass("normalizes a file"),
+                    r.pass("normalizes a glob"),
+                    r.pass("retains trailing slashes"),
+                    r.pass("retains negative"),
+                    r.pass("retains negative + trailing slashes"),
+                ]),
+                r.suite("relative directory", [
+                    r.pass("normalizes a file"),
+                    r.pass("normalizes a glob"),
+                    r.pass("retains trailing slashes"),
+                    r.pass("retains negative"),
+                    r.pass("retains negative + trailing slashes"),
+                ]),
+                r.suite("edge cases", [
+                    r.pass("normalizes `.` with a cwd of `.`"),
+                    r.pass("normalizes `..` with a cwd of `.`"),
+                    r.pass("normalizes `.` with a cwd of `..`"),
+                    r.pass("normalizes directories with a cwd of `..`"),
+                    r.pass("removes excess `.`"),
+                    r.pass("removes excess `..`"),
+                    r.pass("removes excess combined junk"),
+                ]),
+            ]),
+            r.suite("core (timeouts)", [
+                r.pass("succeeds with own"),
+                r.pass("fails with own"),
+                r.pass("succeeds with inherited"),
+                r.pass("fails with inherited"),
+                r.pass("gets own set timeout"),
+                r.pass("gets own inline set timeout"),
+                r.pass("gets own sync inner timeout"),
+                r.pass("gets default timeout"),
+            ]),
         ],
 
         output: [
@@ -491,62 +468,60 @@ describe("reporter/tap", function () { // eslint-disable-line max-statements
         /* eslint-disable max-len */
 
         input: [
-            n.start(),
-            n.enter([p("core (basic)", 0)]),
-            n.pass([p("core (basic)", 0), p("has `base()`", 0)]),
-            n.pass([p("core (basic)", 0), p("has `test()`", 1)]),
-            n.pass([p("core (basic)", 0), p("has `parent()`", 2)]),
-            n.skip([p("core (basic)", 0), p("can accept a string + function", 3)]),
-            n.pass([p("core (basic)", 0), p("can accept a string", 4)]),
-            n.pass([p("core (basic)", 0), p("returns the current instance when given a callback", 5)]),
-            n.fail([p("core (basic)", 0), p("returns a prototypal clone when not given a callback", 6)], badType),
-            n.pass([p("core (basic)", 0), p("runs block tests within tests", 7)]),
-            n.pass([p("core (basic)", 0), p("runs successful inline tests within tests", 8)]),
-            n.pass([p("core (basic)", 0), p("accepts a callback with `run()`", 9)]),
-            n.leave([p("core (basic)", 0)]),
-            n.enter([p("cli normalize glob", 1)]),
-            n.enter([p("cli normalize glob", 1), p("current directory", 0)]),
-            n.fail([p("cli normalize glob", 1), p("current directory", 0), p("normalizes a file", 0)], sentinel),
-            n.pass([p("cli normalize glob", 1), p("current directory", 0), p("normalizes a glob", 1)]),
-            n.pass([p("cli normalize glob", 1), p("current directory", 0), p("retains trailing slashes", 2)]),
-            n.pass([p("cli normalize glob", 1), p("current directory", 0), p("retains negative", 3)]),
-            n.pass([p("cli normalize glob", 1), p("current directory", 0), p("retains negative + trailing slashes", 4)]),
-            n.leave([p("cli normalize glob", 1), p("current directory", 0)]),
-            n.enter([p("cli normalize glob", 1), p("absolute directory", 1)]),
-            n.pass([p("cli normalize glob", 1), p("absolute directory", 1), p("normalizes a file", 0)]),
-            n.pass([p("cli normalize glob", 1), p("absolute directory", 1), p("normalizes a glob", 1)]),
-            n.pass([p("cli normalize glob", 1), p("absolute directory", 1), p("retains trailing slashes", 2)]),
-            n.skip([p("cli normalize glob", 1), p("absolute directory", 1), p("retains negative", 3)]),
-            n.pass([p("cli normalize glob", 1), p("absolute directory", 1), p("retains negative + trailing slashes", 4)]),
-            n.leave([p("cli normalize glob", 1), p("absolute directory", 1)]),
-            n.enter([p("cli normalize glob", 1), p("relative directory", 2)]),
-            n.pass([p("cli normalize glob", 1), p("relative directory", 2), p("normalizes a file", 0)]),
-            n.pass([p("cli normalize glob", 1), p("relative directory", 2), p("normalizes a glob", 1)]),
-            n.pass([p("cli normalize glob", 1), p("relative directory", 2), p("retains trailing slashes", 2)]),
-            n.pass([p("cli normalize glob", 1), p("relative directory", 2), p("retains negative", 3)]),
-            n.fail([p("cli normalize glob", 1), p("relative directory", 2), p("retains negative + trailing slashes", 4)], badType),
-            n.leave([p("cli normalize glob", 1), p("relative directory", 2)]),
-            n.enter([p("cli normalize glob", 1), p("edge cases", 3)]),
-            n.pass([p("cli normalize glob", 1), p("edge cases", 3), p("normalizes `.` with a cwd of `.`", 0)]),
-            n.pass([p("cli normalize glob", 1), p("edge cases", 3), p("normalizes `..` with a cwd of `.`", 1)]),
-            n.pass([p("cli normalize glob", 1), p("edge cases", 3), p("normalizes `.` with a cwd of `..`", 2)]),
-            n.pass([p("cli normalize glob", 1), p("edge cases", 3), p("normalizes directories with a cwd of `..`", 3)]),
-            n.pass([p("cli normalize glob", 1), p("edge cases", 3), p("removes excess `.`", 4)]),
-            n.pass([p("cli normalize glob", 1), p("edge cases", 3), p("removes excess `..`", 5)]),
-            n.pass([p("cli normalize glob", 1), p("edge cases", 3), p("removes excess combined junk", 6)]),
-            n.leave([p("cli normalize glob", 1), p("edge cases", 3)]),
-            n.leave([p("cli normalize glob", 1)]),
-            n.enter([p("core (timeouts)", 2)]),
-            n.skip([p("core (timeouts)", 2), p("succeeds with own", 0)]),
-            n.pass([p("core (timeouts)", 2), p("fails with own", 1)]),
-            n.pass([p("core (timeouts)", 2), p("succeeds with inherited", 2)]),
-            n.pass([p("core (timeouts)", 2), p("fails with inherited", 3)]),
-            n.pass([p("core (timeouts)", 2), p("gets own set timeout", 4)]),
-            n.fail([p("core (timeouts)", 2), p("gets own inline set timeout", 5)], sentinel),
-            n.skip([p("core (timeouts)", 2), p("gets own sync inner timeout", 6)]),
-            n.pass([p("core (timeouts)", 2), p("gets default timeout", 7)]),
-            n.leave([p("core (timeouts)", 2)]),
-            n.end(),
+            r.suite("core (basic)", [
+                r.pass("has `base()`"),
+                r.pass("has `test()`"),
+                r.pass("has `parent()`"),
+                r.skip("can accept a string + function"),
+                r.pass("can accept a string"),
+                r.pass("returns the current instance when given a callback"),
+                r.fail("returns a prototypal clone when not given a callback", badType),
+                r.pass("runs block tests within tests"),
+                r.pass("runs successful inline tests within tests"),
+                r.pass("accepts a callback with `run()`"),
+            ]),
+            r.suite("cli normalize glob", [
+                r.suite("current directory", [
+                    r.fail("normalizes a file", sentinel),
+                    r.pass("normalizes a glob"),
+                    r.pass("retains trailing slashes"),
+                    r.pass("retains negative"),
+                    r.pass("retains negative + trailing slashes"),
+                ]),
+                r.suite("absolute directory", [
+                    r.pass("normalizes a file"),
+                    r.pass("normalizes a glob"),
+                    r.pass("retains trailing slashes"),
+                    r.skip("retains negative"),
+                    r.pass("retains negative + trailing slashes"),
+                ]),
+                r.suite("relative directory", [
+                    r.pass("normalizes a file"),
+                    r.pass("normalizes a glob"),
+                    r.pass("retains trailing slashes"),
+                    r.pass("retains negative"),
+                    r.fail("retains negative + trailing slashes", badType),
+                ]),
+                r.suite("edge cases", [
+                    r.pass("normalizes `.` with a cwd of `.`"),
+                    r.pass("normalizes `..` with a cwd of `.`"),
+                    r.pass("normalizes `.` with a cwd of `..`"),
+                    r.pass("normalizes directories with a cwd of `..`"),
+                    r.pass("removes excess `.`"),
+                    r.pass("removes excess `..`"),
+                    r.pass("removes excess combined junk"),
+                ]),
+            ]),
+            r.suite("core (timeouts)", [
+                r.skip("succeeds with own"),
+                r.pass("fails with own"),
+                r.pass("succeeds with inherited"),
+                r.pass("fails with inherited"),
+                r.pass("gets own set timeout"),
+                r.fail("gets own inline set timeout", sentinel),
+                r.skip("gets own sync inner timeout"),
+                r.pass("gets default timeout"),
+            ]),
         ],
 
         output: [].concat([
@@ -630,17 +605,9 @@ describe("reporter/tap", function () { // eslint-disable-line max-statements
 
     context("restarting", function () {
         test("empty test", {
-            input: [
-                n.start(),
-                n.end(),
-                n.start(),
-                n.end(),
-            ],
+            repeat: true,
+            input: [],
             output: [
-                "TAP version 13",
-                "1..0",
-                "# tests 0",
-                "# duration 0ms",
                 "TAP version 13",
                 "1..0",
                 "# tests 0",
@@ -649,24 +616,12 @@ describe("reporter/tap", function () { // eslint-disable-line max-statements
         })
 
         test("pass 2", {
+            repeat: true,
             input: [
-                n.start(),
-                n.pass([p("test", 0)]),
-                n.pass([p("test", 1)]),
-                n.end(),
-                n.start(),
-                n.pass([p("test", 0)]),
-                n.pass([p("test", 1)]),
-                n.end(),
+                r.pass("test"),
+                r.pass("test"),
             ],
             output: [
-                "TAP version 13",
-                "ok 1 test",
-                "ok 2 test",
-                "1..2",
-                "# tests 2",
-                "# pass 2",
-                "# duration 20ms",
                 "TAP version 13",
                 "ok 1 test",
                 "ok 2 test",
@@ -680,30 +635,12 @@ describe("reporter/tap", function () { // eslint-disable-line max-statements
         var sentinel = new Error("sentinel")
 
         test("fail 2 with Error", {
+            repeat: true,
             input: [
-                n.start(),
-                n.fail([p("one", 0)], sentinel),
-                n.fail([p("two", 1)], sentinel),
-                n.end(),
-                n.start(),
-                n.fail([p("one", 0)], sentinel),
-                n.fail([p("two", 1)], sentinel),
-                n.end(),
+                r.fail("one", sentinel),
+                r.fail("two", sentinel),
             ],
             output: [].concat([
-                "TAP version 13",
-                "not ok 1 one",
-                "  ---",
-            ], stack(sentinel), [
-                "  ...",
-                "not ok 2 two",
-                "  ---",
-            ], stack(sentinel), [
-                "  ...",
-                "1..2",
-                "# tests 2",
-                "# fail 2",
-                "# duration 20ms",
                 "TAP version 13",
                 "not ok 1 one",
                 "  ---",
@@ -721,28 +658,12 @@ describe("reporter/tap", function () { // eslint-disable-line max-statements
         })
 
         test("pass + fail with Error", {
+            repeat: true,
             input: [
-                n.start(),
-                n.pass([p("one", 0)]),
-                n.fail([p("two", 1)], sentinel),
-                n.end(),
-                n.start(),
-                n.pass([p("one", 0)]),
-                n.fail([p("two", 1)], sentinel),
-                n.end(),
+                r.pass("one"),
+                r.fail("two", sentinel),
             ],
             output: [].concat([
-                "TAP version 13",
-                "ok 1 one",
-                "not ok 2 two",
-                "  ---",
-            ], stack(sentinel), [
-                "  ...",
-                "1..2",
-                "# tests 2",
-                "# pass 1",
-                "# fail 1",
-                "# duration 20ms",
                 "TAP version 13",
                 "ok 1 one",
                 "not ok 2 two",
@@ -758,28 +679,12 @@ describe("reporter/tap", function () { // eslint-disable-line max-statements
         })
 
         test("fail with Error + pass", {
+            repeat: true,
             input: [
-                n.start(),
-                n.fail([p("one", 0)], sentinel),
-                n.pass([p("two", 1)]),
-                n.end(),
-                n.start(),
-                n.fail([p("one", 0)], sentinel),
-                n.pass([p("two", 1)]),
-                n.end(),
+                r.fail("one", sentinel),
+                r.pass("two"),
             ],
             output: [].concat([
-                "TAP version 13",
-                "not ok 1 one",
-                "  ---",
-            ], stack(sentinel), [
-                "  ...",
-                "ok 2 two",
-                "1..2",
-                "# tests 2",
-                "# pass 1",
-                "# fail 1",
-                "# duration 20ms",
                 "TAP version 13",
                 "not ok 1 one",
                 "  ---",
@@ -797,36 +702,12 @@ describe("reporter/tap", function () { // eslint-disable-line max-statements
         var assertion = new AssertionError("Expected 1 to equal 2", 1, 2)
 
         test("fail 2 with AssertionError", {
+            repeat: true,
             input: [
-                n.start(),
-                n.fail([p("one", 0)], assertion),
-                n.fail([p("two", 1)], assertion),
-                n.end(),
-                n.start(),
-                n.fail([p("one", 0)], assertion),
-                n.fail([p("two", 1)], assertion),
-                n.end(),
+                r.fail("one", assertion),
+                r.fail("two", assertion),
             ],
             output: [].concat([
-                "TAP version 13",
-                "not ok 1 one",
-                "  ---",
-                "  expected: 1",
-                "  actual: 2",
-                "  message: Expected 1 to equal 2",
-            ], stack(assertion), [
-                "  ...",
-                "not ok 2 two",
-                "  ---",
-                "  expected: 1",
-                "  actual: 2",
-                "  message: Expected 1 to equal 2",
-            ], stack(assertion), [
-                "  ...",
-                "1..2",
-                "# tests 2",
-                "# fail 2",
-                "# duration 20ms",
                 "TAP version 13",
                 "not ok 1 one",
                 "  ---",
@@ -850,31 +731,12 @@ describe("reporter/tap", function () { // eslint-disable-line max-statements
         })
 
         test("pass + fail with AssertionError", {
+            repeat: true,
             input: [
-                n.start(),
-                n.pass([p("one", 0)]),
-                n.fail([p("two", 1)], assertion),
-                n.end(),
-                n.start(),
-                n.pass([p("one", 0)]),
-                n.fail([p("two", 1)], assertion),
-                n.end(),
+                r.pass("one"),
+                r.fail("two", assertion),
             ],
             output: [].concat([
-                "TAP version 13",
-                "ok 1 one",
-                "not ok 2 two",
-                "  ---",
-                "  expected: 1",
-                "  actual: 2",
-                "  message: Expected 1 to equal 2",
-            ], stack(assertion), [
-                "  ...",
-                "1..2",
-                "# tests 2",
-                "# pass 1",
-                "# fail 1",
-                "# duration 20ms",
                 "TAP version 13",
                 "ok 1 one",
                 "not ok 2 two",
@@ -893,31 +755,12 @@ describe("reporter/tap", function () { // eslint-disable-line max-statements
         })
 
         test("fail with AssertionError + pass", {
+            repeat: true,
             input: [
-                n.start(),
-                n.fail([p("one", 0)], assertion),
-                n.pass([p("two", 1)]),
-                n.end(),
-                n.start(),
-                n.fail([p("one", 0)], assertion),
-                n.pass([p("two", 1)]),
-                n.end(),
+                r.fail("one", assertion),
+                r.pass("two"),
             ],
             output: [].concat([
-                "TAP version 13",
-                "not ok 1 one",
-                "  ---",
-                "  expected: 1",
-                "  actual: 2",
-                "  message: Expected 1 to equal 2",
-            ], stack(assertion), [
-                "  ...",
-                "ok 2 two",
-                "1..2",
-                "# tests 2",
-                "# pass 1",
-                "# fail 1",
-                "# duration 20ms",
                 "TAP version 13",
                 "not ok 1 one",
                 "  ---",
