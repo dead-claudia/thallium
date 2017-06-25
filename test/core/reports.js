@@ -730,9 +730,13 @@ describe("core/reports", function () {
 
             tt.test("test", function () {
                 _.push(test = R.enter(tt.reflect.current._, root, 10))
-                _.push(R.beforeEach(tt.reflect.current._, test, root, error,
-                    hookFail))
-                _.push(R.leave(tt.reflect.current._, root))
+                tt.test("inner", function () {
+                    _.push(R.beforeEach(tt.reflect.current._, test, root, error,
+                        hookFail))
+                })
+                tt.afterAll(function () {
+                    _.push(R.leave(tt.reflect.current._, root))
+                })
             })
 
             return tt.run()
@@ -754,11 +758,11 @@ describe("core/reports", function () {
                     type: "before each",
                     parent: test,
                     origin: root,
-                    name: "test",
+                    name: "inner",
                     index: 0,
                     error: error,
                     hookName: hookFail.name,
-                    fullName: "test",
+                    fullName: "test inner",
                 })
                 check(_.get(3), {
                     type: "leave",
@@ -779,7 +783,6 @@ describe("core/reports", function () {
     })
 
     test("inner test after each fail", {
-        it: it.skip,
         init: function (_) {
             var tt = create()
             var root = R.start(tt._)
@@ -792,10 +795,10 @@ describe("core/reports", function () {
                 _.push(test = R.enter(tt.reflect.current._, root, 10))
                 tt.test("inner", function () {
                     _.push(R.skip(tt.reflect.current._, test))
-                })
-                tt.afterAll(function () {
                     _.push(R.afterEach(tt.reflect.current._, test, root, error,
                         hookFail))
+                })
+                tt.afterAll(function () {
                     _.push(R.leave(tt.reflect.current._, root))
                 })
             })

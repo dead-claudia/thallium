@@ -10,7 +10,7 @@ var path = require("path")
 var cp = require("child_process")
 var fixture = require("../../test-util/cli/cli").fixture
 
-describe("cli/e2e (FLAKE)", /** @this */ function () {
+describe.skip("cli/e2e (FLAKE)", /** @this */ function () {
     this.retries(3)
 
     var binary = path.resolve(__dirname, "../../bin/tl.js")
