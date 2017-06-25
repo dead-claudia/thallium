@@ -778,8 +778,6 @@ describe("core/reports", function () {
         ],
     })
 
-    // FIXME: change the `beforeEach` and `afterEach` hooks to feature the
-    // triggering test rather than the parent test.
     test("inner test after each fail", {
         it: it.skip,
         init: function (_) {
@@ -853,75 +851,76 @@ describe("core/reports", function () {
         ],
     })
 
-    // test("root after each fail", {
-    //     init: function (_) {
-    //         var tt = create()
-    //         var root = R.start(tt._)
-    //         var error = new Error("fail")
-    //
-    //         _.push(root)
-    //         tt.test("test", function () {
-    //             _.push(R.pass(tt.reflect.current._, root, 10))
-    //             _.push(R.afterEach(tt._, root, root, error, hookFail))
-    //         })
-    //
-    //         return tt.run()
-    //         .then(function () {
-    //             _.push(R.end(tt._))
-    //             return _.check()
-    //         })
-    //         .then(function () {
-    //             check(_.get(0), {type: "start"})
-    //             check(_.get(1), {
-    //                 type: "pass",
-    //                 parent: root,
-    //                 name: "test",
-    //                 index: 0,
-    //                 duration: 10,
-    //                 fullName: "test",
-    //             })
-    //             check(_.get(2), {
-    //                 type: "after each",
-    //                 parent: root,
-    //                 origin: root,
-    //                 error: error,
-    //                 hookName: hookFail.name,
-    //             })
-    //             check(_.get(3), {type: "end"})
-    //         })
-    //     },
-    //     expected: [
-    //         r.origin(hookFail),
-    //         r.pass("test", {duration: 10}),
-    //         r.suiteHook("after each", hookFail, new Error("fail")),
-    //     ],
-    // })
-    //
-    // test("root after all fail", {
-    //     init: function (_) {
-    //         var tt = create()
-    //         var root = R.start(tt._)
-    //         var error = new Error("fail")
-    //
-    //         _.push(root)
-    //         _.push(R.afterAll(tt._, root, root, error, hookFail))
-    //         _.push(R.end(tt._))
-    //
-    //         return _.check().then(function () {
-    //             check(_.get(0), {type: "start"})
-    //             check(_.get(1), {
-    //                 type: "after all",
-    //                 parent: root,
-    //                 origin: root,
-    //                 error: error,
-    //                 hookName: hookFail.name,
-    //             })
-    //             check(_.get(2), {type: "end"})
-    //         })
-    //     },
-    //     expected: [
-    //         r.origin(hookFail),
-    //         r.suiteHook("after all", hookFail, new Error("fail")),
-    //     ],
-    // })
+    test("inner test after all fail", {
+        init: function (_) {
+            var tt = create()
+            var root = R.start(tt._)
+            var error = new Error("fail")
+            var test
+
+            _.push(root)
+
+            tt.test("test", function () {
+                test = R.enter(tt.reflect.current._, root, 10)
+                _.push(test)
+                tt.test("inner", function () {
+                    _.push(R.skip(tt.reflect.current._, test))
+                })
+                tt.afterAll(function () {
+                    _.push(R.afterAll(tt.reflect.current._, test, root, error,
+                        hookFail))
+                    _.push(R.leave(tt.reflect.current._, root))
+                })
+            })
+
+            return tt.run()
+            .then(function () {
+                _.push(R.end(tt._))
+                return _.check()
+            })
+            .then(function () {
+                check(_.get(0), {type: "start"})
+                check(_.get(1), {
+                    type: "enter",
+                    parent: root,
+                    name: "test",
+                    index: 0,
+                    duration: 10,
+                    fullName: "test",
+                })
+                check(_.get(2), {
+                    type: "skip",
+                    parent: test,
+                    name: "inner",
+                    index: 0,
+                    fullName: "test inner",
+                })
+                check(_.get(3), {
+                    type: "after all",
+                    parent: test,
+                    origin: root,
+                    name: "test",
+                    index: 0,
+                    error: error,
+                    hookName: hookFail.name,
+                    fullName: "test",
+                })
+                check(_.get(4), {
+                    type: "leave",
+                    parent: root,
+                    name: "test",
+                    index: 0,
+                    fullName: "test",
+                })
+                check(_.get(5), {type: "end"})
+            })
+        },
+        expected: [
+            r.origin(hookFail),
+            r.suite("test", {duration: 10}, [
+                r.skip("inner"),
+                r.suiteHook("after all", hookFail, new Error("fail")),
+            ]),
+        ],
+    })
 })

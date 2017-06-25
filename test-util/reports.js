@@ -348,6 +348,27 @@ methods(Check, {
             return self.opts.after(self.tt, self.opts)
         })
     },
+
+    testTree: function () {
+        var list = []
+        var self = this
+
+        return this.tt.runTree(self.opts.opts)
+        .then(function () {
+            if (typeof self.opts.expected === "function") {
+                return walk(self.opts.expected(), function (v) { list.push(v) })
+            } else if (self.opts.expected != null) {
+                return walk(self.opts.expected, function (v) { list.push(v) })
+            } else {
+                return undefined
+            }
+        })
+        .then(function () {
+            assert.match(self.reports, list)
+            if (self.opts.after == null) return undefined
+            return self.opts.after(self.tt, self.opts)
+        })
+    },
 })
 
 exports.check = check
@@ -391,6 +412,50 @@ exports.test = function (name, opts) {
 
     (opts.it || global.it)(name, function () {
         return check(Object.create(opts))
+    })
+}
+
+exports.checkTree = checkTree
+function checkTree(opts) {
+    var tt = Internal.root()
+
+    if (opts.expected == null) {
+        // Don't print anything.
+        tt.reporter = function () {}
+        opts.init(tt, opts)
+        return tt.run(opts.opts)
+    }
+
+    var state = new Check(opts, tt)
+
+    // Any equality tests on either of these are inherently flaky.
+    if (opts != null && opts.each != null) {
+        tt.reporter = function (report) {
+            report = checkReport(state.reports, report, false)
+            return opts.each(report, opts)
+        }
+    } else {
+        tt.reporter = function (report) {
+            checkReport(state.reports, report, true)
+        }
+    }
+
+    return new Promise(function (resolve) { resolve(opts.init(tt, opts)) })
+    .then(function () { return state.testTree() })
+    .then(function () {
+        if (!opts.repeat) return undefined
+        state.reports.length = 0
+        return state.testTree()
+    })
+}
+
+exports.testTree = function (name, opts) {
+    if (typeof name !== "string") {
+        throw new TypeError("`name` must be a string")
+    }
+
+    (opts.it || global.it)(name, function () {
+        return checkTree(Object.create(opts))
     })
 }
 
