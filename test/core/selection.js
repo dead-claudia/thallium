@@ -6,7 +6,7 @@ describe("core/selection", function () {
     var r = Util.report
 
     describe("skip (dynamic)", function () {
-        r.test("filters correctly from instance", {
+        r.testTree("filters correctly from instance", {
             init: function (tt) {
                 tt.test("one", function () {
                     tt.test("inner", function () { tt.skip() })
@@ -30,7 +30,7 @@ describe("core/selection", function () {
             ],
         })
 
-        r.test("filters correctly from reflect", {
+        r.testTree("filters correctly from reflect", {
             init: function (tt) {
                 tt.test("one", function () {
                     tt.test("inner", function () { tt.reflect.skip() })
@@ -79,8 +79,8 @@ describe("core/selection", function () {
             stringInst.selector = [["one", "inner"]]
             regexpInst.selector = [[/^one$/, "inner"]]
 
-            r.test("filters correctly with strings", stringInst)
-            r.test("filters correctly with regexps", regexpInst)
+            r.testTree("filters correctly with strings", stringInst)
+            r.testTree("filters correctly with regexps", regexpInst)
         })
     }
 

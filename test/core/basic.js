@@ -36,7 +36,7 @@ describe("core/basic", function () {
                     inner = tt.reflect.parent
                 })
 
-                return tt.run().then(function () {
+                return tt.runTree().then(function () {
                     assert.equal(inner, tt.reflect)
                 })
             })
@@ -94,7 +94,7 @@ describe("core/basic", function () {
                     child = tt.reflect.name
                 })
 
-                return tt.run().then(function () {
+                return tt.runTree().then(function () {
                     assert.equal(child, "test")
                 })
             })
@@ -117,7 +117,7 @@ describe("core/basic", function () {
                     first = tt.reflect.index
                 })
 
-                return tt.run().then(function () {
+                return tt.runTree().then(function () {
                     assert.equal(first, 0)
                 })
             })
@@ -133,7 +133,7 @@ describe("core/basic", function () {
                     second = tt.reflect.index
                 })
 
-                return tt.run().then(function () {
+                return tt.runTree().then(function () {
                     assert.equal(second, 1)
                 })
             })
@@ -156,7 +156,7 @@ describe("core/basic", function () {
                     test = tt.reflect
                 })
 
-                return tt.run().then(function () {
+                return tt.runTree().then(function () {
                     assert.match(tt.reflect.children, [test])
                 })
             })
@@ -175,7 +175,7 @@ describe("core/basic", function () {
                     second = tt.reflect
                 })
 
-                return tt.run().then(function () {
+                return tt.runTree().then(function () {
                     assert.match(tt.reflect.children, [first, second])
                 })
             })
@@ -204,7 +204,7 @@ describe("core/basic", function () {
                 tt.test("foo", function () { called++ })
             })
 
-            return tt.run().then(function () {
+            return tt.runTree().then(function () {
                 assert.equal(called, 1)
                 assert.notOk(err)
             })
@@ -222,9 +222,9 @@ describe("core/basic", function () {
 
             // Don't print anything
             tt.reporter = function () {}
-            var res = tt.run()
+            var res = tt.runTree()
 
-            assert.throws(Error, function () { tt.run() })
+            assert.throws(Error, function () { tt.runTree() })
             return res
         })
 
@@ -234,11 +234,11 @@ describe("core/basic", function () {
 
             tt.reporter = function () { throw sentinel }
 
-            return tt.run().then(
+            return tt.runTree().then(
                 function () { assert.fail("Expected a rejection") },
                 function (err) { assert.equal(err, sentinel) })
             .then(function () {
-                return tt.run().then(
+                return tt.runTree().then(
                     function () { assert.fail("Expected a rejection") },
                     function (err) { assert.equal(err, sentinel) })
             })

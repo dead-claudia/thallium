@@ -13,7 +13,7 @@ describe("core/failable", function () {
         }}
     }
 
-    r.test("works with own immediate", {
+    r.testTree("works with own immediate", {
         init: function (tt) {
             tt.test("test", function () {
                 tt.isFailable = true
@@ -25,7 +25,7 @@ describe("core/failable", function () {
         ],
     })
 
-    r.test("works with own deferred", {
+    r.testTree("works with own deferred", {
         init: function (tt) {
             tt.test("test", function () {
                 tt.isFailable = true
@@ -37,7 +37,7 @@ describe("core/failable", function () {
         ],
     })
 
-    r.test("works with inherited", {
+    r.testTree("works with inherited", {
         init: function (tt) {
             tt.test("test", function () {
                 tt.isFailable = true
@@ -51,7 +51,7 @@ describe("core/failable", function () {
         ],
     })
 
-    r.test("gets own isFailable", {
+    r.testTree("gets own isFailable", {
         init: function (tt, ctx) {
             tt.test("test", function () {
                 tt.isFailable = true
@@ -63,7 +63,7 @@ describe("core/failable", function () {
         },
     })
 
-    r.test("gets inherited isFailable", {
+    r.testTree("gets inherited isFailable", {
         init: function (tt, ctx) {
             tt.test("test", function () {
                 tt.isFailable = true
@@ -77,7 +77,7 @@ describe("core/failable", function () {
         },
     })
 
-    r.test("gets default isFailable", {
+    r.testTree("gets default isFailable", {
         init: function (tt, ctx) {
             tt.test("test", function () {
                 ctx.isFailable = tt.reflect.isFailable

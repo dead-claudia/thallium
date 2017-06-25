@@ -29,7 +29,7 @@ t.test 'core (basic)', ->
                 inner = undefined
                 tt.reporter = -> # Don't print anything
                 tt.test 'test', -> inner = tt.reflect.parent
-                tt.run().then -> assert.equal inner, tt.reflect
+                tt.runTree().then -> assert.equal inner, tt.reflect
 
         t.test 'get count', ->
             tt = create()
@@ -59,7 +59,7 @@ t.test 'core (basic)', ->
                 child = undefined
                 tt.reporter = -> # Don't print anything
                 tt.test 'test', -> child = tt.reflect.name
-                tt.run().then -> assert.equal child, 'test'
+                tt.runTree().then -> assert.equal child, 'test'
 
             t.test 'works with itself', ->
                 assert.equal t.reflect.name, 'works with itself'
@@ -75,7 +75,7 @@ t.test 'core (basic)', ->
             tt.test 'test', -> first = tt.reflect.index
             tt.test 'test', -> second = tt.reflect.index
 
-            tt.run().then ->
+            tt.runTree().then ->
                 t.test 'works with the first child test', ->
                     assert.equal first, 0
 
@@ -95,7 +95,7 @@ t.test 'core (basic)', ->
                 test = undefined
                 tt.reporter = -> # Don't print anything
                 tt.test 'test', -> test = tt.reflect
-                tt.run().then ->
+                tt.runTree().then ->
                     assert.match tt.reflect.children, [test]
 
             t.test 'works with 2 tests', ->
@@ -104,7 +104,7 @@ t.test 'core (basic)', ->
                 tt.reporter = -> # Don't print anything
                 tt.test 'first', -> first = tt.reflect
                 tt.test 'second', -> second = tt.reflect
-                tt.run().then ->
+                tt.runTree().then ->
                     assert.match tt.reflect.children, [first, second]
 
             t.test 'returns a copy', ->
@@ -126,6 +126,6 @@ t.test 'core (basic)', ->
             tt.test 'test', ->
                 tt.test 'foo', -> called++
 
-            tt.run().then ->
+            tt.runTree().then ->
                 assert.equal called, 1
                 assert.notOk err

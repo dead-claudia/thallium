@@ -47,6 +47,12 @@ describe("core/reports", function () {
         assert.equal(report.timeout, opts.timeout || 2000)
         assert.equal(report.isFailable, !!opts.isFailable)
         assert.equal(report.fullName, opts.fullName)
+        if (opts.path != null) {
+            assert.match(
+                report.path.map(function (p) { return p.inspect() }),
+                opts.path
+            )
+        }
     }
 
     function test(name, opts) {
@@ -62,8 +68,8 @@ describe("core/reports", function () {
             _.push(R.start(tt._))
             _.push(R.end(tt._))
             return _.check().then(function () {
-                check(_.get(0), {type: "start"})
-                check(_.get(1), {type: "end"})
+                check(_.get(0), {type: "start", path: []})
+                check(_.get(1), {type: "end", path: []})
             })
         },
         expected: [],
@@ -80,13 +86,13 @@ describe("core/reports", function () {
                 _.push(R.pass(tt.reflect.current._, root, 10))
             })
 
-            return tt.run()
+            return tt.runTree()
             .then(function () {
                 _.push(R.end(tt._))
                 return _.check()
             })
             .then(function () {
-                check(_.get(0), {type: "start"})
+                check(_.get(0), {type: "start", path: []})
                 check(_.get(1), {
                     type: "pass",
                     parent: root,
@@ -94,8 +100,9 @@ describe("core/reports", function () {
                     index: 0,
                     duration: 10,
                     fullName: "test",
+                    path: [{name: "test", index: 0}],
                 })
-                check(_.get(2), {type: "end"})
+                check(_.get(2), {type: "end", path: []})
             })
         },
         expected: [
@@ -117,13 +124,13 @@ describe("core/reports", function () {
                 _.push(R.fail(child._, root, 10, error))
             })
 
-            return tt.run()
+            return tt.runTree()
             .then(function () {
                 _.push(R.end(tt._))
                 return _.check()
             })
             .then(function () {
-                check(_.get(0), {type: "start"})
+                check(_.get(0), {type: "start", path: []})
                 check(_.get(1), {
                     type: "fail",
                     parent: root,
@@ -132,8 +139,9 @@ describe("core/reports", function () {
                     error: error,
                     duration: 10,
                     fullName: "test",
+                    path: [{name: "test", index: 0}],
                 })
-                check(_.get(2), {type: "end"})
+                check(_.get(2), {type: "end", path: []})
             })
         },
         expected: [
@@ -152,21 +160,22 @@ describe("core/reports", function () {
                 _.push(R.skip(tt.reflect.current._, root))
             })
 
-            return tt.run()
+            return tt.runTree()
             .then(function () {
                 _.push(R.end(tt._))
                 return _.check()
             })
             .then(function () {
-                check(_.get(0), {type: "start"})
+                check(_.get(0), {type: "start", path: []})
                 check(_.get(1), {
                     type: "skip",
                     parent: root,
                     name: "test",
                     index: 0,
                     fullName: "test",
+                    path: [{name: "test", index: 0}],
                 })
-                check(_.get(2), {type: "end"})
+                check(_.get(2), {type: "end", path: []})
             })
         },
         expected: [
@@ -186,13 +195,13 @@ describe("core/reports", function () {
                 _.push(R.leave(tt.reflect.current._, root))
             })
 
-            return tt.run()
+            return tt.runTree()
             .then(function () {
                 _.push(R.end(tt._))
                 return _.check()
             })
             .then(function () {
-                check(_.get(0), {type: "start"})
+                check(_.get(0), {type: "start", path: []})
                 check(_.get(1), {
                     type: "enter",
                     parent: root,
@@ -200,6 +209,7 @@ describe("core/reports", function () {
                     index: 0,
                     duration: 10,
                     fullName: "test",
+                    path: [{name: "test", index: 0}],
                 })
                 check(_.get(2), {
                     type: "leave",
@@ -207,8 +217,9 @@ describe("core/reports", function () {
                     name: "test",
                     index: 0,
                     fullName: "test",
+                    path: [{name: "test", index: 0}],
                 })
-                check(_.get(3), {type: "end"})
+                check(_.get(3), {type: "end", path: []})
             })
         },
         expected: [
@@ -226,8 +237,8 @@ describe("core/reports", function () {
             _.push(R.error(root, error))
 
             return _.check().then(function () {
-                check(_.get(0), {type: "start"})
-                check(_.get(1), {type: "error", error: error})
+                check(_.get(0), {type: "start", path: []})
+                check(_.get(1), {type: "error", error: error, path: []})
             })
         },
         expected: [
@@ -248,15 +259,16 @@ describe("core/reports", function () {
             _.push(R.end(tt._))
 
             return _.check().then(function () {
-                check(_.get(0), {type: "start"})
+                check(_.get(0), {type: "start", path: []})
                 check(_.get(1), {
                     type: "before all",
                     parent: root,
                     origin: root,
                     error: error,
                     hookName: hookFail.name,
+                    path: [],
                 })
-                check(_.get(2), {type: "end"})
+                check(_.get(2), {type: "end", path: []})
             })
         },
         expected: [
@@ -272,24 +284,35 @@ describe("core/reports", function () {
             var error = new Error("fail")
 
             _.push(root)
-            _.push(R.beforeEach(tt._, root, root, error, hookFail))
-            _.push(R.end(tt._))
+            tt.test("test", function () {
+                _.push(R.beforeEach(tt.reflect.current._, root, root, error,
+                    hookFail))
+            })
 
-            return _.check().then(function () {
-                check(_.get(0), {type: "start"})
+            return tt.runTree()
+            .then(function () {
+                _.push(R.end(tt._))
+                return _.check()
+            })
+            .then(function () {
+                check(_.get(0), {type: "start", path: []})
                 check(_.get(1), {
                     type: "before each",
                     parent: root,
                     origin: root,
+                    name: "test",
+                    index: 0,
                     error: error,
                     hookName: hookFail.name,
+                    fullName: "test",
+                    path: [{name: "test", index: 0}],
                 })
-                check(_.get(2), {type: "end"})
+                check(_.get(2), {type: "end", path: []})
             })
         },
         expected: [
             r.origin(hookFail),
-            r.suiteHook("before each", hookFail, new Error("fail")),
+            r.testHook("test", "before each", hookFail, new Error("fail")),
         ],
     })
 
@@ -302,16 +325,17 @@ describe("core/reports", function () {
             _.push(root)
             tt.test("test", function () {
                 _.push(R.pass(tt.reflect.current._, root, 10))
-                _.push(R.afterEach(tt._, root, root, error, hookFail))
+                _.push(R.afterEach(tt.reflect.current._, root, root, error,
+                    hookFail))
             })
 
-            return tt.run()
+            return tt.runTree()
             .then(function () {
                 _.push(R.end(tt._))
                 return _.check()
             })
             .then(function () {
-                check(_.get(0), {type: "start"})
+                check(_.get(0), {type: "start", path: []})
                 check(_.get(1), {
                     type: "pass",
                     parent: root,
@@ -324,16 +348,19 @@ describe("core/reports", function () {
                     type: "after each",
                     parent: root,
                     origin: root,
+                    name: "test",
+                    index: 0,
                     error: error,
                     hookName: hookFail.name,
+                    fullName: "test",
                 })
-                check(_.get(3), {type: "end"})
+                check(_.get(3), {type: "end", path: []})
             })
         },
         expected: [
             r.origin(hookFail),
             r.pass("test", {duration: 10}),
-            r.suiteHook("after each", hookFail, new Error("fail")),
+            r.testHook("test", "after each", hookFail, new Error("fail")),
         ],
     })
 
@@ -348,7 +375,7 @@ describe("core/reports", function () {
             _.push(R.end(tt._))
 
             return _.check().then(function () {
-                check(_.get(0), {type: "start"})
+                check(_.get(0), {type: "start", path: []})
                 check(_.get(1), {
                     type: "after all",
                     parent: root,
@@ -356,7 +383,7 @@ describe("core/reports", function () {
                     error: error,
                     hookName: hookFail.name,
                 })
-                check(_.get(2), {type: "end"})
+                check(_.get(2), {type: "end", path: []})
             })
         },
         expected: [
@@ -386,13 +413,13 @@ describe("core/reports", function () {
                 })
             })
 
-            return tt.run()
+            return tt.runTree()
             .then(function () {
                 _.push(R.end(tt._))
                 return _.check()
             })
             .then(function () {
-                check(_.get(0), {type: "start"})
+                check(_.get(0), {type: "start", path: []})
                 check(_.get(1), {
                     type: "enter",
                     parent: root,
@@ -416,7 +443,7 @@ describe("core/reports", function () {
                     index: 0,
                     fullName: "test",
                 })
-                check(_.get(4), {type: "end"})
+                check(_.get(4), {type: "end", path: []})
             })
         },
         expected: [
@@ -448,13 +475,13 @@ describe("core/reports", function () {
                 })
             })
 
-            return tt.run()
+            return tt.runTree()
             .then(function () {
                 _.push(R.end(tt._))
                 return _.check()
             })
             .then(function () {
-                check(_.get(0), {type: "start"})
+                check(_.get(0), {type: "start", path: []})
                 check(_.get(1), {
                     type: "enter",
                     parent: root,
@@ -479,7 +506,7 @@ describe("core/reports", function () {
                     index: 0,
                     fullName: "test",
                 })
-                check(_.get(4), {type: "end"})
+                check(_.get(4), {type: "end", path: []})
             })
         },
         expected: [
@@ -510,13 +537,13 @@ describe("core/reports", function () {
                 })
             })
 
-            return tt.run()
+            return tt.runTree()
             .then(function () {
                 _.push(R.end(tt._))
                 return _.check()
             })
             .then(function () {
-                check(_.get(0), {type: "start"})
+                check(_.get(0), {type: "start", path: []})
                 check(_.get(1), {
                     type: "enter",
                     parent: root,
@@ -539,7 +566,7 @@ describe("core/reports", function () {
                     index: 0,
                     fullName: "test",
                 })
-                check(_.get(4), {type: "end"})
+                check(_.get(4), {type: "end", path: []})
             })
         },
         expected: [
@@ -571,13 +598,13 @@ describe("core/reports", function () {
                 })
             })
 
-            return tt.run()
+            return tt.runTree()
             .then(function () {
                 _.push(R.end(tt._))
                 return _.check()
             })
             .then(function () {
-                check(_.get(0), {type: "start"})
+                check(_.get(0), {type: "start", path: []})
                 check(_.get(1), {
                     type: "enter",
                     parent: root,
@@ -608,7 +635,7 @@ describe("core/reports", function () {
                     index: 0,
                     fullName: "test",
                 })
-                check(_.get(5), {type: "end"})
+                check(_.get(5), {type: "end", path: []})
             })
         },
         expected: [
@@ -637,10 +664,10 @@ describe("core/reports", function () {
                 })
             })
 
-            return tt.run()
+            return tt.runTree()
             .then(function () { return _.check() })
             .then(function () {
-                check(_.get(0), {type: "start"})
+                check(_.get(0), {type: "start", path: []})
                 check(_.get(1), {
                     type: "enter",
                     parent: root,
@@ -676,13 +703,13 @@ describe("core/reports", function () {
                 _.push(R.leave(tt.reflect.current._, root))
             })
 
-            return tt.run()
+            return tt.runTree()
             .then(function () {
                 _.push(R.end(tt._))
                 return _.check()
             })
             .then(function () {
-                check(_.get(0), {type: "start"})
+                check(_.get(0), {type: "start", path: []})
                 check(_.get(1), {
                     type: "enter",
                     parent: root,
@@ -708,7 +735,7 @@ describe("core/reports", function () {
                     index: 0,
                     fullName: "test",
                 })
-                check(_.get(4), {type: "end"})
+                check(_.get(4), {type: "end", path: []})
             })
         },
         expected: [
@@ -739,13 +766,13 @@ describe("core/reports", function () {
                 })
             })
 
-            return tt.run()
+            return tt.runTree()
             .then(function () {
                 _.push(R.end(tt._))
                 return _.check()
             })
             .then(function () {
-                check(_.get(0), {type: "start"})
+                check(_.get(0), {type: "start", path: []})
                 check(_.get(1), {
                     type: "enter",
                     parent: root,
@@ -771,13 +798,13 @@ describe("core/reports", function () {
                     index: 0,
                     fullName: "test",
                 })
-                check(_.get(4), {type: "end"})
+                check(_.get(4), {type: "end", path: []})
             })
         },
         expected: [
             r.origin(hookFail),
             r.suite("test", {duration: 10}, [
-                r.suiteHook("before each", hookFail, new Error("fail")),
+                r.testHook("inner", "before each", hookFail, new Error("fail")),
             ]),
         ],
     })
@@ -803,13 +830,13 @@ describe("core/reports", function () {
                 })
             })
 
-            return tt.run()
+            return tt.runTree()
             .then(function () {
                 _.push(R.end(tt._))
                 return _.check()
             })
             .then(function () {
-                check(_.get(0), {type: "start"})
+                check(_.get(0), {type: "start", path: []})
                 check(_.get(1), {
                     type: "enter",
                     parent: root,
@@ -842,7 +869,7 @@ describe("core/reports", function () {
                     index: 0,
                     fullName: "test",
                 })
-                check(_.get(5), {type: "end"})
+                check(_.get(5), {type: "end", path: []})
             })
         },
         expected: [
@@ -876,13 +903,13 @@ describe("core/reports", function () {
                 })
             })
 
-            return tt.run()
+            return tt.runTree()
             .then(function () {
                 _.push(R.end(tt._))
                 return _.check()
             })
             .then(function () {
-                check(_.get(0), {type: "start"})
+                check(_.get(0), {type: "start", path: []})
                 check(_.get(1), {
                     type: "enter",
                     parent: root,
@@ -915,7 +942,7 @@ describe("core/reports", function () {
                     index: 0,
                     fullName: "test",
                 })
-                check(_.get(5), {type: "end"})
+                check(_.get(5), {type: "end", path: []})
             })
         },
         expected: [

@@ -18,8 +18,13 @@ function getPath(report) {
     return path.reverse()
 }
 
-function convertHook(report, stage) {
+function convertAllHook(report, stage) {
     return Reports.hook(stage, getPath(report.parent), getPath(report.origin),
+        {name: report.hookName}, report.error)
+}
+
+function convertEachHook(report, stage) {
+    return Reports.hook(stage, getPath(report), getPath(report.origin),
         {name: report.hookName}, report.error)
 }
 
@@ -58,23 +63,19 @@ var convert = {
     },
 
     "before all": function (report) {
-        return convertHook(report, Reports.Types.BeforeAll)
+        return convertAllHook(report, Reports.Types.BeforeAll)
     },
 
     "before each": function (report) {
-        return convertHook(report, Reports.Types.BeforeEach)
+        return convertEachHook(report, Reports.Types.BeforeEach)
     },
 
     "after each": function (report) {
-        return Reports.hook(Reports.Types.AfterEach,
-            getPath(report.parent.parent == null ? report.parent : report),
-            getPath(report.origin),
-            {name: report.hookName},
-            report.error)
+        return convertEachHook(report, Reports.Types.AfterEach)
     },
 
     "after all": function (report) {
-        return convertHook(report, Reports.Types.AfterAll)
+        return convertAllHook(report, Reports.Types.AfterAll)
     },
 }
 
@@ -270,6 +271,7 @@ function checkReport(ret, report, sanitize) {
     return report
 }
 
+exports.walk = walk
 function walk(tree, func) {
     var r = new Renderer()
 
@@ -423,7 +425,7 @@ function checkTree(opts) {
         // Don't print anything.
         tt.reporter = function () {}
         opts.init(tt, opts)
-        return tt.run(opts.opts)
+        return tt.runTree(opts.opts)
     }
 
     var state = new Check(opts, tt)

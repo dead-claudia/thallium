@@ -4,6 +4,7 @@
 describe("reporter/tap", function () { // eslint-disable-line max-statements
     "use strict"
 
+    // FIXME: Update to new report type
     var p = t.internal.location
     var n = t.internal.reports
 

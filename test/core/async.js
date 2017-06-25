@@ -6,7 +6,7 @@ describe("core/async", function () {
     function test(name, opts) {
         it(name, function () {
             var called = false
-            var ret = r.check({
+            var ret = r.checkTree({
                 init: function (tt) {
                     opts.init(tt, function () { called = true })
                 },

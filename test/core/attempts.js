@@ -14,7 +14,7 @@ describe("core/attempts", function () {
         }}
     }
 
-    r.test("succeeds with own immediate", {
+    r.testTree("succeeds with own immediate", {
         attempts: 3,
         init: function (tt, ctx) {
             tt.test("test", function () {
@@ -27,7 +27,7 @@ describe("core/attempts", function () {
         ],
     })
 
-    r.test("succeeds with own deferred", {
+    r.testTree("succeeds with own deferred", {
         attempts: 3,
         init: function (tt, ctx) {
             tt.test("test", function () {
@@ -40,7 +40,7 @@ describe("core/attempts", function () {
         ],
     })
 
-    r.test("fails with own immediate", {
+    r.testTree("fails with own immediate", {
         attempts: 5,
         init: function (tt, ctx) {
             tt.test("test", function () {
@@ -53,7 +53,7 @@ describe("core/attempts", function () {
         ],
     })
 
-    r.test("fails with own deferred", {
+    r.testTree("fails with own deferred", {
         attempts: 5,
         init: function (tt, ctx) {
             tt.test("test", function () {
@@ -66,7 +66,7 @@ describe("core/attempts", function () {
         ],
     })
 
-    r.test("succeeds with inherited", {
+    r.testTree("succeeds with inherited", {
         attempts: 3,
         init: function (tt, ctx) {
             tt.test("test", function () {
@@ -81,7 +81,7 @@ describe("core/attempts", function () {
         ],
     })
 
-    r.test("fails with inherited", {
+    r.testTree("fails with inherited", {
         attempts: 5,
         init: function (tt, ctx) {
             tt.test("test", function () {
@@ -96,7 +96,7 @@ describe("core/attempts", function () {
         ],
     })
 
-    r.test("gets own attempts", {
+    r.testTree("gets own attempts", {
         init: function (tt, ctx) {
             tt.test("test", function () {
                 tt.attempts = 5
@@ -108,7 +108,7 @@ describe("core/attempts", function () {
         },
     })
 
-    r.test("gets inherited attempts", {
+    r.testTree("gets inherited attempts", {
         init: function (tt, ctx) {
             tt.test("test", function () {
                 tt.attempts = 5
@@ -123,7 +123,7 @@ describe("core/attempts", function () {
         },
     })
 
-    r.test("gets default attempts", {
+    r.testTree("gets default attempts", {
         init: function (tt, ctx) {
             tt.test("test", function () {
                 ctx.active = tt.reflect.attempts

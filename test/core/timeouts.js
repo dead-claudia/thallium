@@ -24,7 +24,7 @@ describe("core/timeouts (FLAKE)", /** @this */ function () {
         }
     }
 
-    r.test("succeeds with own", {
+    r.testTree("succeeds with own", {
         init: function (tt) {
             tt.test("test", function () {
                 // It's highly unlikely the engine will take this long to finish
@@ -37,7 +37,7 @@ describe("core/timeouts (FLAKE)", /** @this */ function () {
         ],
     })
 
-    r.test("fails with own", {
+    r.testTree("fails with own", {
         init: function (tt) {
             tt.test("test", function () {
                 tt.timeout = 50
@@ -50,7 +50,7 @@ describe("core/timeouts (FLAKE)", /** @this */ function () {
         ],
     })
 
-    r.test("succeeds with inherited", {
+    r.testTree("succeeds with inherited", {
         init: function (tt) {
             tt.test("test", function () {
                 tt.timeout = 50
@@ -64,7 +64,7 @@ describe("core/timeouts (FLAKE)", /** @this */ function () {
         ],
     })
 
-    r.test("fails with inherited", {
+    r.testTree("fails with inherited", {
         init: function (tt) {
             tt.test("test", function () {
                 tt.timeout = 50
@@ -79,7 +79,7 @@ describe("core/timeouts (FLAKE)", /** @this */ function () {
         ],
     })
 
-    r.test("gets own timeout", {
+    r.testTree("gets own timeout", {
         init: function (tt, ctx) {
             tt.test("test", function () {
                 tt.timeout = 50
@@ -91,7 +91,7 @@ describe("core/timeouts (FLAKE)", /** @this */ function () {
         },
     })
 
-    r.test("gets inherited timeout", {
+    r.testTree("gets inherited timeout", {
         init: function (tt, ctx) {
             tt.test("test", function () {
                 tt.timeout = 50
@@ -105,7 +105,7 @@ describe("core/timeouts (FLAKE)", /** @this */ function () {
         },
     })
 
-    r.test("gets default timeout", {
+    r.testTree("gets default timeout", {
         init: function (tt, ctx) {
             tt.test("test", function () {
                 ctx.active = tt.reflect.timeout

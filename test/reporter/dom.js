@@ -1,11 +1,10 @@
 /* eslint max-nested-callbacks: [2, 5] */
 // Note: the reports *must* be well formed. The reporter assumes the reports are
 // correct, and it will *not* verify this.
-
-// Skipped because it hasn't been finished yet.
 describe("reporter/dom", function () { // eslint-disable-line max-statements
     "use strict"
 
+    // FIXME: Update to new report type
     var p = t.internal.location
     var n = t.internal.reports
 

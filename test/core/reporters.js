@@ -35,7 +35,7 @@ describe("core/reporters", function () { // eslint-disable-line max-statements
                 assert.equal(tt.hasReporter, true)
                 tt.test("test 1", function () {})
                 tt.test("test 2", function () {})
-                return tt.run().then(_.check.bind(_))
+                return tt.runTree().then(_.check.bind(_))
             })
         })
 
@@ -73,7 +73,7 @@ describe("core/reporters", function () { // eslint-disable-line max-statements
                 tt.test("test 1", function () {})
                 tt.test("test 2", function () {})
 
-                return tt.run()
+                return tt.runTree()
                 .then(_1.check.bind(_1))
                 .then(_2.check.bind(_2))
                 .then(_3.check.bind(_3))
@@ -182,7 +182,7 @@ describe("core/reporters", function () { // eslint-disable-line max-statements
 
                 tt.test("test 1", function () {})
                 tt.test("test 2", function () {})
-                return tt.run()
+                return tt.runTree()
                 .then(_1.check.bind(_1))
                 .then(_2.check.bind(_2))
                 .then(_3.check.bind(_3))
@@ -406,7 +406,7 @@ describe("core/reporters", function () { // eslint-disable-line max-statements
             }
 
             tt.test("test", function () {
-                tt.run()
+                tt.runTree()
             })
         },
         after: function () {
@@ -492,7 +492,7 @@ describe("core/reporters", function () { // eslint-disable-line max-statements
             tt.test("test", function () {})
             tt.test("test", function () {})
 
-            return tt.run().then(_.check.bind(_))
+            return tt.runTree().then(_.check.bind(_))
         })
     })
 
@@ -507,7 +507,7 @@ describe("core/reporters", function () { // eslint-disable-line max-statements
         tt.test("test", function () {})
         tt.test("test", function () {})
 
-        return tt.run().then(
+        return tt.runTree().then(
             function () { assert.fail("Expected a rejection") },
             function (err) { assert.equal(err, sentinel) })
     })
@@ -522,7 +522,7 @@ describe("core/reporters", function () { // eslint-disable-line max-statements
             if (report.isStart) throw sentinel
         }
 
-        return tt.run().then(
+        return tt.runTree().then(
             function () { assert.fail("Expected a rejection") },
             function (rejected) {
                 assert.equal(rejected, sentinel)
@@ -545,7 +545,7 @@ describe("core/reporters", function () { // eslint-disable-line max-statements
             tt._.root = undefined
         })
 
-        return tt.run().then(
+        return tt.runTree().then(
             function () { assert.fail("Expected a rejection") },
             function (rejected) {
                 assert.is(Error, rejected)

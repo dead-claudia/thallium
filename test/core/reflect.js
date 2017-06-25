@@ -21,7 +21,7 @@ describe("core/reflect", function () {
                 found = tt.reflect.current
             })
 
-            return tt.run().then(function () {
+            return tt.runTree().then(function () {
                 assert.equal(found, inner)
             })
         })
@@ -85,7 +85,7 @@ describe("core/reflect", function () {
 
                 // Don't print anything
                 tt.reporter = function () {}
-                return tt.run().then(function () {
+                return tt.runTree().then(function () {
                     assert.equal(called, 0)
                 })
             })
@@ -99,7 +99,7 @@ describe("core/reflect", function () {
 
                 // Don't print anything
                 tt.reporter = function () {}
-                return tt.run().then(function () {
+                return tt.runTree().then(function () {
                     assert.equal(called, 1)
                 })
             })
@@ -114,7 +114,7 @@ describe("core/reflect", function () {
 
                 // Don't print anything
                 tt.reporter = function () {}
-                return tt.run().then(function () {
+                return tt.runTree().then(function () {
                     assert.equal(called, 1)
                 })
             })
@@ -130,7 +130,7 @@ describe("core/reflect", function () {
 
                 // Don't print anything
                 tt.reporter = function () {}
-                return tt.run().then(function () {
+                return tt.runTree().then(function () {
                     assert.equal(called, 1)
                 })
             })
@@ -146,7 +146,7 @@ describe("core/reflect", function () {
 
                 // Don't print anything
                 tt.reporter = function () {}
-                return tt.run().then(function () {
+                return tt.runTree().then(function () {
                     assert.equal(called, 1)
                 })
             })
@@ -163,7 +163,7 @@ describe("core/reflect", function () {
 
                 // Don't print anything
                 tt.reporter = function () {}
-                return tt.run().then(function () {
+                return tt.runTree().then(function () {
                     assert.match(queue, ["root", "inner"])
                 })
             })
@@ -178,7 +178,7 @@ describe("core/reflect", function () {
 
                 // Don't print anything
                 tt.reporter = function () {}
-                return tt.run().then(function () {
+                return tt.runTree().then(function () {
                     assert.equal(called, 0)
                 })
             })
@@ -192,7 +192,7 @@ describe("core/reflect", function () {
 
                 // Don't print anything
                 tt.reporter = function () {}
-                return tt.run().then(function () {
+                return tt.runTree().then(function () {
                     assert.equal(called, 1)
                 })
             })
@@ -207,7 +207,7 @@ describe("core/reflect", function () {
 
                 // Don't print anything
                 tt.reporter = function () {}
-                return tt.run().then(function () {
+                return tt.runTree().then(function () {
                     assert.equal(called, 2)
                 })
             })
@@ -223,7 +223,7 @@ describe("core/reflect", function () {
 
                 // Don't print anything
                 tt.reporter = function () {}
-                return tt.run().then(function () {
+                return tt.runTree().then(function () {
                     assert.equal(called, 2)
                 })
             })
@@ -239,7 +239,7 @@ describe("core/reflect", function () {
 
                 // Don't print anything
                 tt.reporter = function () {}
-                return tt.run().then(function () {
+                return tt.runTree().then(function () {
                     assert.equal(called, 1)
                 })
             })
@@ -256,7 +256,7 @@ describe("core/reflect", function () {
 
                 // Don't print anything
                 tt.reporter = function () {}
-                return tt.run().then(function () {
+                return tt.runTree().then(function () {
                     assert.match(queue, ["root", "root", "inner"])
                 })
             })
@@ -271,7 +271,7 @@ describe("core/reflect", function () {
 
                 // Don't print anything
                 tt.reporter = function () {}
-                return tt.run().then(function () {
+                return tt.runTree().then(function () {
                     assert.equal(called, 0)
                 })
             })
@@ -285,7 +285,7 @@ describe("core/reflect", function () {
 
                 // Don't print anything
                 tt.reporter = function () {}
-                return tt.run().then(function () {
+                return tt.runTree().then(function () {
                     assert.equal(called, 1)
                 })
             })
@@ -300,7 +300,7 @@ describe("core/reflect", function () {
 
                 // Don't print anything
                 tt.reporter = function () {}
-                return tt.run().then(function () {
+                return tt.runTree().then(function () {
                     assert.equal(called, 2)
                 })
             })
@@ -316,7 +316,7 @@ describe("core/reflect", function () {
 
                 // Don't print anything
                 tt.reporter = function () {}
-                return tt.run().then(function () {
+                return tt.runTree().then(function () {
                     assert.equal(called, 2)
                 })
             })
@@ -332,7 +332,7 @@ describe("core/reflect", function () {
 
                 // Don't print anything
                 tt.reporter = function () {}
-                return tt.run().then(function () {
+                return tt.runTree().then(function () {
                     assert.equal(called, 1)
                 })
             })
@@ -349,7 +349,7 @@ describe("core/reflect", function () {
 
                 // Don't print anything
                 tt.reporter = function () {}
-                return tt.run().then(function () {
+                return tt.runTree().then(function () {
                     assert.match(queue, ["inner", "root", "root"])
                 })
             })
@@ -364,7 +364,7 @@ describe("core/reflect", function () {
 
                 // Don't print anything
                 tt.reporter = function () {}
-                return tt.run().then(function () {
+                return tt.runTree().then(function () {
                     assert.equal(called, 0)
                 })
             })
@@ -378,7 +378,7 @@ describe("core/reflect", function () {
 
                 // Don't print anything
                 tt.reporter = function () {}
-                return tt.run().then(function () {
+                return tt.runTree().then(function () {
                     assert.equal(called, 1)
                 })
             })
@@ -393,7 +393,7 @@ describe("core/reflect", function () {
 
                 // Don't print anything
                 tt.reporter = function () {}
-                return tt.run().then(function () {
+                return tt.runTree().then(function () {
                     assert.equal(called, 1)
                 })
             })
@@ -409,7 +409,7 @@ describe("core/reflect", function () {
 
                 // Don't print anything
                 tt.reporter = function () {}
-                return tt.run().then(function () {
+                return tt.runTree().then(function () {
                     assert.equal(called, 1)
                 })
             })
@@ -425,7 +425,7 @@ describe("core/reflect", function () {
 
                 // Don't print anything
                 tt.reporter = function () {}
-                return tt.run().then(function () {
+                return tt.runTree().then(function () {
                     assert.equal(called, 1)
                 })
             })
@@ -442,7 +442,7 @@ describe("core/reflect", function () {
 
                 // Don't print anything
                 tt.reporter = function () {}
-                return tt.run().then(function () {
+                return tt.runTree().then(function () {
                     assert.match(queue, ["inner", "root"])
                 })
             })
@@ -460,7 +460,7 @@ describe("core/reflect", function () {
 
                 // Don't print anything
                 tt.reporter = function () {}
-                return tt.run().then(function () {
+                return tt.runTree().then(function () {
                     assert.match(queue, [])
                 })
             })
@@ -477,7 +477,7 @@ describe("core/reflect", function () {
 
                 // Don't print anything
                 tt.reporter = function () {}
-                return tt.run().then(function () {
+                return tt.runTree().then(function () {
                     assert.match(queue, [
                         "before all",
                         "before each",
@@ -500,7 +500,7 @@ describe("core/reflect", function () {
 
                 // Don't print anything
                 tt.reporter = function () {}
-                return tt.run().then(function () {
+                return tt.runTree().then(function () {
                     assert.match(queue, [
                         "before all",
                         "before each",
@@ -526,7 +526,7 @@ describe("core/reflect", function () {
 
                 // Don't print anything
                 tt.reporter = function () {}
-                return tt.run().then(function () {
+                return tt.runTree().then(function () {
                     assert.match(queue, [
                         "before all",
                         "before each",
@@ -552,7 +552,7 @@ describe("core/reflect", function () {
 
                 // Don't print anything
                 tt.reporter = function () {}
-                return tt.run().then(function () {
+                return tt.runTree().then(function () {
                     assert.match(queue, [
                         "before all",
                         "before each",
@@ -580,7 +580,7 @@ describe("core/reflect", function () {
 
                 // Don't print anything
                 tt.reporter = function () {}
-                return tt.run().then(function () {
+                return tt.runTree().then(function () {
                     assert.match(queue, [
                         "root before all",
                         "root before each",

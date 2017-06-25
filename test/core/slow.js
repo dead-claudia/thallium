@@ -42,7 +42,7 @@ describe("core/slow (FLAKE)", /** @this */ function () {
         }
     }
 
-    r.test("succeeds with own", {
+    r.testTree("succeeds with own", {
         each: function (report) {
             if (!report.isPass) return
             this.duration = report.duration
@@ -63,7 +63,7 @@ describe("core/slow (FLAKE)", /** @this */ function () {
         },
     })
 
-    r.test("hits middle with own", {
+    r.testTree("hits middle with own", {
         each: function (report) {
             if (!report.isPass) return
             this.duration = report.duration
@@ -84,7 +84,7 @@ describe("core/slow (FLAKE)", /** @this */ function () {
         },
     })
 
-    r.test("fails with own", {
+    r.testTree("fails with own", {
         each: function (report) {
             if (!report.isPass) return
             this.duration = report.duration
@@ -105,7 +105,7 @@ describe("core/slow (FLAKE)", /** @this */ function () {
         },
     })
 
-    r.test("succeeds with inherited", {
+    r.testTree("succeeds with inherited", {
         each: function (report) {
             if (!report.isPass && !report.isEnter) return
             this.duration = report.duration
@@ -132,7 +132,7 @@ describe("core/slow (FLAKE)", /** @this */ function () {
         },
     })
 
-    r.test("fails with inherited", {
+    r.testTree("fails with inherited", {
         each: function (report) {
             if (!report.isPass && !report.isEnter) return
             assert.equal(report.slow, 50)
@@ -159,7 +159,7 @@ describe("core/slow (FLAKE)", /** @this */ function () {
         },
     })
 
-    r.test("gets own slow", {
+    r.testTree("gets own slow", {
         init: function (tt, ctx) {
             tt.test("test", function () {
                 tt.slow = 50
@@ -171,7 +171,7 @@ describe("core/slow (FLAKE)", /** @this */ function () {
         },
     })
 
-    r.test("gets inherited slow", {
+    r.testTree("gets inherited slow", {
         init: function (tt, ctx) {
             tt.test("test", function () {
                 tt.slow = 50
@@ -185,7 +185,7 @@ describe("core/slow (FLAKE)", /** @this */ function () {
         },
     })
 
-    r.test("gets default slow", {
+    r.testTree("gets default slow", {
         init: function (tt, ctx) {
             tt.test("test", function () {
                 ctx.active = tt.reflect.slow

@@ -4,9 +4,8 @@
 describe("reporter/spec", function () {
     "use strict"
 
+    var r = Util.report
     var c = Util.R.color
-    var p = t.internal.location
-    var n = t.internal.reports
     var Console = Util.R.Console
 
     it("validates no arguments", function () {
@@ -54,7 +53,14 @@ describe("reporter/spec", function () {
                     reset: function () {},
                 })
 
-                return Util.peach(opts.input, reporter).then(function () {
+                if (opts.repeat) opts.output = opts.output.concat(opts.output)
+
+                return r.walk(opts.input, reporter)
+                .then(function () {
+                    if (!opts.repeat) return undefined
+                    return r.walk(opts.input, reporter)
+                })
+                .then(function () {
                     assert.match(list, opts.output)
                 })
             })
@@ -79,10 +85,7 @@ describe("reporter/spec", function () {
         // So I can verify colors are enabled.
         if (envColors || reporterColors) {
             test("empty test", {
-                input: [
-                    n.start(),
-                    n.end(),
-                ],
+                input: [],
                 output: [
                     "",
                     c("plain", "  0 tests") + time("0ms"),
@@ -91,10 +94,7 @@ describe("reporter/spec", function () {
             })
         } else {
             test("empty test", {
-                input: [
-                    n.start(),
-                    n.end(),
-                ],
+                input: [],
                 output: [
                     "",
                     "  0 tests (0ms)",
@@ -105,10 +105,8 @@ describe("reporter/spec", function () {
 
         test("pass 2", {
             input: [
-                n.start(),
-                n.pass([p("test", 0)]),
-                n.pass([p("test", 1)]),
-                n.end(),
+                r.pass("test"),
+                r.pass("test"),
             ],
             output: [
                 "",
@@ -124,10 +122,8 @@ describe("reporter/spec", function () {
 
         test("fail 2 with Error", {
             input: [
-                n.start(),
-                n.fail([p("one", 0)], sentinel),
-                n.fail([p("two", 1)], sentinel),
-                n.end(),
+                r.fail("one", sentinel),
+                r.fail("two", sentinel),
             ],
             output: [].concat([
                 "",
@@ -149,10 +145,8 @@ describe("reporter/spec", function () {
 
         test("pass + fail with Error", {
             input: [
-                n.start(),
-                n.pass([p("one", 0)]),
-                n.fail([p("two", 1)], sentinel),
-                n.end(),
+                r.pass("one"),
+                r.fail("two", sentinel),
             ],
             output: [].concat([
                 "",
@@ -171,10 +165,8 @@ describe("reporter/spec", function () {
 
         test("fail with Error + pass", {
             input: [
-                n.start(),
-                n.fail([p("one", 0)], sentinel),
-                n.pass([p("two", 1)]),
-                n.end(),
+                r.fail("one", sentinel),
+                r.pass("two"),
             ],
             output: [].concat([
                 "",
@@ -196,10 +188,8 @@ describe("reporter/spec", function () {
 
         test("fail 2 with AssertionError", {
             input: [
-                n.start(),
-                n.fail([p("one", 0)], assertion),
-                n.fail([p("two", 1)], assertion),
-                n.end(),
+                r.fail("one", assertion),
+                r.fail("two", assertion),
             ],
             output: [].concat([
                 "",
@@ -235,10 +225,8 @@ describe("reporter/spec", function () {
 
         test("pass + fail with AssertionError", {
             input: [
-                n.start(),
-                n.pass([p("one", 0)]),
-                n.fail([p("two", 1)], assertion),
-                n.end(),
+                r.pass("one"),
+                r.fail("two", assertion),
             ],
             output: [].concat([
                 "",
@@ -264,10 +252,8 @@ describe("reporter/spec", function () {
 
         test("fail with AssertionError + pass", {
             input: [
-                n.start(),
-                n.fail([p("one", 0)], assertion),
-                n.pass([p("two", 1)]),
-                n.end(),
+                r.fail("one", assertion),
+                r.pass("two"),
             ],
             output: [].concat([
                 "",
@@ -293,10 +279,8 @@ describe("reporter/spec", function () {
 
         test("skip 2", {
             input: [
-                n.start(),
-                n.skip([p("one", 0)]),
-                n.skip([p("two", 1)]),
-                n.end(),
+                r.skip("one"),
+                r.skip("two"),
             ],
             output: [
                 "",
@@ -310,10 +294,8 @@ describe("reporter/spec", function () {
 
         test("pass + skip", {
             input: [
-                n.start(),
-                n.pass([p("one", 0)]),
-                n.skip([p("two", 1)]),
-                n.end(),
+                r.pass("one"),
+                r.skip("two"),
             ],
             output: [
                 "",
@@ -328,10 +310,8 @@ describe("reporter/spec", function () {
 
         test("skip + pass", {
             input: [
-                n.start(),
-                n.skip([p("one", 0)]),
-                n.pass([p("two", 1)]),
-                n.end(),
+                r.skip("one"),
+                r.pass("two"),
             ],
             output: [
                 "",
@@ -346,10 +326,8 @@ describe("reporter/spec", function () {
 
         test("fail + skip", {
             input: [
-                n.start(),
-                n.fail([p("one", 0)], sentinel),
-                n.skip([p("two", 1)]),
-                n.end(),
+                r.fail("one", sentinel),
+                r.skip("two"),
             ],
             output: [].concat([
                 "",
@@ -368,10 +346,8 @@ describe("reporter/spec", function () {
 
         test("skip + fail", {
             input: [
-                n.start(),
-                n.skip([p("one", 0)]),
-                n.fail([p("two", 1)], sentinel),
-                n.end(),
+                r.skip("one"),
+                r.fail("two", sentinel),
             ],
             output: [].concat([
                 "",
@@ -392,11 +368,12 @@ describe("reporter/spec", function () {
 
         test("internal errors", {
             input: [
-                n.start(),
-                n.enter([p("test", 0)]),
-                n.enter([p("test", 0), p("inner", 0)]),
-                n.fail([p("test", 0), p("inner", 0), p("fail", 0)], badType),
-                n.error(badType),
+                r.suite("test", [
+                    r.suite("inner", [
+                        r.fail("fail", badType),
+                        r.error(badType),
+                    ]),
+                ]),
             ],
             output: [].concat([
                 "",
@@ -411,62 +388,60 @@ describe("reporter/spec", function () {
             /* eslint-disable max-len */
 
             input: [
-                n.start(),
-                n.enter([p("core (basic)", 0)]),
-                n.pass([p("core (basic)", 0), p("has `base()`", 0)]),
-                n.pass([p("core (basic)", 0), p("has `test()`", 1)]),
-                n.pass([p("core (basic)", 0), p("has `parent()`", 2)]),
-                n.pass([p("core (basic)", 0), p("can accept a string + function", 3)]),
-                n.pass([p("core (basic)", 0), p("can accept a string", 4)]),
-                n.pass([p("core (basic)", 0), p("returns the current instance when given a callback", 5)]),
-                n.pass([p("core (basic)", 0), p("returns a prototypal clone when not given a callback", 6)]),
-                n.pass([p("core (basic)", 0), p("runs block tests within tests", 7)]),
-                n.pass([p("core (basic)", 0), p("runs successful inline tests within tests", 8)]),
-                n.pass([p("core (basic)", 0), p("accepts a callback with `run()`", 9)]),
-                n.leave([p("core (basic)", 0)]),
-                n.enter([p("cli normalize glob", 1)]),
-                n.enter([p("cli normalize glob", 1), p("current directory", 0)]),
-                n.pass([p("cli normalize glob", 1), p("current directory", 0), p("normalizes a file", 0)]),
-                n.pass([p("cli normalize glob", 1), p("current directory", 0), p("normalizes a glob", 1)]),
-                n.pass([p("cli normalize glob", 1), p("current directory", 0), p("retains trailing slashes", 2)]),
-                n.pass([p("cli normalize glob", 1), p("current directory", 0), p("retains negative", 3)]),
-                n.pass([p("cli normalize glob", 1), p("current directory", 0), p("retains negative + trailing slashes", 4)]),
-                n.leave([p("cli normalize glob", 1), p("current directory", 0)]),
-                n.enter([p("cli normalize glob", 1), p("absolute directory", 1)]),
-                n.pass([p("cli normalize glob", 1), p("absolute directory", 1), p("normalizes a file", 0)]),
-                n.pass([p("cli normalize glob", 1), p("absolute directory", 1), p("normalizes a glob", 1)]),
-                n.pass([p("cli normalize glob", 1), p("absolute directory", 1), p("retains trailing slashes", 2)]),
-                n.pass([p("cli normalize glob", 1), p("absolute directory", 1), p("retains negative", 3)]),
-                n.pass([p("cli normalize glob", 1), p("absolute directory", 1), p("retains negative + trailing slashes", 4)]),
-                n.leave([p("cli normalize glob", 1), p("absolute directory", 1)]),
-                n.enter([p("cli normalize glob", 1), p("relative directory", 2)]),
-                n.pass([p("cli normalize glob", 1), p("relative directory", 2), p("normalizes a file", 0)]),
-                n.pass([p("cli normalize glob", 1), p("relative directory", 2), p("normalizes a glob", 1)]),
-                n.pass([p("cli normalize glob", 1), p("relative directory", 2), p("retains trailing slashes", 2)]),
-                n.pass([p("cli normalize glob", 1), p("relative directory", 2), p("retains negative", 3)]),
-                n.pass([p("cli normalize glob", 1), p("relative directory", 2), p("retains negative + trailing slashes", 4)]),
-                n.leave([p("cli normalize glob", 1), p("relative directory", 2)]),
-                n.enter([p("cli normalize glob", 1), p("edge cases", 3)]),
-                n.pass([p("cli normalize glob", 1), p("edge cases", 3), p("normalizes `.` with a cwd of `.`", 0)]),
-                n.pass([p("cli normalize glob", 1), p("edge cases", 3), p("normalizes `..` with a cwd of `.`", 1)]),
-                n.pass([p("cli normalize glob", 1), p("edge cases", 3), p("normalizes `.` with a cwd of `..`", 2)]),
-                n.pass([p("cli normalize glob", 1), p("edge cases", 3), p("normalizes directories with a cwd of `..`", 3)]),
-                n.pass([p("cli normalize glob", 1), p("edge cases", 3), p("removes excess `.`", 4)]),
-                n.pass([p("cli normalize glob", 1), p("edge cases", 3), p("removes excess `..`", 5)]),
-                n.pass([p("cli normalize glob", 1), p("edge cases", 3), p("removes excess combined junk", 6)]),
-                n.leave([p("cli normalize glob", 1), p("edge cases", 3)]),
-                n.leave([p("cli normalize glob", 1)]),
-                n.enter([p("core (timeouts)", 2)]),
-                n.pass([p("core (timeouts)", 2), p("succeeds with own", 0)]),
-                n.pass([p("core (timeouts)", 2), p("fails with own", 1)]),
-                n.pass([p("core (timeouts)", 2), p("succeeds with inherited", 2)]),
-                n.pass([p("core (timeouts)", 2), p("fails with inherited", 3)]),
-                n.pass([p("core (timeouts)", 2), p("gets own set timeout", 4)]),
-                n.pass([p("core (timeouts)", 2), p("gets own inline set timeout", 5)]),
-                n.pass([p("core (timeouts)", 2), p("gets own sync inner timeout", 6)]),
-                n.pass([p("core (timeouts)", 2), p("gets default timeout", 7)]),
-                n.leave([p("core (timeouts)", 2)]),
-                n.end(),
+                r.suite("core (basic)", [
+                    r.pass("has `base()`"),
+                    r.pass("has `test()`"),
+                    r.pass("has `parent()`"),
+                    r.pass("can accept a string + function"),
+                    r.pass("can accept a string"),
+                    r.pass("returns the current instance when given a callback"),
+                    r.pass("returns a prototypal clone when not given a callback"),
+                    r.pass("runs block tests within tests"),
+                    r.pass("runs successful inline tests within tests"),
+                    r.pass("accepts a callback with `run()`"),
+                ]),
+                r.suite("cli normalize glob", [
+                    r.suite("current directory", [
+                        r.pass("normalizes a file"),
+                        r.pass("normalizes a glob"),
+                        r.pass("retains trailing slashes"),
+                        r.pass("retains negative"),
+                        r.pass("retains negative + trailing slashes"),
+                    ]),
+                    r.suite("absolute directory", [
+                        r.pass("normalizes a file"),
+                        r.pass("normalizes a glob"),
+                        r.pass("retains trailing slashes"),
+                        r.pass("retains negative"),
+                        r.pass("retains negative + trailing slashes"),
+                    ]),
+                    r.suite("relative directory", [
+                        r.pass("normalizes a file"),
+                        r.pass("normalizes a glob"),
+                        r.pass("retains trailing slashes"),
+                        r.pass("retains negative"),
+                        r.pass("retains negative + trailing slashes"),
+                    ]),
+                    r.suite("edge cases", [
+                        r.pass("normalizes `.` with a cwd of `.`"),
+                        r.pass("normalizes `..` with a cwd of `.`"),
+                        r.pass("normalizes `.` with a cwd of `..`"),
+                        r.pass("normalizes directories with a cwd of `..`"),
+                        r.pass("removes excess `.`"),
+                        r.pass("removes excess `..`"),
+                        r.pass("removes excess combined junk"),
+                    ]),
+                ]),
+                r.suite("core (timeouts)", [
+                    r.pass("succeeds with own"),
+                    r.pass("fails with own"),
+                    r.pass("succeeds with inherited"),
+                    r.pass("fails with inherited"),
+                    r.pass("gets own set timeout"),
+                    r.pass("gets own inline set timeout"),
+                    r.pass("gets own sync inner timeout"),
+                    r.pass("gets default timeout"),
+                ]),
             ],
 
             output: [
@@ -535,62 +510,60 @@ describe("reporter/spec", function () {
             /* eslint-disable max-len */
 
             input: [
-                n.start(),
-                n.enter([p("core (basic)", 0)]),
-                n.pass([p("core (basic)", 0), p("has `base()`", 0)]),
-                n.pass([p("core (basic)", 0), p("has `test()`", 1)]),
-                n.pass([p("core (basic)", 0), p("has `parent()`", 2)]),
-                n.skip([p("core (basic)", 0), p("can accept a string + function", 3)]),
-                n.pass([p("core (basic)", 0), p("can accept a string", 4)]),
-                n.pass([p("core (basic)", 0), p("returns the current instance when given a callback", 5)]),
-                n.fail([p("core (basic)", 0), p("returns a prototypal clone when not given a callback", 6)], badType),
-                n.pass([p("core (basic)", 0), p("runs block tests within tests", 7)]),
-                n.pass([p("core (basic)", 0), p("runs successful inline tests within tests", 8)]),
-                n.pass([p("core (basic)", 0), p("accepts a callback with `run()`", 9)]),
-                n.leave([p("core (basic)", 0)]),
-                n.enter([p("cli normalize glob", 1)]),
-                n.enter([p("cli normalize glob", 1), p("current directory", 0)]),
-                n.fail([p("cli normalize glob", 1), p("current directory", 0), p("normalizes a file", 0)], sentinel),
-                n.pass([p("cli normalize glob", 1), p("current directory", 0), p("normalizes a glob", 1)]),
-                n.pass([p("cli normalize glob", 1), p("current directory", 0), p("retains trailing slashes", 2)]),
-                n.pass([p("cli normalize glob", 1), p("current directory", 0), p("retains negative", 3)]),
-                n.pass([p("cli normalize glob", 1), p("current directory", 0), p("retains negative + trailing slashes", 4)]),
-                n.leave([p("cli normalize glob", 1), p("current directory", 0)]),
-                n.enter([p("cli normalize glob", 1), p("absolute directory", 1)]),
-                n.pass([p("cli normalize glob", 1), p("absolute directory", 1), p("normalizes a file", 0)]),
-                n.pass([p("cli normalize glob", 1), p("absolute directory", 1), p("normalizes a glob", 1)]),
-                n.pass([p("cli normalize glob", 1), p("absolute directory", 1), p("retains trailing slashes", 2)]),
-                n.skip([p("cli normalize glob", 1), p("absolute directory", 1), p("retains negative", 3)]),
-                n.pass([p("cli normalize glob", 1), p("absolute directory", 1), p("retains negative + trailing slashes", 4)]),
-                n.leave([p("cli normalize glob", 1), p("absolute directory", 1)]),
-                n.enter([p("cli normalize glob", 1), p("relative directory", 2)]),
-                n.pass([p("cli normalize glob", 1), p("relative directory", 2), p("normalizes a file", 0)]),
-                n.pass([p("cli normalize glob", 1), p("relative directory", 2), p("normalizes a glob", 1)]),
-                n.pass([p("cli normalize glob", 1), p("relative directory", 2), p("retains trailing slashes", 2)]),
-                n.pass([p("cli normalize glob", 1), p("relative directory", 2), p("retains negative", 3)]),
-                n.fail([p("cli normalize glob", 1), p("relative directory", 2), p("retains negative + trailing slashes", 4)], badType),
-                n.leave([p("cli normalize glob", 1), p("relative directory", 2)]),
-                n.enter([p("cli normalize glob", 1), p("edge cases", 3)]),
-                n.pass([p("cli normalize glob", 1), p("edge cases", 3), p("normalizes `.` with a cwd of `.`", 0)]),
-                n.pass([p("cli normalize glob", 1), p("edge cases", 3), p("normalizes `..` with a cwd of `.`", 1)]),
-                n.pass([p("cli normalize glob", 1), p("edge cases", 3), p("normalizes `.` with a cwd of `..`", 2)]),
-                n.pass([p("cli normalize glob", 1), p("edge cases", 3), p("normalizes directories with a cwd of `..`", 3)]),
-                n.pass([p("cli normalize glob", 1), p("edge cases", 3), p("removes excess `.`", 4)]),
-                n.pass([p("cli normalize glob", 1), p("edge cases", 3), p("removes excess `..`", 5)]),
-                n.pass([p("cli normalize glob", 1), p("edge cases", 3), p("removes excess combined junk", 6)]),
-                n.leave([p("cli normalize glob", 1), p("edge cases", 3)]),
-                n.leave([p("cli normalize glob", 1)]),
-                n.enter([p("core (timeouts)", 2)]),
-                n.skip([p("core (timeouts)", 2), p("succeeds with own", 0)]),
-                n.pass([p("core (timeouts)", 2), p("fails with own", 1)]),
-                n.pass([p("core (timeouts)", 2), p("succeeds with inherited", 2)]),
-                n.pass([p("core (timeouts)", 2), p("fails with inherited", 3)]),
-                n.pass([p("core (timeouts)", 2), p("gets own set timeout", 4)]),
-                n.fail([p("core (timeouts)", 2), p("gets own inline set timeout", 5)], sentinel),
-                n.skip([p("core (timeouts)", 2), p("gets own sync inner timeout", 6)]),
-                n.pass([p("core (timeouts)", 2), p("gets default timeout", 7)]),
-                n.leave([p("core (timeouts)", 2)]),
-                n.end(),
+                r.suite("core (basic)", [
+                    r.pass("has `base()`"),
+                    r.pass("has `test()`"),
+                    r.pass("has `parent()`"),
+                    r.skip("can accept a string + function"),
+                    r.pass("can accept a string"),
+                    r.pass("returns the current instance when given a callback"),
+                    r.fail("returns a prototypal clone when not given a callback", badType),
+                    r.pass("runs block tests within tests"),
+                    r.pass("runs successful inline tests within tests"),
+                    r.pass("accepts a callback with `run()`"),
+                ]),
+                r.suite("cli normalize glob", [
+                    r.suite("current directory", [
+                        r.fail("normalizes a file", sentinel),
+                        r.pass("normalizes a glob"),
+                        r.pass("retains trailing slashes"),
+                        r.pass("retains negative"),
+                        r.pass("retains negative + trailing slashes"),
+                    ]),
+                    r.suite("absolute directory", [
+                        r.pass("normalizes a file"),
+                        r.pass("normalizes a glob"),
+                        r.pass("retains trailing slashes"),
+                        r.skip("retains negative"),
+                        r.pass("retains negative + trailing slashes"),
+                    ]),
+                    r.suite("relative directory", [
+                        r.pass("normalizes a file"),
+                        r.pass("normalizes a glob"),
+                        r.pass("retains trailing slashes"),
+                        r.pass("retains negative"),
+                        r.fail("retains negative + trailing slashes", badType),
+                    ]),
+                    r.suite("edge cases", [
+                        r.pass("normalizes `.` with a cwd of `.`"),
+                        r.pass("normalizes `..` with a cwd of `.`"),
+                        r.pass("normalizes `.` with a cwd of `..`"),
+                        r.pass("normalizes directories with a cwd of `..`"),
+                        r.pass("removes excess `.`"),
+                        r.pass("removes excess `..`"),
+                        r.pass("removes excess combined junk"),
+                    ]),
+                ]),
+                r.suite("core (timeouts)", [
+                    r.skip("succeeds with own"),
+                    r.pass("fails with own"),
+                    r.pass("succeeds with inherited"),
+                    r.pass("fails with inherited"),
+                    r.pass("gets own set timeout"),
+                    r.fail("gets own inline set timeout", sentinel),
+                    r.skip("gets own sync inner timeout"),
+                    r.pass("gets default timeout"),
+                ]),
             ],
 
             output: [].concat([
@@ -679,10 +652,8 @@ describe("reporter/spec", function () {
 
         test("multiline fail with AssertionError + pass", {
             input: [
-                n.start(),
-                n.fail([p("one", 0)], multiline),
-                n.pass([p("two", 1)]),
-                n.end(),
+                r.fail("one", multiline),
+                r.pass("two"),
             ],
             output: [].concat([
                 "",
@@ -711,16 +682,9 @@ describe("reporter/spec", function () {
 
         context("restarting", function () {
             test("empty test", {
-                input: [
-                    n.start(),
-                    n.end(),
-                    n.start(),
-                    n.end(),
-                ],
+                repeat: true,
+                input: [],
                 output: [
-                    "",
-                    c("plain", "  0 tests") + time("0ms"),
-                    "",
                     "",
                     c("plain", "  0 tests") + time("0ms"),
                     "",
@@ -728,24 +692,12 @@ describe("reporter/spec", function () {
             })
 
             test("pass 2", {
+                repeat: true,
                 input: [
-                    n.start(),
-                    n.pass([p("test", 0)]),
-                    n.pass([p("test", 1)]),
-                    n.end(),
-                    n.start(),
-                    n.pass([p("test", 0)]),
-                    n.pass([p("test", 1)]),
-                    n.end(),
+                    r.pass("test"),
+                    r.pass("test"),
                 ],
                 output: [
-                    "",
-                    "  " + pass("test"),
-                    "  " + pass("test"),
-                    "",
-                    c("bright pass", "  ") + c("green", "2 passing") +
-                        time("20ms"),
-                    "",
                     "",
                     "  " + pass("test"),
                     "  " + pass("test"),
@@ -759,32 +711,12 @@ describe("reporter/spec", function () {
             var sentinel = new Error("sentinel")
 
             test("fail 2 with Error", {
+                repeat: true,
                 input: [
-                    n.start(),
-                    n.fail([p("one", 0)], sentinel),
-                    n.fail([p("two", 1)], sentinel),
-                    n.end(),
-                    n.start(),
-                    n.fail([p("one", 0)], sentinel),
-                    n.fail([p("two", 1)], sentinel),
-                    n.end(),
+                    r.fail("one", sentinel),
+                    r.fail("two", sentinel),
                 ],
                 output: [].concat([
-                    "",
-                    "  " + c("fail", "1) one"),
-                    "  " + c("fail", "2) two"),
-                    "",
-                    c("bright fail", "  ") + c("fail", "2 failing") +
-                        time("20ms"),
-                    "",
-                    "  " + c("plain", "1) one:"),
-                    "    " + c("fail", "Error: sentinel"),
-                ], stack(sentinel), [
-                    "",
-                    "  " + c("plain", "2) two:"),
-                    "    " + c("fail", "Error: sentinel"),
-                ], stack(sentinel), [
-                    "",
                     "",
                     "  " + c("fail", "1) one"),
                     "  " + c("fail", "2) two"),
@@ -804,29 +736,12 @@ describe("reporter/spec", function () {
             })
 
             test("pass + fail with Error", {
+                repeat: true,
                 input: [
-                    n.start(),
-                    n.pass([p("one", 0)]),
-                    n.fail([p("two", 1)], sentinel),
-                    n.end(),
-                    n.start(),
-                    n.pass([p("one", 0)]),
-                    n.fail([p("two", 1)], sentinel),
-                    n.end(),
+                    r.pass("one"),
+                    r.fail("two", sentinel),
                 ],
                 output: [].concat([
-                    "",
-                    "  " + pass("one"),
-                    "  " + c("fail", "1) two"),
-                    "",
-                    c("bright pass", "  ") + c("green", "1 passing") +
-                        time("20ms"),
-                    c("bright fail", "  ") + c("fail", "1 failing"),
-                    "",
-                    "  " + c("plain", "1) two:"),
-                    "    " + c("fail", "Error: sentinel"),
-                ], stack(sentinel), [
-                    "",
                     "",
                     "  " + pass("one"),
                     "  " + c("fail", "1) two"),
@@ -843,29 +758,12 @@ describe("reporter/spec", function () {
             })
 
             test("fail with Error + pass", {
+                repeat: true,
                 input: [
-                    n.start(),
-                    n.fail([p("one", 0)], sentinel),
-                    n.pass([p("two", 1)]),
-                    n.end(),
-                    n.start(),
-                    n.fail([p("one", 0)], sentinel),
-                    n.pass([p("two", 1)]),
-                    n.end(),
+                    r.fail("one", sentinel),
+                    r.pass("two"),
                 ],
                 output: [].concat([
-                    "",
-                    "  " + c("fail", "1) one"),
-                    "  " + pass("two"),
-                    "",
-                    c("bright pass", "  ") + c("green", "1 passing") +
-                        time("20ms"),
-                    c("bright fail", "  ") + c("fail", "1 failing"),
-                    "",
-                    "  " + c("plain", "1) one:"),
-                    "    " + c("fail", "Error: sentinel"),
-                ], stack(sentinel), [
-                    "",
                     "",
                     "  " + c("fail", "1) one"),
                     "  " + pass("two"),
@@ -884,46 +782,12 @@ describe("reporter/spec", function () {
             var assertion = new AssertionError("Expected 1 to equal 2", 1, 2)
 
             test("fail 2 with AssertionError", {
+                repeat: true,
                 input: [
-                    n.start(),
-                    n.fail([p("one", 0)], assertion),
-                    n.fail([p("two", 1)], assertion),
-                    n.end(),
-                    n.start(),
-                    n.fail([p("one", 0)], assertion),
-                    n.fail([p("two", 1)], assertion),
-                    n.end(),
+                    r.fail("one", assertion),
+                    r.fail("two", assertion),
                 ],
                 output: [].concat([
-                    "",
-                    "  " + c("fail", "1) one"),
-                    "  " + c("fail", "2) two"),
-                    "",
-                    c("bright fail", "  ") + c("fail", "2 failing") +
-                        time("20ms"),
-                    "",
-                    "  " + c("plain", "1) one:"),
-                    "    " + c("fail", "AssertionError: Expected 1 to equal 2"),
-                    "",
-                    "      " + c("diff added", "+ expected") + " " +
-                        c("diff removed", "- actual"),
-                    "",
-                    "      " + c("diff removed", "-2"),
-                    "      " + c("diff added", "+1"),
-                    "",
-                ], stack(assertion), [
-                    "",
-                    "  " + c("plain", "2) two:"),
-                    "    " + c("fail", "AssertionError: Expected 1 to equal 2"),
-                    "",
-                    "      " + c("diff added", "+ expected") + " " +
-                        c("diff removed", "- actual"),
-                    "",
-                    "      " + c("diff removed", "-2"),
-                    "      " + c("diff added", "+1"),
-                    "",
-                ], stack(assertion), [
-                    "",
                     "",
                     "  " + c("fail", "1) one"),
                     "  " + c("fail", "2) two"),
@@ -957,36 +821,12 @@ describe("reporter/spec", function () {
             })
 
             test("pass + fail with AssertionError", {
+                repeat: true,
                 input: [
-                    n.start(),
-                    n.pass([p("one", 0)]),
-                    n.fail([p("two", 1)], assertion),
-                    n.end(),
-                    n.start(),
-                    n.pass([p("one", 0)]),
-                    n.fail([p("two", 1)], assertion),
-                    n.end(),
+                    r.pass("one"),
+                    r.fail("two", assertion),
                 ],
                 output: [].concat([
-                    "",
-                    "  " + pass("one"),
-                    "  " + c("fail", "1) two"),
-                    "",
-                    c("bright pass", "  ") + c("green", "1 passing") +
-                        time("20ms"),
-                    c("bright fail", "  ") + c("fail", "1 failing"),
-                    "",
-                    "  " + c("plain", "1) two:"),
-                    "    " + c("fail", "AssertionError: Expected 1 to equal 2"),
-                    "",
-                    "      " + c("diff added", "+ expected") + " " +
-                        c("diff removed", "- actual"),
-                    "",
-                    "      " + c("diff removed", "-2"),
-                    "      " + c("diff added", "+1"),
-                    "",
-                ], stack(assertion), [
-                    "",
                     "",
                     "  " + pass("one"),
                     "  " + c("fail", "1) two"),
@@ -1010,36 +850,12 @@ describe("reporter/spec", function () {
             })
 
             test("fail with AssertionError + pass", {
+                repeat: true,
                 input: [
-                    n.start(),
-                    n.fail([p("one", 0)], assertion),
-                    n.pass([p("two", 1)]),
-                    n.end(),
-                    n.start(),
-                    n.fail([p("one", 0)], assertion),
-                    n.pass([p("two", 1)]),
-                    n.end(),
+                    r.fail("one", assertion),
+                    r.pass("two"),
                 ],
                 output: [].concat([
-                    "",
-                    "  " + c("fail", "1) one"),
-                    "  " + pass("two"),
-                    "",
-                    c("bright pass", "  ") + c("green", "1 passing") +
-                        time("20ms"),
-                    c("bright fail", "  ") + c("fail", "1 failing"),
-                    "",
-                    "  " + c("plain", "1) one:"),
-                    "    " + c("fail", "AssertionError: Expected 1 to equal 2"),
-                    "",
-                    "      " + c("diff added", "+ expected") + " " +
-                        c("diff removed", "- actual"),
-                    "",
-                    "      " + c("diff removed", "-2"),
-                    "      " + c("diff added", "+1"),
-                    "",
-                ], stack(assertion), [
-                    "",
                     "",
                     "  " + c("fail", "1) one"),
                     "  " + pass("two"),
@@ -1079,9 +895,9 @@ describe("reporter/spec", function () {
         var slow = c("slow", " (80ms)")
 
         function at(speed) {
-            if (speed === "slow") return 80
-            if (speed === "medium") return 40
-            if (speed === "fast") return 20
+            if (speed === "slow") return {duration: 80}
+            if (speed === "medium") return {duration: 40}
+            if (speed === "fast") return {duration: 20}
             throw new RangeError("Unknown speed: `" + speed + "`")
         }
 
@@ -1089,62 +905,60 @@ describe("reporter/spec", function () {
             /* eslint-disable max-len */
 
             input: [
-                n.start(),
-                n.enter([p("core (basic)", 0)], at("fast")),
-                n.pass([p("core (basic)", 0), p("has `base()`", 0)], at("fast")),
-                n.pass([p("core (basic)", 0), p("has `test()`", 1)], at("fast")),
-                n.pass([p("core (basic)", 0), p("has `parent()`", 2)], at("fast")),
-                n.pass([p("core (basic)", 0), p("can accept a string + function", 3)], at("fast")),
-                n.pass([p("core (basic)", 0), p("can accept a string", 4)], at("fast")),
-                n.pass([p("core (basic)", 0), p("returns the current instance when given a callback", 5)], at("medium")),
-                n.pass([p("core (basic)", 0), p("returns a prototypal clone when not given a callback", 6)], at("medium")),
-                n.pass([p("core (basic)", 0), p("runs block tests within tests", 7)], at("fast")),
-                n.pass([p("core (basic)", 0), p("runs successful inline tests within tests", 8)], at("fast")),
-                n.pass([p("core (basic)", 0), p("accepts a callback with `run()`", 9)], at("fast")),
-                n.leave([p("core (basic)", 0)]),
-                n.enter([p("cli normalize glob", 1)], at("fast")),
-                n.enter([p("cli normalize glob", 1), p("current directory", 0)], at("fast")),
-                n.pass([p("cli normalize glob", 1), p("current directory", 0), p("normalizes a file", 0)], at("fast")),
-                n.pass([p("cli normalize glob", 1), p("current directory", 0), p("normalizes a glob", 1)], at("fast")),
-                n.pass([p("cli normalize glob", 1), p("current directory", 0), p("retains trailing slashes", 2)], at("fast")),
-                n.pass([p("cli normalize glob", 1), p("current directory", 0), p("retains negative", 3)], at("fast")),
-                n.pass([p("cli normalize glob", 1), p("current directory", 0), p("retains negative + trailing slashes", 4)], at("fast")),
-                n.leave([p("cli normalize glob", 1), p("current directory", 0)]),
-                n.enter([p("cli normalize glob", 1), p("absolute directory", 1)], at("fast")),
-                n.pass([p("cli normalize glob", 1), p("absolute directory", 1), p("normalizes a file", 0)], at("fast")),
-                n.pass([p("cli normalize glob", 1), p("absolute directory", 1), p("normalizes a glob", 1)], at("fast")),
-                n.pass([p("cli normalize glob", 1), p("absolute directory", 1), p("retains trailing slashes", 2)], at("fast")),
-                n.pass([p("cli normalize glob", 1), p("absolute directory", 1), p("retains negative", 3)], at("fast")),
-                n.pass([p("cli normalize glob", 1), p("absolute directory", 1), p("retains negative + trailing slashes", 4)], at("fast")),
-                n.leave([p("cli normalize glob", 1), p("absolute directory", 1)]),
-                n.enter([p("cli normalize glob", 1), p("relative directory", 2)], at("fast")),
-                n.pass([p("cli normalize glob", 1), p("relative directory", 2), p("normalizes a file", 0)], at("fast")),
-                n.pass([p("cli normalize glob", 1), p("relative directory", 2), p("normalizes a glob", 1)], at("fast")),
-                n.pass([p("cli normalize glob", 1), p("relative directory", 2), p("retains trailing slashes", 2)], at("fast")),
-                n.pass([p("cli normalize glob", 1), p("relative directory", 2), p("retains negative", 3)], at("fast")),
-                n.pass([p("cli normalize glob", 1), p("relative directory", 2), p("retains negative + trailing slashes", 4)], at("fast")),
-                n.leave([p("cli normalize glob", 1), p("relative directory", 2)]),
-                n.enter([p("cli normalize glob", 1), p("edge cases", 3)], at("fast")),
-                n.pass([p("cli normalize glob", 1), p("edge cases", 3), p("normalizes `.` with a cwd of `.`", 0)], at("fast")),
-                n.pass([p("cli normalize glob", 1), p("edge cases", 3), p("normalizes `..` with a cwd of `.`", 1)], at("fast")),
-                n.pass([p("cli normalize glob", 1), p("edge cases", 3), p("normalizes `.` with a cwd of `..`", 2)], at("fast")),
-                n.pass([p("cli normalize glob", 1), p("edge cases", 3), p("normalizes directories with a cwd of `..`", 3)], at("fast")),
-                n.pass([p("cli normalize glob", 1), p("edge cases", 3), p("removes excess `.`", 4)], at("fast")),
-                n.pass([p("cli normalize glob", 1), p("edge cases", 3), p("removes excess `..`", 5)], at("fast")),
-                n.pass([p("cli normalize glob", 1), p("edge cases", 3), p("removes excess combined junk", 6)], at("fast")),
-                n.leave([p("cli normalize glob", 1), p("edge cases", 3)]),
-                n.leave([p("cli normalize glob", 1)]),
-                n.enter([p("core (timeouts)", 2)], at("fast")),
-                n.pass([p("core (timeouts)", 2), p("succeeds with own", 0)], at("medium")),
-                n.pass([p("core (timeouts)", 2), p("fails with own", 1)], at("medium")),
-                n.pass([p("core (timeouts)", 2), p("succeeds with inherited", 2)], at("slow")),
-                n.pass([p("core (timeouts)", 2), p("fails with inherited", 3)], at("slow")),
-                n.pass([p("core (timeouts)", 2), p("gets own set timeout", 4)], at("fast")),
-                n.pass([p("core (timeouts)", 2), p("gets own inline set timeout", 5)], at("fast")),
-                n.pass([p("core (timeouts)", 2), p("gets own sync inner timeout", 6)], at("fast")),
-                n.pass([p("core (timeouts)", 2), p("gets default timeout", 7)], at("medium")),
-                n.leave([p("core (timeouts)", 2)]),
-                n.end(),
+                r.suite("core (basic)", at("fast"), [
+                    r.pass("has `base()`", at("fast")),
+                    r.pass("has `test()`", at("fast")),
+                    r.pass("has `parent()`", at("fast")),
+                    r.pass("can accept a string + function", at("fast")),
+                    r.pass("can accept a string", at("fast")),
+                    r.pass("returns the current instance when given a callback", at("medium")),
+                    r.pass("returns a prototypal clone when not given a callback", at("medium")),
+                    r.pass("runs block tests within tests", at("fast")),
+                    r.pass("runs successful inline tests within tests", at("fast")),
+                    r.pass("accepts a callback with `run()`", at("fast")),
+                ]),
+                r.suite("cli normalize glob", at("fast"), [
+                    r.suite("current directory", at("fast"), [
+                        r.pass("normalizes a file", at("fast")),
+                        r.pass("normalizes a glob", at("fast")),
+                        r.pass("retains trailing slashes", at("fast")),
+                        r.pass("retains negative", at("fast")),
+                        r.pass("retains negative + trailing slashes", at("fast")),
+                    ]),
+                    r.suite("absolute directory", at("fast"), [
+                        r.pass("normalizes a file", at("fast")),
+                        r.pass("normalizes a glob", at("fast")),
+                        r.pass("retains trailing slashes", at("fast")),
+                        r.pass("retains negative", at("fast")),
+                        r.pass("retains negative + trailing slashes", at("fast")),
+                    ]),
+                    r.suite("relative directory", at("fast"), [
+                        r.pass("normalizes a file", at("fast")),
+                        r.pass("normalizes a glob", at("fast")),
+                        r.pass("retains trailing slashes", at("fast")),
+                        r.pass("retains negative", at("fast")),
+                        r.pass("retains negative + trailing slashes", at("fast")),
+                    ]),
+                    r.suite("edge cases", at("fast"), [
+                        r.pass("normalizes `.` with a cwd of `.`", at("fast")),
+                        r.pass("normalizes `..` with a cwd of `.`", at("fast")),
+                        r.pass("normalizes `.` with a cwd of `..`", at("fast")),
+                        r.pass("normalizes directories with a cwd of `..`", at("fast")),
+                        r.pass("removes excess `.`", at("fast")),
+                        r.pass("removes excess `..`", at("fast")),
+                        r.pass("removes excess combined junk", at("fast")),
+                    ]),
+                ]),
+                r.suite("core (timeouts)", at("fast"), [
+                    r.pass("succeeds with own", at("medium")),
+                    r.pass("fails with own", at("medium")),
+                    r.pass("succeeds with inherited", at("slow")),
+                    r.pass("fails with inherited", at("slow")),
+                    r.pass("gets own set timeout", at("fast")),
+                    r.pass("gets own inline set timeout", at("fast")),
+                    r.pass("gets own sync inner timeout", at("fast")),
+                    r.pass("gets default timeout", at("medium")),
+                ]),
             ],
 
             output: [
