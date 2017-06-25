@@ -47,7 +47,7 @@ exports.root = function () {
 //         return Reports.pass(p(path), d(duration), s(slow))
 //     },
 //
-//     fail: function (path, value, duration, slow, isFailable) { // eslint-disable-line max-params, max-len
+//     fail: function (path, value, duration, slow, isFailable) {
 //         return Reports.fail(
 //             p(path), value, d(duration), s(slow),
 //             !!isFailable)
