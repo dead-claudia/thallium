@@ -10,12 +10,12 @@ describe("core/selection", function () {
             init: function (tt) {
                 tt.test("one", function () {
                     tt.test("inner", function () { tt.skip() })
-                    tt.test("other", function () {})
+                    tt.test("other", r.noop)
                 })
 
                 tt.test("two", function () {
-                    tt.test("inner", function () {})
-                    tt.test("other", function () {})
+                    tt.test("inner", r.noop)
+                    tt.test("other", r.noop)
                 })
             },
             expected: [
@@ -34,12 +34,12 @@ describe("core/selection", function () {
             init: function (tt) {
                 tt.test("one", function () {
                     tt.test("inner", function () { tt.reflect.skip() })
-                    tt.test("other", function () {})
+                    tt.test("other", r.noop)
                 })
 
                 tt.test("two", function () {
-                    tt.test("inner", function () {})
-                    tt.test("other", function () {})
+                    tt.test("inner", r.noop)
+                    tt.test("other", r.noop)
                 })
             },
             expected: [
@@ -60,13 +60,13 @@ describe("core/selection", function () {
 
         opts.init = function (tt) {
             tt.test("one", function () {
-                tt.test("inner", function () {})
-                tt.test("other", function () {})
+                tt.test("inner", r.noop)
+                tt.test("other", r.noop)
             })
 
             tt.test("two", function () {
-                tt.test("inner", function () {})
-                tt.test("other", function () {})
+                tt.test("inner", r.noop)
+                tt.test("other", r.noop)
             })
 
             if (init != null) init.call(this, tt)

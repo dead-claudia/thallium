@@ -3,19 +3,25 @@
 describe("core/reflect", function () {
     "use strict"
 
+    var r = Util.report
+
+    function push(queue, value) {
+        return function () {
+            queue.push(value)
+        }
+    }
+
     describe("get current", function () {
         it("returns the correct instance", function () {
-            var tt = t.internal.root()
+            var tt = r.silent()
 
             assert.equal(tt.reflect.current, tt.reflect)
         })
 
         it("returns the correct instance in a child test", function () {
-            var tt = t.internal.root()
+            var tt = r.silent()
             var inner, found
 
-            // Don't print anything
-            tt.reporter = function () {}
             tt.test("test", function (tt) {
                 inner = tt.reflect
                 found = tt.reflect.current
@@ -79,12 +85,10 @@ describe("core/reflect", function () {
         describe("before all", function () {
             it("works with no tests", function () {
                 var called = 0
-                var tt = t.internal.root()
+                var tt = r.silent()
 
                 _.beforeAll(tt, function () { called++ })
 
-                // Don't print anything
-                tt.reporter = function () {}
                 return tt.runTree().then(function () {
                     assert.equal(called, 0)
                 })
@@ -92,13 +96,11 @@ describe("core/reflect", function () {
 
             it("works with one test", function () {
                 var called = 0
-                var tt = t.internal.root()
+                var tt = r.silent()
 
                 _.beforeAll(tt, function () { called++ })
-                tt.test("test", function () {})
+                tt.test("test", r.noop)
 
-                // Don't print anything
-                tt.reporter = function () {}
                 return tt.runTree().then(function () {
                     assert.equal(called, 1)
                 })
@@ -106,14 +108,12 @@ describe("core/reflect", function () {
 
             it("works with two tests", function () {
                 var called = 0
-                var tt = t.internal.root()
+                var tt = r.silent()
 
                 _.beforeAll(tt, function () { called++ })
-                tt.test("test", function () {})
-                tt.test("test", function () {})
+                tt.test("test", r.noop)
+                tt.test("test", r.noop)
 
-                // Don't print anything
-                tt.reporter = function () {}
                 return tt.runTree().then(function () {
                     assert.equal(called, 1)
                 })
@@ -121,15 +121,13 @@ describe("core/reflect", function () {
 
             it("avoids child tests", function () {
                 var called = 0
-                var tt = t.internal.root()
+                var tt = r.silent()
 
                 _.beforeAll(tt, function () { called++ })
                 tt.test("test", function () {
-                    tt.test("test", function () {})
+                    tt.test("test", r.noop)
                 })
 
-                // Don't print anything
-                tt.reporter = function () {}
                 return tt.runTree().then(function () {
                     assert.equal(called, 1)
                 })
@@ -137,15 +135,13 @@ describe("core/reflect", function () {
 
             it("works inside child tests", function () {
                 var called = 0
-                var tt = t.internal.root()
+                var tt = r.silent()
 
                 tt.test("test", function () {
                     _.beforeAll(tt, function () { called++ })
-                    tt.test("test", function () {})
+                    tt.test("test", r.noop)
                 })
 
-                // Don't print anything
-                tt.reporter = function () {}
                 return tt.runTree().then(function () {
                     assert.equal(called, 1)
                 })
@@ -153,16 +149,14 @@ describe("core/reflect", function () {
 
             it("executes in the right order", function () {
                 var queue = []
-                var tt = t.internal.root()
+                var tt = r.silent()
 
-                _.beforeAll(tt, function () { queue.push("root") })
+                _.beforeAll(tt, push(queue, "root"))
                 tt.test("test", function () {
-                    _.beforeAll(tt, function () { queue.push("inner") })
-                    tt.test("test", function () {})
+                    _.beforeAll(tt, push(queue, "inner"))
+                    tt.test("test", r.noop)
                 })
 
-                // Don't print anything
-                tt.reporter = function () {}
                 return tt.runTree().then(function () {
                     assert.match(queue, ["root", "inner"])
                 })
@@ -172,12 +166,10 @@ describe("core/reflect", function () {
         describe("before each", function () {
             it("works with no tests", function () {
                 var called = 0
-                var tt = t.internal.root()
+                var tt = r.silent()
 
                 _.beforeEach(tt, function () { called++ })
 
-                // Don't print anything
-                tt.reporter = function () {}
                 return tt.runTree().then(function () {
                     assert.equal(called, 0)
                 })
@@ -185,13 +177,11 @@ describe("core/reflect", function () {
 
             it("works with one test", function () {
                 var called = 0
-                var tt = t.internal.root()
+                var tt = r.silent()
 
                 _.beforeEach(tt, function () { called++ })
-                tt.test("test", function () {})
+                tt.test("test", r.noop)
 
-                // Don't print anything
-                tt.reporter = function () {}
                 return tt.runTree().then(function () {
                     assert.equal(called, 1)
                 })
@@ -199,14 +189,12 @@ describe("core/reflect", function () {
 
             it("works with two tests", function () {
                 var called = 0
-                var tt = t.internal.root()
+                var tt = r.silent()
 
                 _.beforeEach(tt, function () { called++ })
-                tt.test("test", function () {})
-                tt.test("test", function () {})
+                tt.test("test", r.noop)
+                tt.test("test", r.noop)
 
-                // Don't print anything
-                tt.reporter = function () {}
                 return tt.runTree().then(function () {
                     assert.equal(called, 2)
                 })
@@ -214,15 +202,13 @@ describe("core/reflect", function () {
 
             it("hits child tests", function () {
                 var called = 0
-                var tt = t.internal.root()
+                var tt = r.silent()
 
                 _.beforeEach(tt, function () { called++ })
                 tt.test("test", function () {
-                    tt.test("test", function () {})
+                    tt.test("test", r.noop)
                 })
 
-                // Don't print anything
-                tt.reporter = function () {}
                 return tt.runTree().then(function () {
                     assert.equal(called, 2)
                 })
@@ -230,15 +216,13 @@ describe("core/reflect", function () {
 
             it("works inside child tests", function () {
                 var called = 0
-                var tt = t.internal.root()
+                var tt = r.silent()
 
                 tt.test("test", function () {
                     _.beforeEach(tt, function () { called++ })
-                    tt.test("test", function () {})
+                    tt.test("test", r.noop)
                 })
 
-                // Don't print anything
-                tt.reporter = function () {}
                 return tt.runTree().then(function () {
                     assert.equal(called, 1)
                 })
@@ -246,16 +230,14 @@ describe("core/reflect", function () {
 
             it("executes in the right order", function () {
                 var queue = []
-                var tt = t.internal.root()
+                var tt = r.silent()
 
-                _.beforeEach(tt, function () { queue.push("root") })
+                _.beforeEach(tt, push(queue, "root"))
                 tt.test("test", function () {
-                    _.beforeEach(tt, function () { queue.push("inner") })
-                    tt.test("test", function () {})
+                    _.beforeEach(tt, push(queue, "inner"))
+                    tt.test("test", r.noop)
                 })
 
-                // Don't print anything
-                tt.reporter = function () {}
                 return tt.runTree().then(function () {
                     assert.match(queue, ["root", "root", "inner"])
                 })
@@ -265,12 +247,10 @@ describe("core/reflect", function () {
         describe("after each", function () {
             it("works with no tests", function () {
                 var called = 0
-                var tt = t.internal.root()
+                var tt = r.silent()
 
                 _.afterEach(tt, function () { called++ })
 
-                // Don't print anything
-                tt.reporter = function () {}
                 return tt.runTree().then(function () {
                     assert.equal(called, 0)
                 })
@@ -278,13 +258,11 @@ describe("core/reflect", function () {
 
             it("works with one test", function () {
                 var called = 0
-                var tt = t.internal.root()
+                var tt = r.silent()
 
                 _.afterEach(tt, function () { called++ })
-                tt.test("test", function () {})
+                tt.test("test", r.noop)
 
-                // Don't print anything
-                tt.reporter = function () {}
                 return tt.runTree().then(function () {
                     assert.equal(called, 1)
                 })
@@ -292,14 +270,12 @@ describe("core/reflect", function () {
 
             it("works with two tests", function () {
                 var called = 0
-                var tt = t.internal.root()
+                var tt = r.silent()
 
                 _.afterEach(tt, function () { called++ })
-                tt.test("test", function () {})
-                tt.test("test", function () {})
+                tt.test("test", r.noop)
+                tt.test("test", r.noop)
 
-                // Don't print anything
-                tt.reporter = function () {}
                 return tt.runTree().then(function () {
                     assert.equal(called, 2)
                 })
@@ -307,15 +283,13 @@ describe("core/reflect", function () {
 
             it("hits child tests", function () {
                 var called = 0
-                var tt = t.internal.root()
+                var tt = r.silent()
 
                 _.afterEach(tt, function () { called++ })
                 tt.test("test", function () {
-                    tt.test("test", function () {})
+                    tt.test("test", r.noop)
                 })
 
-                // Don't print anything
-                tt.reporter = function () {}
                 return tt.runTree().then(function () {
                     assert.equal(called, 2)
                 })
@@ -323,15 +297,13 @@ describe("core/reflect", function () {
 
             it("works inside child tests", function () {
                 var called = 0
-                var tt = t.internal.root()
+                var tt = r.silent()
 
                 tt.test("test", function () {
                     _.afterEach(tt, function () { called++ })
-                    tt.test("test", function () {})
+                    tt.test("test", r.noop)
                 })
 
-                // Don't print anything
-                tt.reporter = function () {}
                 return tt.runTree().then(function () {
                     assert.equal(called, 1)
                 })
@@ -339,16 +311,14 @@ describe("core/reflect", function () {
 
             it("executes in the right order", function () {
                 var queue = []
-                var tt = t.internal.root()
+                var tt = r.silent()
 
-                _.afterEach(tt, function () { queue.push("root") })
+                _.afterEach(tt, push(queue, "root"))
                 tt.test("test", function () {
-                    _.afterEach(tt, function () { queue.push("inner") })
-                    tt.test("test", function () {})
+                    _.afterEach(tt, push(queue, "inner"))
+                    tt.test("test", r.noop)
                 })
 
-                // Don't print anything
-                tt.reporter = function () {}
                 return tt.runTree().then(function () {
                     assert.match(queue, ["inner", "root", "root"])
                 })
@@ -358,12 +328,10 @@ describe("core/reflect", function () {
         describe("after all", function () {
             it("works with no tests", function () {
                 var called = 0
-                var tt = t.internal.root()
+                var tt = r.silent()
 
                 _.afterAll(tt, function () { called++ })
 
-                // Don't print anything
-                tt.reporter = function () {}
                 return tt.runTree().then(function () {
                     assert.equal(called, 0)
                 })
@@ -371,13 +339,11 @@ describe("core/reflect", function () {
 
             it("works with one test", function () {
                 var called = 0
-                var tt = t.internal.root()
+                var tt = r.silent()
 
                 _.afterAll(tt, function () { called++ })
-                tt.test("test", function () {})
+                tt.test("test", r.noop)
 
-                // Don't print anything
-                tt.reporter = function () {}
                 return tt.runTree().then(function () {
                     assert.equal(called, 1)
                 })
@@ -385,14 +351,12 @@ describe("core/reflect", function () {
 
             it("works with two tests", function () {
                 var called = 0
-                var tt = t.internal.root()
+                var tt = r.silent()
 
                 _.afterAll(tt, function () { called++ })
-                tt.test("test", function () {})
-                tt.test("test", function () {})
+                tt.test("test", r.noop)
+                tt.test("test", r.noop)
 
-                // Don't print anything
-                tt.reporter = function () {}
                 return tt.runTree().then(function () {
                     assert.equal(called, 1)
                 })
@@ -400,15 +364,13 @@ describe("core/reflect", function () {
 
             it("avoids child tests", function () {
                 var called = 0
-                var tt = t.internal.root()
+                var tt = r.silent()
 
                 _.afterAll(tt, function () { called++ })
                 tt.test("test", function () {
-                    tt.test("test", function () {})
+                    tt.test("test", r.noop)
                 })
 
-                // Don't print anything
-                tt.reporter = function () {}
                 return tt.runTree().then(function () {
                     assert.equal(called, 1)
                 })
@@ -416,15 +378,13 @@ describe("core/reflect", function () {
 
             it("works inside child tests", function () {
                 var called = 0
-                var tt = t.internal.root()
+                var tt = r.silent()
 
                 tt.test("test", function () {
                     _.afterAll(tt, function () { called++ })
-                    tt.test("test", function () {})
+                    tt.test("test", r.noop)
                 })
 
-                // Don't print anything
-                tt.reporter = function () {}
                 return tt.runTree().then(function () {
                     assert.equal(called, 1)
                 })
@@ -432,16 +392,14 @@ describe("core/reflect", function () {
 
             it("executes in the right order", function () {
                 var queue = []
-                var tt = t.internal.root()
+                var tt = r.silent()
 
-                _.afterAll(tt, function () { queue.push("root") })
+                _.afterAll(tt, push(queue, "root"))
                 tt.test("test", function () {
-                    _.afterAll(tt, function () { queue.push("inner") })
-                    tt.test("test", function () {})
+                    _.afterAll(tt, push(queue, "inner"))
+                    tt.test("test", r.noop)
                 })
 
-                // Don't print anything
-                tt.reporter = function () {}
                 return tt.runTree().then(function () {
                     assert.match(queue, ["inner", "root"])
                 })
@@ -451,15 +409,13 @@ describe("core/reflect", function () {
         describe("all hooks", function () {
             it("works with no tests", function () {
                 var queue = []
-                var tt = t.internal.root()
+                var tt = r.silent()
 
-                _.beforeAll(tt, function () { queue.push("before all") })
-                _.beforeEach(tt, function () { queue.push("before each") })
-                _.afterEach(tt, function () { queue.push("after each") })
-                _.afterAll(tt, function () { queue.push("after all") })
+                _.beforeAll(tt, push(queue, "before all"))
+                _.beforeEach(tt, push(queue, "before each"))
+                _.afterEach(tt, push(queue, "after each"))
+                _.afterAll(tt, push(queue, "after all"))
 
-                // Don't print anything
-                tt.reporter = function () {}
                 return tt.runTree().then(function () {
                     assert.match(queue, [])
                 })
@@ -467,16 +423,14 @@ describe("core/reflect", function () {
 
             it("works with one test", function () {
                 var queue = []
-                var tt = t.internal.root()
+                var tt = r.silent()
 
-                _.beforeAll(tt, function () { queue.push("before all") })
-                _.beforeEach(tt, function () { queue.push("before each") })
-                _.afterEach(tt, function () { queue.push("after each") })
-                _.afterAll(tt, function () { queue.push("after all") })
-                tt.test("test", function () {})
+                _.beforeAll(tt, push(queue, "before all"))
+                _.beforeEach(tt, push(queue, "before each"))
+                _.afterEach(tt, push(queue, "after each"))
+                _.afterAll(tt, push(queue, "after all"))
+                tt.test("test", r.noop)
 
-                // Don't print anything
-                tt.reporter = function () {}
                 return tt.runTree().then(function () {
                     assert.match(queue, [
                         "before all",
@@ -489,17 +443,15 @@ describe("core/reflect", function () {
 
             it("works with two tests", function () {
                 var queue = []
-                var tt = t.internal.root()
+                var tt = r.silent()
 
-                _.beforeAll(tt, function () { queue.push("before all") })
-                _.beforeEach(tt, function () { queue.push("before each") })
-                _.afterEach(tt, function () { queue.push("after each") })
-                _.afterAll(tt, function () { queue.push("after all") })
-                tt.test("test", function () {})
-                tt.test("test", function () {})
+                _.beforeAll(tt, push(queue, "before all"))
+                _.beforeEach(tt, push(queue, "before each"))
+                _.afterEach(tt, push(queue, "after each"))
+                _.afterAll(tt, push(queue, "after all"))
+                tt.test("test", r.noop)
+                tt.test("test", r.noop)
 
-                // Don't print anything
-                tt.reporter = function () {}
                 return tt.runTree().then(function () {
                     assert.match(queue, [
                         "before all",
@@ -514,18 +466,16 @@ describe("core/reflect", function () {
 
             it("works with child tests", function () {
                 var queue = []
-                var tt = t.internal.root()
+                var tt = r.silent()
 
-                _.beforeAll(tt, function () { queue.push("before all") })
-                _.beforeEach(tt, function () { queue.push("before each") })
-                _.afterEach(tt, function () { queue.push("after each") })
-                _.afterAll(tt, function () { queue.push("after all") })
+                _.beforeAll(tt, push(queue, "before all"))
+                _.beforeEach(tt, push(queue, "before each"))
+                _.afterEach(tt, push(queue, "after each"))
+                _.afterAll(tt, push(queue, "after all"))
                 tt.test("test", function () {
-                    tt.test("test", function () {})
+                    tt.test("test", r.noop)
                 })
 
-                // Don't print anything
-                tt.reporter = function () {}
                 return tt.runTree().then(function () {
                     assert.match(queue, [
                         "before all",
@@ -540,18 +490,16 @@ describe("core/reflect", function () {
 
             it("works inside child tests", function () {
                 var queue = []
-                var tt = t.internal.root()
+                var tt = r.silent()
 
                 tt.test("test", function () {
-                    _.beforeAll(tt, function () { queue.push("before all") }) // eslint-disable-line max-len
-                    _.beforeEach(tt, function () { queue.push("before each") }) // eslint-disable-line max-len
-                    _.afterEach(tt, function () { queue.push("after each") }) // eslint-disable-line max-len
-                    _.afterAll(tt, function () { queue.push("after all") })
-                    tt.test("test", function () {})
+                    _.beforeAll(tt, push(queue, "before all"))
+                    _.beforeEach(tt, push(queue, "before each"))
+                    _.afterEach(tt, push(queue, "after each"))
+                    _.afterAll(tt, push(queue, "after all"))
+                    tt.test("test", r.noop)
                 })
 
-                // Don't print anything
-                tt.reporter = function () {}
                 return tt.runTree().then(function () {
                     assert.match(queue, [
                         "before all",
@@ -564,22 +512,20 @@ describe("core/reflect", function () {
 
             it("executes in the right order", function () {
                 var queue = []
-                var tt = t.internal.root()
+                var tt = r.silent()
 
-                _.beforeAll(tt, function () { queue.push("root before all") }) // eslint-disable-line max-len
-                _.beforeEach(tt, function () { queue.push("root before each") }) // eslint-disable-line max-len
-                _.afterEach(tt, function () { queue.push("root after each") }) // eslint-disable-line max-len
-                _.afterAll(tt, function () { queue.push("root after all") }) // eslint-disable-line max-len
+                _.beforeAll(tt, push(queue, "root before all"))
+                _.beforeEach(tt, push(queue, "root before each"))
+                _.afterEach(tt, push(queue, "root after each"))
+                _.afterAll(tt, push(queue, "root after all"))
                 tt.test("test", function () {
-                    _.beforeAll(tt, function () { queue.push("inner before all") }) // eslint-disable-line max-len
-                    _.beforeEach(tt, function () { queue.push("inner before each") }) // eslint-disable-line max-len
-                    _.afterEach(tt, function () { queue.push("inner after each") }) // eslint-disable-line max-len
-                    _.afterAll(tt, function () { queue.push("inner after all") }) // eslint-disable-line max-len
-                    tt.test("test", function () {})
+                    _.beforeAll(tt, push(queue, "inner before all"))
+                    _.beforeEach(tt, push(queue, "inner before each"))
+                    _.afterEach(tt, push(queue, "inner after each"))
+                    _.afterAll(tt, push(queue, "inner after all"))
+                    tt.test("test", r.noop)
                 })
 
-                // Don't print anything
-                tt.reporter = function () {}
                 return tt.runTree().then(function () {
                     assert.match(queue, [
                         "root before all",
@@ -599,7 +545,7 @@ describe("core/reflect", function () {
 
         describe("removing before all", function () {
             it("works", function () {
-                var tt = t.internal.root()
+                var tt = r.silent()
 
                 function callback() {}
                 _.beforeAll(tt, callback)
@@ -610,7 +556,7 @@ describe("core/reflect", function () {
 
         describe("removing before each", function () {
             it("works", function () {
-                var tt = t.internal.root()
+                var tt = r.silent()
 
                 function callback() {}
                 _.beforeEach(tt, callback)
@@ -621,7 +567,7 @@ describe("core/reflect", function () {
 
         describe("removing after each", function () {
             it("works", function () {
-                var tt = t.internal.root()
+                var tt = r.silent()
 
                 function callback() {}
                 _.beforeEach(tt, callback)
@@ -632,7 +578,7 @@ describe("core/reflect", function () {
 
         describe("removing after all", function () {
             it("works", function () {
-                var tt = t.internal.root()
+                var tt = r.silent()
 
                 function callback() {}
                 _.afterAll(tt, callback)

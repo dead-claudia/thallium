@@ -2,116 +2,52 @@
 
 var Internal = require("../internal")
 var assert = require("clean-assert")
-var Constants = require("../lib/core/constants")
-var Reports = require("../lib/core/reports")
+var Reports = require("../lib/core/reports-tree")
+var Tests = require("../lib/core/tests-tree")
 var methods = require("../lib/methods")
 var Util = require("../lib/util")
 
-function getPath(report) {
-    var path = []
+// Shared no-op reference for easier matching
+exports.noop = function () {}
 
-    while (report.parent != null) {
-        path.push({name: report.name, index: report.index})
-        report = report.parent
-    }
+exports.silent = function () {
+    var tt = Internal.root()
 
-    return path.reverse()
+    tt.reporter = exports.noop
+    return tt
 }
 
-function convertAllHook(report, stage) {
-    return Reports.hook(stage, getPath(report.parent), getPath(report.origin),
-        {name: report.hookName}, report.error)
-}
-
-function convertEachHook(report, stage) {
-    return Reports.hook(stage, getPath(report), getPath(report.origin),
-        {name: report.hookName}, report.error)
-}
-
-var convert = {
-    "start": function () {
-        return Reports.start()
-    },
-
-    "enter": function (report) {
-        return Reports.enter(getPath(report), report.duration, report.slow)
-    },
-
-    "leave": function (report) {
-        return Reports.leave(getPath(report))
-    },
-
-    "pass": function (report) {
-        return Reports.pass(getPath(report), report.duration, report.slow)
-    },
-
-    "fail": function (report) {
-        return Reports.fail(getPath(report), report.error, report.duration,
-            report.slow, report.isFailable)
-    },
-
-    "skip": function (report) {
-        return Reports.skip(getPath(report))
-    },
-
-    "end": function () {
-        return Reports.end()
-    },
-
-    "error": function (report) {
-        return Reports.error(report.error)
-    },
-
-    "before all": function (report) {
-        return convertAllHook(report, Reports.Types.BeforeAll)
-    },
-
-    "before each": function (report) {
-        return convertEachHook(report, Reports.Types.BeforeEach)
-    },
-
-    "after each": function (report) {
-        return convertEachHook(report, Reports.Types.AfterEach)
-    },
-
-    "after all": function (report) {
-        return convertAllHook(report, Reports.Types.AfterAll)
-    },
+exports.initReflect = function (tt) {
+    tt.reflect // eslint-disable-line no-unused-expressions
 }
 
 var Type = Object.freeze({
     Suite: 0,
     Pass: 1,
     Fail: 2,
-    FailOpt: 3,
-    Skip: 4,
-    Origin: 5,
-    Error: 6,
-    SuiteBeforeAll: 7,
-    SuiteBeforeEach: 8,
-    SuiteAfterEach: 9,
-    SuiteAfterAll: 10,
-    TestBeforeAll: 11,
-    TestBeforeEach: 12,
-    TestAfterEach: 13,
-    TestAfterAll: 14,
+    Skip: 3,
+    Origin: 4,
+    Error: 5,
+    BeforeAll: 6,
+    BeforeEach: 7,
+    AfterEach: 8,
+    AfterAll: 9,
 })
 
 var Render = [
     // Type.Suite
     function (r, node, index) {
         r.enter(node, index)
-        r.push(Reports.enter(r.path(), node.duration, node.slow))
+        r.push(Reports.enter(r.current, node.duration))
         r.renderChildren(node.tests)
-        r.push(Reports.leave(r.path()))
-        r.leave()
+        r.push(Reports.leave(r.current))
         return true
     },
 
     // Type.Pass
     function (r, node, index) {
         r.enter(node, index)
-        r.push(Reports.pass(r.path(), node.duration, node.slow))
+        r.push(Reports.pass(r.current, node.duration))
         r.leave()
         return true
     },
@@ -119,17 +55,7 @@ var Render = [
     // Type.Fail
     function (r, node, index) {
         r.enter(node, index)
-        r.push(Reports.fail(r.path(), node.error, node.duration, node.slow,
-            false))
-        r.leave()
-        return true
-    },
-
-    // Type.FailOpt
-    function (r, node, index) {
-        r.enter(node, index)
-        r.push(Reports.fail(r.path(), node.error, node.duration, node.slow,
-            true))
+        r.push(Reports.fail(r.current, node.duration, node.error))
         r.leave()
         return true
     },
@@ -137,7 +63,7 @@ var Render = [
     // Type.Skip
     function (r, node, index) {
         r.enter(node, index)
-        r.push(Reports.skip(r.path()))
+        r.push(Reports.skip(r.current))
         r.leave()
         return true
     },
@@ -145,7 +71,7 @@ var Render = [
     // Type.Origin
     function (r, node) {
         r.hooks.push(node.func)
-        r.origins.push(r.path())
+        r.origins.push(r.current)
         return false
     },
 
@@ -156,44 +82,24 @@ var Render = [
         throw r
     },
 
-    // Type.SuiteBeforeAll
+    // Type.BeforeAll
     function (r, node) {
-        return r.renderHook(node, Reports.Types.BeforeAll)
+        return r.renderHook(node, Reports.beforeAll)
     },
 
-    // Type.SuiteBeforeEach
+    // Type.BeforeEach
+    function (r, node, index) {
+        return r.renderTestHook(node, index, Reports.beforeEach)
+    },
+
+    // Type.AfterEach
+    function (r, node, index) {
+        return r.renderTestHook(node, index - 1, Reports.afterEach)
+    },
+
+    // Type.AfterAll
     function (r, node) {
-        return r.renderHook(node, Reports.Types.BeforeEach)
-    },
-
-    // Type.SuiteAfterEach
-    function (r, node) {
-        return r.renderHook(node, Reports.Types.AfterEach)
-    },
-
-    // Type.SuiteAfterAll
-    function (r, node) {
-        return r.renderHook(node, Reports.Types.AfterAll)
-    },
-
-    // Type.TestBeforeAll
-    function (r, node, index) {
-        return r.renderTestHook(node, index, Reports.Types.BeforeAll)
-    },
-
-    // Type.TestBeforeEach
-    function (r, node, index) {
-        return r.renderTestHook(node, index, Reports.Types.BeforeEach)
-    },
-
-    // Type.TestAfterEach
-    function (r, node, index) {
-        return r.renderTestHook(node, index - 1, Reports.Types.AfterEach)
-    },
-
-    // Type.TestAfterAll
-    function (r, node, index) {
-        return r.renderTestHook(node, index, Reports.Types.AfterAll)
+        return r.renderHook(node, Reports.afterAll)
     },
 ]
 
@@ -201,16 +107,26 @@ function Renderer() {
     this.list = []
     this.hooks = []
     this.origins = []
-    this.current = []
+    this.current = Reports.data(exports.silent()._)
 }
 
 methods(Renderer, {
     enter: function (node, index) {
-        this.current.push({name: node.name, index: index})
+        Tests.addTest(this.current._.test, node.name, exports.noop)
+        var test = this.current._.test.tests.pop()
+
+        exports.initReflect(test)
+
+        test.index = index
+        if (node.timeout != null) test.timeout = node.timeout
+        if (node.slow != null) test.slow = node.slow
+        if (node.isFailable != null) test.isFailable = node.isFailable
+        this.current = Reports.data(test, this.current)
+        Reports.deref(this.current)
     },
 
     leave: function () {
-        this.current.pop()
+        this.current = this.current.parent
     },
 
     path: function () {
@@ -229,19 +145,18 @@ methods(Renderer, {
         }
     },
 
-    renderHook: function (node, stage) {
-        this.push(Reports.hook(
-            stage,
-            this.path(),
+    renderHook: function (node, factory) {
+        this.push(factory(
+            this.current,
             this.origins[this.hooks.indexOf(node.func)],
-            node.func, node.error
+            node.error, node.func
         ))
         return false
     },
 
-    renderTestHook: function (node, index, stage) {
+    renderTestHook: function (node, index, factory) {
         this.enter(node, index)
-        this.renderHook(node, stage)
+        this.renderHook(node, factory)
         this.leave()
         return false
     },
@@ -249,22 +164,9 @@ methods(Renderer, {
 
 // Any equality tests on either of these are inherently flaky.
 function checkReport(ret, report, sanitize) {
-    if (report._test == null) {
-        if (report.isEnter || report.isPass || report.isFail) {
-            assert.isNumber(report.duration)
-            assert.isNumber(report.slow)
-            if (sanitize) {
-                report.duration = 10
-                report.slow = 75
-            }
-        }
-    } else {
-        if (report.isEnter || report.isPass || report.isFail) {
-            assert.isNumber(report._duration)
-            if (sanitize) report._duration = 10
-        }
-
-        report = convert[report.type](report)
+    if (report.isEnter || report.isPass || report.isFail) {
+        assert.isNumber(report.duration)
+        if (sanitize) report._.duration = 10
     }
 
     ret.push(report)
@@ -276,12 +178,14 @@ function walk(tree, func) {
     var r = new Renderer()
 
     try {
-        r.push(Reports.start())
+        r.push(Reports.start(r.current))
         r.renderChildren(tree)
-        r.push(Reports.end())
+        r.push(Reports.end(r.current))
     } catch (e) {
         if (e !== r) throw e
     }
+
+    Reports.deref(r.current)
     return Util.peach(r.list, func)
 }
 
@@ -295,10 +199,12 @@ methods(Wrap, {
     get: function (index) {
         return this.raw[index]
     },
+
     push: function (report) {
         this.raw.push(report)
         checkReport(this.cooked, report, true)
     },
+
     check: function () {
         var tree = []
         var self = this
@@ -375,11 +281,9 @@ methods(Check, {
 
 exports.check = check
 function check(opts) {
-    var tt = Internal.root()
+    var tt = exports.silent()
 
     if (opts.expected == null) {
-        // Don't print anything.
-        tt.reporter = function () {}
         opts.init(tt, opts)
         return tt.run(opts.opts)
     }
@@ -419,11 +323,9 @@ exports.test = function (name, opts) {
 
 exports.checkTree = checkTree
 function checkTree(opts) {
-    var tt = Internal.root()
+    var tt = exports.silent()
 
     if (opts.expected == null) {
-        // Don't print anything.
-        tt.reporter = function () {}
         opts.init(tt, opts)
         return tt.runTree(opts.opts)
     }
@@ -466,11 +368,16 @@ function timed(type, name, opts) {
         throw new TypeError("`name` must be a string")
     }
 
-    return {
-        type: type, name: name,
-        duration: opts != null && opts.duration != null ? opts.duration : 10,
-        slow: opts != null && opts.slow != null
-            ? opts.slow : Constants.defaultSlow,
+    if (opts == null) {
+        return {type: type, name: name, duration: 10}
+    } else {
+        return {
+            type: type, name: name,
+            duration: opts.duration != null ? opts.duration : 10,
+            timeout: opts.timeout,
+            slow: opts.slow,
+            isFailable: opts.isFailable,
+        }
     }
 }
 
@@ -492,8 +399,7 @@ exports.pass = function (name, opts) {
 }
 
 exports.fail = function (name, error, opts) {
-    var type = opts != null && opts.isFailable ? Type.FailOpt : Type.Fail
-    var node = timed(type, name, opts)
+    var node = timed(Type.Fail, name, opts)
 
     node.error = error
     return node
@@ -520,10 +426,8 @@ exports.error = function (error) {
 }
 
 var SuiteStage = Object.freeze({
-    "before all": Type.SuiteBeforeAll,
-    "before each": Type.SuiteBeforeEach,
-    "after each": Type.SuiteAfterEach,
-    "after all": Type.SuiteAfterAll,
+    "before all": Type.BeforeAll,
+    "after all": Type.AfterAll,
 })
 
 exports.suiteHook = function (stage, func, error) {
@@ -539,10 +443,8 @@ exports.suiteHook = function (stage, func, error) {
 }
 
 var TestStage = Object.freeze({
-    "before all": Type.TestBeforeAll,
-    "before each": Type.TestBeforeEach,
-    "after each": Type.TestAfterEach,
-    "after all": Type.TestAfterAll,
+    "before each": Type.BeforeEach,
+    "after each": Type.AfterEach,
 })
 
 exports.testHook = function (name, stage, func, error) {
