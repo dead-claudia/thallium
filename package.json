@@ -41,7 +41,7 @@
     "watchify": "^3.7.0"
   },
   "dependencies": {
-    "clean-assert": "^1.1.1",
+    "clean-assert": "^2.0.0",
     "clean-assert-util": "^1.0.1",
     "clean-match": "^1.0.2",
     "diff": "^3.2.0",

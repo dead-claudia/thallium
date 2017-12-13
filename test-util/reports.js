@@ -104,10 +104,13 @@ var Render = [
 ]
 
 function Renderer() {
+    var tt = exports.silent()
+
+    exports.initReflect(tt)
     this.list = []
     this.hooks = []
     this.origins = []
-    this.current = Reports.data(exports.silent()._)
+    this.current = Reports.data(tt._)
 }
 
 methods(Renderer, {
