@@ -18,8 +18,6 @@
 
 var fs = require("fs")
 var path = require("path")
-var parse = require("./lib/cli/args").parse
-
 var hasOwn = Object.prototype.hasOwnProperty
 
 // NOTE: All updates to this method *must* be mirrored to the identically named
@@ -187,6 +185,7 @@ function forceRespawn(args) {
 }
 
 module.exports = function () {
+    var parse = require("./lib/cli/args").parse
     var args = parse(process.argv.slice(2))
 
     // If help is requested, print it now.

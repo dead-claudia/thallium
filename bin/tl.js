@@ -14,15 +14,14 @@ if (require.main !== module) {
 }
 
 var path = require("path")
-var Module = require("module")
 var init
 
 try {
     var baseDir = path.resolve(process.cwd())
-    var m = new Module(path.join(baseDir, "dummy.js"), undefined)
+    var m = new module.constructor(path.join(baseDir, "dummy.js"))
 
     m.filename = m.id
-    m.paths = Module._nodeModulePaths(baseDir)
+    m.paths = module.constructor._nodeModulePaths(baseDir)
     m.loaded = true
     init = m.require("thallium/cli.js")
 } catch (_) {

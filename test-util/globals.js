@@ -23,6 +23,9 @@ require("../lib/browser-bundle")
 
 /* eslint-disable global-require */
 global.Util = Object.freeze({
+    // In case I wish to wrap these - I need a safe reference to them.
+    get describe() { return global.describe },
+    get it() { return global.it },
     Reports: require("../lib/core/reports-tree"),
     DOM: require("./dom"),
     r: require("../r"),

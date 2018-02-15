@@ -12,20 +12,16 @@ describe("test-util/dom-mock", function () {
         return spy
     }
 
-    function wrap(func) {
-        return function () {
+    function it(desc, func) {
+        Util.it(desc, function () {
             return Util.DOM.init(func)
-        }
+        })
     }
 
-    function wrap2(func) {
-        return function () {
-            return Util.DOM.init(function (mock1) {
-                return Util.DOM.init(function (mock2) {
-                    return func(mock1, mock2)
-                })
-            })
-        }
+    function itN(n, desc, func) {
+        Util.it(desc, function () {
+            return Util.DOM.initN(n, func)
+        })
     }
 
     var globalWindow = Util.DOM.D.window
@@ -39,7 +35,7 @@ describe("test-util/dom-mock", function () {
         assert.equal(mock.h, h)
     })
 
-    it("enables element creation", wrap(function (mock) {
+    it("enables element creation", function (mock) {
         var elem = mock.document.createElement("div")
 
         assert.equal(elem.tagName, "DIV")
@@ -50,9 +46,9 @@ describe("test-util/dom-mock", function () {
         assert.equal(elem.previousSibling, null)
         assert.equal(elem.nextSibling, null)
         assert.notOk(mock.isLive(elem))
-    }))
+    })
 
-    it("allows tree building", wrap(function (mock) {
+    it("allows tree building", function (mock) {
         var document = mock.document
         var parent = document.createElement("div")
         var p = document.createElement("p")
@@ -95,9 +91,9 @@ describe("test-util/dom-mock", function () {
         assert.equal(li3.parentNode, ul)
         assert.equal(li3.previousSibling, li2)
         assert.equal(li3.nextSibling, null)
-    }))
+    })
 
-    it("allows removing the first child", wrap(function (mock) {
+    it("allows removing the first child", function (mock) {
         var document = mock.document
         var parent = document.createElement("div")
         var p = document.createElement("p")
@@ -130,17 +126,17 @@ describe("test-util/dom-mock", function () {
         assert.equal(a.parentNode, parent)
         assert.equal(a.previousSibling, null)
         assert.equal(a.nextSibling, ul)
-    }))
+    })
 
-    it("allows creating text nodes", wrap(function (mock) {
+    it("allows creating text nodes", function (mock) {
         var document = mock.document
         var node = document.createTextNode("node")
 
         assert.equal(node.textContent, "node")
         assert.notHasKey(node, "tagName")
-    }))
+    })
 
-    it("allows appending text nodes", wrap(function (mock) {
+    it("allows appending text nodes", function (mock) {
         var document = mock.document
         var parent = document.createElement("div")
         var node = document.createTextNode("node")
@@ -150,18 +146,18 @@ describe("test-util/dom-mock", function () {
         assert.equal(parent.firstChild, node)
         assert.equal(parent.lastChild, node)
         assert.equal(node.parentNode, parent)
-    }))
+    })
 
-    it("allows getting the text content of a node", wrap(function (mock) {
+    it("allows getting the text content of a node", function (mock) {
         var document = mock.document
         var parent = document.createElement("div")
 
         parent.appendChild(document.createTextNode("node"))
 
         assert.equal(parent.textContent, "node")
-    }))
+    })
 
-    it("allows setting the text content of a node", wrap(function (mock) {
+    it("allows setting the text content of a node", function (mock) {
         var document = mock.document
         var parent = document.createElement("div")
 
@@ -173,13 +169,13 @@ describe("test-util/dom-mock", function () {
         assert.equal(parent.lastChild.textContent, "node")
         assert.equal(parent.firstChild, parent.lastChild)
         assert.equal(parent.firstChild.parentNode, parent)
-    }))
+    })
 
-    it("has a text node shorthand", wrap(function (mock) {
+    it("has a text node shorthand", function (mock) {
         assert.match(mock.h.text("foo"), mock.document.createTextNode("foo"))
-    }))
+    })
 
-    it("allows a hyperscript-ish API", wrap(function (mock) {
+    it("allows a hyperscript-ish API", function (mock) {
         var h = mock.h
         var p, a, ul, li1, li2, li3, text
         var parent = h("div", [
@@ -220,9 +216,9 @@ describe("test-util/dom-mock", function () {
         assert.equal(li3.parentNode, ul)
         assert.equal(li3.previousSibling, li2)
         assert.equal(li3.nextSibling, null)
-    }))
+    })
 
-    it("makes everything live when attached to the body", wrap(function (mock) {
+    it("makes everything live when attached to the body", function (mock) {
         var h = mock.h
         var p, a, ul, li1, li2, li3, text1, text2
         var parent = h("div", [
@@ -247,9 +243,9 @@ describe("test-util/dom-mock", function () {
         assert.equal(mock.isLive(li1), true)
         assert.equal(mock.isLive(li2), true)
         assert.equal(mock.isLive(li3), true)
-    }))
+    })
 
-    it("makes nodes not live when removed from the body", wrap(function (mock) {
+    it("makes nodes not live when removed from the body", function (mock) {
         var h = mock.h
         var p, a, ul, li1, li2, li3, text1, text2
         var parent = h("div", [
@@ -275,9 +271,9 @@ describe("test-util/dom-mock", function () {
         assert.equal(mock.isLive(li1), false)
         assert.equal(mock.isLive(li2), false)
         assert.equal(mock.isLive(li3), false)
-    }))
+    })
 
-    it("walks the tree for textContent", wrap(function (mock) {
+    it("walks the tree for textContent", function (mock) {
         var h = mock.h
         var parent = h("div", [
             h("p", ["text one"]), " ",
@@ -293,9 +289,9 @@ describe("test-util/dom-mock", function () {
             parent.textContent,
             "text one text two text three text four text five"
         )
-    }))
+    })
 
-    it("searches the tree for ids", wrap(function (mock) {
+    it("searches the tree for ids", function (mock) {
         var h = mock.h
         var elem = h("div", {id: "foo"})
 
@@ -310,9 +306,9 @@ describe("test-util/dom-mock", function () {
         ]))
 
         assert.equal(mock.document.getElementById("foo"), elem)
-    }))
+    })
 
-    it("requests and resolves animation frames", wrap(function (mock) {
+    it("requests and resolves animation frames", function (mock) {
         var spy1 = spy()
         var spy2 = spy()
         var spy3 = spy()
@@ -337,9 +333,9 @@ describe("test-util/dom-mock", function () {
             assert.match(spy5.calls, [5])
             assert.match(spy6.calls, [6])
         })
-    }))
+    })
 
-    it("gets a list of elements by class name", wrap(function (mock) {
+    it("gets a list of elements by class name", function (mock) {
         var h = mock.h
         var elem1 = h("div.foo.bar.one")
         var elem2 = h("div.foo.bar.two")
@@ -360,9 +356,9 @@ describe("test-util/dom-mock", function () {
             1: elem2,
             2: elem3,
         })
-    }))
+    })
 
-    it("gets an empty list from non-existent class", wrap(function (mock) {
+    it("gets an empty list from non-existent class", function (mock) {
         var h = mock.h
         var elem1 = h("div.foo.bar.one")
         var elem2 = h("div.foo.bar.two")
@@ -378,9 +374,9 @@ describe("test-util/dom-mock", function () {
         ])
 
         assert.hasKeys(parent.getElementsByClassName("nope"), {length: 0})
-    }))
+    })
 
-    it("gets a list of elements by tag name", wrap(function (mock) {
+    it("gets a list of elements by tag name", function (mock) {
         var h = mock.h
         var elem1 = h("div.foo.bar.one")
         var elem2 = h("div.foo.bar.two")
@@ -401,9 +397,9 @@ describe("test-util/dom-mock", function () {
             1: elem2,
             2: elem3,
         })
-    }))
+    })
 
-    it("gets an empty list from non-existent tag", wrap(function (mock) {
+    it("gets an empty list from non-existent tag", function (mock) {
         var h = mock.h
         var elem1 = h("div.foo.bar.one")
         var elem2 = h("div.foo.bar.two")
@@ -419,73 +415,67 @@ describe("test-util/dom-mock", function () {
         ])
 
         assert.hasKeys(parent.getElementsByTagName("span"), {length: 0})
-    }))
+    })
 
-    it("gets the first element by querying class selector",
-        wrap(function (mock) {
-            var h = mock.h
-            var elem1 = h("div.foo.bar.one")
-            var elem2 = h("div.foo.bar.two")
-            var elem3 = h("div.foo.bar.three")
-            var parent = h("div", [
-                h("p", ["text one", elem1]),
-                h("a", [elem2, "text two"]),
-                h("ul", [
-                    h("li.one"),
-                    h("li.two", [elem3]),
-                    h("li.three"),
-                ]),
-            ])
+    it("gets the first element by querying class selector", function (mock) {
+        var h = mock.h
+        var elem1 = h("div.foo.bar.one")
+        var elem2 = h("div.foo.bar.two")
+        var elem3 = h("div.foo.bar.three")
+        var parent = h("div", [
+            h("p", ["text one", elem1]),
+            h("a", [elem2, "text two"]),
+            h("ul", [
+                h("li.one"),
+                h("li.two", [elem3]),
+                h("li.three"),
+            ]),
+        ])
 
-            assert.equal(parent.querySelector(".foo.bar"), elem1)
-        })
-    )
+        assert.equal(parent.querySelector(".foo.bar"), elem1)
+    })
 
-    it("gets `null` from querying a non-existent selector",
-        wrap(function (mock) {
-            var h = mock.h
-            var elem1 = h("div.foo.bar.one")
-            var elem2 = h("div.foo.bar.two")
-            var elem3 = h("div.foo.bar.three")
-            var parent = h("div", [
-                h("p", ["text one", elem1]),
-                h("a", [elem2, "text two"]),
-                h("ul", [
-                    h("li.one"),
-                    h("li.two", [elem3]),
-                    h("li.three"),
-                ]),
-            ])
+    it("gets `null` from querying a non-existent selector", function (mock) {
+        var h = mock.h
+        var elem1 = h("div.foo.bar.one")
+        var elem2 = h("div.foo.bar.two")
+        var elem3 = h("div.foo.bar.three")
+        var parent = h("div", [
+            h("p", ["text one", elem1]),
+            h("a", [elem2, "text two"]),
+            h("ul", [
+                h("li.one"),
+                h("li.two", [elem3]),
+                h("li.three"),
+            ]),
+        ])
 
-            assert.equal(parent.querySelector(".nope"), null)
-        })
-    )
+        assert.equal(parent.querySelector(".nope"), null)
+    })
 
-    it("has a functioning `head`", wrap(function (mock) {
+    it("has a functioning `head`", function (mock) {
         var title = mock.h("title", ["hello"])
 
         mock.document.head.appendChild(title)
         assert.equal(mock.document.head.firstChild, title)
         assert.equal(mock.document.head.lastChild, title)
-    }))
+    })
 
-    it("matches two identically constructed documents",
-        wrap2(function (mock1, mock2) {
-            mock1.document.head.appendChild(mock1.h("title", ["hello"]))
-            mock1.document.body.appendChild(mock1.h("div", [
-                "bye, ", mock1.h("em", ["and go away!"]),
-            ]))
+    itN(2, "matches two identically constructed documents", function (mocks) {
+        mocks[0].document.head.appendChild(mocks[0].h("title", ["hello"]))
+        mocks[0].document.body.appendChild(mocks[0].h("div", [
+            "bye, ", mocks[0].h("em", ["and go away!"]),
+        ]))
 
-            mock2.document.head.appendChild(mock2.h("title", ["hello"]))
-            mock2.document.body.appendChild(mock2.h("div", [
-                "bye, ", mock2.h("em", ["and go away!"]),
-            ]))
+        mocks[1].document.head.appendChild(mocks[1].h("title", ["hello"]))
+        mocks[1].document.body.appendChild(mocks[1].h("div", [
+            "bye, ", mocks[1].h("em", ["and go away!"]),
+        ]))
 
-            assert.match(mock1.document, mock2.document)
-        })
-    )
+        assert.match(mocks[0].document, mocks[1].document)
+    })
 
-    it("handles events correctly", wrap(function (mock) {
+    it("handles events correctly", function (mock) {
         var onclick = spy()
         var elem = mock.h("div", {onclick: onclick})
 
@@ -503,29 +493,29 @@ describe("test-util/dom-mock", function () {
 
         event.stopPropagation()
         assert.equal(event.propagationStopped, true)
-    }))
+    })
 
-    it("sets events correctly", wrap(function (mock) {
+    it("sets events correctly", function (mock) {
         function handler() {}
 
         assert.equal(mock.h("button", {onclick: handler}).onclick, handler)
         assert.equal(mock.h("button", {onclick: true}).onclick, true)
         assert.equal(mock.h("button", {onclick: false}).onclick, undefined)
-    }))
+    })
 
-    it("doesn't assign event handlers to the node", wrap(function (mock) {
+    it("doesn't assign event handlers to the node", function (mock) {
         assert.match(
             mock.h("button", {onclick: function () {}}),
             mock.h("button", {onclick: function () {}})
         )
-    }))
+    })
 
-    it("lets handlers be matched without matching functions", wrap(function (mock) { // eslint-disable-line max-len
+    it("lets handlers be matched without matching functions", function (mock) {
         assert.match(
             mock.h("button", {onclick: function () {}}),
             mock.h("button", {onclick: true})
         )
-    }))
+    })
 
     // FIXME: test `inspect` - it's causing silent failures in the DOM runner's
     // tests.

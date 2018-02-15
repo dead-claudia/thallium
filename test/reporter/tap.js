@@ -4,7 +4,6 @@
 describe("reporter/tap", function () { // eslint-disable-line max-statements
     "use strict"
 
-    // FIXME: Update to new report type
     var r = Util.report
 
     it("validates no arguments", function () {

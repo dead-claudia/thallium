@@ -23,10 +23,6 @@ var hasOwn = Object.prototype.hasOwnProperty
 
 var globalDocument = global.document
 var globalWindow = global.window
-var hooks = {
-    before: [],
-    after: [],
-}
 
 var readonlyDescriptor = {
     configurable: true,
@@ -155,8 +151,13 @@ function assignMissing(target, elem) {
 
 var handlers
 
-hooks.before.push(function () { handlers = Object.create(null) })
-hooks.after.push(function () { handlers = undefined })
+function initHandlers() {
+    handlers = Object.create(null)
+}
+
+function cleanupHandlers() {
+    handlers = undefined
+}
 
 // So they aren't directly referenced by their hosts (aids in equality).
 function setHandler(name, node, callback) {
@@ -580,38 +581,41 @@ methods(NativeInject, {
     },
 })
 
-function invokeList(list) {
-    for (var i = 0; i < list.length; i++) {
-        (0, list[i])()
-    }
+exports.init = function (func) {
+    return exports.initN(1, function (mocks) { return func(mocks[0]) })
 }
 
-exports.init = function (func) {
-    invokeList(hooks.before)
+exports.initN = function (n, func) {
+    initHandlers()
+    var mocks = []
+
+    for (var i = 0; i < n; i++) mocks.push(createMock(new MockInject()))
+
     return Util.pfinally(
-        Util.ptry(function () {
-            return func(createMock(new MockInject()))
-        }),
-        function () { invokeList(hooks.after) }
+        Promise.resolve(mocks).then(func),
+        cleanupHandlers
     )
+}
+
+function initGlobal(mock) {
+    D.document = mock.document
+    D.window = mock.window
+}
+
+function restoreGlobal() {
+    D.document = globalDocument
+    D.window = globalWindow
 }
 
 function inject(Inject, func) {
     return function () {
-        invokeList(hooks.before)
-        var mock = createMock(new Inject())
-
-        D.document = mock.document
-        D.window = mock.window
-
-        return Util.pfinally(
-            Util.ptry(function () { return func(mock.h, mock) }),
-            function () {
-                D.document = globalDocument
-                D.window = globalWindow
-                invokeList(hooks.after)
-            }
-        )
+        return exports.init(function (mock) {
+            initGlobal(mock)
+            return Util.pfinally(
+                Util.ptry(function () { return func(mock.h, mock) }),
+                restoreGlobal
+            )
+        })
     }
 }
 
