@@ -35,10 +35,11 @@ describe("core/slow (FLAKE)", /** @this */ function () {
     }
 
     function delay(ms) {
-        return {
-            then: function (resolve) {
-                Util.setTimeout(resolve, ms)
-            },
+        var end = Date.now() + ms
+
+        while (Date.now() !== end) {
+            // We have to control the block time ourselves so that the test
+            // isn't as likely to flake out on Travis.
         }
     }
 
@@ -51,7 +52,6 @@ describe("core/slow (FLAKE)", /** @this */ function () {
         },
         init: function (tt) {
             tt.test("test", function () {
-                // It's highly unlikely the engine will take this long to finish
                 tt.slow = 10
                 return resolve()
             })
@@ -72,9 +72,8 @@ describe("core/slow (FLAKE)", /** @this */ function () {
         },
         init: function (tt) {
             tt.test("test", function () {
-                // It's highly unlikely the engine will take this long to finish
                 tt.slow = 100
-                return delay(60)
+                delay(60)
             })
         },
         expected: function () {
@@ -94,8 +93,7 @@ describe("core/slow (FLAKE)", /** @this */ function () {
         init: function (tt) {
             tt.test("test", function () {
                 tt.slow = 50
-                // It's highly unlikely the engine will take this long to finish
-                return delay(200)
+                delay(200)
             })
         },
         expected: function () {
@@ -147,7 +145,7 @@ describe("core/slow (FLAKE)", /** @this */ function () {
         init: function (tt) {
             tt.test("test", function () {
                 tt.slow = 50
-                tt.test("inner", function () { return delay(200) })
+                tt.test("inner", function () { delay(200) })
             })
         },
         expected: function () {
