@@ -4,6 +4,7 @@ node_js:
   - "6"
   - "7"
   - "8"
+  - "9"
 
 os:
   - osx
@@ -37,29 +38,29 @@ matrix:
   fast_finish: true
   include:
     # Browser tests, uses current LTS
-    - node_js: "6"
+    - node_js: "8"
       env: ENV=chrome
       os: linux
       sudo: required
       dist: trusty
-    - node_js: "6"
+    - node_js: "8"
       env: ENV=firefox
       os: linux
       addons:
         firefox: latest
-    - node_js: "6"
+    - node_js: "8"
       env: ENV=firefox-beta
       os: linux
       addons:
         firefox: latest-beta
-    - node_js: "6"
+    - node_js: "8"
       env: ENV=firefox-esr
       os: linux
       addons:
         firefox: latest-esr
-    - node_js: "6"
+    - node_js: "8"
       env: ENV=phantomjs
       os: osx
-    - node_js: "6"
+    - node_js: "8"
       env: ENV=phantomjs
       os: linux
