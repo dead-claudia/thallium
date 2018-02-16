@@ -4,7 +4,7 @@
 
 Thallium is designed to be easy to get started with. But before we continue, there's two things you need to do:
 
-1. Ensure you have [Node.js and npm](https://nodejs.org/en/download/) installed.
+1. Ensure you have [Node.js and npm](https://nodejs.org/) installed. Also, when you install, ensure that it adds the relevant entries to your `$PATH` (or `%PATH%` in Windows).
 
 2. In a terminal (or Command Prompt if you're in Windows), run the following commands:
 
@@ -12,10 +12,31 @@ Thallium is designed to be easy to get started with. But before we continue, the
     # If you're in Windows, use forward slashes (`\`) for the path.
     cd path/to/your/project
 
-    # Install Thallium.
-    npm install --global thallium
-    npm install --save-dev thallium
+    npm install --global thallium   # Install Thallium's `tl` command globally
+    npm install --save-dev thallium # Install Thallium locally
     ```
+
+In the future, you may find yourself needing to upgrade Thallium. It's pretty simple, and if you encounter other packages, it's pretty similar.
+
+```sh
+npm update --global thallium    # To update your global `tl`.
+npm update --save-dev thallium  # To update your local Thallium.
+```
+
+If you prefer [Yarn](https://yarnpkg.com/) and feel left out, that's okay. You can use that instead. [Installation is similar](https://yarnpkg.com/docs/install), if you don't already have it set up, and of course, the commands are similar.
+
+```sh
+# If you're in Windows, use forward slashes (`\`) for the path.
+cd path/to/your/project
+
+# To install
+yarn global add thallium # Install Thallium's `tl` globally
+yarn add thallium        # Install Thallium locally
+
+# To update
+yarn global upgrade thallium # To update your global `tl`.
+yarn upgrade thallium        # To update your local module.
+```
 
 Also, make sure you're familiar with ES2015, because most of the examples use it. [Here's a blog post on CSS Tricks that covers some of the highlights](https://css-tricks.com/lets-learn-es2015/), and if you want to dive deeper, [there's plenty of other resources for you to check out](https://github.com/ericdouglas/ES6-Learning).
 
