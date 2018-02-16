@@ -30,4 +30,4 @@ try {
 
 // Note: This *must* be called after module load, so that errors thrown don't
 // result in running the same code twice.
-init()
+init(process.argv.slice(2))

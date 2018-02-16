@@ -1,6 +1,6 @@
 "use strict"
 
-/* eslint-env node */
+/* eslint-env commonjs */
 
 /**
  * Do watch the dependency chain here - this is called even before the process
@@ -16,8 +16,9 @@
 
 /* eslint-disable global-require, no-process-exit */
 
-var fs = require("fs")
 var path = require("path")
+var Util = require("./lib/cli/util.js")
+var Args = require("./lib/cli/args")
 var hasOwn = Object.prototype.hasOwnProperty
 
 // NOTE: All updates to this method *must* be mirrored to the identically named
@@ -75,10 +76,8 @@ function search(missing, dir) {
 
         try {
             return {
-                dirname: path.resolve(dir),
-                contents: fs.readFileSync(
-                    path.join(dir, ".tl.opts"),
-                    "utf-8"),
+                dirname: Util.resolve(dir),
+                contents: Util.read(path.join(dir, ".tl.opts")),
             }
         } catch (e) {
             if (!/^(ENOENT|ENOTDIR|EISDIR)$/.test(e.code)) throw e
@@ -97,11 +96,11 @@ function readOpts(args) {
     var files = args.files.length ? args.files : ["test/**"]
 
     if (args.opts != null) {
-        var file = path.resolve(args.opts)
+        var file = Util.resolve(args.opts)
 
         return {
             dirname: path.dirname(file),
-            contents: fs.readFileSync(file, "utf-8"),
+            contents: Util.read(file),
         }
     } else {
         for (var i = 0; i < files.length; i++) {
@@ -125,14 +124,11 @@ function readOpts(args) {
 // complains about a bad option and errors out.
 
 function respawn(args) {
-    var program = process.argv[0]
-    var filename = path.resolve(__dirname, "bin/tl.js")
-    var flags = args.unknown.concat([filename])
+    var flags = []
 
     if (args.color != null) flags.push(args.color ? "--color" : "--no-color")
     if (args.config != null) flags.push("--config", args.config)
     if (args.cwd != null) flags.push("--cwd", args.cwd)
-    if (args.respawnAs != null) program = args.respawnAs
 
     args.require.forEach(function (file) {
         flags.push("--require", file)
@@ -146,16 +142,10 @@ function respawn(args) {
 
     // If only there was a cross-platform way to replace the current process
     // like in Ruby...
-    require("child_process").spawn(program, flags, {
-        env: process.env,
-        stdio: "inherit",
-        shell: program !== process.argv[0],
-    })
-    .on("exit", function (code) { if (code != null) process.exit(code) })
-    .on("close", function (code) { if (code != null) process.exit(code) })
-    .on("error", function (e) {
-        console.error(e.stack)
-        process.exit(1)
+    Util.respawn({
+        program: args.respawnAs,
+        nodeOptions: args.unknown,
+        tlOptions: flags,
     })
 }
 
@@ -163,17 +153,17 @@ function execute(args) {
     // Uncomment to log all FS calls.
     // require("./scripts/log-fs")
     require("./lib/cli/run").run(args, require("./lib/cli/util"))
-    .then(process.exit, function (e) {
+    .then(Util.exit, function (e) {
         // Not all libraries provide a nice stack trace, and our warning error
         // is just a message.
-        console.error(e.stack || e.message)
-        process.exit(1)
+        Util.printError(e.stack || e.message)
+        Util.exit(1)
     })
 }
 
-function assign(dest, source) {
-    for (var key in source) {
-        if (hasOwn.call(source, key)) dest[key] = source[key]
+function setEnv(object) {
+    for (var key in object) {
+        if (hasOwn.call(object, key)) Util.setEnv(key, object[key])
     }
 }
 
@@ -184,61 +174,62 @@ function forceRespawn(args) {
     return false
 }
 
-module.exports = function () {
-    var parse = require("./lib/cli/args").parse
-    var args = parse(process.argv.slice(2))
+function parseArgs(args) {
+    try {
+        return Args.parse(args)
+    } catch (e) {
+        if (typeof e !== "string") throw e
+        Util.printError(e)
+        return Util.exit(1)
+    }
+}
+
+module.exports = function (argv) {
+    var args = parseArgs(argv)
 
     // If help is requested, print it now.
     if (args.help) {
-        var file = path.resolve(__dirname, "lib/cli/help-" + args.help + ".txt")
-        var contents = fs.readFileSync(file, "utf-8")
+        Util.printHelp(args.help)
+        Util.exit()
+        return // unreachable
+    }
 
-        // Pad the top by a line.
-        console.log()
-        console.log(process.platform === "win32"
-            ? contents.replace("\n", "\r\n")
-            : contents)
+    setEnv(args.env)
 
-        process.exit()
+    var data = readOpts(args)
+
+    if (data != null) {
+        var extra = parseArgs(splitOpts(data.contents))
+
+        // Note: this list must be kept up with `./args`, or things will
+        // likely break
+        if (extra.color != null && args.color == null) {
+            args.color = extra.color
+        }
+
+        if (extra.config != null && args.config == null) {
+            args.config = Util.resolve(data.dirname, extra.config)
+        }
+
+        if (extra.cwd != null && args.cwd == null) {
+            args.cwd = Util.resolve(data.dirname, extra.cwd)
+        }
+
+        extra.require.forEach(function (file) {
+            args.require.unshift(Util.resolve(data.dirname, file))
+        })
+
+        extra.unknown.forEach(function (file) {
+            args.unknown.unshift(Util.resolve(data.dirname, file))
+        })
+
+        if (extra.respawnAs != null) args.respawnAs = extra.respawnAs
+        setEnv(extra.env)
+    }
+
+    if (forceRespawn(args)) {
+        respawn(args)
     } else {
-        var data = readOpts(args)
-
-        if (data != null) {
-            var extra = parse(splitOpts(data.contents))
-
-            // Note: this list must be kept up with `./args`, or things will
-            // likely break
-            if (extra.color != null && args.color == null) {
-                args.color = extra.color
-            }
-
-            if (extra.config != null && args.config == null) {
-                args.config = path.resolve(data.dirname, extra.config)
-            }
-
-            if (extra.cwd != null && args.cwd == null) {
-                args.cwd = path.resolve(data.dirname, extra.cwd)
-            }
-
-            extra.require.forEach(function (file) {
-                args.require.unshift(path.resolve(data.dirname, file))
-            })
-
-            extra.unknown.forEach(function (file) {
-                args.unknown.unshift(path.resolve(data.dirname, file))
-            })
-
-            if (extra.respawnAs != null) args.respawnAs = extra.respawnAs
-            if (args.env == null) args.env = extra.env
-            else assign(args.env, extra.env)
-        }
-
-        assign(process.env, args.env)
-
-        if (forceRespawn(args)) {
-            respawn(args)
-        } else {
-            process.nextTick(execute, args)
-        }
+        Promise.resolve(args).then(execute)
     }
 }

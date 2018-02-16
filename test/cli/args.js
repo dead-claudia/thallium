@@ -81,12 +81,16 @@ describe("cli/args", function () {
             str = str.trim()
             var args = str ? str.split(/\s+/g) : []
 
+            function isString(x) {
+                return typeof x === "string"
+            }
+
             it("fails with missing argument for " + str, function () {
-                assert.throws(Object, function () { Args.parse(args) })
+                assert.throwsMatch(isString, function () { Args.parse(args) })
             })
 
             it("fails with missing argument for " + str + " --", function () {
-                assert.throws(Object, function () {
+                assert.throwsMatch(isString, function () {
                     Args.parse(args.concat(["--"]))
                 })
             })

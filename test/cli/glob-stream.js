@@ -2,153 +2,167 @@
 
 /* eslint max-nested-callbacks: [2, 5] */
 
-var Transform = require("stream").Transform
 var fixture = require("../../test-util/cli/cli").fixture
 var GS = require("../../lib/cli/glob-stream")
 
 describe("cli/glob-stream", function () {
-    describe("addStream()", function () {
-        it("throws error if stream is not readable", function () {
-            var stream = new GS.Through()
-            var list = [{readable: false}]
+    describe("merge()", function () {
+        function makeStream() {
+            var ref
 
-            assert.throws(function () {
-                GS.addStream(Object.create(null), stream, list, list[0])
+            function source(listener) {
+                ref = listener
+                return function () { ref = undefined }
+            }
+            ["send", "error", "warn", "end"].forEach(function (m) {
+                source[m] = function () {
+                    if (ref != null) ref[m].apply(ref, arguments)
+                }
             })
-        })
+
+            return source
+        }
 
         it("emits data from all streams", function (done) {
-            var s1 = new GS.Through()
-            var s2 = new GS.Through()
-            var s3 = new GS.Through()
-            var streams = [s1, s2, s3]
-            var combined = new GS.Through()
+            var s1 = makeStream()
+            var s2 = makeStream()
+            var s3 = makeStream()
             var results = []
 
-            streams.forEach(function (stream) {
-                GS.addStream(Object.create(null), combined, streams, stream)
+            GS.merge([s1, s2, s3], {
+                send: function (data) { results.push(data) },
+                error: function () {},
+                warn: function () {},
+                end: function () {
+                    assert.match(results, [
+                        "stream 1",
+                        "stream 2",
+                        "stream 3",
+                    ])
+                    done()
+                },
             })
 
-            combined.on("data", function (data) { results.push(data) })
-            combined.on("end", function () {
-                assert.match(results, [
-                    "stream 1",
-                    "stream 2",
-                    "stream 3",
-                ])
-                done()
-            })
-
-            s1.write("stream 1")
+            s1.send("stream 1")
             s1.end()
 
-            s2.write("stream 2")
+            s2.send("stream 2")
             s2.end()
 
-            s3.write("stream 3")
+            s3.send("stream 3")
             s3.end()
         })
 
         it("emits all data event from each stream", function (done) {
-            var s = new GS.Through()
-            var combined = new GS.Through()
+            var s1 = makeStream()
+            var s2 = makeStream()
             var results = []
 
-            GS.addStream(Object.create(null), combined, [s], s)
-
-            combined.on("data", function (data) { results.push(data) })
-
-            combined.on("end", function () {
-                assert.match(results, [
-                    "data1",
-                    "data2",
-                    "data3",
-                ])
-                done()
+            GS.merge([s1, s2], {
+                send: function (data) { results.push(data) },
+                error: function () {},
+                warn: function () {},
+                end: function () {
+                    assert.match(results, [
+                        "stream 1 data 1",
+                        "stream 1 data 2",
+                        "stream 1 data 3",
+                        "stream 2 data 1",
+                        "stream 2 data 2",
+                        "stream 2 data 3",
+                    ])
+                    done()
+                },
             })
 
-            s.write("data1")
-            s.write("data2")
-            s.write("data3")
-            s.end()
+            s1.send("stream 1 data 1")
+            s1.send("stream 1 data 2")
+            s1.send("stream 1 data 3")
+            s1.end()
+
+            s2.send("stream 2 data 1")
+            s2.send("stream 2 data 2")
+            s2.send("stream 2 data 3")
+            s2.end()
         })
 
         it("preserves streams order", function (done) {
-            function Delay(ms) {
-                Transform.call(this, {objectMode: true})
-                this.ms = ms
-            }
+            var s1 = makeStream()
+            var s2 = makeStream()
+            var s3 = makeStream()
+            var results = []
 
-            Util.methods(Delay, GS.Through, {
-                _transform: function (data, enc, callback) {
-                    var self = this
-
-                    Util.setTimeout(function () {
-                        self.push(data)
-                        return callback()
-                    }, this.ms)
+            GS.merge([s1, s2, s3], {
+                send: function (data) { results.push(data) },
+                error: function () {},
+                warn: function () {},
+                end: function () {
+                    assert.match(results, [
+                        "stream 1",
+                        "stream 2",
+                        "stream 3",
+                    ])
+                    done()
                 },
             })
 
-            var s1 = new Delay(200)
-            var s2 = new Delay(30)
-            var s3 = new Delay(100)
-            var streams = [s1, s2, s3]
-            var combined = new GS.Through()
-            var results = []
-
-            streams.forEach(function (stream) {
-                GS.addStream(Object.create(null), combined, streams, stream)
-            })
-
-            combined.on("data", function (data) { results.push(data) })
-            combined.on("end", function () {
-                assert.match(results, [
-                    "stream 1",
-                    "stream 2",
-                    "stream 3",
-                ])
-                done()
-            })
-
-            s1.write("stream 1")
-            s1.end()
-
-            s2.write("stream 2")
+            s2.send("stream 2")
+            s3.send("stream 3")
+            s1.send("stream 1")
             s2.end()
-
-            s3.write("stream 3")
             s3.end()
+            s1.end()
         })
 
         it("emits stream errors downstream", function (done) {
-            var s1 = new Transform({
-                transform: function (data, enc, callback) {
-                    this.emit("error", new Error("stop"))
-                    return callback()
-                },
-            })
-            var s2 = new GS.Through()
-
-            var error
+            var s1 = makeStream()
+            var s2 = makeStream()
             var streamData = []
-            var streams = [s1, s2]
-            var combined = new GS.Through()
 
-            GS.addStream(Object.create(null), combined, streams, s1)
-            GS.addStream(Object.create(null), combined, streams, s2)
-
-            combined.on("data", function (data) { streamData.push(data) })
-            combined.on("error", function (err) { error = err })
-            combined.on("end", function () {
-                assert.hasOwn(error, "message", "stop")
-                assert.match(streamData, ["okay"])
-                done()
+            GS.merge([s1, s2], {
+                send: function (data) { streamData.push(data) },
+                error: function (err) {
+                    try {
+                        assert.isObject(err)
+                        assert.hasOwn(err, "message", "stop")
+                        assert.match(streamData, ["okay"])
+                        return done()
+                    } catch (e) {
+                        return done(e)
+                    }
+                },
+                warn: function () { done(new Error("Expected no warnings")) },
+                end: function () { done(new Error("Expected an error")) },
             })
 
-            s1.write("go")
+            s1.send("okay")
+            s2.error(new Error("stop"))
             s1.end()
-            s2.write("okay")
+        })
+
+        it("doesn't emit buffered items after errors", function (done) {
+            var s1 = makeStream()
+            var s2 = makeStream()
+            var streamData = []
+
+            GS.merge([s1, s2], {
+                send: function (data) { streamData.push(data) },
+                error: function (err) {
+                    try {
+                        assert.isObject(err)
+                        assert.hasOwn(err, "message", "stop")
+                        assert.match(streamData, [])
+                        return done()
+                    } catch (e) {
+                        return done(e)
+                    }
+                },
+                warn: function () { done(new Error("Expected no warnings")) },
+                end: function () { done(new Error("Expected an error")) },
+            })
+
+            s2.send("okay")
+            s1.error(new Error("stop"))
             s2.end()
         })
     })
@@ -163,12 +177,14 @@ describe("cli/glob-stream", function () {
 
         function read(globs) {
             return new Promise(function (resolve, reject) {
-                var stream = GS.create(globs)
                 var list = []
 
-                stream.on("error", reject)
-                stream.on("data", function (file) { list.push(file) })
-                stream.on("end", function () { resolve(list) })
+                GS.create(globs, {
+                    send: function (file) { list.push(file) },
+                    warn: function () {},
+                    error: reject,
+                    end: function () { resolve(list) },
+                })
             })
         }
 
@@ -296,69 +312,113 @@ describe("cli/glob-stream", function () {
             })
         })
 
-        it("throws on invalid glob argument", function () {
-            assert.throws(function () {
-                GS.create([42])
-            })
+        function asyncIt(desc, init) {
+            it(desc, function (callback) {
+                var locked = false
 
-            assert.throws(function () {
-                GS.create([".", 42])
+                function wrap(func) {
+                    return function () {
+                        try {
+                            if (!locked) func.apply(undefined, arguments)
+                            return undefined
+                        } catch (e) {
+                            return done(e)
+                        }
+                    }
+                }
+
+                function done(e) {
+                    locked = true
+                    return callback(e)
+                }
+
+                return init({
+                    wrap: wrap,
+                    done: done,
+                    reject: function (e) {
+                        return wrap(function () { done(e) })
+                    },
+                    flag: function () {
+                        var cond = false
+
+                        return {
+                            set: wrap(function () { cond = true }),
+                            check: wrap(function () {
+                                assert.equal(cond, true)
+                            }),
+                            wrap: function (check) {
+                                return wrap(function () {
+                                    cond = true
+                                    check.apply(undefined, arguments)
+                                })
+                            },
+                            done: wrap(function () {
+                                assert.equal(cond, true)
+                                done()
+                            }),
+                        }
+                    },
+                })
+            })
+        }
+
+        asyncIt("warns on missing positive glob", function (_) {
+            var warned1 = _.flag()
+
+            GS.create(["!c"], {
+                send: _.reject(new Error("Expected no files")),
+                warn: warned1.wrap(assert.isString),
+                error: _.done,
+                end: _.wrap(function () {
+                    warned1.check()
+                    var warned2 = _.flag()
+
+                    GS.create(["!a", "!b"], {
+                        send: _.reject(new Error("Expected no files")),
+                        warn: warned2.wrap(assert.isString),
+                        error: _.done,
+                        end: warned2.done,
+                    })
+                }),
             })
         })
 
-        it("throws on missing positive glob", function () {
-            assert.notExists(GS.create(["!c"]))
-            assert.notExists(GS.create(["!a", "!b"]))
-        })
+        asyncIt("warns on singular glob when file not found", function (_) {
+            var warned = _.flag()
 
-        it("warns on singular glob when file not found", function (done) {
-            var stream = GS.create(["notfound"])
-            var warned = false
-
-            stream.on("data", function () {})
-            stream.on("warn", function (str) {
-                warned = true
-                assert.isString(str)
-            })
-            stream.on("error", done)
-            stream.on("end", function () {
-                done(warned ? null : new Error("A warning was expected"))
+            GS.create(["notfound"], {
+                send: _.reject(new Error("Expected no files")),
+                warn: warned.wrap(assert.isString),
+                error: _.done,
+                end: warned.done,
             })
         })
 
-        it("warns when multiple globs not found", function (done) {
-            var stream = GS.create([
+        asyncIt("warns when multiple single globs not found", function (_) {
+            var warned = _.flag()
+
+            GS.create([
                 "notfound",
                 fixture("glob-stream/stuff/foo.js"),
-            ])
-            var warned = false
-
-            stream.on("data", function () {})
-            stream.on("warn", function (str) {
-                warned = true
-                assert.isString(str)
-            })
-            stream.on("error", done)
-            stream.on("end", function () {
-                done(warned ? null : new Error("A warning was expected"))
+            ], {
+                send: _.reject(new Error("Expected no files")),
+                warn: warned.wrap(assert.isString),
+                error: _.done,
+                end: warned.done,
             })
         })
 
-        it("warns when one of many globs is not found", function (done) {
-            var stream = GS.create([
+        asyncIt("warns when missing single glob isn't alone", function (_) {
+            var warned = _.flag()
+
+            GS.create([
                 "notfound",
                 fixture("glob-stream/stuff/*.dmc"),
-            ])
-            var warned = false
-
-            stream.on("data", function () {})
-            stream.on("warn", function (str) {
-                warned = true
-                assert.isString(str)
-            })
-            stream.on("error", done)
-            stream.on("end", function () {
-                done(warned ? null : new Error("A warning was expected"))
+            ], {
+                send: function () {},
+                warn: warned.wrap(assert.isString),
+                error: _.done,
+                end: warned.done,
             })
         })
 
