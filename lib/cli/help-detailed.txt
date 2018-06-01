@@ -50,10 +50,6 @@ Options:
     Force-disable terminal colors for core reporters, so that even if the
     terminal does support colors, only raw Unicode is printed.
 
---no-color
-    Force-disable terminal colors for core reporters, so that even if the
-    terminal does support colors, only raw Unicode is printed.
-
 --env [key=value], -e [key=value]
     Set an environment variable, or omit `value` to unset it. This is useful for
     setting relevant environment variables without resorting to either ugly
