@@ -167,7 +167,7 @@ Note that I don't actually test the documentation's code, but please ensure it o
 
 - There is a class-ish `methods` ~~swiss army knife~~ helper [here](http://github.com/isiahmeadows/thallium/blob/master/lib/methods.js) which is used throughout. This is one of the main reasons why I don't really need ES6 beyond promises - it even handles inheritance and non-enumerability of methods. It's used to define the API, simplify the internal DSL for the core reporters, and decouple script loading in the CLI. The [report types](http://github.com/isiahmeadows/thallium/blob/master/lib/core/reports.js) are a good example on how this can be used, since it covers most ways you can use this. Don't overuse it, though, mainly because ESLint doesn't catch undefined properties, and object oriented code itself often drives up the boilerplate unnecessarily.
 
-- Lazy iteration of a list can be done by taking a callback and calling it when you're ready with a value. This is done in one of the functions in [the arguments parser](http://github.com/isiahmeadows/thallium/blob/master/lib/methods.js):
+- Lazy iteration of a list can be done by taking a callback and calling it when you're ready with a value:
 
     ```js
     /**
@@ -208,6 +208,6 @@ Note that I don't actually test the documentation's code, but please ensure it o
     }
     ```
 
-- If you're on Linux and have [`nvm`](https://github.com/creationix/nvm) installed, there's a little `scripts/test.sh` script in the root you can run, which will test everything Travis will on your local machine, installing versions that don't exist if necessary. Note that it doesn't actually update existing installations for you, though. It's not quite *that* magical, and I don't suspect you'd want that, either.
+- If you're on Linux and have [`nvm`](https://github.com/creationix/nvm) installed, there's a little `scripts/test.sh` script in the root you can run, which will test everything Travis will on your local machine, installing versions that don't exist if necessary. Note that it doesn't update existing installations for you, so if things need updated, that's on you to address. It's not quite *that* magical, and I don't suspect you'd want it overwriting your stuff, either.
 
 - For the tests, feel free to use the framework's own plugin and reporter system to your advantage to simplify your testing. They are very well tested, and if any of the assertions or plugin/reporter APIs break, you'll know it immediately. For example, I used [`t.reporter`](./docs/reporter-api.md) with `assert.match` to test the reporter output throughout the tests.
