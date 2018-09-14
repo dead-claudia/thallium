@@ -33,8 +33,8 @@ describe("core/reporters", function () { // eslint-disable-line max-statements
                 assert.equal(tt.hasReporter, false)
                 tt.reporter = _.push.bind(_)
                 assert.equal(tt.hasReporter, true)
-                tt.test("test 1", function () {})
-                tt.test("test 2", function () {})
+                tt.test("test 1", r.noop)
+                tt.test("test 2", r.noop)
                 return tt.runTree().then(_.check.bind(_))
             })
         })
@@ -47,7 +47,7 @@ describe("core/reporters", function () { // eslint-disable-line max-statements
                     })
 
                     assert.throws(function () {
-                        tt.reporter = function () {}
+                        tt.reporter = r.noop
                     })
                 })
             },
@@ -70,8 +70,8 @@ describe("core/reporters", function () { // eslint-disable-line max-statements
                 tt.reporter = push3
                 tt.reporter = push2
 
-                tt.test("test 1", function () {})
-                tt.test("test 2", function () {})
+                tt.test("test 1", r.noop)
+                tt.test("test 2", r.noop)
 
                 return tt.runTree()
                 .then(_1.check.bind(_1))
@@ -107,7 +107,7 @@ describe("core/reporters", function () { // eslint-disable-line max-statements
         })
 
         r.test("errors if added to children", {
-            reporter: function () {},
+            reporter: r.noop,
             init: function (tt, ctx) {
                 tt.reflect.addReporter(ctx.reporter)
                 hasReporter(tt, ctx.reporter)
@@ -139,7 +139,7 @@ describe("core/reporters", function () { // eslint-disable-line max-statements
         })
 
         r.test("errors if \"removed\" from children", {
-            reporter: function () {},
+            reporter: r.noop,
             init: function (tt, ctx) {
                 tt.reflect.addReporter(ctx.reporter)
 
@@ -149,7 +149,7 @@ describe("core/reporters", function () { // eslint-disable-line max-statements
                     })
 
                     assert.throws(function () {
-                        tt.reflect.removeReporter(function () {})
+                        tt.reflect.removeReporter(r.noop)
                     })
                 })
             },
@@ -168,11 +168,9 @@ describe("core/reporters", function () { // eslint-disable-line max-statements
             ]
 
             return wrap3(expected, expected, expected, function (_1, _2, _3) {
-                var tt = t.internal.root()
+                var tt = r.silent()
                 var push1, push3
 
-                // Silence it
-                tt.reporter = function () {}
                 tt.reflect.addReporter(push1 = _1.push.bind(_1))
                 tt.reflect.addReporter(_2.push.bind(_2))
                 tt.reflect.addReporter(push3 = _3.push.bind(_3))
@@ -180,8 +178,8 @@ describe("core/reporters", function () { // eslint-disable-line max-statements
                 tt.reflect.addReporter(push3)
                 tt.reflect.addReporter(push1)
 
-                tt.test("test 1", function () {})
-                tt.test("test 2", function () {})
+                tt.test("test 1", r.noop)
+                tt.test("test 2", r.noop)
                 return tt.runTree()
                 .then(_1.check.bind(_1))
                 .then(_2.check.bind(_2))
@@ -192,8 +190,8 @@ describe("core/reporters", function () { // eslint-disable-line max-statements
 
     r.test("called correctly with sync passing", {
         init: function (tt) {
-            tt.test("test", function () {})
-            tt.test("test", function () {})
+            tt.test("test", r.noop)
+            tt.test("test", r.noop)
         },
         expected: [
             r.pass("test"),
@@ -215,7 +213,7 @@ describe("core/reporters", function () { // eslint-disable-line max-statements
     r.test("called correctly with sync both", {
         init: function (tt) {
             tt.test("one", function () { throw new Error("sentinel") })
-            tt.test("two", function () {})
+            tt.test("two", r.noop)
         },
         expected: [
             r.fail("one", new Error("sentinel")),
@@ -225,8 +223,8 @@ describe("core/reporters", function () { // eslint-disable-line max-statements
 
     r.test("called correctly with inline passing", {
         init: function (tt) {
-            tt.test("test", function () {})
-            tt.test("test", function () {})
+            tt.test("test", r.noop)
+            tt.test("test", r.noop)
         },
         expected: [
             r.pass("test"),
@@ -250,7 +248,7 @@ describe("core/reporters", function () { // eslint-disable-line max-statements
         it: Util.phantomFix(it),
         init: function (tt) {
             tt.test("one", function () { assert.fail("fail") })
-            tt.test("two", function () {})
+            tt.test("two", r.noop)
         },
         expected: [
             r.fail("one", new assert.AssertionError("fail")),
@@ -261,7 +259,7 @@ describe("core/reporters", function () { // eslint-disable-line max-statements
     r.test("called correctly with async passing", {
         init: function (tt) {
             tt.test("test", function () { return resolve() })
-            tt.test("test", function () {})
+            tt.test("test", r.noop)
         },
         expected: [
             r.pass("test"),
@@ -294,7 +292,7 @@ describe("core/reporters", function () { // eslint-disable-line max-statements
     r.test("called correctly with async + promise passing", {
         init: function (tt) {
             tt.test("test", function () { return resolve() })
-            tt.test("test", function () {})
+            tt.test("test", r.noop)
         },
         expected: [
             r.pass("test"),
@@ -327,8 +325,8 @@ describe("core/reporters", function () { // eslint-disable-line max-statements
     r.test("called correctly with child passing tests", {
         init: function (tt) {
             tt.test("test", function () {
-                tt.test("one", function () {})
-                tt.test("two", function () {})
+                tt.test("one", r.noop)
+                tt.test("two", r.noop)
             })
         },
         expected: [
@@ -377,14 +375,14 @@ describe("core/reporters", function () { // eslint-disable-line max-statements
                 tt.test("child one", function () {
                     throw new Error("sentinel one")
                 })
-                tt.test("child two", function () {})
+                tt.test("child two", r.noop)
             })
 
             tt.test("parent two", function () {
                 tt.test("child one", function () {
                     throw new Error("sentinel two")
                 })
-                tt.test("child two", function () {})
+                tt.test("child two", r.noop)
             })
         },
         expected: [
@@ -489,8 +487,8 @@ describe("core/reporters", function () { // eslint-disable-line max-statements
                 }
             }
 
-            tt.test("test", function () {})
-            tt.test("test", function () {})
+            tt.test("test", r.noop)
+            tt.test("test", r.noop)
 
             return tt.runTree().then(_.check.bind(_))
         })
@@ -504,8 +502,8 @@ describe("core/reporters", function () { // eslint-disable-line max-statements
             return {then: function (_, reject) { return reject(sentinel) }}
         }
 
-        tt.test("test", function () {})
-        tt.test("test", function () {})
+        tt.test("test", r.noop)
+        tt.test("test", r.noop)
 
         return tt.runTree().then(
             function () { assert.fail("Expected a rejection") },
@@ -621,7 +619,7 @@ describe("core/reporters", function () { // eslint-disable-line max-statements
     r.test("reports global `before all` failures", {
         init: function (tt) {
             tt.beforeAll(hookFail)
-            tt.test("foo", function () {})
+            tt.test("foo", r.noop)
         },
         expected: [
             r.origin(hookFail),
@@ -632,7 +630,7 @@ describe("core/reporters", function () { // eslint-disable-line max-statements
     r.test("reports global `before each` failures", {
         init: function (tt) {
             tt.before(hookFail)
-            tt.test("foo", function () {})
+            tt.test("foo", r.noop)
         },
         expected: [
             r.origin(hookFail),
@@ -643,7 +641,7 @@ describe("core/reporters", function () { // eslint-disable-line max-statements
     r.test("reports global `after each` failures", {
         init: function (tt) {
             tt.after(hookFail)
-            tt.test("foo", function () {})
+            tt.test("foo", r.noop)
         },
         expected: [
             r.origin(hookFail),
@@ -655,7 +653,7 @@ describe("core/reporters", function () { // eslint-disable-line max-statements
     r.test("reports global `after all` failures", {
         init: function (tt) {
             tt.afterAll(hookFail)
-            tt.test("foo", function () {})
+            tt.test("foo", r.noop)
         },
         expected: [
             r.origin(hookFail),
@@ -668,7 +666,7 @@ describe("core/reporters", function () { // eslint-disable-line max-statements
         init: function (tt) {
             tt.test("foo", function () {
                 tt.beforeAll(hookFail)
-                tt.test("inner", function () {})
+                tt.test("inner", r.noop)
             })
         },
         expected: [
@@ -683,7 +681,7 @@ describe("core/reporters", function () { // eslint-disable-line max-statements
         init: function (tt) {
             tt.test("foo", function () {
                 tt.before(hookFail)
-                tt.test("inner", function () {})
+                tt.test("inner", r.noop)
             })
         },
         expected: [
@@ -699,7 +697,7 @@ describe("core/reporters", function () { // eslint-disable-line max-statements
         init: function (tt) {
             tt.test("foo", function () {
                 tt.after(hookFail)
-                tt.test("inner", function () {})
+                tt.test("inner", r.noop)
             })
         },
         expected: [
@@ -716,7 +714,7 @@ describe("core/reporters", function () { // eslint-disable-line max-statements
         init: function (tt) {
             tt.test("foo", function () {
                 tt.afterAll(hookFail)
-                tt.test("inner", function () {})
+                tt.test("inner", r.noop)
             })
         },
         expected: [

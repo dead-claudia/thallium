@@ -37,7 +37,7 @@ describe("reporter/tap", function () { // eslint-disable-line max-statements
                     acc = lines.pop()
                     list.push.apply(list, lines)
                 },
-                reset: function () {},
+                reset: r.noop,
             })
 
             if (opts.repeat) opts.output = opts.output.concat(opts.output)

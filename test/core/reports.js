@@ -4,18 +4,17 @@
  * The report objects are very non-trivial, and so is the logic for detecting
  * them. This simultaneously tests both are correct and work.
  */
-describe("core/reports", function () {
+describe.only("core/reports", function () {
     "use strict"
 
     var r = Util.report
     var R = Util.Reports
 
-    function create() {
-        var tt = t.internal.root()
+    function create(tt, parent) {
+        var child = R.data(tt.reflect.current._, parent)
 
-        // Silence it.
-        tt.reporter = function () {}
-        return tt
+        R.deref(child)
+        return child
     }
 
     function check(report, opts) {
@@ -36,22 +35,21 @@ describe("core/reports", function () {
             opts.type === "before all" || opts.type === "before each" ||
             opts.type === "after each" || opts.type === "after all"
         )
-        assert.equal(report.parent, opts.parent)
+        assert.equal(report.test, opts.test)
+        assert.equal(report.test, opts.test) // check identity
+        assert.equal(report.test.parent, opts.parent)
         assert.equal(report.duration, opts.duration || 0)
-        assert.equal(report.origin, opts.origin || report)
+        assert.equal(report.origin, opts.origin || opts.test)
         assert.equal(report.error, opts.error)
-        assert.equal(report.hookName, opts.hookName)
-        assert.equal(report.name, opts.name)
-        assert.equal(report.index, opts.index)
-        assert.equal(report.slow, opts.slow || 75)
-        assert.equal(report.timeout, opts.timeout || 2000)
-        assert.equal(report.isFailable, !!opts.isFailable)
-        assert.equal(report.fullName, opts.fullName)
+        assert.equal(report.name, opts.hookName)
+        assert.equal(report.test.name, opts.name)
+        assert.equal(report.test.index, opts.index)
+        assert.equal(report.test.slow, opts.slow || 75)
+        assert.equal(report.test.timeout, opts.timeout || 2000)
+        assert.equal(report.test.isFailable, !!opts.isFailable)
+        assert.equal(report.test.fullName, opts.fullName)
         if (opts.path != null) {
-            assert.match(
-                report.path.map(function (p) { return p.inspect() }),
-                opts.path
-            )
+            assert.match(report.test.path, opts.path)
         }
     }
 
@@ -63,13 +61,14 @@ describe("core/reports", function () {
 
     test("root", {
         init: function (_) {
-            var tt = create()
+            var tt = r.silent()
+            var root = create(tt)
 
-            _.push(R.start(tt._))
-            _.push(R.end(tt._))
+            _.push(R.start(root))
+            _.push(R.end(root))
             return _.check().then(function () {
-                check(_.get(0), {type: "start", path: []})
-                check(_.get(1), {type: "end", path: []})
+                check(_.get(0), {type: "start", test: root, path: []})
+                check(_.get(1), {type: "end", test: root, path: []})
             })
         },
         expected: [],
@@ -77,32 +76,35 @@ describe("core/reports", function () {
 
     test("test pass", {
         init: function (_) {
-            var tt = create()
-            var root = R.start(tt._)
+            var tt = r.silent()
+            var root = create(tt)
+            var child
 
-            _.push(root)
+            _.push(R.start(root))
 
             tt.test("test", function () {
-                _.push(R.pass(tt.reflect.current._, root, 10))
+                child = create(tt, root)
+                _.push(R.pass(child, 10))
             })
 
             return tt.runTree()
             .then(function () {
-                _.push(R.end(tt._))
+                _.push(R.end(root))
                 return _.check()
             })
             .then(function () {
-                check(_.get(0), {type: "start", path: []})
+                check(_.get(0), {type: "start", test: root, path: []})
                 check(_.get(1), {
                     type: "pass",
+                    test: child,
                     parent: root,
                     name: "test",
                     index: 0,
                     duration: 10,
                     fullName: "test",
-                    path: [{name: "test", index: 0}],
+                    path: [child],
                 })
-                check(_.get(2), {type: "end", path: []})
+                check(_.get(2), {type: "end", test: root, path: []})
             })
         },
         expected: [
@@ -111,37 +113,39 @@ describe("core/reports", function () {
     })
 
     test("test fail", {
+        it: it.skip,
         init: function (_) {
-            var tt = create()
-            var root = R.start(tt._)
+            var tt = r.silent()
+            var root = create(tt)
             var error = new Error("fail")
+            var child
 
-            _.push(root)
+            _.push(R.start(root))
 
             tt.test("test", function () {
-                var child = tt.reflect.current
-
-                _.push(R.fail(child._, root, 10, error))
+                child = create(tt, root)
+                _.push(R.fail(child, 10, error))
             })
 
             return tt.runTree()
             .then(function () {
-                _.push(R.end(tt._))
+                _.push(R.end(root))
                 return _.check()
             })
             .then(function () {
-                check(_.get(0), {type: "start", path: []})
+                check(_.get(0), {type: "start", test: root, path: []})
                 check(_.get(1), {
                     type: "fail",
                     parent: root,
+                    test: child,
                     name: "test",
                     index: 0,
                     error: error,
                     duration: 10,
                     fullName: "test",
-                    path: [{name: "test", index: 0}],
+                    path: [child],
                 })
-                check(_.get(2), {type: "end", path: []})
+                check(_.get(2), {type: "end", test: root, path: []})
             })
         },
         expected: [
@@ -150,32 +154,36 @@ describe("core/reports", function () {
     })
 
     test("test skip", {
+        it: it.skip,
         init: function (_) {
-            var tt = create()
-            var root = R.start(tt._)
+            var tt = r.silent()
+            var root = create(tt)
+            var child
 
-            _.push(root)
+            _.push(R.start(root))
 
             tt.test("test", function () {
-                _.push(R.skip(tt.reflect.current._, root))
+                child = create(tt, root)
+                _.push(R.skip(child))
             })
 
             return tt.runTree()
             .then(function () {
-                _.push(R.end(tt._))
+                _.push(R.end(root))
                 return _.check()
             })
             .then(function () {
-                check(_.get(0), {type: "start", path: []})
+                check(_.get(0), {type: "start", test: root, path: []})
                 check(_.get(1), {
                     type: "skip",
                     parent: root,
+                    test: child,
                     name: "test",
                     index: 0,
                     fullName: "test",
-                    path: [{name: "test", index: 0}],
+                    path: [child],
                 })
-                check(_.get(2), {type: "end", path: []})
+                check(_.get(2), {type: "end", test: root, path: []})
             })
         },
         expected: [
@@ -184,42 +192,47 @@ describe("core/reports", function () {
     })
 
     test("test enter/leave", {
+        it: it.skip,
         init: function (_) {
-            var tt = create()
-            var root = R.start(tt._)
+            var tt = r.silent()
+            var root = create(tt)
+            var child
 
-            _.push(root)
+            _.push(R.start(root))
 
             tt.test("test", function () {
-                _.push(R.enter(tt.reflect.current._, root, 10))
-                _.push(R.leave(tt.reflect.current._, root))
+                child = create(tt, root)
+                _.push(R.enter(child, 10))
+                _.push(R.leave(child))
             })
 
             return tt.runTree()
             .then(function () {
-                _.push(R.end(tt._))
+                _.push(R.end(root))
                 return _.check()
             })
             .then(function () {
-                check(_.get(0), {type: "start", path: []})
+                check(_.get(0), {type: "start", test: root, path: []})
                 check(_.get(1), {
                     type: "enter",
                     parent: root,
+                    test: child,
                     name: "test",
                     index: 0,
                     duration: 10,
                     fullName: "test",
-                    path: [{name: "test", index: 0}],
+                    path: [child],
                 })
                 check(_.get(2), {
                     type: "leave",
                     parent: root,
+                    test: child,
                     name: "test",
                     index: 0,
                     fullName: "test",
-                    path: [{name: "test", index: 0}],
+                    path: [child],
                 })
-                check(_.get(3), {type: "end", path: []})
+                check(_.get(3), {type: "end", test: root, path: []})
             })
         },
         expected: [
@@ -228,16 +241,17 @@ describe("core/reports", function () {
     })
 
     test("root error", {
+        it: it.skip,
         init: function (_) {
-            var tt = create()
-            var root = R.start(tt._)
+            var tt = r.silent()
+            var root = create(tt)
             var error = new Error("fail")
 
-            _.push(root)
-            _.push(R.error(root, error))
+            _.push(R.start(root))
+            _.push(R.error(error))
 
             return _.check().then(function () {
-                check(_.get(0), {type: "start", path: []})
+                check(_.get(0), {type: "start", test: root, path: []})
                 check(_.get(1), {type: "error", error: error, path: []})
             })
         },
@@ -249,8 +263,9 @@ describe("core/reports", function () {
     function hookFail() {}
 
     test("root before all fail", {
+        it: it.skip,
         init: function (_) {
-            var tt = create()
+            var tt = r.silent()
             var root = R.start(tt._)
             var error = new Error("fail")
 
@@ -278,8 +293,9 @@ describe("core/reports", function () {
     })
 
     test("root before each fail", {
+        it: it.skip,
         init: function (_) {
-            var tt = create()
+            var tt = r.silent()
             var root = R.start(tt._)
             var error = new Error("fail")
 
@@ -317,8 +333,9 @@ describe("core/reports", function () {
     })
 
     test("root after each fail", {
+        it: it.skip,
         init: function (_) {
-            var tt = create()
+            var tt = r.silent()
             var root = R.start(tt._)
             var error = new Error("fail")
 
@@ -365,8 +382,9 @@ describe("core/reports", function () {
     })
 
     test("root after all fail", {
+        it: it.skip,
         init: function (_) {
-            var tt = create()
+            var tt = r.silent()
             var root = R.start(tt._)
             var error = new Error("fail")
 
@@ -393,8 +411,9 @@ describe("core/reports", function () {
     })
 
     test("inner test pass", {
+        it: it.skip,
         init: function (_) {
-            var tt = create()
+            var tt = r.silent()
             var root = R.start(tt._)
             var test
 
@@ -454,8 +473,9 @@ describe("core/reports", function () {
     })
 
     test("inner test fail", {
+        it: it.skip,
         init: function (_) {
-            var tt = create()
+            var tt = r.silent()
             var root = R.start(tt._)
             var error = new Error("fail")
             var test
@@ -517,8 +537,9 @@ describe("core/reports", function () {
     })
 
     test("inner test skip", {
+        it: it.skip,
         init: function (_) {
-            var tt = create()
+            var tt = r.silent()
             var root = R.start(tt._)
             var test
 
@@ -577,8 +598,9 @@ describe("core/reports", function () {
     })
 
     test("inner test enter/leave", {
+        it: it.skip,
         init: function (_) {
-            var tt = create()
+            var tt = r.silent()
             var root = R.start(tt._)
             var test
 
@@ -646,8 +668,9 @@ describe("core/reports", function () {
     })
 
     test("inner test error", {
+        it: it.skip,
         init: function (_) {
-            var tt = create()
+            var tt = r.silent()
             var root = R.start(tt._)
             var error = new Error("fail")
             var test
@@ -687,8 +710,9 @@ describe("core/reports", function () {
     })
 
     test("inner test before all fail", {
+        it: it.skip,
         init: function (_) {
-            var tt = create()
+            var tt = r.silent()
             var root = R.start(tt._)
             var error = new Error("fail")
             var test
@@ -747,8 +771,9 @@ describe("core/reports", function () {
     })
 
     test("inner test before each fail", {
+        it: it.skip,
         init: function (_) {
-            var tt = create()
+            var tt = r.silent()
             var root = R.start(tt._)
             var error = new Error("fail")
             var test
@@ -810,8 +835,9 @@ describe("core/reports", function () {
     })
 
     test("inner test after each fail", {
+        it: it.skip,
         init: function (_) {
-            var tt = create()
+            var tt = r.silent()
             var root = R.start(tt._)
             var error = new Error("fail")
             var test
@@ -882,8 +908,9 @@ describe("core/reports", function () {
     })
 
     test("inner test after all fail", {
+        it: it.skip,
         init: function (_) {
-            var tt = create()
+            var tt = r.silent()
             var root = R.start(tt._)
             var error = new Error("fail")
             var test
